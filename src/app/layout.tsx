@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cloze AI — You're Paying for 1,000 Leads. Your Team Is Working 200.",
+  title: "Cloze AI — Stop Losing Jobs to Whoever Answers First",
   description:
-    "Cloze AI responds to every lead in under 60 seconds, qualifies against your ICP, and books meetings with your reps — so no lead dies in your CRM. Used by revenue teams at $10M–$500M ARR companies.",
+    "Cloze AI responds to every new lead in under 60 seconds, qualifies the serious buyers, and books appointments to your calendar — while you're busy running your business.",
   openGraph: {
-    title: "Cloze AI — You're Paying for 1,000 Leads. Your Team Is Working 200.",
+    title: "Cloze AI — Stop Losing Jobs to Whoever Answers First",
     description:
-      "The average revenue team properly works less than 30% of their inbound leads. Cloze AI works all of them — instantly, persistently, and at scale.",
+      "78% of customers hire whoever responds first. Cloze AI makes sure that's always you — responding instantly, following up persistently, and booking appointments automatically.",
     type: "website",
   },
 };

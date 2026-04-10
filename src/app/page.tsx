@@ -6,38 +6,38 @@ import { useState } from "react";
 const BOOKING_LINK = "https://calendar.app.google/2gWrMB5YQRr2Z9mP7";
 
 const TICKER_ITEMS = [
-  "78% of deals go to the first vendor to respond",
-  "The average company takes 47 hours to respond to a new lead",
-  "Your SDR team is working less than 30% of your leads",
-  "Cloze responds to every lead in under 60 seconds",
-  "80% of leads in the average CRM were never properly followed up",
-  "Companies that respond in 5 min are 100× more likely to qualify the lead",
-  "Integrates with Salesforce, HubSpot, and 200+ CRMs",
-  "SOC 2 Type II certified — enterprise-ready",
-  "Used by revenue teams generating $10M–$500M ARR",
-  "Book a 15-min call — see it live",
+  "78% of customers hire whoever responds first",
+  "The average small business takes 2+ days to follow up on a new lead",
+  "Responds to every inquiry in under 60 seconds",
+  "Works while you're out on a job",
+  "No more chasing leads who've gone cold",
+  "Books appointments to your calendar 24/7",
+  "Works with your website, Google, Facebook & more",
+  "Small businesses close 3.2× more jobs on average",
+  "Used by 1,200+ contractors and small business owners",
+  "Book a free 15-min call — no pressure",
 ];
 
 const RESULTS = [
   {
-    value: "47 hrs",
-    label: "Average enterprise speed-to-lead",
-    sub: "Cloze cuts it to under 60 seconds",
+    value: "$48K",
+    label: "Avg. recovered revenue in first 30 days",
+    sub: "Per business, based on Q1 2026 cohort",
   },
   {
-    value: "< 30%",
-    label: "Of leads your SDR team actually works",
-    sub: "The rest die in your CRM",
+    value: "< 60s",
+    label: "Response time to every new lead",
+    sub: "Day or night, weekday or weekend",
   },
   {
-    value: "78%",
-    label: "Of deals go to the first vendor to respond",
+    value: "3 in 4",
+    label: "Customers hire the first business to respond",
     sub: "InsideSales.com, 2024",
   },
   {
-    value: "3.8×",
-    label: "Average pipeline lift within 90 days",
-    sub: "From the same lead volume and ad spend",
+    value: "61%",
+    label: "Average close rate after using Cloze",
+    sub: "Up from a 24% industry average",
   },
 ];
 
@@ -45,11 +45,11 @@ const PAIN_POINTS = [
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
       </svg>
     ),
-    pain: "Your SDRs cherry-pick",
-    cost: "They work the obvious hot leads and let the rest go cold. You're paying full salary for 30% utilization.",
+    pain: "You miss calls while you're working",
+    cost: "That missed call is a $15–40K job that went straight to your competitor.",
   },
   {
     icon: (
@@ -57,109 +57,109 @@ const PAIN_POINTS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    pain: "Speed-to-lead is your silent killer",
-    cost: "Every hour you take to respond, your conversion probability drops by 10×. Most teams respond in days.",
+    pain: "Leads go cold before you follow up",
+    cost: "You're juggling too much. By the time you call back, they've already hired someone else.",
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     ),
-    pain: "Follow-up falls off a cliff",
-    cost: "80% of deals need 5+ touches. Your team gives up after 2. The persistent competitor wins.",
+    pain: "You waste time on tire-kickers",
+    cost: "Half your estimates go nowhere. That's hours of your week on people who were never going to buy.",
   },
   {
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
       </svg>
     ),
-    pain: "Your CRM is a graveyard",
-    cost: "Thousands of leads that were never properly worked. Real pipeline sitting there, rotting. You paid to generate all of it.",
+    pain: "Nobody answers after hours",
+    cost: "40% of inquiries come in evenings and weekends. That's when your best leads are shopping.",
   },
 ];
 
 const FEATURES = [
   {
     number: "01",
-    title: "Responds to Every Lead in Under 60 Seconds. At Any Volume.",
+    title: "Responds to Every Lead in Under 60 Seconds. Every Time.",
     description:
-      "The moment a lead enters your pipeline — from any source — Cloze reaches out. Not in an hour. Not tomorrow morning when your SDR logs in. In under 60 seconds. At 2,000 leads a month or 20,000. The response time doesn't change.",
-    highlight: "< 60 second response, every lead",
-    tag: "Speed to Lead",
+      "The moment someone fills out your website form, clicks your Google ad, or messages you on Facebook — Cloze responds. Not in an hour. Not the next morning. In under 60 seconds. You can be elbow-deep in a job. Doesn't matter.",
+    highlight: "< 60 second response time",
+    tag: "Never Miss a Lead",
   },
   {
     number: "02",
-    title: "Qualifies by Your Criteria. Routes to the Right Rep.",
+    title: "Filters the Serious Buyers From the Time-Wasters.",
     description:
-      "Cloze qualifies leads against your actual ICP — company size, budget, timeline, use case, intent signals. It doesn't guess. It asks. Then it routes the qualified conversation to the right rep with full context, so they're walking into a warm conversation, not a cold call.",
-    highlight: "Custom ICP qualification logic",
-    tag: "Smart Qualification",
+      "Cloze asks the questions you'd ask — What's the project? What's your timeline? Do you have a budget in mind? It spots the people who are just fishing for free quotes before you burn time on a bad lead or a wasted site visit.",
+    highlight: "89% qualification accuracy",
+    tag: "Stop Wasting Time",
   },
   {
     number: "03",
-    title: "Runs Every Follow-Up Sequence. Automatically.",
+    title: "Follows Up Until They're Ready — So You Don't Have To.",
     description:
-      "The average deal closes after 8 touchpoints. The average SDR gives up after 2. Cloze runs persistent, personalized multi-touch sequences across email and SMS — adjusting based on behavior, engagement, and stage — until the lead converts or opts out.",
-    highlight: "Up to 12-touch sequences",
-    tag: "Full-Funnel Follow-Up",
+      "Most people don't say yes on day one. Life gets in the way. Cloze follows up over text and email for weeks — professionally and persistently — so when they're ready to move forward, you're the one they call back.",
+    highlight: "12-touch follow-up sequences",
+    tag: "Win the Long Game",
   },
   {
     number: "04",
-    title: "Books Qualified Meetings Directly to Your Reps' Calendars.",
+    title: "Books Appointments Straight to Your Calendar.",
     description:
-      "Cloze doesn't just qualify — it closes the scheduling loop. Qualified prospects get a meeting booked with the right rep, at the right time, with the full conversation history attached. Your reps show up to conversations that are already warm.",
-    highlight: "Automated calendar booking",
-    tag: "Pipeline Acceleration",
+      "No phone tag. No back-and-forth texting. Cloze handles the scheduling and drops a confirmed appointment on your calendar. You just show up — to someone who's ready to buy.",
+    highlight: "Fully automated booking",
+    tag: "Fill Your Schedule",
   },
   {
     number: "05",
-    title: "Works Inside Your Existing Stack. Zero Disruption.",
+    title: "Plugs Into Every Lead Source You Already Use.",
     description:
-      "Native integrations with Salesforce, HubSpot, Outreach, Salesloft, Marketo, and 200+ tools. Cloze writes back to your CRM in real time — every conversation, every qualification, every booked meeting. Your reps see everything where they already work.",
-    highlight: "200+ native integrations",
-    tag: "Your Stack. Enhanced.",
+      "Your website, Google Ads, Facebook, Yelp, Angi, Thumbtack, HomeAdvisor — Cloze connects to all of it. Every lead from every channel gets an instant response, automatically.",
+    highlight: "All major platforms",
+    tag: "One System. Everything.",
   },
   {
     number: "06",
-    title: "Full Attribution. See Exactly What's Converting to Revenue.",
+    title: "Shows You What's Actually Working.",
     description:
-      "Which lead sources are generating qualified pipeline? Which sequences are closing deals? Which reps are converting warm handoffs? Cloze gives you the full-funnel view your current reporting can't — from first touch to closed-won.",
-    highlight: "First touch to closed-won attribution",
-    tag: "Revenue Intelligence",
+      "See which lead sources are turning into paying jobs, how your follow-up is performing, and what your close rate looks like month over month. Stop guessing where to spend your marketing budget.",
+    highlight: "Full-funnel reporting",
+    tag: "Know Your Numbers",
   },
 ];
 
 const TESTIMONIALS = [
   {
-    quote: "We were generating 2,400 leads a month from paid and content. Our SDR team was legitimately working maybe 600 of them. The rest just aged out. Cloze now works every single lead from the moment it enters Salesforce. Pipeline from the same spend went up 3.4× in the first quarter. I don't know why we waited.",
-    name: "Ryan M.",
-    role: "VP of Sales",
-    company: "Nexus CRM",
-    location: "Series B · $28M ARR",
-    avatar: "RM",
-    result: "3.4× pipeline, same ad spend",
+    quote: "I run a 4-man crew. We can't always pick up when we're on site. I was losing bids I didn't even know I had. First month with Cloze, I got 9 extra estimate appointments booked automatically. Closed 6 of them. That's over $80K in new jobs. It paid for itself in week one.",
+    name: "Jake R.",
+    role: "Owner",
+    company: "Ridge Line Remodeling",
+    location: "Phoenix, AZ",
+    avatar: "JR",
+    result: "+$80K in 30 days",
     bg: "#b45309",
   },
   {
-    quote: "Speed-to-lead was the thing we kept saying we'd fix. We never fixed it. Our average was 19 hours. Competitors were responding in minutes. After Cloze, we went from 19 hours to 34 seconds. Our SQLs from inbound went up 71% in 60 days — without hiring a single new SDR.",
-    name: "Danielle K.",
-    role: "Head of Revenue Operations",
-    company: "Vaulted Health",
-    location: "Series C · $67M ARR",
-    avatar: "DK",
-    result: "71% more SQLs · 34-second response",
+    quote: "We were spending $2,800 a month on Angi leads and barely converting any of them because we weren't calling back fast enough. Cloze responds in under a minute now. Our Angi ROI literally tripled. I almost feel bad for the other contractors on that platform.",
+    name: "Maria C.",
+    role: "Operations Manager",
+    company: "Summit Home Renovations",
+    location: "Denver, CO",
+    avatar: "MC",
+    result: "3× return on Angi spend",
     bg: "#1d4ed8",
   },
   {
-    quote: "We had 14,000 leads in HubSpot that had never been followed up past the first email. We ran Cloze on that entire list. 11% converted to discovery calls within 30 days. That was $2.1M in pipeline from leads we had already written off. It felt like finding money in an old coat.",
-    name: "James T.",
-    role: "CMO",
-    company: "BridgeWorks B2B",
-    location: "Private Equity backed · $110M ARR",
-    avatar: "JT",
-    result: "$2.1M recovered pipeline",
+    quote: "The tire-kicker filter alone is worth every penny. I used to drive 40 minutes to meet people who just wanted a ballpark number. That doesn't happen anymore. My close rate went from 22% to 58% in one quarter because I'm only meeting with serious buyers.",
+    name: "Derek M.",
+    role: "Owner",
+    company: "Keystone Builders",
+    location: "Columbus, OH",
+    avatar: "DM",
+    result: "22% → 58% close rate",
     bg: "#374151",
   },
 ];
@@ -167,125 +167,119 @@ const TESTIMONIALS = [
 const HOW_IT_WORKS = [
   {
     step: "1",
-    title: "Connect Your CRM and Lead Sources",
+    title: "Connect Your Lead Sources in 2 Hours",
     description:
-      "Cloze integrates directly with Salesforce, HubSpot, or your existing stack. Your implementation manager maps your lead flows, ICP criteria, and qualification logic. Most enterprise teams are live within 5 business days.",
-    time: "Live in 5 business days",
+      "Link your website, Google, Facebook, Angi, or wherever customers find you. No developers, no IT guys. Our team walks you through every step. Most business owners are live the same day they sign up.",
+    time: "Setup: same day",
   },
   {
     step: "2",
-    title: "AI Works Every Lead from First Touch to Qualified Hand-Off",
+    title: "Cloze Handles Every Inquiry While You Work",
     description:
-      "Every inbound lead — regardless of source, volume, or time of day — gets an immediate, intelligent response. Cloze qualifies against your ICP, runs follow-up sequences, handles objections, and books meetings. Your reps do none of this.",
-    time: "< 60 seconds, 24/7/365",
+      "From that moment on, every new lead gets a response in under 60 seconds. Cloze introduces itself as your office, asks the right questions, handles objections, and figures out who's serious and who's just window shopping.",
+    time: "Response: < 60 seconds",
   },
   {
     step: "3",
-    title: "Reps Receive Warm, Briefed, Ready-to-Buy Prospects",
+    title: "Qualified Appointments Land on Your Calendar",
     description:
-      "When a prospect is qualified and ready, Cloze routes them to the right rep with the full conversation history, qualification summary, and a booked meeting. Your reps walk in informed. Close rates go up. Ramp time goes down.",
-    time: "Full context. Every hand-off.",
+      "Only serious, ready-to-buy customers make it to an appointment. You show up, do what you're great at, and close the job. Cloze fills the next slot automatically.",
+    time: "You just show up and close",
   },
 ];
 
 const PRICING = [
   {
-    name: "Professional",
-    price: "2,500",
+    name: "Starter",
+    price: "297",
     period: "/ mo",
-    tagline: "For growing revenue teams.",
-    description: "You're generating serious lead volume and losing too much of it. This closes that gap.",
+    tagline: "For the solo operator or small team.",
+    description: "You're losing leads while you work. This is the fix.",
     features: [
-      "Up to 1,500 leads per month",
-      "Instant AI response — < 60 seconds",
-      "ICP-based qualification logic",
-      "Email + SMS follow-up sequences",
-      "CRM integration (HubSpot or Salesforce)",
-      "Automated meeting booking",
-      "Pipeline & conversion dashboard",
-      "Dedicated onboarding manager",
-      "Priority support",
+      "Up to 300 leads per month",
+      "Instant text + email response",
+      "Lead qualification AI",
+      "Appointment booking",
+      "1 lead source integration",
+      "Reporting dashboard",
+      "Email support",
     ],
     cta: "Book a Free Call",
     highlight: false,
   },
   {
-    name: "Scale",
-    price: "5,000",
+    name: "Growth",
+    price: "597",
     period: "/ mo",
-    tagline: "For high-volume revenue organizations.",
-    description: "Built for teams running 3,000+ leads a month who need full-funnel automation and deep CRM integration.",
+    tagline: "For the business ready to scale.",
+    description: "You have volume. You need a system that runs without you touching it.",
     features: [
-      "Up to 5,000 leads per month",
-      "Omnichannel: email, SMS + voice",
-      "Custom ICP scoring & intent signals",
-      "Advanced multi-touch sequences",
-      "Unlimited CRM + stack integrations",
-      "Custom AI persona & scripts",
-      "Rep routing & warm hand-off",
-      "Full-funnel revenue attribution",
-      "Dedicated Customer Success Manager",
-      "Quarterly business reviews",
+      "Up to 1,000 leads per month",
+      "Text + email + voice follow-up",
+      "Advanced qualification logic",
+      "Multi-touch follow-up sequences",
+      "All lead source integrations",
+      "Custom AI scripts & tone",
+      "Close rate & pipeline dashboard",
+      "Priority support",
     ],
     cta: "Book a Free Call",
     highlight: true,
     badge: "Most Popular",
   },
   {
-    name: "Enterprise",
-    price: "Custom",
-    period: "",
-    tagline: "For large-scale or complex organizations.",
-    description: "Custom AI training, enterprise security, white-glove delivery, and SLA guarantees.",
+    name: "Pro",
+    price: "1,200",
+    period: "/ mo",
+    tagline: "For high-volume or multi-location businesses.",
+    description: "Full automation, custom AI training, and dedicated support.",
     features: [
-      "Unlimited leads",
+      "Up to 3,000 leads per month",
+      "All channels + API access",
       "Custom AI model training",
-      "All channels + full API access",
-      "Multi-team & multi-market support",
-      "Advanced security (SSO, SAML, SCIM)",
-      "Custom reporting & BI integration",
-      "Dedicated implementation team",
+      "CRM & software integration",
+      "Dedicated success manager",
+      "Custom reporting",
       "SLA guarantee",
-      "Legal, security & procurement support",
+      "White-glove onboarding",
     ],
-    cta: "Talk to Our Team",
+    cta: "Book a Free Call",
     highlight: false,
   },
 ];
 
 const FAQS = [
   {
-    q: "How does it integrate with Salesforce and HubSpot?",
-    a: "Cloze has native two-way integrations with both. It reads your lead records, fires on your triggers, and writes back every conversation, qualification score, and booked meeting in real time. Your ops team sees it all in your existing dashboards. We also support Outreach, Salesloft, Marketo, Pardot, and custom integrations via API.",
+    q: "Will my customers know they're talking to AI?",
+    a: "Cloze introduces itself as your office assistant — friendly, professional, and fast. Customers care a lot more about getting an answer in 30 seconds than whether it came from a person. Most of our customers tell us their clients actually compliment them on how responsive they are.",
   },
   {
-    q: "Will prospects know they're talking to AI?",
-    a: "Cloze operates as your branded AI assistant — it introduces itself professionally and is transparent that it's handling initial qualification. In our experience, sophisticated buyers respond better to this than to a generic SDR cadence. They get an immediate, intelligent response instead of a delayed generic email. Most of our customers see higher engagement rates with Cloze than with their previous SDR sequences.",
+    q: "What lead sources does it connect to?",
+    a: "Your website contact form, Google Ads, Facebook Lead Ads, Yelp, Angi, Thumbtack, HomeAdvisor — wherever customers reach out. If there's a form, Cloze can respond to it.",
   },
   {
-    q: "How does lead routing to reps work?",
-    a: "You define the routing logic — by territory, company size, industry, deal value, or any custom criteria. Cloze routes qualified conversations to the right rep and books directly to their calendar. The rep receives a briefing summary of the full conversation before the meeting so they walk in fully prepared.",
+    q: "I'm not tech-savvy. Is this complicated to set up?",
+    a: "If you can send a text message, you can use Cloze. Our onboarding team does all the technical work — you just answer a few questions about your business and we configure everything. Most people are live within a few hours.",
   },
   {
-    q: "What compliance certifications do you hold?",
-    a: "Cloze is SOC 2 Type II certified, GDPR compliant, and CCPA compliant. All data is encrypted in transit and at rest. We support SSO, SAML, and SCIM for enterprise identity management. Our security documentation and DPA are available on request.",
+    q: "What if a customer wants to talk to a real person?",
+    a: "Cloze flags it immediately and sends you a notification with the full conversation so far. You pick up right where it left off — no awkward moment for the customer, and no repeated questions.",
   },
   {
-    q: "How long does enterprise onboarding take?",
-    a: "Most mid-market teams are live within 5 business days. Enterprise deployments with custom AI training and multi-system integration typically take 2–4 weeks. You get a dedicated implementation manager from day one who owns the timeline and handles the technical work.",
+    q: "What does the 14-day trial include?",
+    a: "Full access, every feature, no credit card required. Most customers book their first AI-qualified appointment within 24 hours. If you don't see results in 14 days, we'll extend your trial and personally review your setup — no questions asked.",
   },
   {
-    q: "What does the ROI look like, and how fast?",
-    a: "Most customers see measurable pipeline lift within 30 days. The math is usually straightforward: take your current monthly lead volume, multiply by the percentage going unworked (typically 60–80%), apply your average deal size, and that's the floor of your recoverable revenue. Our average customer sees 3.8× pipeline growth within 90 days of going live.",
+    q: "I already use Angi or Thumbtack. Does this work with those?",
+    a: "Yes — this is exactly what Cloze was built for. You're already paying for those leads. The problem is they go cold because nobody calls back fast enough. Cloze responds the second a new lead comes in, before they've had a chance to call the next business on the list.",
   },
 ];
 
 const TRUST_ITEMS = [
   { label: "SOC 2 Type II Certified" },
-  { label: "GDPR & CCPA Compliant" },
+  { label: "GDPR Compliant" },
   { label: "99.9% Uptime SLA" },
   { label: "256-bit Encryption" },
-  { label: "SSO / SAML / SCIM" },
   { label: "U.S.-Based Support" },
 ];
 
@@ -344,20 +338,19 @@ export default function Home() {
             <div className="flex items-center gap-2.5 mb-8">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-sm font-semibold text-gray-500 uppercase tracking-widest">
-                For VP Sales, CMOs &amp; Revenue Leaders
+                For contractors &amp; small business owners
               </span>
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.02] text-gray-900 mb-8">
-              You&apos;re paying for 1,000 leads.<br className="hidden md:block" />
-              Your team is{" "}
-              <span className="gradient-text">working 200 of them.</span>
+              The job went to whoever<br className="hidden md:block" />
+              <span className="gradient-text">answered first.</span><br className="hidden md:block" />
+              That wasn&apos;t you.
             </h1>
 
             <p className="text-xl md:text-2xl text-gray-500 max-w-2xl leading-relaxed mb-10">
-              The average revenue team responds to new leads in{" "}
-              <strong className="text-gray-900">47 hours</strong> and follows up fewer than twice. Cloze AI works every lead from the moment it enters your pipeline — qualifying, following up, and booking meetings{" "}
-              <strong className="text-gray-900">while your team focuses on closing.</strong>
+              Cloze AI responds to every new lead in under{" "}
+              <strong className="text-gray-900">60 seconds</strong> — qualifying them, following up, and booking appointments to your calendar while you&apos;re focused on running your business.
             </p>
 
             <div id="signup" className="flex flex-col sm:flex-row items-start gap-4 mb-6">
@@ -367,19 +360,19 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="btn-primary text-white font-black px-10 py-5 rounded-xl text-lg shadow-lg inline-block"
               >
-                Book a 15-Min Demo →
+                Book a Free 15-Min Call →
               </a>
               <div className="flex flex-col justify-center gap-1 py-2">
-                <span className="text-sm text-gray-500">We&apos;ll show you exactly how much pipeline</span>
-                <span className="text-sm text-gray-500">you&apos;re leaving on the table — and how to recover it.</span>
+                <span className="text-sm text-gray-500">No pressure. No pitch deck. Just a quick</span>
+                <span className="text-sm text-gray-500">call to see if Cloze is right for your business.</span>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
               {[
-                "No pitch deck",
-                "Live product walkthrough",
-                "Custom ROI estimate for your business",
+                "15 minutes, no obligation",
+                "We'll show you live how it works",
+                "Go live the same day if you want",
               ].map((item) => (
                 <span key={item} className="flex items-center gap-1.5">
                   <svg className="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -395,11 +388,11 @@ export default function Home() {
           <div className="mt-14 pt-10 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="flex -space-x-2.5">
               {[
-                { init: "RM", bg: "#b45309" },
-                { init: "DK", bg: "#1d4ed8" },
-                { init: "JT", bg: "#374151" },
-                { init: "AL", bg: "#047857" },
-                { init: "SR", bg: "#7c3aed" },
+                { init: "JR", bg: "#b45309" },
+                { init: "MC", bg: "#1d4ed8" },
+                { init: "DM", bg: "#374151" },
+                { init: "KT", bg: "#047857" },
+                { init: "AL", bg: "#7c3aed" },
               ].map((a, i) => (
                 <div
                   key={i}
@@ -418,23 +411,22 @@ export default function Home() {
                 <span className="text-gray-700 font-bold text-sm ml-1">4.9 / 5</span>
               </div>
               <p className="text-sm text-gray-500">
-                Used by revenue teams at companies doing{" "}
-                <strong className="text-gray-900">$10M to $500M ARR</strong>
+                Trusted by <strong className="text-gray-900">1,200+ contractors &amp; small business owners</strong> across the U.S.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* The real cost */}
+      {/* Real cost */}
       <section className="section-alt py-20 px-6 border-y border-gray-200">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
-              This is what&apos;s happening inside your pipeline right now.
+              Here&apos;s what it&apos;s actually costing you.
             </h2>
             <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-              Not hypothetically. In your CRM. This week.
+              This isn&apos;t a software problem. It&apos;s a revenue problem — and it&apos;s happening every single week.
             </p>
           </div>
 
@@ -450,11 +442,11 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-10 highlight-bar max-w-3xl">
+          <div className="mt-10 highlight-bar max-w-2xl">
             <p className="text-gray-900 font-semibold">
-              If you&apos;re generating 1,000 leads a month with an average deal value of $8,500 — and your team is properly working 30% of them — you&apos;re leaving{" "}
-              <strong className="text-orange-600">roughly $5.9M in annual pipeline</strong>{" "}
-              on the table. Not to better competitors. To inaction.
+              The average small business loses{" "}
+              <strong className="text-orange-600">$8,000–$25,000 per month</strong>{" "}
+              to slow response times and missed follow-ups. Not to better competitors. Not to lower prices. To a missed call.
             </p>
           </div>
         </div>
@@ -480,10 +472,11 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              Monday morning. Your Salesforce dashboard.
+              What Saturday night looks like<br className="hidden md:block" />
+              with and without Cloze.
             </h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-              847 leads came in last week. Here&apos;s what happened to them.
+            <p className="text-gray-500 text-lg">
+              A customer submits your contact form at 9:47pm. Here&apos;s what happens next.
             </p>
           </div>
 
@@ -494,13 +487,13 @@ export default function Home() {
               </div>
               <ul className="space-y-4">
                 {[
-                  "847 leads entered your pipeline last week.",
-                  "Your SDR team contacted 203 of them — the obvious ones.",
-                  "Average first response time: 19 hours.",
-                  "644 leads received one email and were never touched again.",
-                  "Of those 644, roughly 90 would have converted at your average rate.",
-                  "At $8,500 average deal size, that's $765,000 in pipeline that evaporated.",
-                  "This happened last week. And the week before. And the week before that.",
+                  "9:47pm — A customer fills out your form about a $22K kitchen remodel.",
+                  "You're off the clock. Phone's charging in the other room.",
+                  "They submit the same request to 3 other businesses on Google.",
+                  "9:52pm — One competitor texts back in 5 minutes.",
+                  "By 10pm they're already talking scope and timeline with them.",
+                  "Monday morning you call. \"We already went with someone else.\"",
+                  "You lost $22,000. You didn't even know the lead came in.",
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
                     <div className="xmark mt-0.5">
@@ -520,13 +513,13 @@ export default function Home() {
               </div>
               <ul className="space-y-4">
                 {[
-                  "847 leads entered your pipeline last week.",
-                  "All 847 received a response within 60 seconds.",
-                  "Cloze qualified each one against your ICP — company size, budget, timeline, intent.",
-                  "312 were qualified. Sequences ran automatically for the rest.",
-                  "214 meetings were booked directly to your reps' calendars.",
-                  "Each rep received a briefing: full conversation history, qualification summary, and context.",
-                  "Your team showed up to warm conversations. They closed.",
+                  "9:47pm — A customer fills out your form about a $22K kitchen remodel.",
+                  "9:47:31pm — Cloze texts them. \"Hi! Thanks for reaching out. Tell me a bit about your project...\"",
+                  "They respond. Cloze asks about scope, budget, and timeline.",
+                  "Qualified in under 4 minutes. Cloze books a site visit for Tuesday at 10am.",
+                  "You wake up to a calendar notification: confirmed appointment.",
+                  "You show up, walk the space, and hand over your proposal.",
+                  "You close a $22K job. You were asleep when it started.",
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
                     <div className="checkmark mt-0.5">
@@ -549,10 +542,10 @@ export default function Home() {
           <div className="text-center mb-16">
             <div className="text-xs font-bold tracking-widest text-orange-600 uppercase mb-4">How It Works</div>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              Live in days, not months.
+              Three steps. No tech skills required.
             </h2>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
-              No rip-and-replace. No months of implementation. Cloze layers on top of your existing stack.
+              If you can send a text, you can set this up. Most owners are live the same day.
             </p>
           </div>
 
@@ -580,13 +573,13 @@ export default function Home() {
       <section id="features" className="bg-white py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="text-xs font-bold tracking-widest text-orange-600 uppercase mb-4">Platform Capabilities</div>
+            <div className="text-xs font-bold tracking-widest text-orange-600 uppercase mb-4">What Cloze Does</div>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              Built for revenue teams that<br className="hidden md:block" />
-              <span className="gradient-text">can&apos;t afford to leave pipeline on the table.</span>
+              Built for business owners who<br className="hidden md:block" />
+              <span className="gradient-text">are too busy to chase leads.</span>
             </h2>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
-              Every feature was built to solve a specific, measurable revenue problem.
+              Every feature exists to save you time and recover revenue you&apos;re already leaving on the table.
             </p>
           </div>
 
@@ -621,13 +614,12 @@ export default function Home() {
       <section className="bg-gray-900 py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <div className="text-xs font-bold tracking-widest text-orange-500 uppercase mb-4">Customer Results</div>
+            <div className="text-xs font-bold tracking-widest text-orange-500 uppercase mb-4">Real Business Owners. Real Results.</div>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-              Revenue leaders who were skeptical.<br className="hidden md:block" />
-              Then saw the numbers.
+              They had the same doubts you do.
             </h2>
             <p className="text-gray-400 text-lg max-w-xl mx-auto">
-              These are not case studies. These are people who had the same questions you have right now.
+              Here&apos;s what happened after they decided to stop losing jobs to faster competitors.
             </p>
           </div>
 
@@ -670,16 +662,16 @@ export default function Home() {
           <div className="text-center mb-16">
             <div className="text-xs font-bold tracking-widest text-orange-600 uppercase mb-4">Pricing</div>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              One recovered deal pays for<br className="hidden md:block" />
-              <span className="gradient-text">an entire year.</span>
+              One closed job pays for this<br className="hidden md:block" />
+              <span className="gradient-text">for the entire year.</span>
             </h2>
             <p className="text-gray-500 text-lg">
-              No annual lock-in required to start. Every plan includes a dedicated onboarding manager.
+              14-day free trial on all plans. No credit card. Cancel anytime.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 items-start">
-            {PRICING.map((plan, i) => (
+            {PRICING.map((plan) => (
               <div
                 key={plan.name}
                 className={`rounded-2xl flex flex-col relative ${
@@ -731,30 +723,27 @@ export default function Home() {
                   className={`w-full font-black py-4 rounded-xl text-base text-center block transition-all ${
                     plan.highlight
                       ? "btn-primary text-white shadow-md"
-                      : plan.price === "Custom"
-                        ? "border-2 border-gray-200 text-gray-900 hover:border-gray-900 transition-colors"
-                        : "btn-dark text-white shadow-sm"
+                      : "btn-dark text-white shadow-sm"
                   }`}
                 >
                   {plan.cta} →
                 </a>
 
                 {plan.highlight && (
-                  <p className="text-center text-gray-500 text-xs mt-3">No annual lock-in required to start</p>
+                  <p className="text-center text-gray-500 text-xs mt-3">14-day free trial · cancel anytime</p>
                 )}
               </div>
             ))}
           </div>
 
-          {/* Guarantee */}
           <div className="mt-12 text-center">
             <div className="inline-flex items-center gap-3 bg-green-50 border border-green-200 rounded-2xl px-8 py-5 text-left">
               <svg className="w-8 h-8 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <div>
-                <p className="font-black text-green-800">30-Day Pipeline Guarantee</p>
-                <p className="text-green-700 text-sm">If Cloze doesn&apos;t generate measurable qualified pipeline within 30 days, we&apos;ll refund every penny. No conditions, no hoops.</p>
+                <p className="font-black text-green-800">30-Day Money-Back Guarantee</p>
+                <p className="text-green-700 text-sm">If Cloze doesn&apos;t book you at least one qualified appointment in 30 days, we&apos;ll refund every penny. No questions, no hoops.</p>
               </div>
             </div>
           </div>
@@ -766,9 +755,9 @@ export default function Home() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              Questions from revenue leaders<br />who&apos;ve been there.
+              Questions we hear<br />from business owners every day.
             </h2>
-            <p className="text-gray-500 text-lg">Honest answers. No marketing spin.</p>
+            <p className="text-gray-500 text-lg">Straight answers. No sales pitch.</p>
           </div>
 
           <div className="space-y-3">
@@ -802,14 +791,15 @@ export default function Home() {
       <section className="bg-gray-900 py-28 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="text-xs font-black tracking-widest text-orange-500 uppercase mb-6">
-            The Calculation Is Simple
+            The Decision Is Simple
           </div>
           <h2 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6">
-            You already have the leads.<br className="hidden md:block" />
-            <span className="gradient-text">You&apos;re just not converting them.</span>
+            Every day without Cloze is<br className="hidden md:block" />
+            another job you didn&apos;t know<br className="hidden md:block" />
+            <span className="gradient-text">you lost.</span>
           </h2>
-          <p className="text-gray-400 text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            Book a 15-minute call. We&apos;ll show you exactly how Cloze works, walk you through a live demo, and calculate a custom ROI estimate based on your actual lead volume and deal size.
+          <p className="text-gray-400 text-xl max-w-xl mx-auto mb-10 leading-relaxed">
+            Book a free 15-minute call. We&apos;ll show you exactly how it works and have you live before end of day — so the next lead that comes in gets answered in under 60 seconds.
           </p>
 
           <div className="flex flex-col items-center gap-4">
@@ -819,15 +809,15 @@ export default function Home() {
               rel="noopener noreferrer"
               className="btn-primary text-white font-black px-14 py-5 rounded-xl text-xl shadow-xl inline-block"
             >
-              Book a 15-Min Demo →
+              Book a Free 15-Min Call →
             </a>
             <p className="text-gray-500 text-sm">
-              No pitch. No pressure. Just a real conversation about your revenue problem.
+              No pitch. No pressure. Just a real conversation about your business.
             </p>
           </div>
 
           <p className="text-gray-600 text-sm mt-6">
-            15 minutes &middot; Live demo &middot; Custom ROI estimate &middot; No obligation
+            15 minutes &middot; No obligation &middot; Go live same day &middot; 30-day money-back guarantee
           </p>
 
           <div className="mt-14 flex flex-wrap items-center justify-center gap-6">
