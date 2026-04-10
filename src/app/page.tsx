@@ -289,7 +289,6 @@ const TRUST_ITEMS = [
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [isAnnual, setIsAnnual] = useState(true);
 
   return (
     <div className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
@@ -664,155 +663,111 @@ export default function Home() {
       {/* Pricing */}
       <section id="pricing" className="bg-white py-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
+          <div className="text-center mb-16">
             <div className="text-xs font-bold tracking-widest text-orange-600 uppercase mb-4">Pricing</div>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
               One closed job pays for this<br className="hidden md:block" />
               <span className="gradient-text">for the entire year.</span>
             </h2>
-            <p className="text-gray-500 text-lg mb-10">
+            <p className="text-gray-500 text-lg">
               14-day free trial on all plans. No credit card. Cancel anytime.
             </p>
-
-            {/* Billing toggle */}
-            <div className="inline-flex flex-col items-center gap-3">
-              <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1.5 shadow-inner">
-                <button
-                  onClick={() => setIsAnnual(false)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
-                    !isAnnual
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-400 hover:text-gray-600"
-                  }`}
-                >
-                  Monthly
-                </button>
-                <button
-                  onClick={() => setIsAnnual(true)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
-                    isAnnual
-                      ? "bg-gray-900 text-white shadow-sm"
-                      : "text-gray-400 hover:text-gray-600"
-                  }`}
-                >
-                  Annual
-                  <span className={`text-xs font-black px-2 py-0.5 rounded-full transition-all ${
-                    isAnnual ? "bg-orange-500 text-white" : "bg-gray-200 text-gray-500"
-                  }`}>
-                    2 months free
-                  </span>
-                </button>
-              </div>
-              {isAnnual && (
-                <p className="text-sm text-green-600 font-semibold animate-fade-up">
-                  You&apos;re saving up to $7,188 by paying annually
-                </p>
-              )}
-            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 items-start">
-            {PRICING.map((plan) => {
-              const tier = isAnnual ? plan.annual : plan.monthly;
-              return (
-                <div
-                  key={plan.name}
-                  className={`rounded-2xl flex flex-col relative transition-all duration-300 ${
-                    plan.highlight
-                      ? "bg-gray-900 text-white p-8 shadow-2xl shadow-gray-900/20 ring-2 ring-orange-500"
-                      : "surface-card p-8"
-                  }`}
-                >
-                  {plan.badge && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 btn-primary text-white text-xs font-black px-5 py-2 rounded-full shadow-lg whitespace-nowrap">
-                      {plan.badge}
-                    </div>
-                  )}
+            {PRICING.map((plan) => (
+              <div
+                key={plan.name}
+                className={`rounded-2xl flex flex-col relative ${
+                  plan.highlight
+                    ? "bg-gray-900 text-white p-8 shadow-2xl shadow-gray-900/20 ring-2 ring-orange-500"
+                    : "surface-card p-8"
+                }`}
+              >
+                {plan.badge && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 btn-primary text-white text-xs font-black px-5 py-2 rounded-full shadow-lg whitespace-nowrap">
+                    {plan.badge}
+                  </div>
+                )}
 
-                  <div className="mb-7">
-                    <p className={`text-xs font-black uppercase tracking-widest mb-2 ${plan.highlight ? "text-orange-400" : "text-orange-600"}`}>
-                      {plan.tagline}
+                <div className="mb-7">
+                  <p className={`text-xs font-black uppercase tracking-widest mb-2 ${plan.highlight ? "text-orange-400" : "text-orange-600"}`}>
+                    {plan.tagline}
+                  </p>
+                  <h3 className={`font-black text-2xl mb-5 ${plan.highlight ? "text-white" : "text-gray-900"}`}>{plan.name}</h3>
+
+                  {/* Annual price — primary */}
+                  <div className={`rounded-xl p-4 mb-3 ${plan.highlight ? "bg-white/10" : "bg-orange-50 border border-orange-100"}`}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-xs font-black uppercase tracking-wider ${plan.highlight ? "text-orange-300" : "text-orange-600"}`}>
+                        Annual — Best Value
+                      </span>
+                      <span className="text-xs font-bold text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+                        3 months free
+                      </span>
+                    </div>
+                    <div className="flex items-end gap-1.5">
+                      <span className={`text-5xl font-black leading-none ${plan.highlight ? "text-white" : "text-gray-900"}`}>
+                        {plan.annual.label}
+                      </span>
+                      <span className={`text-sm mb-1.5 ${plan.highlight ? "text-gray-400" : "text-gray-400"}`}>/mo</span>
+                    </div>
+                    <p className={`text-xs mt-1 ${plan.highlight ? "text-gray-400" : "text-gray-400"}`}>
+                      {plan.annual.billed} · {plan.annual.saving.split("—")[0].trim()}
                     </p>
-                    <h3 className={`font-black text-2xl mb-4 ${plan.highlight ? "text-white" : "text-gray-900"}`}>{plan.name}</h3>
-
-                    {/* Price display */}
-                    <div className="mb-3">
-                      <div className="flex items-end gap-1.5">
-                        <span className={`text-5xl font-black leading-none transition-all duration-200 ${plan.highlight ? "text-white" : "text-gray-900"}`}>
-                          {tier.label}
-                        </span>
-                        <span className="text-sm text-gray-400 mb-1.5">{tier.period}</span>
-                      </div>
-                      {isAnnual ? (
-                        <div className="mt-2 space-y-1">
-                          <p className={`text-xs ${plan.highlight ? "text-gray-400" : "text-gray-400"}`}>
-                            {plan.annual.billed}
-                          </p>
-                          <div className="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            {plan.annual.saving}
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-gray-400 mt-1">
-                          or {plan.annual.billed} &mdash; save {plan.annual.saving.split("—")[0].replace("Save ", "")}
-                        </p>
-                      )}
-                    </div>
-
-                    <p className={`text-sm leading-relaxed ${plan.highlight ? "text-gray-400" : "text-gray-500"}`}>{plan.description}</p>
                   </div>
 
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {plan.features.map((f) => (
-                      <li key={f} className={`flex items-start gap-3 text-sm ${plan.highlight ? "text-gray-300" : "text-gray-600"}`}>
-                        <svg className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
+                  {/* Monthly price — secondary */}
+                  <div className={`rounded-xl px-4 py-3 flex items-center justify-between ${plan.highlight ? "bg-white/5" : "bg-gray-50 border border-gray-200"}`}>
+                    <div>
+                      <span className={`text-xs font-semibold ${plan.highlight ? "text-gray-500" : "text-gray-400"}`}>
+                        Month-to-month
+                      </span>
+                      <div className="flex items-end gap-1 mt-0.5">
+                        <span className={`text-2xl font-black leading-none ${plan.highlight ? "text-gray-300" : "text-gray-500"}`}>
+                          {plan.monthly.label}
+                        </span>
+                        <span className={`text-xs mb-0.5 ${plan.highlight ? "text-gray-500" : "text-gray-400"}`}>/mo</span>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-semibold ${plan.highlight ? "text-gray-500" : "text-gray-400"}`}>
+                      No commitment
+                    </span>
+                  </div>
 
-                  <a
-                    href={BOOKING_LINK}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`w-full font-black py-4 rounded-xl text-base text-center block transition-all ${
-                      plan.highlight
-                        ? "btn-primary text-white shadow-md"
-                        : "btn-dark text-white shadow-sm"
-                    }`}
-                  >
-                    {plan.cta} →
-                  </a>
-
-                  {plan.highlight && (
-                    <p className="text-center text-gray-500 text-xs mt-3">
-                      {isAnnual ? "Billed annually · cancel anytime" : "14-day free trial · cancel anytime"}
-                    </p>
-                  )}
+                  <p className={`text-sm leading-relaxed mt-4 ${plan.highlight ? "text-gray-400" : "text-gray-500"}`}>{plan.description}</p>
                 </div>
-              );
-            })}
-          </div>
 
-          {/* Annual nudge when monthly is selected */}
-          {!isAnnual && (
-            <div className="mt-6 text-center animate-fade-up">
-              <button
-                onClick={() => setIsAnnual(true)}
-                className="inline-flex items-center gap-2 text-sm font-bold text-orange-600 hover:text-orange-700 transition-colors border border-orange-200 bg-orange-50 rounded-full px-5 py-2.5"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                </svg>
-                Switch to annual and save up to $7,188 — 3 months on us
-              </button>
-            </div>
-          )}
+                <ul className="space-y-3 mb-8 flex-1">
+                  {plan.features.map((f) => (
+                    <li key={f} className={`flex items-start gap-3 text-sm ${plan.highlight ? "text-gray-300" : "text-gray-600"}`}>
+                      <svg className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                <a
+                  href={BOOKING_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-full font-black py-4 rounded-xl text-base text-center block transition-all ${
+                    plan.highlight
+                      ? "btn-primary text-white shadow-md"
+                      : "btn-dark text-white shadow-sm"
+                  }`}
+                >
+                  {plan.cta} →
+                </a>
+
+                {plan.highlight && (
+                  <p className="text-center text-gray-500 text-xs mt-3">14-day free trial · cancel anytime</p>
+                )}
+              </div>
+            ))}
+          </div>
 
           {/* Money back */}
           <div className="mt-10 text-center">
