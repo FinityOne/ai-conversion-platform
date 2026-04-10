@@ -191,12 +191,12 @@ const HOW_IT_WORKS = [
 const PRICING = [
   {
     name: "Starter",
-    price: "297",
+    price: "99",
     period: "/ mo",
-    tagline: "For the solo operator or small team.",
-    description: "You're losing leads while you work. This is the fix.",
+    tagline: "For the solo operator just getting started.",
+    description: "Stop losing leads while you work. Get Cloze responding for you today.",
     features: [
-      "Up to 300 leads per month",
+      "Up to 100 leads per month",
       "Instant text + email response",
       "Lead qualification AI",
       "Appointment booking",
@@ -206,15 +206,17 @@ const PRICING = [
     ],
     cta: "Book a Free Call",
     highlight: false,
+    badge: null,
+    lifetime: null,
   },
   {
     name: "Growth",
-    price: "597",
+    price: "499",
     period: "/ mo",
-    tagline: "For the business ready to scale.",
-    description: "You have volume. You need a system that runs without you touching it.",
+    tagline: "For the business serious about scaling.",
+    description: "Full automation across every lead source. The system serious operators run on.",
     features: [
-      "Up to 1,000 leads per month",
+      "Up to 500 leads per month",
       "Text + email + voice follow-up",
       "Advanced qualification logic",
       "Multi-touch follow-up sequences",
@@ -226,27 +228,47 @@ const PRICING = [
     cta: "Book a Free Call",
     highlight: true,
     badge: "Most Popular",
+    lifetime: null,
   },
   {
     name: "Pro",
-    price: "1,200",
+    price: "2,000",
     period: "/ mo",
     tagline: "For high-volume or multi-location businesses.",
-    description: "Full automation, custom AI training, and dedicated support.",
+    description: "Unlimited leads, custom AI, and a dedicated team working alongside you.",
     features: [
-      "Up to 3,000 leads per month",
+      "Unlimited leads",
       "All channels + API access",
       "Custom AI model training",
       "CRM & software integration",
       "Dedicated success manager",
-      "Custom reporting",
+      "Custom reporting & attribution",
       "SLA guarantee",
       "White-glove onboarding",
     ],
     cta: "Book a Free Call",
     highlight: false,
+    badge: null,
+    lifetime: null,
   },
 ];
+
+const LIFETIME_DEAL = {
+  name: "Founder's Lifetime Deal",
+  price: "1,497",
+  description: "Pay once. Use Cloze forever. No monthly bill, no annual renewal, no price increases — ever. This is for the business owner who knows a good tool when they see one.",
+  includes: "Everything in Growth — for life.",
+  features: [
+    "Up to 500 leads per month — for life",
+    "All Growth plan features, forever",
+    "All future feature updates included",
+    "No monthly fees, ever",
+    "Priority onboarding & setup",
+    "Locked in at today's price permanently",
+  ],
+  spotsLeft: 47,
+  badge: "Limited — 47 spots remaining",
+};
 
 const FAQS = [
   {
@@ -670,6 +692,7 @@ export default function Home() {
             </p>
           </div>
 
+          {/* Monthly plans */}
           <div className="grid md:grid-cols-3 gap-6 items-start">
             {PRICING.map((plan) => (
               <div
@@ -692,15 +715,11 @@ export default function Home() {
                   </p>
                   <h3 className={`font-black text-2xl mb-4 ${plan.highlight ? "text-white" : "text-gray-900"}`}>{plan.name}</h3>
                   <div className="flex items-end gap-1 mb-3">
-                    {plan.price === "Custom" ? (
-                      <span className="text-4xl font-black gradient-text">Custom</span>
-                    ) : (
-                      <>
-                        <span className="text-2xl font-black mt-1 text-gray-400">$</span>
-                        <span className={`text-5xl font-black leading-none ${plan.highlight ? "text-white" : "text-gray-900"}`}>{plan.price}</span>
-                        <span className="text-sm mb-1.5 text-gray-400">{plan.period}</span>
-                      </>
-                    )}
+                    <>
+                      <span className="text-2xl font-black mt-1 text-gray-400">$</span>
+                      <span className={`text-5xl font-black leading-none ${plan.highlight ? "text-white" : "text-gray-900"}`}>{plan.price}</span>
+                      <span className="text-sm mb-1.5 text-gray-400">{plan.period}</span>
+                    </>
                   </div>
                   <p className={`text-sm leading-relaxed ${plan.highlight ? "text-gray-400" : "text-gray-500"}`}>{plan.description}</p>
                 </div>
@@ -736,13 +755,82 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
+          {/* Lifetime Deal */}
+          <div className="mt-8 relative">
+            {/* Scarcity badge */}
+            <div className="flex justify-center mb-4">
+              <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-300 text-amber-700 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block" />
+                {LIFETIME_DEAL.spotsLeft} founder spots remaining — closes when full
+              </div>
+            </div>
+
+            <div className="rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50 p-8 md:p-10 shadow-xl shadow-amber-100">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                {/* Left: copy */}
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full mb-4">
+                    🔒 Founder&apos;s Lifetime Deal
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+                    Buy it once.<br />
+                    <span className="gradient-text">Own it forever.</span>
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    A good tool is an investment, not a subscription. Pay{" "}
+                    <strong className="text-gray-900">${LIFETIME_DEAL.price} once</strong> and Cloze works for your business forever — no monthly bill, no annual renewal, no price increases. Ever.
+                  </p>
+                  <p className="text-sm text-gray-500 mb-6">
+                    {LIFETIME_DEAL.includes} All future updates included at no extra cost.
+                  </p>
+                  <ul className="space-y-2.5 mb-8">
+                    {LIFETIME_DEAL.features.map((f) => (
+                      <li key={f} className="flex items-center gap-3 text-sm text-gray-700">
+                        <svg className="w-4 h-4 text-amber-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Right: price + CTA */}
+                <div className="bg-white rounded-2xl border border-amber-200 p-8 shadow-sm text-center">
+                  <p className="text-xs font-black text-amber-600 uppercase tracking-widest mb-2">One-Time Payment</p>
+                  <div className="flex items-start justify-center gap-1 mb-1">
+                    <span className="text-3xl font-black text-gray-400 mt-2">$</span>
+                    <span className="text-7xl font-black text-gray-900 leading-none">{LIFETIME_DEAL.price}</span>
+                  </div>
+                  <p className="text-gray-400 text-sm mb-1">one time · no subscription</p>
+                  <p className="text-orange-600 font-bold text-sm mb-6">
+                    vs. $499/mo on Growth = saves $4,491/yr
+                  </p>
+
+                  <a
+                    href={BOOKING_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary text-white font-black px-8 py-4 rounded-xl text-base shadow-md w-full block text-center mb-4"
+                  >
+                    Claim Lifetime Access →
+                  </a>
+                  <p className="text-gray-400 text-xs">
+                    Includes 30-day money-back guarantee · Spots are limited and won&apos;t reopen
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Money back */}
+          <div className="mt-8 text-center">
             <div className="inline-flex items-center gap-3 bg-green-50 border border-green-200 rounded-2xl px-8 py-5 text-left">
               <svg className="w-8 h-8 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <div>
-                <p className="font-black text-green-800">30-Day Money-Back Guarantee</p>
+                <p className="font-black text-green-800">30-Day Money-Back Guarantee — All Plans</p>
                 <p className="text-green-700 text-sm">If Cloze doesn&apos;t book you at least one qualified appointment in 30 days, we&apos;ll refund every penny. No questions, no hoops.</p>
               </div>
             </div>
