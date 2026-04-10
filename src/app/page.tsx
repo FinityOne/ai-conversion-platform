@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+// Replace this with your actual Google Calendar booking link
+const BOOKING_LINK = "https://calendar.google.com/calendar/appointments";
 
 const TICKER_ITEMS = [
   "3 out of 4 homeowners hire the first contractor to respond",
@@ -12,7 +13,7 @@ const TICKER_ITEMS = [
   "Works with Angi, Thumbtack & HomeAdvisor",
   "Contractors closed 3.2× more jobs on average",
   "Used by 1,200+ remodelers across the U.S.",
-  "14-day free trial — no credit card",
+  "Book a free 15-min call — no pressure",
 ];
 
 const RESULTS = [
@@ -163,7 +164,7 @@ const PRICING = [
       "Dashboard + reporting",
       "Email support",
     ],
-    cta: "Start Free — 14 Days",
+    cta: "Book a Free Call",
     highlight: false,
   },
   {
@@ -182,7 +183,7 @@ const PRICING = [
       "Close rate & pipeline dashboard",
       "Priority support",
     ],
-    cta: "Start Free — 14 Days",
+    cta: "Book a Free Call",
     highlight: true,
     badge: "Most Popular",
   },
@@ -202,7 +203,7 @@ const PRICING = [
       "SLA guarantee",
       "White-glove onboarding",
     ],
-    cta: "Talk to Our Team",
+    cta: "Book a Free Call",
     highlight: false,
   },
 ];
@@ -243,14 +244,7 @@ const TRUST_ITEMS = [
 ];
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) setSubmitted(true);
-  };
 
   return (
     <div className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
@@ -277,10 +271,12 @@ export default function Home() {
               See Pricing
             </a>
             <a
-              href="#signup"
+              href={BOOKING_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary text-white text-sm font-bold px-5 py-2.5 rounded-lg shadow-sm"
             >
-              Start Free Trial
+              Book a Free Call
             </a>
           </div>
         </div>
@@ -325,44 +321,33 @@ export default function Home() {
             </p>
 
             {/* Primary CTA */}
-            <div id="signup" className="flex flex-col sm:flex-row gap-4 mb-6">
-              {submitted ? (
-                <div className="bg-green-50 border border-green-200 rounded-xl px-6 py-4">
-                  <p className="text-green-700 font-bold">You&apos;re in. Check your inbox.</p>
-                  <p className="text-green-600 text-sm mt-0.5">Trial access is on its way to you now.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-lg">
-                  <input
-                    type="email"
-                    placeholder="Your work email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="flex-1 bg-white border border-gray-300 rounded-xl px-5 py-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all text-base"
-                  />
-                  <button
-                    type="submit"
-                    className="btn-primary text-white font-bold px-8 py-4 rounded-xl whitespace-nowrap text-base shadow-md"
-                  >
-                    Start Free — 14 Days →
-                  </button>
-                </form>
-              )}
+            <div id="signup" className="flex flex-col sm:flex-row items-start gap-4 mb-6">
+              <a
+                href={BOOKING_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary text-white font-black px-10 py-5 rounded-xl text-lg shadow-lg inline-block"
+              >
+                Book a Free 15-Min Call →
+              </a>
+              <div className="flex flex-col justify-center gap-1 py-1">
+                <span className="text-sm text-gray-500">No pressure. No pitch deck. Just a quick</span>
+                <span className="text-sm text-gray-500">call to see if Cloze is right for your business.</span>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
               <span className="flex items-center gap-1.5">
                 <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                No credit card required
+                15 minutes, no obligation
               </span>
               <span className="flex items-center gap-1.5">
                 <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                Live the same day you sign up
+                We&apos;ll show you live how it works
               </span>
               <span className="flex items-center gap-1.5">
                 <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                Cancel anytime
+                Go live the same day if you want
               </span>
             </div>
           </div>
@@ -692,8 +677,11 @@ export default function Home() {
                   ))}
                 </ul>
 
-                <button
-                  className={`w-full font-black py-4 rounded-xl text-base transition-all ${
+                <a
+                  href={BOOKING_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-full font-black py-4 rounded-xl text-base text-center block transition-all ${
                     plan.highlight
                       ? "btn-primary text-white shadow-md"
                       : plan.price === "Custom"
@@ -701,11 +689,11 @@ export default function Home() {
                         : "btn-dark text-white shadow-sm"
                   }`}
                 >
-                  {plan.cta}
-                </button>
+                  {plan.cta} →
+                </a>
 
                 {plan.highlight && (
-                  <p className="text-center text-gray-500 text-xs mt-3">14-day free trial included</p>
+                  <p className="text-center text-gray-500 text-xs mt-3">14-day free trial · cancel anytime</p>
                 )}
               </div>
             ))}
@@ -781,34 +769,22 @@ export default function Home() {
             Start your free 14-day trial today. No credit card. Our team will have you live before end of day — and the next lead that comes in will be answered in under 60 seconds.
           </p>
 
-          <div className="max-w-lg mx-auto">
-            {submitted ? (
-              <div className="bg-green-900/20 border border-green-500/30 rounded-2xl p-8">
-                <p className="text-green-400 font-black text-xl mb-1">You&apos;re in. Check your inbox.</p>
-                <p className="text-gray-400 text-sm">Trial access and onboarding details are on the way.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  placeholder="Your work email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="flex-1 bg-gray-800 border border-gray-600 rounded-xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-base"
-                />
-                <button
-                  type="submit"
-                  className="btn-primary text-white font-black px-8 py-4 rounded-xl whitespace-nowrap text-base shadow-lg"
-                >
-                  Claim Free Trial →
-                </button>
-              </form>
-            )}
+          <div className="flex flex-col items-center gap-4">
+            <a
+              href={BOOKING_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary text-white font-black px-14 py-5 rounded-xl text-xl shadow-xl inline-block"
+            >
+              Book a Free 15-Min Call →
+            </a>
+            <p className="text-gray-500 text-sm">
+              Pick a time that works. We&apos;ll call you. No pitch, no pressure — just a real conversation.
+            </p>
           </div>
 
-          <p className="text-gray-500 text-sm mt-4">
-            14 days free &middot; No credit card &middot; Live today &middot; 30-day money-back guarantee
+          <p className="text-gray-500 text-sm mt-6">
+            15 minutes &middot; No obligation &middot; Go live same day if you&apos;re ready
           </p>
 
           <div className="mt-14 flex flex-wrap items-center justify-center gap-6">
