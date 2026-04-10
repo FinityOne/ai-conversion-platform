@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cloze AI — Never Miss Another Remodeling Lead",
+  title: "Cloze AI — The Job Went to the Contractor Who Called Back First",
   description:
-    "AI that responds to every homeowner inquiry in under 47 seconds — qualifying leads, answering questions, and booking estimate appointments while you're on the job site.",
+    "3 out of 4 homeowners hire whoever responds first. Cloze AI calls back every lead in under 60 seconds, filters tire-kickers, and books your estimate appointments — so you close more jobs without chasing anyone.",
   openGraph: {
-    title: "Cloze AI — Never Miss Another Remodeling Lead",
+    title: "Cloze AI — The Job Went to the Contractor Who Called Back First",
     description:
-      "Stop losing jobs to contractors who respond faster. Cloze AI follows up instantly, filters tire-kickers, and fills your calendar with serious homeowners.",
+      "Stop losing $20,000 jobs because you were on a roof. Cloze AI answers every inquiry instantly, qualifies homeowners, and books your calendar while you work.",
     type: "website",
   },
 };
@@ -34,7 +34,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#f8fafc] text-[#0f172a]">
+      <body className="min-h-full flex flex-col bg-white text-gray-900">
         {children}
       </body>
     </html>
