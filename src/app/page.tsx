@@ -191,10 +191,10 @@ const HOW_IT_WORKS = [
 const PRICING = [
   {
     name: "Starter",
-    price: "99",
-    period: "/ mo",
     tagline: "For the solo operator just getting started.",
     description: "Stop losing leads while you work. Get Cloze responding for you today.",
+    monthly: { price: 99, label: "$99", period: "/ mo" },
+    annual:  { price: 990, label: "$82", period: "/ mo", billed: "$990 billed annually", saving: "Save $198 — 2 months free" },
     features: [
       "Up to 100 leads per month",
       "Instant text + email response",
@@ -207,14 +207,13 @@ const PRICING = [
     cta: "Book a Free Call",
     highlight: false,
     badge: null,
-    lifetime: null,
   },
   {
     name: "Growth",
-    price: "499",
-    period: "/ mo",
     tagline: "For the business serious about scaling.",
     description: "Full automation across every lead source. The system serious operators run on.",
+    monthly: { price: 499, label: "$499", period: "/ mo" },
+    annual:  { price: 4990, label: "$416", period: "/ mo", billed: "$4,990 billed annually", saving: "Save $998 — 2 months free" },
     features: [
       "Up to 500 leads per month",
       "Text + email + voice follow-up",
@@ -228,14 +227,13 @@ const PRICING = [
     cta: "Book a Free Call",
     highlight: true,
     badge: "Most Popular",
-    lifetime: null,
   },
   {
     name: "Pro",
-    price: "2,000",
-    period: "/ mo",
     tagline: "For high-volume or multi-location businesses.",
     description: "Unlimited leads, custom AI, and a dedicated team working alongside you.",
+    monthly: { price: 2000, label: "$2,000", period: "/ mo" },
+    annual:  { price: 20000, label: "$1,667", period: "/ mo", billed: "$20,000 billed annually", saving: "Save $4,000 — 2 months free" },
     features: [
       "Unlimited leads",
       "All channels + API access",
@@ -249,26 +247,8 @@ const PRICING = [
     cta: "Book a Free Call",
     highlight: false,
     badge: null,
-    lifetime: null,
   },
 ];
-
-const LIFETIME_DEAL = {
-  name: "Founder's Lifetime Deal",
-  price: "1,497",
-  description: "Pay once. Use Cloze forever. No monthly bill, no annual renewal, no price increases — ever. This is for the business owner who knows a good tool when they see one.",
-  includes: "Everything in Growth — for life.",
-  features: [
-    "Up to 500 leads per month — for life",
-    "All Growth plan features, forever",
-    "All future feature updates included",
-    "No monthly fees, ever",
-    "Priority onboarding & setup",
-    "Locked in at today's price permanently",
-  ],
-  spotsLeft: 47,
-  badge: "Limited — 47 spots remaining",
-};
 
 const FAQS = [
   {
@@ -307,6 +287,7 @@ const TRUST_ITEMS = [
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [isAnnual, setIsAnnual] = useState(true);
 
   return (
     <div className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
@@ -681,150 +662,158 @@ export default function Home() {
       {/* Pricing */}
       <section id="pricing" className="bg-white py-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <div className="text-xs font-bold tracking-widest text-orange-600 uppercase mb-4">Pricing</div>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
               One closed job pays for this<br className="hidden md:block" />
               <span className="gradient-text">for the entire year.</span>
             </h2>
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-500 text-lg mb-10">
               14-day free trial on all plans. No credit card. Cancel anytime.
             </p>
-          </div>
 
-          {/* Monthly plans */}
-          <div className="grid md:grid-cols-3 gap-6 items-start">
-            {PRICING.map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-2xl flex flex-col relative ${
-                  plan.highlight
-                    ? "bg-gray-900 text-white p-8 shadow-2xl shadow-gray-900/20 ring-2 ring-orange-500"
-                    : "surface-card p-8"
-                }`}
-              >
-                {plan.badge && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 btn-primary text-white text-xs font-black px-5 py-2 rounded-full shadow-lg whitespace-nowrap">
-                    {plan.badge}
-                  </div>
-                )}
-
-                <div className="mb-7">
-                  <p className={`text-xs font-black uppercase tracking-widest mb-2 ${plan.highlight ? "text-orange-400" : "text-orange-600"}`}>
-                    {plan.tagline}
-                  </p>
-                  <h3 className={`font-black text-2xl mb-4 ${plan.highlight ? "text-white" : "text-gray-900"}`}>{plan.name}</h3>
-                  <div className="flex items-end gap-1 mb-3">
-                    <>
-                      <span className="text-2xl font-black mt-1 text-gray-400">$</span>
-                      <span className={`text-5xl font-black leading-none ${plan.highlight ? "text-white" : "text-gray-900"}`}>{plan.price}</span>
-                      <span className="text-sm mb-1.5 text-gray-400">{plan.period}</span>
-                    </>
-                  </div>
-                  <p className={`text-sm leading-relaxed ${plan.highlight ? "text-gray-400" : "text-gray-500"}`}>{plan.description}</p>
-                </div>
-
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className={`flex items-start gap-3 text-sm ${plan.highlight ? "text-gray-300" : "text-gray-600"}`}>
-                      <svg className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <a
-                  href={BOOKING_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-full font-black py-4 rounded-xl text-base text-center block transition-all ${
-                    plan.highlight
-                      ? "btn-primary text-white shadow-md"
-                      : "btn-dark text-white shadow-sm"
+            {/* Billing toggle */}
+            <div className="inline-flex flex-col items-center gap-3">
+              <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1.5 shadow-inner">
+                <button
+                  onClick={() => setIsAnnual(false)}
+                  className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
+                    !isAnnual
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
-                  {plan.cta} →
-                </a>
-
-                {plan.highlight && (
-                  <p className="text-center text-gray-500 text-xs mt-3">14-day free trial · cancel anytime</p>
-                )}
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setIsAnnual(true)}
+                  className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
+                    isAnnual
+                      ? "bg-gray-900 text-white shadow-sm"
+                      : "text-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  Annual
+                  <span className={`text-xs font-black px-2 py-0.5 rounded-full transition-all ${
+                    isAnnual ? "bg-orange-500 text-white" : "bg-gray-200 text-gray-500"
+                  }`}>
+                    2 months free
+                  </span>
+                </button>
               </div>
-            ))}
+              {isAnnual && (
+                <p className="text-sm text-green-600 font-semibold animate-fade-up">
+                  You&apos;re saving up to $4,000 by paying annually
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Lifetime Deal */}
-          <div className="mt-8 relative">
-            {/* Scarcity badge */}
-            <div className="flex justify-center mb-4">
-              <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-300 text-amber-700 text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block" />
-                {LIFETIME_DEAL.spotsLeft} founder spots remaining — closes when full
-              </div>
-            </div>
+          <div className="grid md:grid-cols-3 gap-6 items-start">
+            {PRICING.map((plan) => {
+              const tier = isAnnual ? plan.annual : plan.monthly;
+              return (
+                <div
+                  key={plan.name}
+                  className={`rounded-2xl flex flex-col relative transition-all duration-300 ${
+                    plan.highlight
+                      ? "bg-gray-900 text-white p-8 shadow-2xl shadow-gray-900/20 ring-2 ring-orange-500"
+                      : "surface-card p-8"
+                  }`}
+                >
+                  {plan.badge && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 btn-primary text-white text-xs font-black px-5 py-2 rounded-full shadow-lg whitespace-nowrap">
+                      {plan.badge}
+                    </div>
+                  )}
 
-            <div className="rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50 p-8 md:p-10 shadow-xl shadow-amber-100">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                {/* Left: copy */}
-                <div>
-                  <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full mb-4">
-                    🔒 Founder&apos;s Lifetime Deal
+                  <div className="mb-7">
+                    <p className={`text-xs font-black uppercase tracking-widest mb-2 ${plan.highlight ? "text-orange-400" : "text-orange-600"}`}>
+                      {plan.tagline}
+                    </p>
+                    <h3 className={`font-black text-2xl mb-4 ${plan.highlight ? "text-white" : "text-gray-900"}`}>{plan.name}</h3>
+
+                    {/* Price display */}
+                    <div className="mb-3">
+                      <div className="flex items-end gap-1.5">
+                        <span className={`text-5xl font-black leading-none transition-all duration-200 ${plan.highlight ? "text-white" : "text-gray-900"}`}>
+                          {tier.label}
+                        </span>
+                        <span className="text-sm text-gray-400 mb-1.5">{tier.period}</span>
+                      </div>
+                      {isAnnual ? (
+                        <div className="mt-2 space-y-1">
+                          <p className={`text-xs ${plan.highlight ? "text-gray-400" : "text-gray-400"}`}>
+                            {plan.annual.billed}
+                          </p>
+                          <div className="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            {plan.annual.saving}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-400 mt-1">
+                          or {plan.annual.billed} &mdash; save {plan.annual.saving.split("—")[0].replace("Save ", "")}
+                        </p>
+                      )}
+                    </div>
+
+                    <p className={`text-sm leading-relaxed ${plan.highlight ? "text-gray-400" : "text-gray-500"}`}>{plan.description}</p>
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
-                    Buy it once.<br />
-                    <span className="gradient-text">Own it forever.</span>
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed mb-4">
-                    A good tool is an investment, not a subscription. Pay{" "}
-                    <strong className="text-gray-900">${LIFETIME_DEAL.price} once</strong> and Cloze works for your business forever — no monthly bill, no annual renewal, no price increases. Ever.
-                  </p>
-                  <p className="text-sm text-gray-500 mb-6">
-                    {LIFETIME_DEAL.includes} All future updates included at no extra cost.
-                  </p>
-                  <ul className="space-y-2.5 mb-8">
-                    {LIFETIME_DEAL.features.map((f) => (
-                      <li key={f} className="flex items-center gap-3 text-sm text-gray-700">
-                        <svg className="w-4 h-4 text-amber-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {plan.features.map((f) => (
+                      <li key={f} className={`flex items-start gap-3 text-sm ${plan.highlight ? "text-gray-300" : "text-gray-600"}`}>
+                        <svg className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         {f}
                       </li>
                     ))}
                   </ul>
-                </div>
-
-                {/* Right: price + CTA */}
-                <div className="bg-white rounded-2xl border border-amber-200 p-8 shadow-sm text-center">
-                  <p className="text-xs font-black text-amber-600 uppercase tracking-widest mb-2">One-Time Payment</p>
-                  <div className="flex items-start justify-center gap-1 mb-1">
-                    <span className="text-3xl font-black text-gray-400 mt-2">$</span>
-                    <span className="text-7xl font-black text-gray-900 leading-none">{LIFETIME_DEAL.price}</span>
-                  </div>
-                  <p className="text-gray-400 text-sm mb-1">one time · no subscription</p>
-                  <p className="text-orange-600 font-bold text-sm mb-6">
-                    vs. $499/mo on Growth = saves $4,491/yr
-                  </p>
 
                   <a
                     href={BOOKING_LINK}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-primary text-white font-black px-8 py-4 rounded-xl text-base shadow-md w-full block text-center mb-4"
+                    className={`w-full font-black py-4 rounded-xl text-base text-center block transition-all ${
+                      plan.highlight
+                        ? "btn-primary text-white shadow-md"
+                        : "btn-dark text-white shadow-sm"
+                    }`}
                   >
-                    Claim Lifetime Access →
+                    {plan.cta} →
                   </a>
-                  <p className="text-gray-400 text-xs">
-                    Includes 30-day money-back guarantee · Spots are limited and won&apos;t reopen
-                  </p>
+
+                  {plan.highlight && (
+                    <p className="text-center text-gray-500 text-xs mt-3">
+                      {isAnnual ? "Billed annually · cancel anytime" : "14-day free trial · cancel anytime"}
+                    </p>
+                  )}
                 </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
 
+          {/* Annual nudge when monthly is selected */}
+          {!isAnnual && (
+            <div className="mt-6 text-center animate-fade-up">
+              <button
+                onClick={() => setIsAnnual(true)}
+                className="inline-flex items-center gap-2 text-sm font-bold text-orange-600 hover:text-orange-700 transition-colors border border-orange-200 bg-orange-50 rounded-full px-5 py-2.5"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                </svg>
+                Switch to annual and save up to $4,000 — 2 months on us
+              </button>
+            </div>
+          )}
+
           {/* Money back */}
-          <div className="mt-8 text-center">
+          <div className="mt-10 text-center">
             <div className="inline-flex items-center gap-3 bg-green-50 border border-green-200 rounded-2xl px-8 py-5 text-left">
               <svg className="w-8 h-8 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
