@@ -188,13 +188,15 @@ const HOW_IT_WORKS = [
   },
 ];
 
+// Annual = $99/mo commitment. Monthly = $129/mo (30% premium drives annual conversion).
+// Same ~30% spread applied across Growth and Pro tiers.
 const PRICING = [
   {
     name: "Starter",
     tagline: "For the solo operator just getting started.",
     description: "Stop losing leads while you work. Get Cloze responding for you today.",
-    monthly: { price: 99, label: "$99", period: "/ mo" },
-    annual:  { price: 990, label: "$82", period: "/ mo", billed: "$990 billed annually", saving: "Save $198 — 2 months free" },
+    monthly: { label: "$129", period: "/ mo" },
+    annual:  { label: "$99", period: "/ mo", billed: "$1,188 billed annually", saving: "Save $360/yr — 3 months free" },
     features: [
       "Up to 100 leads per month",
       "Instant text + email response",
@@ -212,8 +214,8 @@ const PRICING = [
     name: "Growth",
     tagline: "For the business serious about scaling.",
     description: "Full automation across every lead source. The system serious operators run on.",
-    monthly: { price: 499, label: "$499", period: "/ mo" },
-    annual:  { price: 4990, label: "$416", period: "/ mo", billed: "$4,990 billed annually", saving: "Save $998 — 2 months free" },
+    monthly: { label: "$649", period: "/ mo" },
+    annual:  { label: "$499", period: "/ mo", billed: "$5,988 billed annually", saving: "Save $1,800/yr — 3 months free" },
     features: [
       "Up to 500 leads per month",
       "Text + email + voice follow-up",
@@ -232,8 +234,8 @@ const PRICING = [
     name: "Pro",
     tagline: "For high-volume or multi-location businesses.",
     description: "Unlimited leads, custom AI, and a dedicated team working alongside you.",
-    monthly: { price: 2000, label: "$2,000", period: "/ mo" },
-    annual:  { price: 20000, label: "$1,667", period: "/ mo", billed: "$20,000 billed annually", saving: "Save $4,000 — 2 months free" },
+    monthly: { label: "$2,599", period: "/ mo" },
+    annual:  { label: "$2,000", period: "/ mo", billed: "$24,000 billed annually", saving: "Save $7,188/yr — 3 months free" },
     features: [
       "Unlimited leads",
       "All channels + API access",
@@ -703,7 +705,7 @@ export default function Home() {
               </div>
               {isAnnual && (
                 <p className="text-sm text-green-600 font-semibold animate-fade-up">
-                  You&apos;re saving up to $4,000 by paying annually
+                  You&apos;re saving up to $7,188 by paying annually
                 </p>
               )}
             </div>
@@ -807,7 +809,7 @@ export default function Home() {
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                 </svg>
-                Switch to annual and save up to $4,000 — 2 months on us
+                Switch to annual and save up to $7,188 — 3 months on us
               </button>
             </div>
           )}
