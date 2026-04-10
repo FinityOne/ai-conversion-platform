@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 // Replace this with your actual Google Calendar booking link
-const BOOKING_LINK = "https://calendar.google.com/calendar/appointments";
+const BOOKING_LINK = "https://calendar.app.google/2gWrMB5YQRr2Z9mP7";
 
 const TICKER_ITEMS = [
   "3 out of 4 homeowners hire the first contractor to respond",
