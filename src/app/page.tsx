@@ -3,54 +3,78 @@
 import { useState } from "react";
 
 const STATS = [
-  { value: "3.2×", label: "Average revenue lift" },
-  { value: "47 sec", label: "Avg. first response time" },
-  { value: "89%", label: "Lead qualification rate" },
-  { value: "$0", label: "Human intervention cost" },
+  { value: "3.2×", label: "More jobs booked" },
+  { value: "47 sec", label: "Avg. response to homeowners" },
+  { value: "89%", label: "Leads auto-qualified" },
+  { value: "$0", label: "In missed follow-ups" },
 ];
 
 const FEATURES = [
   {
-    icon: "⚡",
-    title: "Instant Response Engine",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+    title: "Instant Response to Every Inquiry",
     description:
-      "Respond to every inbound lead within seconds — not hours. Speed-to-lead is the #1 conversion factor, and Cloze AI never sleeps.",
+      "Whether a homeowner fills out your form at 7am or 11pm, Cloze responds in under 47 seconds — before they move on to the next contractor on Google.",
     highlight: "47-second avg. response",
   },
   {
-    icon: "🧠",
-    title: "Intent-Aware Qualification",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    title: "Smart Job Qualification",
     description:
-      "Our AI reads between the lines — scoring interest, urgency, and budget signals to prioritize the leads most likely to close.",
+      "The AI asks about scope, budget, timeline, and location — so you only drive out to homeowners who are serious, ready, and a real fit for your crew.",
     highlight: "89% qualification accuracy",
   },
   {
-    icon: "🔄",
-    title: "Multi-Touch Follow-Up Cadences",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+    ),
+    title: "Persistent Follow-Up Sequences",
     description:
-      "Automated sequences across email, SMS, and chat — each message personalized by behavior, source, and stage in the funnel.",
-    highlight: "12-touch average sequence",
+      "Most homeowners don't decide on day one. Cloze follows up over email and SMS until they're ready to book — so no lead goes cold because you were too busy.",
+    highlight: "12-touch follow-up sequences",
   },
   {
-    icon: "📅",
-    title: "Auto-Book to Calendar",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    title: "Estimate Appointments on Autopilot",
     description:
-      "From first contact to booked meeting — Cloze handles scheduling negotiation and calendar sync so your team only shows up for the call.",
-    highlight: "Zero back-and-forth",
+      "Cloze handles the scheduling negotiation and books the site visit directly to your calendar. You just show up — no phone tag, no back-and-forth.",
+    highlight: "Zero phone tag",
   },
   {
-    icon: "🔗",
-    title: "CRM & Stack Integration",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+      </svg>
+    ),
+    title: "Works With Your Lead Sources",
     description:
-      "Plug into HubSpot, Salesforce, GoHighLevel, or any custom CRM via API. Your data stays clean, synced, and enriched automatically.",
-    highlight: "200+ native integrations",
+      "Connect Angi, Thumbtack, HomeAdvisor, your website, Google Ads — every lead channel in one place. No lead slips through because it came from the wrong form.",
+    highlight: "All major platforms supported",
   },
   {
-    icon: "📊",
-    title: "Revenue Attribution Dashboard",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+    title: "Pipeline & Close Rate Visibility",
     description:
-      "See exactly which lead sources, messages, and sequences are generating closed deals — not just clicks or opens.",
-    highlight: "Full-funnel visibility",
+      "See exactly which lead sources are turning into signed contracts — not just inquiries. Know where to spend your marketing dollars and where to cut.",
+    highlight: "Full-funnel tracking",
   },
 ];
 
@@ -59,62 +83,62 @@ const HOW_IT_WORKS = [
     step: "01",
     title: "Connect Your Lead Sources",
     description:
-      "Connect your forms, ads, CRM, or any inbound channel in minutes. Cloze starts working the moment a lead hits your pipeline.",
+      "Link your website form, Google Ads, Angi, Thumbtack, or any channel where homeowners find you. Setup takes under 2 hours — no engineers needed.",
   },
   {
     step: "02",
-    title: "AI Engages Immediately",
+    title: "AI Qualifies Every Homeowner",
     description:
-      "Your AI rep introduces itself, learns intent, handles objections, and builds rapport — all in real time, at scale.",
+      "Cloze reaches out immediately, asks the right questions about scope, budget, and timeline, handles objections, and filters out tire-kickers before they waste your time.",
   },
   {
     step: "03",
-    title: "Qualified Meetings Land on Your Calendar",
+    title: "Serious Leads Land on Your Calendar",
     description:
-      "Only warm, qualified prospects make it to your sales team. You show up, close, and repeat.",
+      "Only pre-qualified homeowners make it to a site visit. You show up ready to estimate — and close. Cloze handles everything before the handshake.",
   },
 ];
 
 const TESTIMONIALS = [
   {
     quote:
-      "We were losing 60% of leads to competitors who called faster. Cloze AI cut our response time from 4 hours to 41 seconds. Pipeline doubled in 6 weeks.",
-    name: "Marcus L.",
-    role: "VP of Sales",
-    company: "GrowthBase",
-    avatar: "ML",
-    color: "from-indigo-500 to-purple-600",
+      "We were losing jobs to contractors who called back faster. We can't always pick up when we're on site. Cloze responds in under a minute and books the estimate. We picked up 11 extra jobs in the first month alone.",
+    name: "Jake R.",
+    role: "Owner",
+    company: "Ridge Line Remodeling",
+    avatar: "JR",
+    color: "bg-amber-600",
   },
   {
     quote:
-      "Our sales team went from chasing cold leads to only taking warm, pre-qualified calls. Close rate jumped from 18% to 51% in a single quarter.",
-    name: "Priya S.",
-    role: "Head of Revenue",
-    company: "ScaleOps",
-    avatar: "PS",
-    color: "from-purple-500 to-pink-600",
+      "My estimator used to drive 45 minutes to meet homeowners who weren't serious. Now Cloze qualifies them first. Our closing rate went from 24% to 61% because we stopped wasting time on bad fits.",
+    name: "Maria C.",
+    role: "Operations Manager",
+    company: "Summit Home Renovations",
+    avatar: "MC",
+    color: "bg-blue-700",
   },
   {
     quote:
-      "I was skeptical about AI handling our leads. Then it booked 38 demos in the first week — while I was on vacation. I'm a believer now.",
-    name: "Jordan T.",
-    role: "Founder",
-    company: "Launchpad CRE",
-    avatar: "JT",
-    color: "from-pink-500 to-rose-600",
+      "I was texting leads myself at 10pm just to keep them warm. Now Cloze does it automatically. I got my evenings back, my pipeline grew, and I stopped feeling like I was always behind.",
+    name: "Derek M.",
+    role: "Owner",
+    company: "Keystone Builders",
+    avatar: "DM",
+    color: "bg-slate-700",
   },
 ];
 
 const TICKER_ITEMS = [
-  "47-second first response",
-  "3.2× revenue lift",
-  "Zero human needed",
-  "24/7 AI follow-up",
+  "Never miss a homeowner inquiry",
+  "Responds in 47 seconds",
+  "Filters tire-kickers automatically",
+  "Books estimate appointments",
+  "Works with Angi & Thumbtack",
   "89% qualification rate",
-  "Auto-book meetings",
-  "200+ integrations",
-  "Full CRM sync",
-  "5-star onboarding",
+  "3.2× more jobs booked",
+  "No after-hours missed calls",
+  "Works while you're on site",
   "SOC 2 compliant",
 ];
 
@@ -123,13 +147,13 @@ const PRICING = [
     name: "Starter",
     price: "297",
     period: "/ month",
-    description: "Perfect for solo operators and small teams ready to stop losing leads.",
+    description: "For solo contractors and small crews tired of losing jobs to faster competitors.",
     features: [
-      "Up to 500 leads/mo",
-      "Email + SMS outreach",
-      "Basic lead scoring",
+      "Up to 200 leads/mo",
+      "Email + SMS follow-up",
+      "Lead qualification AI",
       "Calendar booking",
-      "1 CRM integration",
+      "1 lead source integration",
       "Email support",
     ],
     cta: "Start Free Trial",
@@ -137,18 +161,18 @@ const PRICING = [
   },
   {
     name: "Growth",
-    price: "797",
+    price: "597",
     period: "/ month",
-    description: "For scaling teams who need full automation and deep insights.",
+    description: "For growing remodeling companies who need full pipeline automation.",
     features: [
-      "Up to 5,000 leads/mo",
-      "Email + SMS + Chat",
-      "Advanced intent scoring",
-      "Multi-touch sequences",
-      "Unlimited CRM integrations",
-      "Revenue attribution",
+      "Up to 1,000 leads/mo",
+      "Email + SMS + Voice follow-up",
+      "Advanced job qualification",
+      "Multi-touch follow-up sequences",
+      "All lead source integrations",
+      "Pipeline & close rate dashboard",
       "Priority support",
-      "Custom AI persona",
+      "Custom AI tone & scripts",
     ],
     cta: "Start Free Trial",
     highlight: true,
@@ -158,16 +182,16 @@ const PRICING = [
     name: "Enterprise",
     price: "Custom",
     period: "",
-    description: "Unlimited scale, dedicated AI training, and white-glove setup.",
+    description: "For multi-location or high-volume contractors with custom requirements.",
     features: [
       "Unlimited leads",
       "All channels + API access",
-      "Custom AI model training",
+      "Custom AI training",
       "Dedicated success manager",
       "SLA guarantee",
-      "SSO & advanced security",
+      "CRM + field software integration",
       "Custom reporting",
-      "Onsite onboarding",
+      "White-glove onboarding",
     ],
     cta: "Talk to Sales",
     highlight: false,
@@ -176,24 +200,28 @@ const PRICING = [
 
 const FAQS = [
   {
-    q: "Will the AI sound robotic to my leads?",
-    a: "Not at all. Cloze AI is trained on thousands of high-converting sales conversations. It adapts tone, vocabulary, and pacing to match your brand voice — leads regularly don't realize they're talking to AI until well into the conversation.",
+    q: "Will homeowners know they're talking to AI?",
+    a: "Cloze is trained to sound natural and conversational — not robotic. It introduces itself as your virtual assistant and handles the conversation professionally. Most homeowners appreciate the instant response far more than they care whether it's AI.",
+  },
+  {
+    q: "What lead sources does it connect to?",
+    a: "Cloze connects to your website contact form, Google Ads lead forms, Angi, Thumbtack, HomeAdvisor, Facebook Lead Ads, and more. If homeowners can fill out a form, Cloze can respond to it.",
   },
   {
     q: "How long does setup take?",
-    a: "Most customers are live in under 2 hours. Connect your lead sources, customize your AI's persona and scripts, and you're off. Our onboarding team handles the rest.",
+    a: "Most contractors are live in under 2 hours. You connect your lead sources, customize the AI's tone and the questions it asks, and it starts working immediately. Our onboarding team walks you through every step.",
   },
   {
-    q: "What if a lead asks to speak with a human?",
-    a: "Cloze hands off seamlessly. Your team gets a real-time notification with the full conversation context so you can jump in right where the AI left off — no awkward repeats.",
+    q: "What if a homeowner insists on speaking to a human?",
+    a: "Cloze flags the conversation and notifies you in real time, with the full chat history so you can pick up exactly where it left off — no awkward repeats for the homeowner.",
   },
   {
-    q: "Does it work with my existing CRM?",
-    a: "Yes. We have native integrations with HubSpot, Salesforce, Pipedrive, GoHighLevel, Close, and 200+ others. If your CRM has an API, we can connect to it.",
+    q: "Does it work with my existing software?",
+    a: "Yes. Cloze integrates with JobNimbus, ServiceTitan, HubSpot, GoHighLevel, and most CRMs and field management tools. If your software has an API, we can connect to it.",
   },
   {
     q: "Is there a free trial?",
-    a: "Yes — 14 days, no credit card required. You'll see results in the first 48 hours or we'll extend your trial, no questions asked.",
+    a: "Yes — 14 days, no credit card required. Most contractors see their first booked appointment within 48 hours. If you don't, we'll extend your trial and work with you to figure out why.",
   },
 ];
 
@@ -204,42 +232,41 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      setSubmitted(true);
-    }
+    if (email) setSubmitted(true);
   };
 
   return (
-    <div className="min-h-screen bg-[#07070f] text-[#f0f0ff] overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a] overflow-x-hidden">
+
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/5 backdrop-blur-xl bg-[#07070f]/80">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-white/90 border-b border-slate-200/80 backdrop-blur-xl">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
             C
           </div>
-          <span className="font-bold text-lg tracking-tight">Cloze AI</span>
+          <span className="font-bold text-lg tracking-tight text-slate-900">Cloze AI</span>
         </div>
-        <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
-          <a href="#features" className="hover:text-white transition-colors">Features</a>
-          <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-          <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-          <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+        <div className="hidden md:flex items-center gap-8 text-sm text-slate-500">
+          <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
+          <a href="#how-it-works" className="hover:text-slate-900 transition-colors">How It Works</a>
+          <a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a>
+          <a href="#faq" className="hover:text-slate-900 transition-colors">FAQ</a>
         </div>
         <a
           href="#signup"
-          className="btn-primary text-white text-sm font-semibold px-5 py-2.5 rounded-full"
+          className="btn-primary text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm"
         >
-          Start Free Trial →
+          Start Free Trial
         </a>
       </nav>
 
       {/* Ticker Bar */}
       <div className="pt-[73px]">
-        <div className="bg-gradient-to-r from-indigo-600/20 via-purple-600/20 to-pink-600/20 border-b border-white/5 py-2.5 ticker-wrap">
+        <div className="bg-slate-900 py-2.5 ticker-wrap">
           <div className="ticker-content">
             {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-              <span key={i} className="flex items-center gap-6 px-6 text-sm text-white/70 whitespace-nowrap">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block" />
+              <span key={i} className="flex items-center gap-6 px-6 text-sm text-slate-300 whitespace-nowrap">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
                 {item}
               </span>
             ))}
@@ -248,38 +275,34 @@ export default function Home() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[92vh] flex flex-col items-center justify-center text-center px-6 mesh-bg grid-bg">
-        {/* Orbs */}
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative py-24 md:py-32 flex flex-col items-center justify-center text-center px-6 bg-white">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(217,119,6,0.07),transparent)]" />
 
-        <div className="relative z-10 max-w-5xl mx-auto">
+        <div className="relative z-10 max-w-4xl mx-auto">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-4 py-2 text-sm text-indigo-300 mb-8">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            Now live — AI that converts 24/7, zero headcount required
+          <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-4 py-2 text-sm text-amber-700 font-medium mb-8">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            Built for remodelers, GCs, and home service businesses
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.05] mb-6">
-            Stop Losing Leads to<br />
-            <span className="gradient-text">Slow Follow-Up.</span>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] text-slate-900 mb-6">
+            You&apos;re on the Job Site.<br />
+            <span className="gradient-text">Your Next Customer</span><br />
+            Just Called a Competitor.
           </h1>
 
-          <p className="text-xl md:text-2xl text-white/60 max-w-2xl mx-auto leading-relaxed mb-10">
-            Cloze AI responds in{" "}
-            <span className="text-white font-semibold">47 seconds</span>, qualifies
-            in minutes, and books meetings{" "}
-            <span className="text-white font-semibold">while you sleep</span> — no
-            human reps needed.
+          <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-10">
+            Cloze AI responds to every homeowner inquiry in{" "}
+            <span className="text-slate-800 font-semibold">under 47 seconds</span> — qualifying leads, booking estimate appointments, and following up{" "}
+            <span className="text-slate-800 font-semibold">while you work.</span>
           </p>
 
           {/* CTA Form */}
           <div id="signup" className="max-w-md mx-auto mb-6">
             {submitted ? (
-              <div className="glass-card rounded-2xl p-6 border border-green-500/30 bg-green-500/5">
-                <div className="text-4xl mb-3">🎉</div>
-                <p className="text-green-400 font-semibold text-lg">You&apos;re on the list!</p>
-                <p className="text-white/60 text-sm mt-1">Check your inbox for your free trial access.</p>
+              <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+                <p className="text-green-700 font-semibold text-lg">You&apos;re on the list!</p>
+                <p className="text-green-600 text-sm mt-1">Check your inbox for your free trial access.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
@@ -289,31 +312,31 @@ export default function Home() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500/60 focus:bg-white/8 transition-all"
+                  className="flex-1 bg-white border border-slate-300 rounded-lg px-5 py-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                 />
                 <button
                   type="submit"
-                  className="btn-primary text-white font-bold px-8 py-4 rounded-xl whitespace-nowrap"
+                  className="btn-primary text-white font-bold px-8 py-4 rounded-lg whitespace-nowrap shadow-sm"
                 >
-                  Start Free Trial →
+                  Start Free Trial
                 </button>
               </form>
             )}
           </div>
 
-          <p className="text-white/35 text-sm">
-            14-day free trial · No credit card · Live in under 2 hours
+          <p className="text-slate-400 text-sm">
+            14-day free trial &middot; No credit card &middot; Live in under 2 hours
           </p>
 
           {/* Social proof mini */}
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-white/50">
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-500">
             <div className="flex -space-x-2">
-              {["ML", "PS", "JT", "KR", "AN"].map((init, i) => (
+              {["JR", "MC", "DM", "KT", "AL"].map((init, i) => (
                 <div
                   key={i}
-                  className="w-8 h-8 rounded-full border-2 border-[#07070f] flex items-center justify-center text-xs font-bold text-white"
+                  className="w-9 h-9 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white shadow-sm"
                   style={{
-                    background: `linear-gradient(135deg, hsl(${220 + i * 20}, 70%, 50%), hsl(${260 + i * 20}, 70%, 50%))`,
+                    background: ["#b45309", "#1e40af", "#374151", "#047857", "#7c3aed"][i],
                   }}
                 >
                   {init}
@@ -322,63 +345,68 @@ export default function Home() {
             </div>
             <span>
               Trusted by{" "}
-              <span className="text-white font-semibold">2,400+ revenue teams</span>
+              <span className="text-slate-800 font-semibold">1,200+ contractors</span>
             </span>
             <div className="flex items-center gap-1">
               {"★★★★★".split("").map((s, i) => (
-                <span key={i} className="text-yellow-400 text-base">{s}</span>
+                <span key={i} className="text-amber-400 text-base">{s}</span>
               ))}
-              <span className="ml-1">4.9/5</span>
+              <span className="ml-1 text-slate-500">4.9/5</span>
             </div>
           </div>
         </div>
 
         {/* Hero Visual */}
-        <div className="relative z-10 mt-20 w-full max-w-3xl mx-auto float-animation">
-          <div className="glass-card rounded-2xl p-6 pulse-glow">
-            <div className="flex items-center gap-2 mb-4">
+        <div className="relative z-10 mt-20 w-full max-w-2xl mx-auto float-animation">
+          <div className="bg-white rounded-2xl shadow-2xl shadow-slate-200 border border-slate-200 overflow-hidden">
+            {/* Browser chrome */}
+            <div className="flex items-center gap-2 px-4 py-3 bg-slate-100 border-b border-slate-200">
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/70" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
-                <div className="w-3 h-3 rounded-full bg-green-500/70" />
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                <div className="w-3 h-3 rounded-full bg-green-400" />
               </div>
-              <span className="text-white/30 text-xs ml-2">cloze.ai/dashboard</span>
+              <span className="text-slate-400 text-xs ml-2 font-mono">cloze.ai/dashboard</span>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+
+            {/* Stats row */}
+            <div className="grid grid-cols-4 gap-px bg-slate-100 border-b border-slate-200">
               {STATS.map((stat) => (
-                <div key={stat.label} className="bg-white/3 rounded-xl p-4 text-center border border-white/5">
-                  <div className="text-2xl font-black gradient-text">{stat.value}</div>
-                  <div className="text-xs text-white/40 mt-1">{stat.label}</div>
+                <div key={stat.label} className="bg-white px-4 py-4 text-center">
+                  <div className="text-xl font-black gradient-text">{stat.value}</div>
+                  <div className="text-xs text-slate-400 mt-0.5 leading-tight">{stat.label}</div>
                 </div>
               ))}
             </div>
-            {/* Fake chat thread */}
-            <div className="space-y-3">
+
+            {/* Chat thread */}
+            <div className="p-5 space-y-3 bg-slate-50">
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Live conversation — New inquiry from Angi</div>
               <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-                <div className="bg-indigo-600/20 border border-indigo-500/20 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-white/80 max-w-sm">
-                  Hi Marcus! Thanks for your interest in scaling your sales ops. Quick question — are you currently running a team, or is it just you right now?
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-xs font-bold text-white shrink-0">AI</div>
+                <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-700 max-w-sm shadow-sm">
+                  Hi Sarah! Thanks for reaching out about your kitchen remodel. To make sure we&apos;re a great fit — do you have a rough budget in mind, and are you looking to start in the next 60 days?
                 </div>
               </div>
               <div className="flex items-start gap-3 flex-row-reverse">
-                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold shrink-0">M</div>
-                <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white/80 max-w-sm">
-                  Team of 4 reps, but we're losing leads over weekends. Budget is around 2k/mo.
+                <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">S</div>
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-slate-700 max-w-sm">
+                  Yes, budget is around $40–50k. We want to start in March.
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold shrink-0">AI</div>
-                <div className="bg-indigo-600/20 border border-indigo-500/20 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-white/80 max-w-sm">
-                  Perfect — that&apos;s exactly what Cloze was built for. I have an opening Thursday at 2pm or Friday at 10am. Which works better for a 20-min demo?
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-xs font-bold text-white shrink-0">AI</div>
+                <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-700 max-w-sm shadow-sm">
+                  Perfect — that&apos;s right in our wheelhouse. I have an opening for a site visit this Thursday at 10am or Saturday at 9am. Which works better?
                   <div className="flex gap-2 mt-3">
-                    <button className="text-xs bg-indigo-600/40 border border-indigo-500/40 rounded-lg px-3 py-1.5 hover:bg-indigo-600/60 transition-colors">Thu 2pm ✓</button>
-                    <button className="text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-1.5">Fri 10am</button>
+                    <button className="text-xs bg-amber-600 text-white rounded-lg px-3 py-1.5 font-medium">Thu 10am</button>
+                    <button className="text-xs bg-slate-100 text-slate-600 border border-slate-200 rounded-lg px-3 py-1.5">Sat 9am</button>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-xs text-green-400/80 mt-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                Lead qualified in 4 minutes · Meeting booked automatically
+              <div className="flex items-center gap-2 text-xs text-green-600 font-medium mt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                Lead qualified in 3 min &middot; Estimate appointment booked automatically
               </div>
             </div>
           </div>
@@ -386,41 +414,51 @@ export default function Home() {
       </section>
 
       {/* Stats Band */}
-      <section className="py-16 px-6 border-y border-white/5 bg-white/[0.02]">
+      <section className="py-16 px-6 bg-slate-900">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { value: "2,400+", label: "Revenue teams using Cloze" },
-            { value: "$180M+", label: "Pipeline generated via Cloze" },
-            { value: "47 sec", label: "Average first-touch response" },
-            { value: "3.2×", label: "Average conversion lift" },
+            { value: "1,200+", label: "Contractors using Cloze" },
+            { value: "$94M+", label: "In jobs booked via Cloze" },
+            { value: "47 sec", label: "Avg. first-touch response" },
+            { value: "3.2×", label: "More jobs closed on avg." },
           ].map((s) => (
             <div key={s.label}>
               <div className="text-4xl font-black gradient-text mb-2">{s.value}</div>
-              <div className="text-sm text-white/40">{s.label}</div>
+              <div className="text-sm text-slate-400">{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* Problem → Solution */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="text-center mb-14">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+              The real reason you&apos;re losing jobs
+            </h2>
+            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+              It&apos;s not your craftsmanship. It&apos;s not your pricing. It&apos;s response time.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 items-start">
             {/* Problem */}
-            <div className="glass-card rounded-2xl p-8 border border-red-500/10 bg-red-500/3">
-              <div className="text-3xl mb-4">😩</div>
-              <h3 className="text-xl font-bold mb-4 text-red-300">The Old Way</h3>
-              <ul className="space-y-3 text-white/60 text-sm">
+            <div className="rounded-2xl p-8 border border-red-100 bg-red-50">
+              <div className="inline-flex items-center gap-2 text-sm font-semibold text-red-600 bg-red-100 rounded-full px-3 py-1.5 mb-5">
+                <span>Without Cloze AI</span>
+              </div>
+              <ul className="space-y-3.5 text-slate-600 text-sm">
                 {[
-                  "Lead fills out form at 11pm Friday",
-                  "No one responds until Monday",
-                  "Competitor calls in 5 minutes",
-                  "Lead ghosts you by Monday",
-                  "Rep blames lead quality",
-                  "You spend more on ads. Repeat.",
+                  "Homeowner fills out your form at 9pm Saturday",
+                  "You're wrapping up another job, can't respond",
+                  "They fill out 3 more competitor forms",
+                  "First contractor to call wins the job",
+                  "You call back Monday. \"We already went with someone.\"",
+                  "You spend more on Angi. Repeat.",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <span className="text-red-400 mt-0.5 shrink-0">✕</span>
+                    <span className="text-red-400 mt-0.5 shrink-0 font-bold">✕</span>
                     {item}
                   </li>
                 ))}
@@ -428,20 +466,21 @@ export default function Home() {
             </div>
 
             {/* Solution */}
-            <div className="glass-card rounded-2xl p-8 border border-green-500/10 bg-green-500/3">
-              <div className="text-3xl mb-4">🚀</div>
-              <h3 className="text-xl font-bold mb-4 text-green-300">With Cloze AI</h3>
-              <ul className="space-y-3 text-white/60 text-sm">
+            <div className="rounded-2xl p-8 border border-green-100 bg-green-50">
+              <div className="inline-flex items-center gap-2 text-sm font-semibold text-green-700 bg-green-100 rounded-full px-3 py-1.5 mb-5">
+                <span>With Cloze AI</span>
+              </div>
+              <ul className="space-y-3.5 text-slate-600 text-sm">
                 {[
-                  "Lead fills out form at 11pm Friday",
-                  "Cloze responds in 47 seconds",
-                  "Qualifies intent, handles objections",
-                  "Books a Monday 9am call automatically",
-                  "Rep shows up to a warm conversation",
-                  "You close. Cloze does it again.",
+                  "Homeowner fills out your form at 9pm Saturday",
+                  "Cloze responds in 47 seconds, every time",
+                  "Qualifies scope, budget, and timeline",
+                  "Handles objections, answers questions",
+                  "Books an estimate appointment for Tuesday",
+                  "You show up, estimate, close. Cloze does it again.",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <span className="text-green-400 mt-0.5 shrink-0">✓</span>
+                    <span className="text-green-500 mt-0.5 shrink-0 font-bold">✓</span>
                     {item}
                   </li>
                 ))}
@@ -452,31 +491,33 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-24 px-6">
+      <section id="features" className="py-24 px-6 bg-slate-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-block text-xs font-semibold tracking-widest text-indigo-400 uppercase mb-4">
+            <div className="inline-block text-xs font-bold tracking-widest text-amber-600 uppercase mb-4">
               Platform Features
             </div>
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
               Everything you need to{" "}
-              <span className="gradient-text">close more,</span> do less.
+              <span className="gradient-text">fill your calendar</span>{" "}with serious jobs.
             </h2>
-            <p className="text-white/50 text-lg max-w-xl mx-auto">
-              One AI platform that covers the full conversion journey from first touch to booked meeting.
+            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+              One AI system that covers the full lead journey — from first inquiry to signed estimate.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f) => (
               <div
                 key={f.title}
-                className="glass-card rounded-2xl p-6 card-hover feature-glow relative cursor-default border border-white/5"
+                className="glass-card rounded-2xl p-6 card-hover cursor-default"
               >
-                <div className="text-3xl mb-4">{f.icon}</div>
-                <h3 className="font-bold text-lg mb-2">{f.title}</h3>
-                <p className="text-white/50 text-sm leading-relaxed mb-4">{f.description}</p>
-                <div className="inline-block text-xs font-semibold text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-3 py-1">
+                <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 mb-4">
+                  {f.icon}
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 mb-2">{f.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed mb-4">{f.description}</p>
+                <div className="inline-block text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
                   {f.highlight}
                 </div>
               </div>
@@ -486,41 +527,38 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6 bg-white/[0.015]">
+      <section id="how-it-works" className="py-24 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-block text-xs font-semibold tracking-widest text-purple-400 uppercase mb-4">
+            <div className="inline-block text-xs font-bold tracking-widest text-amber-600 uppercase mb-4">
               How It Works
             </div>
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
-              Live in{" "}
-              <span className="gradient-text">2 hours.</span>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+              Live in <span className="gradient-text">2 hours.</span>
             </h2>
-            <p className="text-white/50 text-lg">
-              No engineers. No months of setup. Just connect and convert.
+            <p className="text-slate-500 text-lg">
+              No developers. No months of setup. Connect and start booking.
             </p>
           </div>
 
           <div className="relative">
-            {/* Connector line */}
-            <div className="absolute left-8 top-12 bottom-12 w-px bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 hidden md:block" />
-
-            <div className="space-y-8">
+            <div className="absolute left-8 top-12 bottom-12 w-px bg-gradient-to-b from-amber-400 to-orange-400 hidden md:block" />
+            <div className="space-y-6">
               {HOW_IT_WORKS.map((step, i) => (
                 <div key={step.step} className="flex gap-8 items-start">
                   <div className="relative shrink-0">
                     <div
-                      className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-lg text-white"
+                      className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-lg text-white shadow-md"
                       style={{
-                        background: `linear-gradient(135deg, hsl(${240 + i * 30}, 70%, 55%), hsl(${270 + i * 30}, 70%, 55%))`,
+                        background: ["#b45309", "#d97706", "#ea580c"][i],
                       }}
                     >
                       {step.step}
                     </div>
                   </div>
-                  <div className="glass-card rounded-2xl p-6 flex-1 border border-white/5">
-                    <h3 className="font-bold text-xl mb-2">{step.title}</h3>
-                    <p className="text-white/50 leading-relaxed">{step.description}</p>
+                  <div className="glass-card rounded-2xl p-6 flex-1">
+                    <h3 className="font-bold text-xl text-slate-900 mb-2">{step.title}</h3>
+                    <p className="text-slate-500 leading-relaxed">{step.description}</p>
                   </div>
                 </div>
               ))}
@@ -530,15 +568,15 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-slate-900">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-block text-xs font-semibold tracking-widest text-pink-400 uppercase mb-4">
-              Customer Results
+            <div className="inline-block text-xs font-bold tracking-widest text-amber-400 uppercase mb-4">
+              Contractor Results
             </div>
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
-              Real revenue.{" "}
-              <span className="gradient-text">Real results.</span>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+              Real contractors.{" "}
+              <span className="gradient-text">Real jobs closed.</span>
             </h2>
           </div>
 
@@ -546,26 +584,26 @@ export default function Home() {
             {TESTIMONIALS.map((t) => (
               <div
                 key={t.name}
-                className="glass-card rounded-2xl p-6 card-hover border border-white/5 flex flex-col"
+                className="bg-slate-800 border border-slate-700 rounded-2xl p-6 card-hover flex flex-col"
               >
                 <div className="flex mb-4">
                   {"★★★★★".split("").map((s, i) => (
-                    <span key={i} className="text-yellow-400 text-lg">{s}</span>
+                    <span key={i} className="text-amber-400 text-lg">{s}</span>
                   ))}
                 </div>
-                <blockquote className="text-white/70 text-sm leading-relaxed flex-1 mb-6">
+                <blockquote className="text-slate-300 text-sm leading-relaxed flex-1 mb-6">
                   &ldquo;{t.quote}&rdquo;
                 </blockquote>
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-xs font-bold text-white shrink-0`}
+                    className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center text-xs font-bold text-white shrink-0`}
                   >
                     {t.avatar}
                   </div>
                   <div>
-                    <div className="font-semibold text-sm">{t.name}</div>
-                    <div className="text-white/40 text-xs">
-                      {t.role} · {t.company}
+                    <div className="font-semibold text-sm text-white">{t.name}</div>
+                    <div className="text-slate-400 text-xs">
+                      {t.role} &middot; {t.company}
                     </div>
                   </div>
                 </div>
@@ -576,18 +614,17 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-24 px-6 bg-white/[0.015]">
+      <section id="pricing" className="py-24 px-6 bg-slate-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-block text-xs font-semibold tracking-widest text-indigo-400 uppercase mb-4">
+            <div className="inline-block text-xs font-bold tracking-widest text-amber-600 uppercase mb-4">
               Pricing
             </div>
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
-              Pay less than one{" "}
-              <span className="gradient-text">SDR&apos;s salary.</span>
-              <br />Get 10× the output.
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+              Less than losing{" "}
+              <span className="gradient-text">one job a month.</span>
             </h2>
-            <p className="text-white/50 text-lg">
+            <p className="text-slate-500 text-lg">
               14-day free trial on all plans. Cancel anytime.
             </p>
           </div>
@@ -598,35 +635,35 @@ export default function Home() {
                 key={plan.name}
                 className={`rounded-2xl p-8 flex flex-col relative ${
                   plan.highlight
-                    ? "bg-gradient-to-b from-indigo-600/20 to-purple-600/10 border border-indigo-500/40 shadow-2xl shadow-indigo-500/10"
-                    : "glass-card border border-white/5"
+                    ? "bg-slate-900 border border-slate-700 shadow-2xl"
+                    : "glass-card"
                 }`}
               >
                 {plan.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold px-4 py-1.5 rounded-full whitespace-nowrap">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 btn-primary text-white text-xs font-bold px-4 py-1.5 rounded-full whitespace-nowrap shadow-md">
                     {plan.badge}
                   </div>
                 )}
                 <div className="mb-6">
-                  <h3 className="font-bold text-xl mb-1">{plan.name}</h3>
+                  <h3 className={`font-bold text-xl mb-1 ${plan.highlight ? "text-white" : "text-slate-900"}`}>{plan.name}</h3>
                   <div className="flex items-end gap-1 mb-3">
                     {plan.price === "Custom" ? (
                       <span className="text-4xl font-black gradient-text">Custom</span>
                     ) : (
                       <>
-                        <span className="text-white/40 text-lg mt-1">$</span>
-                        <span className="text-4xl font-black">{plan.price}</span>
-                        <span className="text-white/40 text-sm mb-1">{plan.period}</span>
+                        <span className={`text-lg mt-1 ${plan.highlight ? "text-slate-400" : "text-slate-400"}`}>$</span>
+                        <span className={`text-4xl font-black ${plan.highlight ? "text-white" : "text-slate-900"}`}>{plan.price}</span>
+                        <span className={`text-sm mb-1 ${plan.highlight ? "text-slate-400" : "text-slate-400"}`}>{plan.period}</span>
                       </>
                     )}
                   </div>
-                  <p className="text-white/50 text-sm">{plan.description}</p>
+                  <p className={`text-sm ${plan.highlight ? "text-slate-400" : "text-slate-500"}`}>{plan.description}</p>
                 </div>
 
                 <ul className="space-y-3 mb-8 flex-1">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-white/70">
-                      <span className="text-green-400 text-base shrink-0">✓</span>
+                    <li key={f} className={`flex items-center gap-3 text-sm ${plan.highlight ? "text-slate-300" : "text-slate-600"}`}>
+                      <span className="text-amber-500 text-base shrink-0 font-bold">✓</span>
                       {f}
                     </li>
                   ))}
@@ -635,8 +672,8 @@ export default function Home() {
                 <button
                   className={`w-full font-bold py-3.5 rounded-xl transition-all ${
                     plan.highlight
-                      ? "btn-primary text-white"
-                      : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
+                      ? "btn-primary text-white shadow-md"
+                      : "bg-slate-900 text-white hover:bg-slate-800 transition-colors"
                   }`}
                 >
                   {plan.cta}
@@ -648,28 +685,28 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-24 px-6">
+      <section id="faq" className="py-24 px-6 bg-white">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
-              Still have{" "}
-              <span className="gradient-text">questions?</span>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+              Common <span className="gradient-text">questions</span>
             </h2>
+            <p className="text-slate-500 text-lg">Everything contractors ask before getting started.</p>
           </div>
 
           <div className="space-y-3">
             {FAQS.map((faq, i) => (
               <div
                 key={i}
-                className="glass-card border border-white/5 rounded-2xl overflow-hidden"
+                className="glass-card border border-slate-200 rounded-2xl overflow-hidden"
               >
                 <button
-                  className="w-full flex items-center justify-between gap-4 p-6 text-left hover:bg-white/3 transition-colors"
+                  className="w-full flex items-center justify-between gap-4 p-6 text-left hover:bg-slate-50 transition-colors"
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 >
-                  <span className="font-semibold">{faq.q}</span>
+                  <span className="font-semibold text-slate-900">{faq.q}</span>
                   <span
-                    className={`text-indigo-400 text-xl shrink-0 transition-transform duration-300 ${
+                    className={`text-amber-500 text-xl shrink-0 transition-transform duration-300 font-bold ${
                       openFaq === i ? "rotate-45" : ""
                     }`}
                   >
@@ -677,7 +714,7 @@ export default function Home() {
                   </span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-6 pb-6 text-white/55 text-sm leading-relaxed border-t border-white/5 pt-4">
+                  <div className="px-6 pb-6 text-slate-500 text-sm leading-relaxed border-t border-slate-100 pt-4">
                     {faq.a}
                   </div>
                 )}
@@ -688,27 +725,25 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-32 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 mesh-bg" />
-        <div className="absolute inset-0 grid-bg opacity-50" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-indigo-600/15 rounded-full blur-3xl" />
-
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <div className="text-6xl mb-6">🤖</div>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">
-            Your leads are worth more<br />
-            than a{" "}
-            <span className="shimmer-text">slow response.</span>
+      <section className="py-28 px-6 bg-slate-900">
+        <div className="relative max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-2 text-sm text-amber-400 font-medium mb-8">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            Start responding in under 47 seconds
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-6">
+            Stop leaving jobs on the table.<br />
+            <span className="gradient-text">Let Cloze handle the follow-up.</span>
           </h2>
-          <p className="text-xl text-white/55 mb-10 max-w-xl mx-auto leading-relaxed">
-            Every minute without Cloze AI is a minute a competitor could be talking to your lead. Start your free trial — no credit card, no risk.
+          <p className="text-xl text-slate-400 mb-10 max-w-xl mx-auto leading-relaxed">
+            Every hour you don&apos;t respond is an hour a competitor is talking to your lead. Start your free trial — no credit card, no risk.
           </p>
 
           <div className="max-w-md mx-auto">
             {submitted ? (
-              <div className="glass-card rounded-2xl p-6 border border-green-500/30 bg-green-500/5">
-                <p className="text-green-400 font-semibold text-lg">You&apos;re in! 🎉</p>
-                <p className="text-white/60 text-sm mt-1">Check your inbox for your free trial access.</p>
+              <div className="bg-green-900/30 border border-green-500/30 rounded-xl p-6">
+                <p className="text-green-400 font-semibold text-lg">You&apos;re in!</p>
+                <p className="text-slate-400 text-sm mt-1">Check your inbox for your free trial access.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
@@ -718,50 +753,51 @@ export default function Home() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500/60 transition-all"
+                  className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-5 py-4 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                 />
                 <button
                   type="submit"
-                  className="btn-primary text-white font-bold px-8 py-4 rounded-xl whitespace-nowrap"
+                  className="btn-primary text-white font-bold px-8 py-4 rounded-lg whitespace-nowrap shadow-md"
                 >
-                  Get Free Access →
+                  Get Free Access
                 </button>
               </form>
             )}
           </div>
 
-          <p className="text-white/25 text-sm mt-4">
-            14 days free · No credit card · Cancel anytime
+          <p className="text-slate-500 text-sm mt-4">
+            14 days free &middot; No credit card &middot; Cancel anytime
           </p>
 
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-white/30">
-            <span>🔒 SOC 2 Type II</span>
-            <span>🛡️ GDPR Compliant</span>
-            <span>⚡ 99.9% Uptime SLA</span>
-            <span>🤝 White-glove onboarding</span>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500">
+            <span>SOC 2 Type II</span>
+            <span>GDPR Compliant</span>
+            <span>99.9% Uptime SLA</span>
+            <span>White-glove onboarding</span>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-white/5">
+      <footer className="py-10 px-6 border-t border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
               C
             </div>
-            <span className="font-bold">Cloze AI</span>
+            <span className="font-bold text-slate-900">Cloze AI</span>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/30">
-            <a href="#" className="hover:text-white/60 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Terms</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Security</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Blog</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Contact</a>
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
+            <a href="#" className="hover:text-slate-700 transition-colors">Privacy</a>
+            <a href="#" className="hover:text-slate-700 transition-colors">Terms</a>
+            <a href="#" className="hover:text-slate-700 transition-colors">Security</a>
+            <a href="#" className="hover:text-slate-700 transition-colors">Blog</a>
+            <a href="#" className="hover:text-slate-700 transition-colors">Contact</a>
           </div>
-          <p className="text-white/20 text-sm">© 2026 Cloze AI. All rights reserved.</p>
+          <p className="text-slate-400 text-sm">&copy; 2026 Cloze AI. All rights reserved.</p>
         </div>
       </footer>
+
     </div>
   );
 }
