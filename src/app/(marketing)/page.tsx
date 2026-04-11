@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 
-const BOOKING_LINK = "https://calendar.app.google/2gWrMB5YQRr2Z9mP7";
-
-// ── Constants for inline styles (dark-mode design system) ──────────
 const BASE_BG = "#05091a";
-const GLASS_STYLE = {
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.08)",
-};
 const DIVIDER_STYLE = {
   height: "1px",
   background: "rgba(255,255,255,0.07)",
@@ -18,7 +11,6 @@ const DIVIDER_STYLE = {
 const MUTED = "rgba(255,255,255,0.4)";
 const VERY_MUTED = "rgba(255,255,255,0.22)";
 
-// ── Data ───────────────────────────────────────────────────────────
 const TESTIMONIALS = [
   {
     result: "+$80K",
@@ -64,12 +56,12 @@ const STEPS = [
   {
     n: "02",
     title: "AI qualifies every inquiry",
-    body: "Every lead gets a response in under 60 seconds, 24/7. Cloze introduces itself, asks the right questions, and filters out tire-kickers automatically.",
+    body: "Every lead gets a response in under 60 seconds, 24/7. ClozeFlow introduces itself, asks the right questions, and filters out tire-kickers automatically.",
   },
   {
     n: "03",
     title: "Appointments hit your calendar",
-    body: "Qualified, ready-to-buy customers book directly to your calendar. You show up, close the job. Cloze fills the next slot while you work.",
+    body: "Qualified, ready-to-buy customers book directly to your calendar. You show up, close the job. ClozeFlow fills the next slot while you work.",
   },
 ];
 
@@ -132,11 +124,11 @@ const PRICING = [
 const FAQS = [
   {
     q: "Will my customers know they're talking to AI?",
-    a: "Cloze introduces itself as your office assistant — friendly and professional. Customers care far more about a 30-second response than who sent it. Most clients actually compliment contractors on how responsive they've become.",
+    a: "ClozeFlow introduces itself as your office assistant — friendly and professional. Customers care far more about a 30-second response than who sent it. Most clients actually compliment contractors on how responsive they've become.",
   },
   {
     q: "What lead sources does it connect to?",
-    a: "Your website, Google Ads, Facebook, Angi, Thumbtack, HomeAdvisor, Yelp — wherever customers reach out. If there's a form, Cloze can respond to it.",
+    a: "Your website, Google Ads, Facebook, Angi, Thumbtack, HomeAdvisor, Yelp — wherever customers reach out. If there's a form, ClozeFlow can respond to it.",
   },
   {
     q: "I'm not tech-savvy. Is this hard to set up?",
@@ -144,7 +136,7 @@ const FAQS = [
   },
   {
     q: "What if a customer wants to speak with a real person?",
-    a: "Cloze flags it immediately and notifies you with the full conversation context. You pick up right where it left off — no awkward repetition for the customer.",
+    a: "ClozeFlow flags it immediately and notifies you with the full conversation context. You pick up right where it left off — no awkward repetition for the customer.",
   },
   {
     q: "Does the trial include everything?",
@@ -152,60 +144,15 @@ const FAQS = [
   },
 ];
 
-// ── Page ───────────────────────────────────────────────────────────
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
     <div className="min-h-screen" style={{ background: BASE_BG, color: "#f1f5f9" }}>
-
-      {/* ── Nav ─────────────────────────────────────────── */}
-      <header
-        className="fixed top-0 inset-x-0 z-50"
-        style={{
-          background: "rgba(5,9,26,0.85)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg,#ea580c,#f97316)" }}
-            >
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <span className="font-black text-lg tracking-tight text-white">
-              Cloze<span className="text-gradient">.</span>
-            </span>
-          </div>
-
-          {/* Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium" style={{ color: MUTED }}>
-            {[["#how-it-works", "How It Works"], ["#pricing", "Pricing"], ["#faq", "FAQ"]].map(([href, label]) => (
-              <a key={href} href={href} className="hover:text-white transition-colors">{label}</a>
-            ))}
-          </nav>
-
-          <a
-            href={BOOKING_LINK} target="_blank" rel="noopener noreferrer"
-            className="btn-glow px-5 py-2.5 rounded-lg text-sm"
-          >
-            Book Free Call
-          </a>
-        </div>
-      </header>
-
       <main>
 
         {/* ── Hero ──────────────────────────────────────── */}
         <section className="relative overflow-hidden pt-36 pb-28 px-6">
-          {/* Ambient glow blobs */}
           <div className="absolute inset-0 pointer-events-none" aria-hidden>
             <div
               className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[560px] rounded-full"
@@ -216,12 +163,9 @@ export default function Home() {
               style={{ background: "radial-gradient(ellipse, rgba(251,191,36,0.06) 0%, transparent 65%)", filter: "blur(60px)" }}
             />
           </div>
-          {/* Dot grid overlay */}
           <div className="absolute inset-0 dot-grid pointer-events-none" aria-hidden />
 
           <div className="relative max-w-4xl mx-auto text-center">
-
-            {/* Pill badge */}
             <div
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-10 uppercase tracking-widest"
               style={{ background: "rgba(234,88,12,0.11)", border: "1px solid rgba(234,88,12,0.24)", color: "#fb923c" }}
@@ -230,7 +174,6 @@ export default function Home() {
               Built for contractors &amp; remodelers
             </div>
 
-            {/* Headline */}
             <h1 className="text-5xl md:text-7xl lg:text-[84px] font-black tracking-tight leading-[0.91] mb-8 text-white">
               Your next job went<br />
               to whoever answered<br />
@@ -238,16 +181,15 @@ export default function Home() {
             </h1>
 
             <p className="text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed mb-12" style={{ color: MUTED }}>
-              Cloze responds to every lead in under 60 seconds — day or night — qualifying real buyers and booking them straight to your calendar.
+              ClozeFlow responds to every lead in under 60 seconds — day or night — qualifying real buyers and booking them straight to your calendar.
             </p>
 
-            {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               <a
-                href={BOOKING_LINK} target="_blank" rel="noopener noreferrer"
+                href="/signup"
                 className="btn-glow px-10 py-5 rounded-xl text-lg w-full sm:w-auto text-center"
               >
-                Book a Free 15-Min Demo →
+                Start Free Trial →
               </a>
               <a
                 href="#how-it-works"
@@ -257,7 +199,6 @@ export default function Home() {
               </a>
             </div>
 
-            {/* Social proof strip */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8 text-sm" style={{ color: VERY_MUTED }}>
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-2.5">
@@ -288,10 +229,7 @@ export default function Home() {
         <hr style={DIVIDER_STYLE} />
         <section className="py-7 px-6" style={{ background: "rgba(255,255,255,0.02)" }}>
           <div className="max-w-5xl mx-auto">
-            <p
-              className="text-center text-[11px] font-bold tracking-widest uppercase mb-5"
-              style={{ color: "rgba(255,255,255,0.2)" }}
-            >
+            <p className="text-center text-[11px] font-bold tracking-widest uppercase mb-5" style={{ color: "rgba(255,255,255,0.2)" }}>
               Catches leads from every platform you advertise on
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
@@ -350,13 +288,9 @@ export default function Home() {
             ))}
           </div>
 
-          {/* 78% callout */}
           <div
             className="p-8 rounded-2xl text-center"
-            style={{
-              background: "linear-gradient(135deg,#ea580c 0%,#f97316 100%)",
-              boxShadow: "0 0 48px rgba(234,88,12,0.22)",
-            }}
+            style={{ background: "linear-gradient(135deg,#ea580c 0%,#f97316 100%)", boxShadow: "0 0 48px rgba(234,88,12,0.22)" }}
           >
             <p className="text-5xl font-black text-white mb-2">78%</p>
             <p className="text-lg font-semibold text-white mb-1.5">
@@ -372,10 +306,7 @@ export default function Home() {
         <hr style={DIVIDER_STYLE} />
         <section className="py-20 px-6" style={{ background: "rgba(255,255,255,0.02)" }}>
           <div className="max-w-5xl mx-auto">
-            <p
-              className="text-center text-[11px] font-bold tracking-widest uppercase mb-14"
-              style={{ color: "rgba(255,255,255,0.2)" }}
-            >
+            <p className="text-center text-[11px] font-bold tracking-widest uppercase mb-14" style={{ color: "rgba(255,255,255,0.2)" }}>
               What changes when you respond first — every time
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
@@ -383,7 +314,7 @@ export default function Home() {
                 { n: "< 60s", label: "Response to every lead", sub: "day or night, 365 days/yr" },
                 { n: "3 in 4", label: "Customers hire whoever responds first", sub: "industry-wide data" },
                 { n: "3.2×", label: "More jobs closed on average", sub: "vs. no automation" },
-                { n: "$48K", label: "Avg. revenue recovered in 30 days", sub: "per Cloze customer" },
+                { n: "$48K", label: "Avg. revenue recovered in 30 days", sub: "per ClozeFlow customer" },
               ].map((s) => (
                 <div key={s.n}>
                   <p className="text-4xl md:text-5xl font-black text-gradient mb-2">{s.n}</p>
@@ -443,7 +374,6 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-5">
               {TESTIMONIALS.map((t) => (
                 <div key={t.name} className="glass glass-hover rounded-2xl p-8 flex flex-col">
-                  {/* Outcome metric leads */}
                   <div className="mb-6 pb-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
                     <p className="text-4xl font-black text-gradient mb-1">{t.result}</p>
                     <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: VERY_MUTED }}>
@@ -463,10 +393,7 @@ export default function Home() {
                     &ldquo;{t.quote}&rdquo;
                   </blockquote>
 
-                  <div
-                    className="flex items-center gap-3 pt-5"
-                    style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
-                  >
+                  <div className="flex items-center gap-3 pt-5" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                       style={{ background: t.avatarBg }}
@@ -488,15 +415,11 @@ export default function Home() {
         {/* ── Pricing ───────────────────────────────────── */}
         <section id="pricing" className="max-w-6xl mx-auto px-6 py-24">
           <div className="text-center mb-16">
-            <p className="text-xs font-bold tracking-widest uppercase mb-4 text-gradient inline-block">
-              Pricing
-            </p>
+            <p className="text-xs font-bold tracking-widest uppercase mb-4 text-gradient inline-block">Pricing</p>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
               One closed job pays for<br className="hidden md:block" /> a full year.
             </h2>
-            <p className="text-lg" style={{ color: MUTED }}>
-              14-day free trial · No credit card · Cancel anytime
-            </p>
+            <p className="text-lg" style={{ color: MUTED }}>14-day free trial · No credit card · Cancel anytime</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-5 items-stretch">
@@ -515,15 +438,11 @@ export default function Home() {
                 )}
 
                 <div className="mb-6">
-                  <p
-                    className="text-[11px] font-black uppercase tracking-widest mb-2"
-                    style={{ color: plan.highlight ? "#fb923c" : VERY_MUTED }}
-                  >
+                  <p className="text-[11px] font-black uppercase tracking-widest mb-2" style={{ color: plan.highlight ? "#fb923c" : VERY_MUTED }}>
                     {plan.tagline}
                   </p>
                   <h3 className="font-black text-2xl text-white mb-6">{plan.name}</h3>
 
-                  {/* Annual — primary */}
                   <div
                     className="rounded-xl p-4 mb-3"
                     style={{
@@ -532,10 +451,7 @@ export default function Home() {
                     }}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span
-                        className="text-[11px] font-bold uppercase tracking-wide"
-                        style={{ color: plan.highlight ? "#fb923c" : VERY_MUTED }}
-                      >
+                      <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: plan.highlight ? "#fb923c" : VERY_MUTED }}>
                         Annual · Best Value
                       </span>
                       <span
@@ -554,15 +470,12 @@ export default function Home() {
                     </p>
                   </div>
 
-                  {/* Monthly — secondary */}
                   <div
                     className="rounded-xl px-4 py-3 flex items-center justify-between"
                     style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
                   >
                     <div>
-                      <p className="text-[10px] font-medium mb-0.5" style={{ color: "rgba(255,255,255,0.2)" }}>
-                        Month-to-month
-                      </p>
+                      <p className="text-[10px] font-medium mb-0.5" style={{ color: "rgba(255,255,255,0.2)" }}>Month-to-month</p>
                       <p className="text-xl font-black leading-none" style={{ color: "rgba(255,255,255,0.28)" }}>
                         {plan.monthly.label}<span className="text-xs font-normal">/mo</span>
                       </p>
@@ -583,10 +496,8 @@ export default function Home() {
                 </ul>
 
                 <a
-                  href={BOOKING_LINK} target="_blank" rel="noopener noreferrer"
-                  className={`py-4 rounded-xl font-bold text-sm text-center block transition-all ${
-                    plan.highlight ? "btn-glow" : "btn-outline-dark"
-                  }`}
+                  href="/signup"
+                  className={`py-4 rounded-xl font-bold text-sm text-center block transition-all ${plan.highlight ? "btn-glow" : "btn-outline-dark"}`}
                 >
                   {plan.cta} →
                 </a>
@@ -600,7 +511,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Guarantee */}
           <div className="mt-12 glass rounded-2xl p-8 max-w-2xl mx-auto text-center">
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5"
@@ -612,7 +522,7 @@ export default function Home() {
             </div>
             <h3 className="font-black text-white text-xl mb-2">30-Day Money-Back Guarantee</h3>
             <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-              If Cloze doesn&apos;t book you at least one qualified appointment in 30 days,<br className="hidden md:block" />
+              If ClozeFlow doesn&apos;t book you at least one qualified appointment in 30 days,<br className="hidden md:block" />
               we&apos;ll refund every penny — no questions asked.
             </p>
           </div>
@@ -659,14 +569,10 @@ export default function Home() {
 
         {/* ── Final CTA ─────────────────────────────────── */}
         <section className="relative py-32 px-6 overflow-hidden">
-          {/* Central glow */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden>
             <div
               className="w-[700px] h-[500px] rounded-full"
-              style={{
-                background: "radial-gradient(ellipse, rgba(234,88,12,0.14) 0%, transparent 65%)",
-                filter: "blur(40px)",
-              }}
+              style={{ background: "radial-gradient(ellipse, rgba(234,88,12,0.14) 0%, transparent 65%)", filter: "blur(40px)" }}
             />
           </div>
           <div className="absolute inset-0 dot-grid pointer-events-none opacity-60" aria-hidden />
@@ -676,18 +582,15 @@ export default function Home() {
               Stop Losing Jobs to Faster Competitors
             </p>
             <h2 className="text-4xl md:text-6xl font-black text-white leading-[0.93] mb-6">
-              Every day without Cloze<br className="hidden md:block" />
+              Every day without ClozeFlow<br className="hidden md:block" />
               is a job you didn&apos;t know<br className="hidden md:block" />
               <span className="text-gradient">you lost.</span>
             </h2>
             <p className="text-lg mb-12 leading-relaxed max-w-xl mx-auto" style={{ color: MUTED }}>
-              Book a free 15-minute call. We&apos;ll show you exactly how it works and have you live before end of day.
+              Start your free trial in under 2 minutes. No credit card required.
             </p>
-            <a
-              href={BOOKING_LINK} target="_blank" rel="noopener noreferrer"
-              className="btn-glow inline-block px-12 py-5 rounded-xl text-lg mb-6"
-            >
-              Book a Free 15-Min Demo →
+            <a href="/signup" className="btn-glow inline-block px-12 py-5 rounded-xl text-lg mb-6">
+              Start Free Trial →
             </a>
             <p className="text-sm" style={{ color: "rgba(255,255,255,0.2)" }}>
               No pitch · No pressure · 30-day money-back guarantee
@@ -712,17 +615,16 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <span className="font-bold text-white">Cloze<span className="text-gradient">.</span></span>
+            <span className="font-bold text-white">Cloze<span className="text-gradient">Flow</span></span>
           </div>
           <div className="flex flex-wrap justify-center gap-6">
             {["Privacy Policy", "Terms of Service", "Security", "Contact"].map((l) => (
               <a key={l} href="#" className="hover:text-white transition-colors">{l}</a>
             ))}
           </div>
-          <p>&copy; 2026 Cloze AI, Inc.</p>
+          <p>&copy; 2026 ClozeFlow, Inc.</p>
         </div>
       </footer>
-
     </div>
   );
 }
