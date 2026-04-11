@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import SignOutButton from "@/components/SignOutButton";
 
 const TEXT   = "#1c1917";
 const MUTED  = "#78716c";
@@ -34,11 +36,34 @@ export default async function ProfilePage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: 28 }}>
+      <div style={{ marginBottom: 20 }}>
         <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#ea580c" }}>
           Account
         </p>
-        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: TEXT }}>Your Profile</h1>
+        <h1 style={{ margin: "0 0 16px", fontSize: 28, fontWeight: 900, color: TEXT }}>Your Profile</h1>
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: 4, borderBottom: `1px solid ${BORDER}`, paddingBottom: 0, marginBottom: 0 }}>
+          {([
+            { label: "Account",         href: "/profile"         },
+            { label: "Billing",         href: "/profile/billing" },
+            { label: "Flyer Marketing", href: "/profile/flyer"   },
+          ]).map(tab => (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              style={{
+                padding: "10px 16px", fontSize: 14, fontWeight: 700,
+                textDecoration: "none",
+                color: tab.href === "/profile" ? "#ea580c" : MUTED,
+                borderBottom: tab.href === "/profile" ? "2px solid #ea580c" : "2px solid transparent",
+                marginBottom: -1, transition: "color 0.15s",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Avatar card */}
@@ -83,6 +108,11 @@ export default async function ProfilePage() {
             {profile?.business_name || "Not set"}
           </p>
         </div>
+      </div>
+
+      {/* Sign out */}
+      <div style={{ marginBottom: 20 }}>
+        <SignOutButton />
       </div>
 
       {/* Setup call preference */}

@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
   const { error } = await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL ?? "ClozeFlow <hello@clozeflow.com>",
-    to: email,
+    to: process.env.RESEND_TEST_TO ?? email,
     subject: "You're in — ClozeFlow is responding to leads right now ⚡",
     html: buildWelcomeEmail({ firstName, businessName, dashboardUrl }),
   });

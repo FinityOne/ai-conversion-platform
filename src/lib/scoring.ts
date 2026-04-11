@@ -3,6 +3,7 @@ export type LeadStatus =
   | "contacted"
   | "replied"
   | "follow_up_sent"
+  | "project_submitted"
   | "booked"
   | "closed_won"
   | "closed_lost";
@@ -19,13 +20,14 @@ interface EmailLogEntry {
 
 /** Base score contribution from pipeline stage */
 const STATUS_BASE: Record<LeadStatus, number> = {
-  new:            5,
-  contacted:      20,
-  replied:        55,
-  follow_up_sent: 35,
-  booked:         80,
-  closed_won:     100,
-  closed_lost:    0,
+  new:               5,
+  contacted:         20,
+  replied:           55,
+  follow_up_sent:    35,
+  project_submitted: 70,
+  booked:            80,
+  closed_won:        100,
+  closed_lost:       0,
 };
 
 export function computeScore(
@@ -90,8 +92,9 @@ export const PIPELINE_STAGES: {
   { status: "new",            label: "New",           emoji: "🆕", bg: "#eff6ff", color: "#2563eb", border: "#dbeafe", description: "Just came in, no action yet" },
   { status: "contacted",      label: "Contacted",     emoji: "📤", bg: "#fffbeb", color: "#d97706", border: "#fde68a", description: "First message sent to lead" },
   { status: "replied",        label: "Replied",       emoji: "💬", bg: "#f0fdf4", color: "#16a34a", border: "#bbf7d0", description: "Lead responded — engagement started" },
-  { status: "follow_up_sent", label: "Follow-Up",     emoji: "🔄", bg: "#fff7ed", color: "#ea580c", border: "#fed7aa", description: "No reply — nudged again" },
-  { status: "booked",         label: "Booked",        emoji: "📅", bg: "#ecfeff", color: "#0891b2", border: "#a5f3fc", description: "Appointment confirmed" },
+  { status: "follow_up_sent",    label: "Follow-Up",        emoji: "🔄", bg: "#fff7ed", color: "#ea580c", border: "#fed7aa", description: "Asked for project details" },
+  { status: "project_submitted", label: "Details Submitted", emoji: "📋", bg: "#faf5ff", color: "#7c3aed", border: "#ddd6fe", description: "Lead submitted project details & photos" },
+  { status: "booked",            label: "Booked",            emoji: "📅", bg: "#ecfeff", color: "#0891b2", border: "#a5f3fc", description: "Appointment confirmed" },
   { status: "closed_won",     label: "Closed (Won)",  emoji: "✅", bg: "#f0fdf4", color: "#059669", border: "#6ee7b7", description: "Job complete — revenue won" },
   { status: "closed_lost",    label: "Closed (Lost)", emoji: "❌", bg: "#f8fafc", color: "#64748b", border: "#e2e8f0", description: "Lead declined or went cold" },
 ];

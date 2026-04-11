@@ -1,5 +1,108 @@
 import { createSupabaseServerClient } from "./supabase-server";
+import { createSupabaseServiceClient } from "./supabase-service";
 import { type LeadStatus, computeScore } from "./scoring";
+
+// Statuses that sit strictly before project_submitted in the pipeline.
+// A lead in any of these states will be auto-advanced when submitted project
+// details are detected on load.
+const BEFORE_PROJECT_SUBMITTED: LeadStatus[] = [
+  "new", "contacted", "replied", "follow_up_sent",
+];
+
+/**
+ * Given a list of lead IDs, check which ones have a submitted project_details
+ * record and whose status is still before project_submitted. Batch-update
+ * those leads in the DB and return a map of id → updated status so callers
+ * can apply the change without a second round-trip.
+ */
+async function syncProjectSubmittedStatus(
+  leadIds: string[],
+  leads: { id: string; status: LeadStatus; created_at: string; last_activity_at: string | null }[],
+): Promise<Record<string, LeadStatus>> {
+  if (!leadIds.length) return {};
+
+  const sb = createSupabaseServiceClient();
+
+  // Find which leads have a submitted project_details record
+  const { data: submitted } = await sb
+    .from("project_details")
+    .select("lead_id")
+    .in("lead_id", leadIds)
+    .not("submitted_at", "is", null);
+
+  if (!submitted?.length) return {};
+
+  const submittedIds = new Set(submitted.map(r => r.lead_id));
+
+  // Filter to only leads that need advancing
+  const toAdvance = leads.filter(
+    l => submittedIds.has(l.id) && BEFORE_PROJECT_SUBMITTED.includes(l.status),
+  );
+
+  if (!toAdvance.length) return {};
+
+  const now = new Date().toISOString();
+  const updates: Record<string, LeadStatus> = {};
+
+  await Promise.all(
+    toAdvance.map(async lead => {
+      const newScore = computeScore({ ...lead, status: "project_submitted" }, []);
+      await sb.from("leads").update({
+        status:           "project_submitted",
+        score:            newScore,
+        last_activity_at: now,
+      }).eq("id", lead.id);
+      updates[lead.id] = "project_submitted";
+    }),
+  );
+
+  return updates;
+}
+
+/**
+ * For leads currently in "booked" status, check if their confirmed booking
+ * date is in the past. If so, auto-advance to "closed_won".
+ * Leads in any other status are left untouched.
+ */
+async function syncBookedToClosedWon(
+  leads: { id: string; status: LeadStatus; created_at: string; last_activity_at: string | null }[],
+): Promise<Record<string, LeadStatus>> {
+  const bookedLeads = leads.filter(l => l.status === "booked");
+  if (!bookedLeads.length) return {};
+
+  const sb   = createSupabaseServiceClient();
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const { data: pastBookings } = await sb
+    .from("bookings")
+    .select("lead_id")
+    .in("lead_id", bookedLeads.map(l => l.id))
+    .eq("status", "confirmed")
+    .lt("booking_date", today);
+
+  if (!pastBookings?.length) return {};
+
+  const pastIds = new Set(pastBookings.map(r => r.lead_id));
+  const toAdvance = bookedLeads.filter(l => pastIds.has(l.id));
+  if (!toAdvance.length) return {};
+
+  const now = new Date().toISOString();
+  const updates: Record<string, LeadStatus> = {};
+
+  await Promise.all(
+    toAdvance.map(async lead => {
+      const newScore = computeScore({ ...lead, status: "closed_won" }, []);
+      await sb.from("leads").update({
+        status:           "closed_won",
+        score:            newScore,
+        last_activity_at: now,
+      }).eq("id", lead.id);
+      updates[lead.id] = "closed_won";
+    }),
+  );
+
+  return updates;
+}
 
 export type { LeadStatus };
 
@@ -13,6 +116,7 @@ export interface Lead {
   description: string | null;
   status: LeadStatus;
   score: number;
+  source: "manual" | "intake_form";
   last_activity_at: string | null;
   created_at: string;
   updated_at: string;
@@ -28,6 +132,21 @@ export interface EmailLogEntry {
   email_status: string;
   opened_at: string | null;
   clicked_at: string | null;
+  created_at: string;
+}
+
+export interface ProjectDetails {
+  id: string;
+  token: string;
+  job_type: string | null;
+  description: string | null;
+  property_type: string | null;
+  budget_range: string | null;
+  timeline: string | null;
+  address: string | null;
+  additional_notes: string | null;
+  photo_urls: string[];
+  submitted_at: string | null;
   created_at: string;
 }
 
@@ -66,10 +185,21 @@ export async function getLeads(): Promise<Lead[]> {
     logsByLead[log.lead_id].push(log);
   }
 
-  const scored = (leads as Lead[]).map(lead => ({
-    ...lead,
-    score: computeScore(lead, logsByLead[lead.id] ?? []),
-  }));
+  // Auto-advance any leads whose project details were submitted outside this session
+  const [projectUpdates, bookedUpdates] = await Promise.all([
+    syncProjectSubmittedStatus((leads as Lead[]).map(l => l.id), leads as Lead[]),
+    syncBookedToClosedWon(leads as Lead[]),
+  ]);
+  const statusUpdates = { ...projectUpdates, ...bookedUpdates };
+
+  const scored = (leads as Lead[]).map(lead => {
+    const overrideStatus = statusUpdates[lead.id];
+    const effective = { ...lead, ...(overrideStatus ? { status: overrideStatus } : {}) } as Lead;
+    return {
+      ...effective,
+      score: computeScore(effective, logsByLead[lead.id] ?? []),
+    };
+  });
 
   // Sort: closed_lost at bottom, everything else by score desc
   return scored.sort((a, b) => {
@@ -84,24 +214,42 @@ export async function getLeads(): Promise<Lead[]> {
 export async function getLeadById(id: string): Promise<{
   lead: Lead | null;
   emailLog: EmailLogEntry[];
+  projectDetails: ProjectDetails | null;
 }> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { lead: null, emailLog: [] };
+  if (!user) return { lead: null, emailLog: [], projectDetails: null };
 
-  const [{ data: lead }, { data: logs }] = await Promise.all([
+  const sb = createSupabaseServiceClient();
+
+  const [{ data: lead }, { data: logs }, { data: pd }] = await Promise.all([
     supabase.from("leads").select("*").eq("id", id).eq("user_id", user.id).single(),
     supabase.from("email_log").select("*").eq("lead_id", id).order("created_at", { ascending: false }),
+    sb.from("project_details").select("*").eq("lead_id", id).order("created_at", { ascending: false }).limit(1).single(),
   ]);
 
-  if (!lead) return { lead: null, emailLog: [] };
+  if (!lead) return { lead: null, emailLog: [], projectDetails: null };
 
-  const emailLog = (logs ?? []) as EmailLogEntry[];
-  const score = computeScore(lead as Lead, emailLog);
+  const emailLog       = (logs ?? []) as EmailLogEntry[];
+  const projectDetails = pd ? (pd as ProjectDetails) : null;
+
+  // Auto-advance: project submitted check + past booking → closed_won
+  const [projectUpdates, bookedUpdates] = await Promise.all([
+    syncProjectSubmittedStatus([lead.id], [lead as Lead]),
+    syncBookedToClosedWon([lead as Lead]),
+  ]);
+  const statusUpdates = { ...projectUpdates, ...bookedUpdates };
+  const effectiveLead = {
+    ...lead as Lead,
+    ...(statusUpdates[lead.id] ? { status: statusUpdates[lead.id] } : {}),
+  } as Lead;
+
+  const score = computeScore(effectiveLead, emailLog);
 
   return {
-    lead: { ...lead as Lead, score },
+    lead: { ...effectiveLead, score },
     emailLog,
+    projectDetails,
   };
 }
 

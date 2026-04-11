@@ -14,14 +14,30 @@ interface NavProps {
 
 const LOGO_ICON = (
   <div
-    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-    style={{ background: "linear-gradient(135deg,#ea580c,#f97316)" }}
+    style={{
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      background: "linear-gradient(135deg,#ea580c,#f97316)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
+    }}
   >
-    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg width="16" height="16" fill="none" stroke="white" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
     </svg>
   </div>
 );
+
+const MARKETING_LINKS = [
+  { href: "/how-it-works", label: "How It Works" },
+  { href: "/features", label: "Features" },
+  { href: "/blog", label: "Blog" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/calculator", label: "Calculator" },
+];
 
 export default function Nav({ variant = "marketing", userName }: NavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,111 +50,198 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
     router.refresh();
   }
 
-  const MUTED = "rgba(255,255,255,0.45)";
+  if (variant === "app") {
+    return (
+      <>
+        <header
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 50,
+            background: "rgba(5,9,26,0.92)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            borderBottom: "1px solid rgba(255,255,255,0.07)",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 1152,
+              margin: "0 auto",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 20px",
+              height: 64,
+            }}
+          >
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+              {LOGO_ICON}
+              <span style={{ fontWeight: 900, fontSize: 18, color: "#fff", letterSpacing: "-0.02em" }}>
+                Cloze<span style={{ color: "#f97316" }}>Flow</span>
+              </span>
+            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <Link href="/dashboard" style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, textDecoration: "none" }}>Dashboard</Link>
+              <Link href="/leads" style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, textDecoration: "none" }}>Leads</Link>
+              {userName && <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>{userName}</span>}
+              <button
+                onClick={handleSignOut}
+                style={{
+                  color: "rgba(255,255,255,0.55)",
+                  fontSize: 14,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "8px 12px",
+                }}
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </header>
+      </>
+    );
+  }
 
+  // Marketing variant — light theme
   return (
     <>
       <header
-        className="fixed top-0 inset-x-0 z-50"
         style={{
-          background: "rgba(5,9,26,0.88)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          background: "#ffffff",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+          borderBottom: "1px solid #e6e2db",
         }}
       >
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-5 h-16">
+        <div
+          style={{
+            maxWidth: 1152,
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 20px",
+            height: 64,
+          }}
+        >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
             {LOGO_ICON}
-            <span className="font-black text-lg tracking-tight text-white">
-              Cloze<span className="text-gradient">Flow</span>
+            <span style={{ fontWeight: 900, fontSize: 18, color: "#1c1917", letterSpacing: "-0.02em" }}>
+              Cloze<span style={{ fontWeight: 900, color: "#1c1917" }}>Flow</span>
             </span>
           </Link>
 
           {/* Desktop nav links */}
-          {variant === "marketing" && (
-            <nav className="hidden md:flex items-center gap-8 text-sm font-medium" style={{ color: MUTED }}>
-              {[
-                ["#how-it-works", "How It Works"],
-                ["#pricing", "Pricing"],
-                ["#faq", "FAQ"],
-              ].map(([href, label]) => (
-                <a key={href} href={href} className="hover:text-white transition-colors">
-                  {label}
-                </a>
-              ))}
-            </nav>
-          )}
-
-          {variant === "app" && (
-            <nav className="hidden md:flex items-center gap-8 text-sm font-medium" style={{ color: MUTED }}>
-              <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
-              <Link href="/leads" className="hover:text-white transition-colors">Leads</Link>
-            </nav>
-          )}
+          <nav
+            style={{ display: "flex", alignItems: "center", gap: 32 }}
+            className="hidden-mobile"
+          >
+            {MARKETING_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  color: "#78716c",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  textDecoration: "none",
+                }}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
 
           {/* Desktop CTAs */}
-          <div className="hidden md:flex items-center gap-3">
-            {variant === "marketing" ? (
-              <>
-                <Link
-                  href="/login"
-                  className="text-sm font-medium px-4 py-2 rounded-lg transition-colors hover:text-white"
-                  style={{ color: MUTED }}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="btn-glow px-5 py-2.5 rounded-lg text-sm font-bold"
-                >
-                  Get Started →
-                </Link>
-              </>
-            ) : (
-              <>
-                {userName && (
-                  <span className="text-sm" style={{ color: MUTED }}>
-                    {userName}
-                  </span>
-                )}
-                <button
-                  onClick={handleSignOut}
-                  className="text-sm font-medium px-4 py-2 rounded-lg transition-colors hover:text-white"
-                  style={{ color: MUTED }}
-                >
-                  Sign Out
-                </button>
-              </>
-            )}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }} className="hidden-mobile">
+            <Link
+              href="/login"
+              style={{
+                color: "#78716c",
+                fontSize: 14,
+                fontWeight: 500,
+                textDecoration: "none",
+                padding: "8px 16px",
+                borderRadius: 8,
+                border: "1px solid #e6e2db",
+              }}
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              style={{
+                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 700,
+                textDecoration: "none",
+                padding: "10px 20px",
+                borderRadius: 8,
+                boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Start Free — No Card Needed →
+            </Link>
           </div>
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg transition-colors hover:bg-white/5"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 8,
+              display: "flex",
+              flexDirection: "column",
+              gap: 5,
+            }}
+            className="show-mobile"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle menu"
           >
             <span
-              className="block h-0.5 w-6 rounded-full transition-all duration-200"
               style={{
-                background: "rgba(255,255,255,0.7)",
-                transform: mobileOpen ? "translateY(8px) rotate(45deg)" : "none",
+                display: "block",
+                height: 2,
+                width: 24,
+                borderRadius: 2,
+                background: "#1c1917",
+                transition: "all 0.2s",
+                transform: mobileOpen ? "translateY(7px) rotate(45deg)" : "none",
               }}
             />
             <span
-              className="block h-0.5 w-6 rounded-full transition-all duration-200"
               style={{
-                background: "rgba(255,255,255,0.7)",
+                display: "block",
+                height: 2,
+                width: 24,
+                borderRadius: 2,
+                background: "#1c1917",
+                transition: "all 0.2s",
                 opacity: mobileOpen ? 0 : 1,
               }}
             />
             <span
-              className="block h-0.5 w-6 rounded-full transition-all duration-200"
               style={{
-                background: "rgba(255,255,255,0.7)",
-                transform: mobileOpen ? "translateY(-8px) rotate(-45deg)" : "none",
+                display: "block",
+                height: 2,
+                width: 24,
+                borderRadius: 2,
+                background: "#1c1917",
+                transition: "all 0.2s",
+                transform: mobileOpen ? "translateY(-7px) rotate(-45deg)" : "none",
               }}
             />
           </button>
@@ -148,86 +251,83 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 md:hidden"
-          onClick={() => setMobileOpen(false)}
+          style={{
+            position: "fixed",
+            top: 64,
+            left: 0,
+            right: 0,
+            zIndex: 40,
+            background: "#ffffff",
+            borderBottom: "1px solid #e6e2db",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+            padding: "16px 20px 24px",
+          }}
         >
-          {/* Backdrop */}
-          <div className="absolute inset-0" style={{ background: "rgba(5,9,26,0.6)", backdropFilter: "blur(4px)" }} />
-
-          {/* Panel */}
-          <div
-            className="absolute top-16 inset-x-0 px-4 pt-4 pb-8"
-            style={{
-              background: "rgba(8,13,30,0.98)",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {variant === "marketing" ? (
-              <div className="flex flex-col gap-1">
-                {[
-                  ["#how-it-works", "How It Works"],
-                  ["#pricing", "Pricing"],
-                  ["#faq", "FAQ"],
-                ].map(([href, label]) => (
-                  <a
-                    key={href}
-                    href={href}
-                    className="text-base font-medium px-3 py-3.5 rounded-xl transition-colors hover:bg-white/5"
-                    style={{ color: "rgba(255,255,255,0.65)" }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {label}
-                  </a>
-                ))}
-                <hr className="my-3" style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.07)" }} />
-                <Link
-                  href="/login"
-                  className="text-base font-medium px-3 py-3.5 rounded-xl transition-colors hover:bg-white/5"
-                  style={{ color: "rgba(255,255,255,0.65)" }}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="btn-glow mt-2 py-4 rounded-xl text-base font-bold text-center"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Get Started Free →
-                </Link>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-1">
-                <Link
-                  href="/dashboard"
-                  className="text-base font-medium px-3 py-3.5 rounded-xl transition-colors hover:bg-white/5"
-                  style={{ color: "rgba(255,255,255,0.65)" }}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/leads"
-                  className="text-base font-medium px-3 py-3.5 rounded-xl transition-colors hover:bg-white/5"
-                  style={{ color: "rgba(255,255,255,0.65)" }}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Leads
-                </Link>
-                <hr className="my-3" style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.07)" }} />
-                <button
-                  onClick={() => { setMobileOpen(false); handleSignOut(); }}
-                  className="text-left text-base font-medium px-3 py-3.5 rounded-xl transition-colors hover:bg-white/5"
-                  style={{ color: "rgba(255,255,255,0.65)" }}
-                >
-                  Sign Out
-                </button>
-              </div>
-            )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {MARKETING_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  color: "#1c1917",
+                  fontSize: 16,
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  padding: "12px 12px",
+                  borderRadius: 8,
+                }}
+                onClick={() => setMobileOpen(false)}
+              >
+                {label}
+              </Link>
+            ))}
+            <div style={{ height: 1, background: "#e6e2db", margin: "8px 0" }} />
+            <Link
+              href="/login"
+              style={{
+                color: "#78716c",
+                fontSize: 16,
+                fontWeight: 500,
+                textDecoration: "none",
+                padding: "12px 12px",
+                borderRadius: 8,
+              }}
+              onClick={() => setMobileOpen(false)}
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              style={{
+                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: 700,
+                textDecoration: "none",
+                padding: "14px 20px",
+                borderRadius: 8,
+                textAlign: "center",
+                marginTop: 8,
+                boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+              }}
+              onClick={() => setMobileOpen(false)}
+            >
+              Start Free — No Card Needed →
+            </Link>
           </div>
         </div>
       )}
+
+      <style>{`
+        @media (min-width: 768px) {
+          .hidden-mobile { display: flex !important; }
+          .show-mobile { display: none !important; }
+        }
+        @media (max-width: 767px) {
+          .hidden-mobile { display: none !important; }
+          .show-mobile { display: flex !important; }
+        }
+      `}</style>
     </>
   );
 }

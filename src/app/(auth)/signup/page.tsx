@@ -196,7 +196,7 @@ export default function SignupPage() {
       }
     }
 
-    router.push("/dashboard");
+    router.push("/onboarding");
   }
 
   async function handleGoogleSignIn() {

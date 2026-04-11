@@ -1,38 +1,37 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
-const BASE_BG = "#05091a";
-const DIVIDER_STYLE = {
-  height: "1px",
-  background: "rgba(255,255,255,0.07)",
-  border: "none",
-};
-const MUTED = "rgba(255,255,255,0.4)";
-const VERY_MUTED = "rgba(255,255,255,0.22)";
+const BG = "#faf9f7";
+const ORANGE = "#ea580c";
+const TEXT = "#1c1917";
+const MUTED = "#78716c";
+const BORDER = "#e6e2db";
+const GREEN = "#16a34a";
 
 const TESTIMONIALS = [
   {
     result: "+$80K",
     resultLabel: "extra revenue, first month",
     quote:
-      "First month with Cloze I got 9 extra estimate appointments — automatically. Closed 6 of them. It paid for itself in week one.",
+      "First month with ClozeFlow I got 9 extra estimate appointments — automatically. Closed 6 of them. It paid for itself in week one.",
     name: "Jake R.",
     title: "Owner, Ridge Line Remodeling",
     location: "Phoenix, AZ",
     initials: "JR",
-    avatarBg: "#c2410c",
+    avatarColor: "#c2410c",
   },
   {
     result: "3× ROI",
     resultLabel: "on Angi leads, overnight",
     quote:
-      "We were spending $2,800/mo on Angi and barely converting. Cloze responds in under a minute. Our ROI on those leads literally tripled.",
+      "We were spending $2,800/mo on Angi and barely converting. ClozeFlow responds in under a minute. Our ROI on those leads literally tripled.",
     name: "Maria C.",
     title: "Operations Manager, Summit Renovations",
     location: "Denver, CO",
     initials: "MC",
-    avatarBg: "#1e40af",
+    avatarColor: "#1e40af",
   },
   {
     result: "22%→58%",
@@ -43,588 +42,583 @@ const TESTIMONIALS = [
     title: "Owner, Keystone Builders",
     location: "Columbus, OH",
     initials: "DM",
-    avatarBg: "#5b21b6",
+    avatarColor: "#5b21b6",
   },
 ];
 
-const STEPS = [
-  {
-    n: "01",
-    title: "Connect your lead sources",
-    body: "Your website, Google Ads, Facebook, Angi, Thumbtack — wherever customers find you. Our team handles setup. Most owners are live the same day.",
-  },
-  {
-    n: "02",
-    title: "AI qualifies every inquiry",
-    body: "Every lead gets a response in under 60 seconds, 24/7. ClozeFlow introduces itself, asks the right questions, and filters out tire-kickers automatically.",
-  },
-  {
-    n: "03",
-    title: "Appointments hit your calendar",
-    body: "Qualified, ready-to-buy customers book directly to your calendar. You show up, close the job. ClozeFlow fills the next slot while you work.",
-  },
-];
-
-const PRICING = [
-  {
-    name: "Starter",
-    tagline: "Solo operators & small crews",
-    annual: { label: "$99", billed: "$1,188/yr", saving: "Save $360" },
-    monthly: { label: "$129" },
-    features: [
-      "Up to 100 leads/mo",
-      "60s text + email response",
-      "Lead qualification",
-      "Calendar booking",
-      "1 lead source",
-      "Email support",
-    ],
-    highlight: false,
-    cta: "Start Free Trial",
-  },
-  {
-    name: "Growth",
-    tagline: "Growing businesses ready to scale",
-    annual: { label: "$499", billed: "$5,988/yr", saving: "Save $1,800" },
-    monthly: { label: "$649" },
-    features: [
-      "Up to 500 leads/mo",
-      "Text + email + voice follow-up",
-      "Advanced qualification",
-      "Multi-touch sequences",
-      "All lead source integrations",
-      "Custom AI scripts",
-      "Pipeline dashboard",
-      "Priority support",
-    ],
-    highlight: true,
-    badge: "Most Popular",
-    cta: "Start Free Trial",
-  },
-  {
-    name: "Pro",
-    tagline: "High-volume & multi-location",
-    annual: { label: "$2,000", billed: "$24,000/yr", saving: "Save $7,188" },
-    monthly: { label: "$2,599" },
-    features: [
-      "Unlimited leads",
-      "All channels + API",
-      "Custom AI training",
-      "CRM integration",
-      "Dedicated success manager",
-      "Custom reporting",
-      "SLA guarantee",
-      "White-glove onboarding",
-    ],
-    highlight: false,
-    cta: "Talk to Sales",
-  },
-];
-
-const FAQS = [
-  {
-    q: "Will my customers know they're talking to AI?",
-    a: "ClozeFlow introduces itself as your office assistant — friendly and professional. Customers care far more about a 30-second response than who sent it. Most clients actually compliment contractors on how responsive they've become.",
-  },
-  {
-    q: "What lead sources does it connect to?",
-    a: "Your website, Google Ads, Facebook, Angi, Thumbtack, HomeAdvisor, Yelp — wherever customers reach out. If there's a form, ClozeFlow can respond to it.",
-  },
-  {
-    q: "I'm not tech-savvy. Is this hard to set up?",
-    a: "Not at all. Our team handles the entire setup. You answer a few questions about your business and we configure everything. Most owners are live within hours of signing up.",
-  },
-  {
-    q: "What if a customer wants to speak with a real person?",
-    a: "ClozeFlow flags it immediately and notifies you with the full conversation context. You pick up right where it left off — no awkward repetition for the customer.",
-  },
-  {
-    q: "Does the trial include everything?",
-    a: "Yes. Full access, every feature, no credit card required. Most customers book their first AI-qualified appointment within 24 hours. If you don't see results in 14 days, we'll extend the trial and personally review your setup.",
-  },
+const FEATURES = [
+  { icon: "⚡", title: "Lightning Fast Response", desc: "Every lead gets a reply in under 60 seconds — around the clock." },
+  { icon: "🧠", title: "Smart Lead Qualification", desc: "AI asks the right questions so you only talk to serious buyers." },
+  { icon: "🔁", title: "Automatic Follow-Up", desc: "5-touch sequences nurture leads over days so none fall through." },
+  { icon: "📅", title: "Calendar Booking", desc: "Qualified leads book themselves straight onto your schedule." },
+  { icon: "📊", title: "Pipeline Tracking", desc: "See every lead's status in one clean dashboard." },
+  { icon: "📄", title: "Flyer Marketing Tools", desc: "Create trackable flyers and see exactly which campaigns convert." },
 ];
 
 export default function Home() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [_activeTestimonial] = useState(0);
 
   return (
-    <div className="min-h-screen" style={{ background: BASE_BG, color: "#f1f5f9" }}>
-      <main>
+    <div style={{ background: BG, color: TEXT }}>
 
-        {/* ── Hero ──────────────────────────────────────── */}
-        <section className="relative overflow-hidden pt-36 pb-28 px-6">
-          <div className="absolute inset-0 pointer-events-none" aria-hidden>
-            <div
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[560px] rounded-full"
-              style={{ background: "radial-gradient(ellipse, rgba(234,88,12,0.17) 0%, transparent 65%)", filter: "blur(2px)" }}
-            />
-            <div
-              className="absolute -top-20 right-0 w-[420px] h-[420px] rounded-full"
-              style={{ background: "radial-gradient(ellipse, rgba(251,191,36,0.06) 0%, transparent 65%)", filter: "blur(60px)" }}
-            />
+      {/* ── Hero ─────────────────────────────────────────── */}
+      <section style={{ padding: "80px 24px 72px", textAlign: "center" }}>
+        <div style={{ maxWidth: 560, margin: "0 auto" }}>
+
+          {/* Badge */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              background: "rgba(234,88,12,0.08)",
+              border: "1px solid rgba(234,88,12,0.2)",
+              borderRadius: 100,
+              padding: "6px 14px",
+              fontSize: 12,
+              fontWeight: 700,
+              color: ORANGE,
+              letterSpacing: "0.04em",
+              marginBottom: 28,
+            }}
+          >
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: ORANGE }} />
+            ⚡ 500+ contractors already growing faster
           </div>
-          <div className="absolute inset-0 dot-grid pointer-events-none" aria-hidden />
 
-          <div className="relative max-w-4xl mx-auto text-center">
-            <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-10 uppercase tracking-widest"
-              style={{ background: "rgba(234,88,12,0.11)", border: "1px solid rgba(234,88,12,0.24)", color: "#fb923c" }}
+          {/* H1 */}
+          <h1
+            style={{
+              fontSize: "clamp(40px, 7vw, 56px)",
+              fontWeight: 900,
+              color: TEXT,
+              letterSpacing: "-0.03em",
+              lineHeight: 1.05,
+              marginBottom: 20,
+            }}
+          >
+            Never lose a lead again.
+          </h1>
+
+          {/* Subhead */}
+          <p
+            style={{
+              fontSize: 18,
+              color: MUTED,
+              lineHeight: 1.65,
+              marginBottom: 36,
+              maxWidth: 480,
+              margin: "0 auto 36px",
+            }}
+          >
+            ClozeFlow responds to every inquiry in under 60 seconds, qualifies them, and books them straight to your calendar — while you&apos;re on the job.
+          </p>
+
+          {/* CTAs */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center", marginBottom: 24 }}>
+            <Link
+              href="/signup"
+              style={{
+                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: 16,
+                padding: "14px 28px",
+                borderRadius: 10,
+                textDecoration: "none",
+                boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+              }}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
-              Built for contractors &amp; remodelers
-            </div>
-
-            <h1 className="text-5xl md:text-7xl lg:text-[84px] font-black tracking-tight leading-[0.91] mb-8 text-white">
-              Your next job went<br />
-              to whoever answered<br />
-              <span className="text-gradient">first.</span>
-            </h1>
-
-            <p className="text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed mb-12" style={{ color: MUTED }}>
-              ClozeFlow responds to every lead in under 60 seconds — day or night — qualifying real buyers and booking them straight to your calendar.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-              <a
-                href="/signup"
-                className="btn-glow px-10 py-5 rounded-xl text-lg w-full sm:w-auto text-center"
-              >
-                Start Free Trial →
-              </a>
-              <a
-                href="#how-it-works"
-                className="btn-outline-dark px-8 py-4 rounded-xl text-base w-full sm:w-auto text-center"
-              >
-                See How It Works
-              </a>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8 text-sm" style={{ color: VERY_MUTED }}>
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-2.5">
-                  {[["JR","#c2410c"],["MC","#1e40af"],["DM","#374151"],["KT","#065f46"],["AL","#5b21b6"]].map(([init, bg], i) => (
-                    <div
-                      key={i}
-                      className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                      style={{ background: bg, border: "2px solid #05091a" }}
-                    >
-                      {init}
-                    </div>
-                  ))}
-                </div>
-                <span><strong className="text-white font-semibold">1,200+</strong> contractors</span>
-              </div>
-              <div className="hidden sm:block w-px h-5" style={{ background: "rgba(255,255,255,0.1)" }} />
-              <div className="flex items-center gap-2">
-                <span className="text-amber-400 text-base">★★★★★</span>
-                <span><strong className="text-white font-semibold">4.9 / 5</strong> rating</span>
-              </div>
-              <div className="hidden sm:block w-px h-5" style={{ background: "rgba(255,255,255,0.1)" }} />
-              <span><strong className="text-white font-semibold">14-day</strong> free trial · No card</span>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Integration strip ─────────────────────────── */}
-        <hr style={DIVIDER_STYLE} />
-        <section className="py-7 px-6" style={{ background: "rgba(255,255,255,0.02)" }}>
-          <div className="max-w-5xl mx-auto">
-            <p className="text-center text-[11px] font-bold tracking-widest uppercase mb-5" style={{ color: "rgba(255,255,255,0.2)" }}>
-              Catches leads from every platform you advertise on
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
-              {["Google Ads", "Facebook Ads", "Angi", "Thumbtack", "HomeAdvisor", "Yelp", "Your Website"].map((name) => (
-                <span key={name} className="text-sm font-bold" style={{ color: "rgba(255,255,255,0.26)" }}>
-                  {name}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-        <hr style={DIVIDER_STYLE} />
-
-        {/* ── Pain ──────────────────────────────────────── */}
-        <section className="max-w-4xl mx-auto px-6 py-24">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold tracking-widest uppercase mb-4 text-gradient inline-block">
-              The Hidden Cost of Slow Response
-            </p>
-            <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
-              Every unanswered lead<br className="hidden md:block" />
-              is money walking out the door.
-            </h2>
+              Start Free — No Card Needed →
+            </Link>
+            <Link
+              href="/how-it-works"
+              style={{
+                background: "#fff",
+                color: TEXT,
+                fontWeight: 600,
+                fontSize: 16,
+                padding: "14px 28px",
+                borderRadius: 10,
+                textDecoration: "none",
+                border: `1px solid ${BORDER}`,
+              }}
+            >
+              See How It Works
+            </Link>
           </div>
 
-          <div className="space-y-4 mb-10">
+          {/* Trust chips */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "center" }}>
+            {["✓ Free to start", "✓ Setup in one day", "✓ No tech skills needed"].map((chip) => (
+              <span key={chip} style={{ fontSize: 13, color: MUTED, fontWeight: 500 }}>{chip}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Product screenshot placeholder */}
+        <div style={{ maxWidth: 800, margin: "52px auto 0" }}>
+          <div
+            style={{
+              background: "#fff",
+              border: `1px solid ${BORDER}`,
+              borderRadius: 16,
+              height: 320,
+              boxShadow: "0 8px 40px rgba(0,0,0,0.08)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: 32,
+                background: "#f5f3f0",
+                borderRadius: "14px 14px 0 0",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "0 16px",
+                position: "absolute",
+                top: 0,
+                left: 0,
+              }}
+            />
+            <span style={{ fontSize: 36 }}>📸</span>
+            <span style={{ color: MUTED, fontSize: 14, fontWeight: 500 }}>Product screenshot coming soon</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Social proof strip ───────────────────────────── */}
+      <section
+        style={{
+          background: "#fff",
+          borderTop: `1px solid ${BORDER}`,
+          borderBottom: `1px solid ${BORDER}`,
+          padding: "24px 24px",
+          textAlign: "center",
+        }}
+      >
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: MUTED, marginBottom: 16 }}>
+          Trusted by contractors from
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px 32px" }}>
+          {["Angi", "Thumbtack", "HomeAdvisor", "Google Local", "Yelp"].map((name) => (
+            <span key={name} style={{ fontSize: 14, fontWeight: 700, color: "#a8a29e" }}>{name}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Pain / Solution ──────────────────────────────── */}
+      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <h2
+            style={{
+              fontSize: "clamp(26px, 4vw, 36px)",
+              fontWeight: 900,
+              color: TEXT,
+              lineHeight: 1.2,
+              maxWidth: 640,
+              margin: "0 auto",
+            }}
+          >
+            Most home service businesses lose 60–70% of their leads — not because of bad work, but bad follow-up.
+          </h2>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: 24,
+          }}
+        >
+          {/* Pain column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#ef4444", marginBottom: 4 }}>
+              The Problem
+            </p>
             {[
-              {
-                icon: "📵",
-                headline: "You miss calls while you're on the job.",
-                detail: "By the time you call back, they've hired whoever answered in 5 minutes. That's a $10K–$50K job gone forever.",
-              },
-              {
-                icon: "🚗",
-                headline: "You drive out to tire-kickers.",
-                detail: "Half your estimates go to people who were never going to buy. You can't get those hours — or that fuel — back.",
-              },
-              {
-                icon: "📉",
-                headline: "Leads go cold while you're busy.",
-                detail: "You mean to follow up but the day runs away from you. The lead moves on. You never know what you lost.",
-              },
-            ].map(({ icon, headline, detail }, i) => (
-              <div key={i} className="glass glass-hover flex gap-5 items-start p-7 rounded-2xl">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-                  style={{ background: "rgba(239,68,68,0.09)", border: "1px solid rgba(239,68,68,0.18)" }}
+              "You're busy on a job when a hot lead texts. By the time you reply, they hired someone else.",
+              "You spent money on ads. The leads came in. Nobody followed up within the hour. Money wasted.",
+              "Estimates go out but never come back. No system. No reminders. Deals die on the vine.",
+            ].map((pain) => (
+              <div
+                key={pain}
+                style={{
+                  background: "rgba(239,68,68,0.05)",
+                  border: "1px solid rgba(239,68,68,0.15)",
+                  borderRadius: 12,
+                  padding: "20px 20px",
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "flex-start",
+                }}
+              >
+                <span style={{ fontSize: 18, flexShrink: 0, marginTop: 2 }}>❌</span>
+                <p style={{ fontSize: 15, color: TEXT, lineHeight: 1.55 }}>{pain}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Solution column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN, marginBottom: 4 }}>
+              With ClozeFlow
+            </p>
+            {[
+              "Every lead gets a text + email in under 60 seconds. First response wins.",
+              "Automated follow-up sequence nudges leads every 24–48 hours until they book or say no.",
+              "Your calendar fills automatically. You just show up and do the work you love.",
+            ].map((solution) => (
+              <div
+                key={solution}
+                style={{
+                  background: "rgba(22,163,74,0.05)",
+                  border: "1px solid rgba(22,163,74,0.15)",
+                  borderRadius: 12,
+                  padding: "20px 20px",
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "flex-start",
+                }}
+              >
+                <span style={{ fontSize: 18, flexShrink: 0, marginTop: 2 }}>✅</span>
+                <p style={{ fontSize: 15, color: TEXT, lineHeight: 1.55 }}>{solution}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Numbers ──────────────────────────────────────── */}
+      <section
+        style={{
+          background: "#fff",
+          borderTop: `1px solid ${BORDER}`,
+          borderBottom: `1px solid ${BORDER}`,
+          padding: "72px 24px",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 900,
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 40,
+          }}
+        >
+          {[
+            {
+              stat: "< 60 sec",
+              label: "Average response time to every new lead",
+              sub: "day or night, 365 days/year",
+            },
+            {
+              stat: "3× more",
+              label: "Booked jobs compared to manual follow-up",
+              sub: "vs. industry average",
+            },
+            {
+              stat: "$0 extra",
+              label: "No extra ad spend needed",
+              sub: "just convert what you already pay for",
+            },
+          ].map(({ stat, label, sub }) => (
+            <div key={stat} style={{ textAlign: "center" }}>
+              <p
+                style={{
+                  fontSize: 44,
+                  fontWeight: 900,
+                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  marginBottom: 8,
+                  lineHeight: 1,
+                }}
+              >
+                {stat}
+              </p>
+              <p style={{ fontWeight: 700, fontSize: 15, color: TEXT, marginBottom: 4 }}>{label}</p>
+              <p style={{ fontSize: 13, color: MUTED }}>{sub}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── How It Works ─────────────────────────────────── */}
+      <section style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
+          How It Works
+        </p>
+        <h2 style={{ fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT, marginBottom: 48 }}>
+          Three steps to a full calendar
+        </h2>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 24,
+            textAlign: "left",
+          }}
+        >
+          {[
+            {
+              n: "01",
+              title: "Connect your lead sources",
+              body: "Website, Google Ads, Angi, Thumbtack — wherever your customers find you. Our team handles the setup.",
+            },
+            {
+              n: "02",
+              title: "ClozeFlow qualifies every inquiry",
+              body: "Every lead gets a response in under 60 seconds, 24/7. AI asks the right questions to filter real buyers.",
+            },
+            {
+              n: "03",
+              title: "Bookings land on your calendar",
+              body: "Ready-to-book customers schedule themselves. You show up and do the work you love.",
+            },
+          ].map((step) => (
+            <div
+              key={step.n}
+              style={{
+                background: "#fff",
+                border: `1px solid ${BORDER}`,
+                borderRadius: 14,
+                padding: "28px 24px",
+              }}
+            >
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontWeight: 900,
+                  fontSize: 14,
+                  marginBottom: 18,
+                }}
+              >
+                {step.n}
+              </div>
+              <h3 style={{ fontWeight: 800, fontSize: 17, color: TEXT, marginBottom: 8 }}>{step.title}</h3>
+              <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.6 }}>{step.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Calculator Teaser ────────────────────────────── */}
+      <section
+        style={{
+          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          padding: "72px 24px",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 900, color: "#fff", marginBottom: 16 }}>
+            How much revenue are you leaving on the table every month?
+          </h2>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.85)", lineHeight: 1.65, marginBottom: 32 }}>
+            100 leads a month at 25% close rate = 25 jobs. With ClozeFlow at 55%? That&apos;s 55 jobs.
+            Use our free calculator to see your exact numbers.
+          </p>
+          <Link
+            href="/calculator"
+            style={{
+              background: "#fff",
+              color: ORANGE,
+              fontWeight: 800,
+              fontSize: 16,
+              padding: "14px 28px",
+              borderRadius: 10,
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            Calculate My Revenue Gap →
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Testimonials ─────────────────────────────────── */}
+      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
+            Real Results
+          </p>
+          <h2 style={{ fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT }}>
+            Skeptical at first. Then they saw the numbers.
+          </h2>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+          {TESTIMONIALS.map((t) => (
+            <div
+              key={t.name}
+              style={{
+                background: "#fff",
+                border: `1px solid ${BORDER}`,
+                borderRadius: 16,
+                padding: "28px 24px",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: `1px solid ${BORDER}` }}>
+                <p
+                  style={{
+                    fontSize: 36,
+                    fontWeight: 900,
+                    background: "linear-gradient(135deg,#ea580c,#f97316)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    lineHeight: 1,
+                    marginBottom: 4,
+                  }}
                 >
-                  {icon}
+                  {t.result}
+                </p>
+                <p style={{ fontSize: 12, fontWeight: 600, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  {t.resultLabel}
+                </p>
+              </div>
+
+              {/* Stars */}
+              <div style={{ display: "flex", gap: 2, marginBottom: 14 }}>
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} style={{ color: "#f59e0b", fontSize: 14 }}>★</span>
+                ))}
+              </div>
+
+              <blockquote style={{ fontSize: 14, color: MUTED, lineHeight: 1.65, flexGrow: 1, marginBottom: 20 }}>
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 12, borderTop: `1px solid ${BORDER}`, paddingTop: 16 }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: t.avatarColor,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    flexShrink: 0,
+                  }}
+                >
+                  {t.initials}
                 </div>
                 <div>
-                  <p className="font-black text-white text-lg mb-1.5">{headline}</p>
-                  <p className="text-sm leading-relaxed" style={{ color: MUTED }}>{detail}</p>
+                  <p style={{ fontWeight: 700, fontSize: 14, color: TEXT }}>{t.name}</p>
+                  <p style={{ fontSize: 12, color: MUTED }}>{t.title} · {t.location}</p>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div
-            className="p-8 rounded-2xl text-center"
-            style={{ background: "linear-gradient(135deg,#ea580c 0%,#f97316 100%)", boxShadow: "0 0 48px rgba(234,88,12,0.22)" }}
-          >
-            <p className="text-5xl font-black text-white mb-2">78%</p>
-            <p className="text-lg font-semibold text-white mb-1.5">
-              of customers hire the first contractor to respond.
-            </p>
-            <p className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
-              The average contractor takes 2+ days to follow up. That gap is where your revenue disappears.
-            </p>
-          </div>
-        </section>
-
-        {/* ── Stats bar ─────────────────────────────────── */}
-        <hr style={DIVIDER_STYLE} />
-        <section className="py-20 px-6" style={{ background: "rgba(255,255,255,0.02)" }}>
-          <div className="max-w-5xl mx-auto">
-            <p className="text-center text-[11px] font-bold tracking-widest uppercase mb-14" style={{ color: "rgba(255,255,255,0.2)" }}>
-              What changes when you respond first — every time
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
-              {[
-                { n: "< 60s", label: "Response to every lead", sub: "day or night, 365 days/yr" },
-                { n: "3 in 4", label: "Customers hire whoever responds first", sub: "industry-wide data" },
-                { n: "3.2×", label: "More jobs closed on average", sub: "vs. no automation" },
-                { n: "$48K", label: "Avg. revenue recovered in 30 days", sub: "per ClozeFlow customer" },
-              ].map((s) => (
-                <div key={s.n}>
-                  <p className="text-4xl md:text-5xl font-black text-gradient mb-2">{s.n}</p>
-                  <p className="text-sm leading-snug mb-1" style={{ color: "rgba(255,255,255,0.6)" }}>{s.label}</p>
-                  <p className="text-xs" style={{ color: VERY_MUTED }}>{s.sub}</p>
-                </div>
-              ))}
             </div>
-          </div>
-        </section>
-        <hr style={DIVIDER_STYLE} />
-
-        {/* ── How It Works ──────────────────────────────── */}
-        <section id="how-it-works" className="max-w-5xl mx-auto px-6 py-24">
-          <div className="text-center mb-16">
-            <p className="text-xs font-bold tracking-widest uppercase mb-4 text-gradient inline-block">
-              How It Works
-            </p>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-              Live in hours. No tech skills needed.
-            </h2>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: MUTED }}>
-              Our team handles the entire setup. You answer a few questions. We take care of the rest.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {STEPS.map((s) => (
-              <div key={s.n} className="glass glass-hover rounded-2xl p-8">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-black mb-6"
-                  style={{ background: "linear-gradient(135deg,#ea580c,#f97316)" }}
-                >
-                  {s.n}
-                </div>
-                <h3 className="font-black text-white text-lg mb-2.5">{s.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: MUTED }}>{s.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Testimonials ──────────────────────────────── */}
-        <hr style={DIVIDER_STYLE} />
-        <section className="py-24 px-6" style={{ background: "rgba(255,255,255,0.015)" }}>
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <p className="text-xs font-bold tracking-widest uppercase mb-4 text-gradient inline-block">
-                Real Results
-              </p>
-              <h2 className="text-4xl md:text-5xl font-black text-white">
-                Skeptical at first.<br className="hidden md:block" />
-                Then they saw the numbers.
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-5">
-              {TESTIMONIALS.map((t) => (
-                <div key={t.name} className="glass glass-hover rounded-2xl p-8 flex flex-col">
-                  <div className="mb-6 pb-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                    <p className="text-4xl font-black text-gradient mb-1">{t.result}</p>
-                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: VERY_MUTED }}>
-                      {t.resultLabel}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-0.5 mb-5">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-
-                  <blockquote className="text-sm leading-relaxed flex-1 mb-6" style={{ color: "rgba(255,255,255,0.52)" }}>
-                    &ldquo;{t.quote}&rdquo;
-                  </blockquote>
-
-                  <div className="flex items-center gap-3 pt-5" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
-                      style={{ background: t.avatarBg }}
-                    >
-                      {t.initials}
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm text-white">{t.name}</p>
-                      <p className="text-xs" style={{ color: VERY_MUTED }}>{t.title} · {t.location}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        <hr style={DIVIDER_STYLE} />
-
-        {/* ── Pricing ───────────────────────────────────── */}
-        <section id="pricing" className="max-w-6xl mx-auto px-6 py-24">
-          <div className="text-center mb-16">
-            <p className="text-xs font-bold tracking-widest uppercase mb-4 text-gradient inline-block">Pricing</p>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-              One closed job pays for<br className="hidden md:block" /> a full year.
-            </h2>
-            <p className="text-lg" style={{ color: MUTED }}>14-day free trial · No credit card · Cancel anytime</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5 items-stretch">
-            {PRICING.map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-2xl p-8 flex flex-col relative ${plan.highlight ? "pricing-highlight" : "glass"}`}
-              >
-                {plan.badge && (
-                  <div
-                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-white text-xs font-black px-5 py-1.5 rounded-full whitespace-nowrap"
-                    style={{ background: "linear-gradient(135deg,#ea580c,#f97316)" }}
-                  >
-                    {plan.badge}
-                  </div>
-                )}
-
-                <div className="mb-6">
-                  <p className="text-[11px] font-black uppercase tracking-widest mb-2" style={{ color: plan.highlight ? "#fb923c" : VERY_MUTED }}>
-                    {plan.tagline}
-                  </p>
-                  <h3 className="font-black text-2xl text-white mb-6">{plan.name}</h3>
-
-                  <div
-                    className="rounded-xl p-4 mb-3"
-                    style={{
-                      background: plan.highlight ? "rgba(234,88,12,0.1)" : "rgba(255,255,255,0.04)",
-                      border: plan.highlight ? "1px solid rgba(234,88,12,0.22)" : "1px solid rgba(255,255,255,0.07)",
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: plan.highlight ? "#fb923c" : VERY_MUTED }}>
-                        Annual · Best Value
-                      </span>
-                      <span
-                        className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                        style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", color: "#4ade80" }}
-                      >
-                        3 months free
-                      </span>
-                    </div>
-                    <div className="flex items-end gap-1 mb-1">
-                      <span className="text-4xl font-black leading-none text-white">{plan.annual.label}</span>
-                      <span className="text-sm mb-0.5" style={{ color: MUTED }}>/mo</span>
-                    </div>
-                    <p className="text-xs" style={{ color: VERY_MUTED }}>
-                      {plan.annual.billed} · {plan.annual.saving}
-                    </p>
-                  </div>
-
-                  <div
-                    className="rounded-xl px-4 py-3 flex items-center justify-between"
-                    style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
-                  >
-                    <div>
-                      <p className="text-[10px] font-medium mb-0.5" style={{ color: "rgba(255,255,255,0.2)" }}>Month-to-month</p>
-                      <p className="text-xl font-black leading-none" style={{ color: "rgba(255,255,255,0.28)" }}>
-                        {plan.monthly.label}<span className="text-xs font-normal">/mo</span>
-                      </p>
-                    </div>
-                    <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.18)" }}>No commitment</span>
-                  </div>
-                </div>
-
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm" style={{ color: "rgba(255,255,255,0.58)" }}>
-                      <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 16 16" style={{ color: "#f97316" }}>
-                        <path d="M3 8l3.5 3.5 6.5-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <a
-                  href="/signup"
-                  className={`py-4 rounded-xl font-bold text-sm text-center block transition-all ${plan.highlight ? "btn-glow" : "btn-outline-dark"}`}
-                >
-                  {plan.cta} →
-                </a>
-
-                {plan.highlight && (
-                  <p className="text-center text-xs mt-3" style={{ color: VERY_MUTED }}>
-                    14-day free trial · No card required
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 glass rounded-2xl p-8 max-w-2xl mx-auto text-center">
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5"
-              style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "#4ade80" }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <h3 className="font-black text-white text-xl mb-2">30-Day Money-Back Guarantee</h3>
-            <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-              If ClozeFlow doesn&apos;t book you at least one qualified appointment in 30 days,<br className="hidden md:block" />
-              we&apos;ll refund every penny — no questions asked.
-            </p>
-          </div>
-        </section>
-
-        {/* ── FAQ ───────────────────────────────────────── */}
-        <hr style={DIVIDER_STYLE} />
-        <section id="faq" className="py-24 px-6" style={{ background: "rgba(255,255,255,0.015)" }}>
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-black text-white">Common questions</h2>
-            </div>
-
-            <div className="space-y-2">
-              {FAQS.map((faq, i) => (
-                <div key={i} className="glass rounded-2xl overflow-hidden">
-                  <button
-                    className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-white/5"
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  >
-                    <span className="font-semibold text-sm text-white/75">{faq.q}</span>
-                    <svg
-                      className={`w-4 h-4 shrink-0 transition-transform duration-200 ${openFaq === i ? "rotate-45" : ""}`}
-                      fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                      style={{ color: VERY_MUTED }}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                  {openFaq === i && (
-                    <div
-                      className="px-6 pb-5 text-sm leading-relaxed pt-4"
-                      style={{ borderTop: "1px solid rgba(255,255,255,0.06)", color: MUTED }}
-                    >
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        <hr style={DIVIDER_STYLE} />
-
-        {/* ── Final CTA ─────────────────────────────────── */}
-        <section className="relative py-32 px-6 overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden>
-            <div
-              className="w-[700px] h-[500px] rounded-full"
-              style={{ background: "radial-gradient(ellipse, rgba(234,88,12,0.14) 0%, transparent 65%)", filter: "blur(40px)" }}
-            />
-          </div>
-          <div className="absolute inset-0 dot-grid pointer-events-none opacity-60" aria-hidden />
-
-          <div className="relative max-w-3xl mx-auto text-center">
-            <p className="text-xs font-bold tracking-widest uppercase mb-6 text-gradient inline-block">
-              Stop Losing Jobs to Faster Competitors
-            </p>
-            <h2 className="text-4xl md:text-6xl font-black text-white leading-[0.93] mb-6">
-              Every day without ClozeFlow<br className="hidden md:block" />
-              is a job you didn&apos;t know<br className="hidden md:block" />
-              <span className="text-gradient">you lost.</span>
-            </h2>
-            <p className="text-lg mb-12 leading-relaxed max-w-xl mx-auto" style={{ color: MUTED }}>
-              Start your free trial in under 2 minutes. No credit card required.
-            </p>
-            <a href="/signup" className="btn-glow inline-block px-12 py-5 rounded-xl text-lg mb-6">
-              Start Free Trial →
-            </a>
-            <p className="text-sm" style={{ color: "rgba(255,255,255,0.2)" }}>
-              No pitch · No pressure · 30-day money-back guarantee
-            </p>
-          </div>
-        </section>
-
-      </main>
-
-      {/* ── Footer ────────────────────────────────────── */}
-      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }} className="py-10 px-6">
-        <div
-          className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm"
-          style={{ color: VERY_MUTED }}
-        >
-          <div className="flex items-center gap-2">
-            <div
-              className="w-6 h-6 rounded-md flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg,#ea580c,#f97316)" }}
-            >
-              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <span className="font-bold text-white">Cloze<span className="text-gradient">Flow</span></span>
-          </div>
-          <div className="flex flex-wrap justify-center gap-6">
-            {["Privacy Policy", "Terms of Service", "Security", "Contact"].map((l) => (
-              <a key={l} href="#" className="hover:text-white transition-colors">{l}</a>
-            ))}
-          </div>
-          <p>&copy; 2026 ClozeFlow, Inc.</p>
+          ))}
         </div>
-      </footer>
+      </section>
+
+      {/* ── Features Preview ─────────────────────────────── */}
+      <section
+        style={{
+          background: "#fff",
+          borderTop: `1px solid ${BORDER}`,
+          borderBottom: `1px solid ${BORDER}`,
+          padding: "80px 24px",
+        }}
+      >
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
+              Features
+            </p>
+            <h2 style={{ fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT }}>
+              Everything you need to fill your calendar
+            </h2>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                style={{
+                  background: "#faf9f7",
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: 12,
+                  padding: "24px 20px",
+                }}
+              >
+                <span style={{ fontSize: 28, display: "block", marginBottom: 12 }}>{f.icon}</span>
+                <h3 style={{ fontWeight: 700, fontSize: 16, color: TEXT, marginBottom: 6 }}>{f.title}</h3>
+                <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.55 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 32 }}>
+            <Link
+              href="/features"
+              style={{
+                color: ORANGE,
+                fontWeight: 700,
+                fontSize: 15,
+                textDecoration: "none",
+                border: `1px solid rgba(234,88,12,0.3)`,
+                padding: "10px 24px",
+                borderRadius: 8,
+              }}
+            >
+              See all features →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Final CTA ────────────────────────────────────── */}
+      <section style={{ padding: "96px 24px", textAlign: "center" }}>
+        <div style={{ maxWidth: 600, margin: "0 auto" }}>
+          <h2 style={{ fontSize: "clamp(28px, 5vw, 44px)", fontWeight: 900, color: TEXT, marginBottom: 16, lineHeight: 1.1 }}>
+            Ready to fill your calendar this week?
+          </h2>
+          <p style={{ fontSize: 17, color: MUTED, lineHeight: 1.65, marginBottom: 36 }}>
+            Join 500+ contractors who stopped losing leads and started booking more jobs — with zero extra ad spend.
+          </p>
+          <Link
+            href="/signup"
+            style={{
+              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              color: "#fff",
+              fontWeight: 800,
+              fontSize: 17,
+              padding: "16px 36px",
+              borderRadius: 12,
+              textDecoration: "none",
+              display: "inline-block",
+              boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+              marginBottom: 16,
+            }}
+          >
+            Create Your Free Account → It&apos;s FREE
+          </Link>
+          <p style={{ fontSize: 13, color: MUTED }}>No credit card needed · Cancel anytime · Setup in one day</p>
+        </div>
+      </section>
+
     </div>
   );
 }

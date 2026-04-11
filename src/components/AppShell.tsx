@@ -3,17 +3,22 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { PLANS, type PlanId } from "@/lib/subscriptions";
 
 interface AppShellProps {
   firstName?: string | null;
   businessName?: string | null;
   email?: string | null;
+  plan?: PlanId | null;
+  leadCount?: number;
+  leadLimit?: number | null;
   children: React.ReactNode;
 }
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", fa: "fa-solid fa-gauge-high" },
   { href: "/leads",     label: "Leads",     fa: "fa-solid fa-bolt-lightning" },
+  { href: "/calendar",  label: "Calendar",  fa: "fa-solid fa-calendar" },
   { href: "/profile",   label: "Profile",   fa: "fa-solid fa-user" },
 ];
 
@@ -24,7 +29,7 @@ const TEXT   = "#1c1917";
 const MUTED  = "#78716c";
 const ORANGE = "#ea580c";
 
-export default function AppShell({ firstName, businessName, email, children }: AppShellProps) {
+export default function AppShell({ firstName, businessName, email, plan, leadCount = 0, leadLimit, children }: AppShellProps) {
   const pathname = usePathname();
   const router   = useRouter();
 
@@ -98,6 +103,56 @@ export default function AppShell({ firstName, businessName, email, children }: A
 
         {/* User + sign out */}
         <div style={{ padding: "14px 12px", borderTop: `1px solid ${BORDER}` }}>
+          {/* Plan badge */}
+          {plan ? (() => {
+            const p = PLANS[plan];
+            const pct = leadLimit ? Math.min(100, Math.round((leadCount / leadLimit) * 100)) : 0;
+            const atLimit = leadLimit && leadCount >= leadLimit;
+            const nearLimit = leadLimit && leadCount >= leadLimit * 0.8 && !atLimit;
+            return (
+              <Link href="/profile/billing" style={{ textDecoration: "none", display: "block", marginBottom: 8 }}>
+                <div style={{
+                  padding: "10px 12px", borderRadius: 10,
+                  background: p.badgeBg, border: `1px solid ${p.badgeBorder}`,
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: p.color }}>
+                      {p.emoji} {p.name} Plan
+                    </span>
+                    <span style={{ fontSize: 10, color: p.color, fontWeight: 600 }}>Manage →</span>
+                  </div>
+                  {leadLimit && (
+                    <div style={{ marginTop: 7 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ fontSize: 10, color: atLimit ? "#dc2626" : nearLimit ? "#d97706" : MUTED, fontWeight: 600 }}>
+                          {leadCount} / {leadLimit} leads this month
+                        </span>
+                        {atLimit && <span style={{ fontSize: 9, fontWeight: 800, color: "#dc2626" }}>LIMIT REACHED</span>}
+                      </div>
+                      <div style={{ height: 4, borderRadius: 2, background: "rgba(0,0,0,0.08)", overflow: "hidden" }}>
+                        <div style={{
+                          height: "100%", borderRadius: 2, transition: "width 0.3s",
+                          width: `${pct}%`,
+                          background: atLimit ? "#dc2626" : nearLimit ? "#d97706" : p.color,
+                        }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Link>
+            );
+          })() : (
+            <Link href="/onboarding" style={{ textDecoration: "none", display: "block", marginBottom: 8 }}>
+              <div style={{
+                padding: "10px 12px", borderRadius: 10,
+                background: "rgba(234,88,12,0.06)", border: "1px solid rgba(234,88,12,0.18)",
+                display: "flex", alignItems: "center", gap: 8,
+              }}>
+                <i className="fa-solid fa-rocket" style={{ fontSize: 11, color: ORANGE }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: ORANGE }}>Pick a plan to go live</span>
+              </div>
+            </Link>
+          )}
           <div style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "10px 10px", borderRadius: 10, background: BG, marginBottom: 8,
@@ -137,7 +192,7 @@ export default function AppShell({ firstName, businessName, email, children }: A
       </aside>
 
       {/* ── Main content ─────────────────────────── */}
-      <main className="md:ml-[240px]" style={{ minHeight: "100vh", paddingBottom: 80 }}>
+      <main className="md:ml-[240px] pb-20 md:pb-0" style={{ minHeight: "100vh" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 16px" }} className="md:px-10 md:py-10">
           {children}
         </div>
@@ -149,7 +204,7 @@ export default function AppShell({ firstName, businessName, email, children }: A
         style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
           background: WHITE, borderTop: `1px solid ${BORDER}`,
-          display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
+          display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >

@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
   const { data: sendData, error: sendError } = await resend.emails.send({
     from:    process.env.RESEND_FROM_EMAIL ?? `${businessName} <hello@clozeflow.com>`,
-    to:      toEmail,
+    to:      process.env.RESEND_TEST_TO ?? toEmail,
     subject,
     html,
   });

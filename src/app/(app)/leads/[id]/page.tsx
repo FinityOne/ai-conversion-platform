@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getLeadById, type EmailLogEntry } from "@/lib/leads";
+import { getLeadById, type EmailLogEntry, type ProjectDetails } from "@/lib/leads";
 import { getStageConfig, scoreColor, scoreBgColor, scoreBorderColor, PIPELINE_STAGES, type LeadStatus } from "@/lib/scoring";
 import ScoreGauge from "@/components/ScoreGauge";
+import SendFollowUpButton from "@/components/SendFollowUpButton";
+import SendBookingButton from "@/components/SendBookingButton";
+import { createSupabaseServiceClient } from "@/lib/supabase-service";
+import { formatDateFull, formatTime12 } from "@/lib/bookings";
 
 const TEXT   = "#1c1917";
 const MUTED  = "#78716c";
@@ -156,11 +160,106 @@ function EmailLogTable({ logs }: { logs: EmailLogEntry[] }) {
   );
 }
 
+function ProjectDetailsPanel({ pd, siteUrl }: { pd: ProjectDetails; siteUrl: string }) {
+  const projectUrl = `${siteUrl}/project/${pd.token}`;
+  return (
+    <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT }}>
+          <i className="fa-solid fa-clipboard-list" style={{ marginRight: 8, color: "#7c3aed" }} />
+          Project Details
+          {pd.submitted_at && (
+            <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "#faf5ff", color: "#7c3aed", border: "1px solid #ddd6fe" }}>
+              Submitted
+            </span>
+          )}
+        </p>
+        {/* Always show copy link */}
+        <CopyProjectLink url={projectUrl} />
+      </div>
+
+      {!pd.submitted_at ? (
+        <p style={{ margin: 0, fontSize: 13, color: MUTED }}>
+          Waiting for the lead to fill out their project details.
+        </p>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {[
+            { label: "Service",       value: pd.job_type },
+            { label: "Property",      value: pd.property_type },
+            { label: "Budget",        value: pd.budget_range },
+            { label: "Timeline",      value: pd.timeline },
+            { label: "Location",      value: pd.address },
+          ].filter(r => r.value).map(r => (
+            <div key={r.label}>
+              <p style={{ margin: "0 0 2px", fontSize: 11, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.5px" }}>{r.label}</p>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT }}>{r.value}</p>
+            </div>
+          ))}
+          {pd.description && (
+            <div>
+              <p style={{ margin: "0 0 2px", fontSize: 11, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.5px" }}>Description</p>
+              <p style={{ margin: 0, fontSize: 14, color: "#57534e", lineHeight: 1.6 }}>{pd.description}</p>
+            </div>
+          )}
+          {pd.additional_notes && (
+            <div>
+              <p style={{ margin: "0 0 2px", fontSize: 11, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.5px" }}>Additional Notes</p>
+              <p style={{ margin: 0, fontSize: 14, color: "#57534e", lineHeight: 1.6 }}>{pd.additional_notes}</p>
+            </div>
+          )}
+          {pd.photo_urls.length > 0 && (
+            <div>
+              <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.5px" }}>Photos ({pd.photo_urls.length})</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+                {pd.photo_urls.map((url, i) => (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" style={{ display: "block", borderRadius: 8, overflow: "hidden", aspectRatio: "1", background: "#f0ede8" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={`Photo ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CopyProjectLink({ url }: { url: string }) {
+  // Server-rendered placeholder; actual copy is handled client-side via ShareLinkButton-style inline script
+  // We render a compact copy button using a form action workaround — simplest: inline client island
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ fontSize: 12, fontWeight: 700, color: "#7c3aed", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}
+    >
+      <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: 11 }} />
+      Open
+    </a>
+  );
+}
+
 export default async function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { lead, emailLog } = await getLeadById(id);
+  const { lead, emailLog, projectDetails } = await getLeadById(id);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   if (!lead) notFound();
+
+  // Fetch confirmed booking for this lead
+  const sb = createSupabaseServiceClient();
+  const { data: confirmedBooking } = await sb
+    .from("bookings")
+    .select("booking_date, start_time, end_time")
+    .eq("lead_id", lead.id)
+    .eq("status", "confirmed")
+    .order("booking_date")
+    .limit(1)
+    .maybeSingle();
 
   const stageCfg = getStageConfig(lead.status);
   const sColor   = scoreColor(lead.score);
@@ -300,6 +399,54 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             <p style={{ margin: 0, fontSize: 14, color: MUTED }}>No job details added.</p>
           )}
         </div>
+      </div>
+
+      {/* Follow-up / Project Details */}
+      <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "20px", marginBottom: 16 }}>
+        <p style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 700, color: TEXT }}>
+          <i className="fa-solid fa-paper-plane" style={{ marginRight: 8, color: "#7c3aed" }} />
+          Follow-Up & Project Details
+        </p>
+        <SendFollowUpButton leadId={lead.id} hasEmail={!!lead.email} />
+      </div>
+
+      {/* Project details panel — shown once a follow-up has been sent */}
+      {projectDetails && (
+        <div style={{ marginBottom: 16 }}>
+          <ProjectDetailsPanel pd={projectDetails} siteUrl={siteUrl} />
+        </div>
+      )}
+
+      {/* Book Consultation */}
+      <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "20px", marginBottom: 16 }}>
+        <div style={{ marginBottom: 14 }}>
+          <p style={{ margin: "0 0 2px", fontSize: 14, fontWeight: 700, color: TEXT }}>
+            <i className="fa-solid fa-calendar-plus" style={{ marginRight: 8, color: "#0891b2" }} />
+            Book Consultation
+          </p>
+          {confirmedBooking ? (
+            <div style={{ marginTop: 10, padding: "12px 14px", background: "#ecfeff", border: "1px solid #a5f3fc", borderRadius: 10, display: "flex", alignItems: "center", gap: 10 }}>
+              <i className="fa-solid fa-calendar-check" style={{ color: "#0891b2", fontSize: 16, flexShrink: 0 }} />
+              <div>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#0e7490" }}>
+                  {confirmedBooking.booking_date ? formatDateFull(confirmedBooking.booking_date) : ""}
+                </p>
+                <p style={{ margin: 0, fontSize: 13, color: "#0891b2" }}>
+                  {confirmedBooking.start_time ? formatTime12(String(confirmedBooking.start_time).slice(0, 5)) : ""}
+                  {confirmedBooking.end_time ? ` – ${formatTime12(String(confirmedBooking.end_time).slice(0, 5))}` : ""}
+                  {" · 15-min consultation"}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p style={{ margin: "4px 0 12px", fontSize: 13, color: MUTED }}>
+              Send a booking request to let this lead pick a consultation time.
+            </p>
+          )}
+        </div>
+        {!confirmedBooking && (
+          <SendBookingButton leadId={lead.id} hasEmail={!!lead.email} />
+        )}
       </div>
 
       {/* Email log */}
