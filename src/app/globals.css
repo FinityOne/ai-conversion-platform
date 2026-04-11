@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #111827;
+  --background: #05091a;
+  --foreground: #f1f5f9;
 }
 
 @theme inline {
@@ -17,54 +17,76 @@ html {
 }
 
 body {
-  background: #ffffff;
-  color: #111827;
+  background: #05091a;
+  color: #f1f5f9;
   font-family: var(--font-geist-sans), Arial, sans-serif;
 }
 
-/* Primary CTA button */
-.btn-cta {
-  background: #ea580c;
+/* ── Gradient text ────────────────────────────────────── */
+.text-gradient {
+  background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glassmorphism card ───────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-hover {
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Primary glowing CTA button ──────────────────────── */
+.btn-glow {
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
   color: #ffffff;
   font-weight: 800;
-  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 0 20px rgba(234, 88, 12, 0.4), 0 4px 16px rgba(234, 88, 12, 0.25);
+  transition: box-shadow 0.2s ease, transform 0.15s ease, filter 0.15s ease;
 }
-.btn-cta:hover {
-  background: #c2410c;
+.btn-glow:hover {
+  box-shadow: 0 0 36px rgba(234, 88, 12, 0.58), 0 8px 24px rgba(234, 88, 12, 0.35);
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.30);
+  filter: brightness(1.06);
 }
 
-/* Ghost button */
-.btn-ghost {
-  color: #374151;
+/* ── Ghost/outline button for dark backgrounds ────────── */
+.btn-outline-dark {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 600;
-  border: 1.5px solid #e5e7eb;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
-.btn-ghost:hover {
-  border-color: #9ca3af;
-  color: #111827;
+.btn-outline-dark:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
 }
 
-/* Card */
+/* ── Dot grid background overlay ─────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ── Highlighted pricing card (Growth) ───────────────── */
+.pricing-highlight {
+  background: rgba(234, 88, 12, 0.06);
+  border: 1px solid rgba(234, 88, 12, 0.28);
+  box-shadow: 0 0 48px rgba(234, 88, 12, 0.1);
+}
+
+/* ── Legacy card (kept for fallback) ─────────────────── */
 .card {
-  background: #ffffff;
-  border: 1px solid #f3f4f6;
-  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.06);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-.card:hover {
-  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.09);
-  transform: translateY(-2px);
-}
-
-/* FAQ accordion */
-.faq-answer {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-.faq-answer.open {
-  max-height: 500px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
