@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cloze AI — Stop Losing Jobs to Whoever Answers First",
   description:
-    "Cloze AI responds to every new lead in under 60 seconds, qualifies the serious buyers, and books appointments to your calendar — while you're busy running your business.",
+    "Cloze AI responds to every new lead in under 60 seconds, qualifies serious buyers, and books appointments to your calendar — so you never lose another job to a faster competitor.",
   openGraph: {
     title: "Cloze AI — Stop Losing Jobs to Whoever Answers First",
     description:
-      "78% of customers hire whoever responds first. Cloze AI makes sure that's always you — responding instantly, following up persistently, and booking appointments automatically.",
+      "78% of customers hire the first business to respond. Cloze makes sure that's always you.",
     type: "website",
   },
 };
@@ -30,13 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-white text-gray-900">
-        {children}
-      </body>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className="bg-white text-gray-900">{children}</body>
     </html>
   );
 }
