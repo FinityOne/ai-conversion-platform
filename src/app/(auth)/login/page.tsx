@@ -178,9 +178,9 @@ export default function LoginPage() {
           />
 
           <div className="flex justify-end">
-            <a href="#" className="text-sm transition-colors hover:text-white" style={{ color: MUTED }}>
+            <Link href="/forgot-password" className="text-sm transition-colors hover:text-white" style={{ color: MUTED }}>
               Forgot password?
-            </a>
+            </Link>
           </div>
 
           <button

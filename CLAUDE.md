@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Project: HomeHive
+# Project: ClozeFlow
 
 A Next.js 16 app that turns every lead into an instant response — so you book more jobs automatically.
 

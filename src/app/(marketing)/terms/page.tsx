@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "ClozeFlow Terms of Service — the rules of the road for using our platform.",
+};
+
 const BG = "#faf9f7";
 const TEXT = "#1c1917";
 const MUTED = "#78716c";

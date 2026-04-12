@@ -39,6 +39,12 @@ export async function GET(request: Request) {
         { onConflict: "id", ignoreDuplicates: true }
       );
 
+      // Support a `next` param for password reset and other post-auth redirects
+      const next = searchParams.get("next");
+      if (next && next.startsWith("/")) {
+        return NextResponse.redirect(`${origin}${next}`);
+      }
+
       return NextResponse.redirect(`${origin}/dashboard`);
     }
   }

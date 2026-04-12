@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import PhoneInput from "@/components/PhoneInput";
+import { formatPhoneE164 } from "@/lib/phone";
 
 const JOB_TYPES = [
   "Roofing",
@@ -69,7 +71,7 @@ export default function AddLeadModal() {
     const { data: lead, error: insertError } = await sb.from("leads").insert({
       user_id:     user.id,
       name:        name.trim(),
-      phone:       phone.trim()       || null,
+      phone:       formatPhoneE164(phone) ?? (phone.trim() || null),
       email:       email.trim()       || null,
       job_type:    jobType            || null,
       description: description.trim() || null,
@@ -181,8 +183,12 @@ export default function AddLeadModal() {
               </Field>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <Field label="Phone">
-                  <input style={inputStyle} type="tel" inputMode="tel" placeholder="(555) 000-0000" value={phone} onChange={e => setPhone(e.target.value)} />
+                <Field label="🇺🇸 Phone">
+                  <PhoneInput
+                    value={phone}
+                    onChange={setPhone}
+                    inputStyle={inputStyle}
+                  />
                 </Field>
                 <Field label="Email">
                   <input style={inputStyle} type="email" inputMode="email" placeholder="jake@email.com" value={email} onChange={e => setEmail(e.target.value)} />

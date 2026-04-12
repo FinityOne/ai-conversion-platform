@@ -2,74 +2,104 @@
 
 import type { DailyVolume } from "@/lib/email-stats";
 
+const CHART_H = 110;
+const GRID_LINES = [0.25, 0.5, 0.75, 1];
+
 export default function DailyEmailChart({ data }: { data: DailyVolume[] }) {
-  const max = Math.max(...data.map(d => d.count), 1);
+  const max   = Math.max(...data.map(d => d.count), 1);
+  const total = data.reduce((s, d) => s + d.count, 0);
 
   return (
     <div>
-      {/* Bars */}
-      <div style={{
-        display: "flex",
-        alignItems: "flex-end",
-        gap: 6,
-        height: 80,
-        padding: "0 2px",
-      }}>
-        {data.map((d) => {
-          const pct    = d.count / max;
-          const isToday = d.label === "Today";
-          const height  = Math.max(pct * 72, d.count > 0 ? 8 : 3);
+      <div style={{ position: "relative" }}>
+        {/* Grid lines */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          {GRID_LINES.map(pct => (
+            <div key={pct} style={{
+              position: "absolute",
+              left: 0, right: 0,
+              bottom: pct * CHART_H,
+              borderTop: `1px dashed ${pct === 1 ? "#e6e2db" : "#f0ede8"}`,
+            }}>
+              {pct === 1 && (
+                <span style={{
+                  position: "absolute", right: 0, top: -9,
+                  fontSize: 9, color: "#c4bfb8", fontWeight: 600,
+                }}>
+                  {max}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
 
-          return (
-            <div
-              key={d.date}
-              style={{
+        {/* Bars */}
+        <div style={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: 6,
+          height: CHART_H,
+          padding: "0 2px",
+          position: "relative",
+        }}>
+          {data.map(d => {
+            const pct     = d.count / max;
+            const isToday = d.label === "Today";
+            const barH    = Math.max(pct * (CHART_H - 4), d.count > 0 ? 8 : 3);
+
+            return (
+              <div key={d.date} style={{
                 flex: 1,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "flex-end",
                 height: "100%",
-                gap: 4,
-              }}
-            >
-              {/* Count label above bar */}
-              <span style={{
-                fontSize: 11, fontWeight: 700,
-                color: d.count > 0 ? (isToday ? "#ea580c" : "#78716c") : "transparent",
+                gap: 3,
               }}>
-                {d.count}
-              </span>
+                {/* Count above bar */}
+                <span style={{
+                  fontSize: 10, fontWeight: 700,
+                  color: d.count > 0 ? (isToday ? "#ea580c" : "#a8a29e") : "transparent",
+                }}>
+                  {d.count}
+                </span>
 
-              {/* Bar */}
-              <div style={{
-                width: "100%",
-                height: height,
-                borderRadius: "4px 4px 2px 2px",
-                background: isToday
-                  ? "linear-gradient(180deg,#f97316,#ea580c)"
-                  : d.count > 0
-                    ? "#e8e3dc"
-                    : "#f0ede8",
-                transition: "height 0.4s ease",
-              }} />
-            </div>
-          );
-        })}
+                {/* Bar */}
+                <div style={{
+                  width: "100%",
+                  height: barH,
+                  borderRadius: "4px 4px 2px 2px",
+                  background: isToday
+                    ? "linear-gradient(180deg,#f97316,#ea580c)"
+                    : d.count > 0
+                      ? "linear-gradient(180deg,#e2ddd6,#d4cfc8)"
+                      : "#f5f3f0",
+                  transition: "height 0.4s ease",
+                  boxShadow: isToday ? "0 2px 8px rgba(234,88,12,0.2)" : "none",
+                }} />
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Day labels */}
-      <div style={{ display: "flex", gap: 6, padding: "6px 2px 0", marginTop: 2 }}>
-        {data.map((d) => (
+      {/* Day labels + total */}
+      <div style={{ display: "flex", gap: 6, padding: "6px 2px 0", alignItems: "center" }}>
+        {data.map(d => (
           <div key={d.date} style={{ flex: 1, textAlign: "center" }}>
             <span style={{
-              fontSize: 10, fontWeight: d.label === "Today" ? 800 : 500,
+              fontSize: 10,
+              fontWeight: d.label === "Today" ? 800 : 500,
               color: d.label === "Today" ? "#ea580c" : "#c4bfb8",
             }}>
               {d.label}
             </span>
           </div>
         ))}
+        <span style={{ fontSize: 10, color: "#c4bfb8", whiteSpace: "nowrap", paddingLeft: 8 }}>
+          {total} total
+        </span>
       </div>
     </div>
   );

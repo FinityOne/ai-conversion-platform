@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import SignOutButton from "@/components/SignOutButton";
+import ChangePasswordForm from "@/components/ChangePasswordForm";
 
 const TEXT   = "#1c1917";
 const MUTED  = "#78716c";
@@ -109,6 +110,9 @@ export default async function ProfilePage() {
           </p>
         </div>
       </div>
+
+      {/* Change password */}
+      <ChangePasswordForm />
 
       {/* Sign out */}
       <div style={{ marginBottom: 20 }}>

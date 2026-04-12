@@ -18,10 +18,13 @@ const PLANS = [
     monthlyPrice: 129,
     features: [
       "Up to 50 leads/month",
-      "60-second response",
-      "Email + SMS follow-up",
-      "Calendar booking",
-      "1 lead source",
+      "Custom intake form with photo upload",
+      "60-second automated email response",
+      "Follow-up email sequences",
+      "Lead inbox with AI scoring",
+      "AI-powered messaging to boost conversions",
+      "Flyer generator",
+      "Seamless calendar bookings",
       "Email support",
     ],
     highlight: false,
@@ -34,12 +37,13 @@ const PLANS = [
     monthlyPrice: 389,
     badge: "Most Popular",
     features: [
-      "Up to 200 leads/month",
-      "Priority 60-second response",
-      "Full follow-up sequences",
-      "Multi-source lead capture",
+      "Everything in Starter",
+      "Up to 500 leads/month",
+      "Smart AI reply detection",
+      "Full multi-step follow-up sequences",
+      "Performance tracking & analytics",
       "Daily lead digest email",
-      "Priority support + onboarding call",
+      "Priority support",
     ],
     highlight: true,
     cta: "Start Free — No Card Needed",
@@ -50,7 +54,9 @@ const PLANS = [
     annualPrice: 999,
     monthlyPrice: 1299,
     features: [
+      "Everything in Growth",
       "Unlimited leads",
+      "Hot lead SMS alerts",
       "White-label booking pages",
       "Advanced analytics",
       "Dedicated account manager",
@@ -81,7 +87,7 @@ const FAQS = [
   },
   {
     q: "How is the Growth plan different from Starter?",
-    a: "Growth unlocks multi-source lead capture (connect all your lead sources — Angi, Thumbtack, Google, website simultaneously), full multi-step follow-up sequences, a daily lead digest email, and a priority onboarding call with our team.",
+    a: "Growth gives you 500 leads/month (vs. 50 on Starter), smart AI reply detection, full multi-step follow-up sequences, performance tracking, a daily lead digest email, and priority support.",
   },
   {
     q: "Do you offer a money-back guarantee?",
@@ -267,6 +273,52 @@ export default function PricingPage() {
               )}
             </div>
           ))}
+        </div>
+
+        {/* Enterprise callout */}
+        <div
+          style={{
+            background: "#fff",
+            border: `1px solid ${BORDER}`,
+            borderRadius: 14,
+            padding: "28px 32px",
+            margin: "32px 0 0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 20,
+          }}
+        >
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+              Enterprise
+            </p>
+            <h3 style={{ fontSize: 20, fontWeight: 900, color: TEXT, marginBottom: 6 }}>
+              Need something bigger?
+            </h3>
+            <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.6, maxWidth: 480 }}>
+              We work with enterprise systems, multi-location operators, and custom integrations.
+              Custom pricing available — let&apos;s build something that fits your operation.
+            </p>
+          </div>
+          <a
+            href="mailto:hello@clozeflow.com"
+            style={{
+              display: "inline-block",
+              padding: "13px 28px",
+              borderRadius: 10,
+              fontWeight: 700,
+              fontSize: 15,
+              textDecoration: "none",
+              background: TEXT,
+              color: "#fff",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            Contact us →
+          </a>
         </div>
 
         {/* Money-back guarantee */}

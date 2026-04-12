@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "ClozeFlow Privacy Policy — how we collect, use, and protect your data.",
+};
+
 const BG = "#faf9f7";
 const TEXT = "#1c1917";
 const MUTED = "#78716c";

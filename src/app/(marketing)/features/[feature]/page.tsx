@@ -1,6 +1,17 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getFeature, features } from "@/lib/features-data";
+
+export async function generateMetadata({ params }: { params: Promise<{ feature: string }> }): Promise<Metadata> {
+  const { feature } = await params;
+  const f = getFeature(feature);
+  if (!f) return { title: "Feature Not Found" };
+  return {
+    title: f.title,
+    description: f.description,
+  };
+}
 
 const BG = "#faf9f7";
 const TEXT = "#1c1917";

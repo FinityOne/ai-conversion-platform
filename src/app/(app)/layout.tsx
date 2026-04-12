@@ -10,7 +10,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect("/login");
 
   const [{ data: profile }, subscription, leadCount] = await Promise.all([
-    supabase.from("profiles").select("first_name, last_name, business_name").eq("id", user.id).single(),
+    supabase.from("profiles").select("first_name, last_name, business_name, role").eq("id", user.id).single(),
     getSubscription(user.id),
     getLeadCountThisMonth(user.id),
   ]);
@@ -26,6 +26,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       plan={plan}
       leadCount={leadCount}
       leadLimit={leadLimit}
+      isAdmin={profile?.role === "admin"}
     >
       {children}
     </AppShell>

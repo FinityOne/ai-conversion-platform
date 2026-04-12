@@ -153,9 +153,12 @@ export interface ProjectDetails {
 export interface LeadStats {
   total: number;
   today: number;
+  thisWeek: number;
   new: number;
   contacted: number;
+  followUpSent: number;
   replied: number;
+  projectSubmitted: number;
   booked: number;
   closedWon: number;
   closedLost: number;
@@ -256,27 +259,31 @@ export async function getLeadById(id: string): Promise<{
 export async function getLeadStats(): Promise<LeadStats> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { total: 0, today: 0, new: 0, contacted: 0, replied: 0, booked: 0, closedWon: 0, closedLost: 0 };
+  if (!user) return { total: 0, today: 0, thisWeek: 0, new: 0, contacted: 0, followUpSent: 0, replied: 0, projectSubmitted: 0, booked: 0, closedWon: 0, closedLost: 0 };
 
   const { data } = await supabase
     .from("leads")
     .select("status, created_at")
     .eq("user_id", user.id);
 
-  if (!data) return { total: 0, today: 0, new: 0, contacted: 0, replied: 0, booked: 0, closedWon: 0, closedLost: 0 };
+  if (!data) return { total: 0, today: 0, thisWeek: 0, new: 0, contacted: 0, followUpSent: 0, replied: 0, projectSubmitted: 0, booked: 0, closedWon: 0, closedLost: 0 };
 
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
+  const now        = new Date();
+  const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+  const weekStart  = new Date(now); weekStart.setDate(now.getDate() - 6); weekStart.setHours(0, 0, 0, 0);
 
   return {
-    total:      data.length,
-    today:      data.filter(l => new Date(l.created_at) >= todayStart).length,
-    new:        data.filter(l => l.status === "new").length,
-    contacted:  data.filter(l => l.status === "contacted").length,
-    replied:    data.filter(l => l.status === "replied").length,
-    booked:     data.filter(l => l.status === "booked").length,
-    closedWon:  data.filter(l => l.status === "closed_won").length,
-    closedLost: data.filter(l => l.status === "closed_lost").length,
+    total:            data.length,
+    today:            data.filter(l => new Date(l.created_at) >= todayStart).length,
+    thisWeek:         data.filter(l => new Date(l.created_at) >= weekStart).length,
+    new:              data.filter(l => l.status === "new").length,
+    contacted:        data.filter(l => l.status === "contacted").length,
+    followUpSent:     data.filter(l => l.status === "follow_up_sent").length,
+    replied:          data.filter(l => l.status === "replied").length,
+    projectSubmitted: data.filter(l => l.status === "project_submitted").length,
+    booked:           data.filter(l => l.status === "booked").length,
+    closedWon:        data.filter(l => l.status === "closed_won").length,
+    closedLost:       data.filter(l => l.status === "closed_lost").length,
   };
 }
 

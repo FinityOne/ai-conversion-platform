@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "How It Works — The Science Behind Instant Follow-Up",
+  description:
+    "Learn why responding to leads within 60 seconds increases conversion by up to 391%. See exactly how ClozeFlow qualifies, responds, and books appointments automatically.",
+};
 
 const BG = "#faf9f7";
 const TEXT = "#1c1917";

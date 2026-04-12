@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import PhoneInput from "@/components/PhoneInput";
+import { formatPhoneE164 } from "@/lib/phone";
 
 // Steps: email → firstName → lastName → phone → businessName → password
 const TOTAL_STEPS = 6;
@@ -158,7 +160,7 @@ export default function SignupPage() {
         data: {
           first_name: firstName,
           last_name: lastName,
-          phone,
+          phone: formatPhoneE164(phone) ?? phone,
           business_name: businessName,
           wants_setup_call: wantsSetupCall,
         },
@@ -178,7 +180,7 @@ export default function SignupPage() {
         email,
         first_name: firstName,
         last_name: lastName,
-        phone,
+        phone: formatPhoneE164(phone) ?? phone,
         business_name: businessName,
         wants_setup_call: wantsSetupCall,
       });
@@ -346,17 +348,20 @@ export default function SignupPage() {
           {/* Step 4 — Phone */}
           {step === 4 && (
             <>
-              <StepInput
-                label="Mobile number"
-                placeholder="(555) 000-0000"
-                type="tel"
-                inputMode="tel"
-                value={phone}
-                onChange={setPhone}
-                onNext={() => phone.trim() && advanceTo(5)}
-                autoFocus
-                hint="We'll only use this to notify you about leads."
-              />
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold" style={{ color: MUTED }}>Mobile number</label>
+                <PhoneInput
+                  value={phone}
+                  onChange={setPhone}
+                  inputStyle={inputStyle}
+                  prefixColor="rgba(255,255,255,0.55)"
+                  dividerColor="rgba(255,255,255,0.12)"
+                  placeholder="(555) 000-0000"
+                  autoFocus
+                  onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); if (phone.trim()) advanceTo(5); } }}
+                />
+                <p className="text-xs" style={{ color: VERY_MUTED }}>We&apos;ll only use this to notify you about leads.</p>
+              </div>
               <button
                 onClick={() => phone.trim() && advanceTo(5)}
                 className="btn-glow w-full py-4 rounded-2xl text-base font-bold transition-all active:scale-[0.98]"

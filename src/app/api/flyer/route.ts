@@ -10,10 +10,18 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const intakeUrl = `${siteUrl}/intake/${user.id}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const sb      = createSupabaseServiceClient();
 
-  const sb = createSupabaseServiceClient();
+  // Use custom intake_slug if set, otherwise fall back to UUID
+  const { data: profile0 } = await sb
+    .from("profiles")
+    .select("intake_slug, business_name, phone")
+    .eq("id", user.id)
+    .maybeSingle();
+  const activeSlug = profile0?.intake_slug ?? user.id;
+  const intakeUrl  = `${siteUrl}/intake/${activeSlug}`;
+
   const { data } = await sb
     .from("flyer_data")
     .select("*")
@@ -21,22 +29,17 @@ export async function GET() {
     .maybeSingle();
 
   if (!data) {
-    // Pre-fill from profile
-    const { data: profile } = await sb
-      .from("profiles")
-      .select("business_name, phone")
-      .eq("id", user.id)
-      .maybeSingle();
+    // Pre-fill from profile (already fetched above as profile0)
 
     return NextResponse.json({
       intakeUrl,
       flyer: {
-        business_name:  profile?.business_name ?? "",
+        business_name:  profile0?.business_name ?? "",
         tagline:        "",
         promo_headline: "",
         services:       [],
         areas_served:   [],
-        phone:          profile?.phone ?? "",
+        phone:          profile0?.phone ?? "",
         email_contact:  "",
         footer_note:    "",
         color_theme:    "orange",

@@ -12,15 +12,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const OG_IMAGE = "https://www.leavitt.com/dA/b23b96683d/featuredImage/blog-construction.jpg/1200w/webp/50q";
+
 export const metadata: Metadata = {
-  title: "Cloze AI — Stop Losing Jobs to Whoever Answers First",
+  metadataBase: new URL("https://clozeflow.com"),
+
+  title: {
+    default: "ClozeFlow — Never Lose a Lead Again",
+    template: "%s | ClozeFlow",
+  },
   description:
-    "Cloze AI responds to every new lead in under 60 seconds, qualifies serious buyers, and books appointments to your calendar — so you never lose another job to a faster competitor.",
+    "ClozeFlow responds to every new lead in under 60 seconds, qualifies serious buyers, and books appointments straight to your calendar — so you never lose another job to a faster competitor.",
+
   openGraph: {
-    title: "Cloze AI — Stop Losing Jobs to Whoever Answers First",
-    description:
-      "78% of customers hire the first business to respond. Cloze makes sure that's always you.",
-    type: "website",
+    siteName:    "ClozeFlow",
+    type:        "website",
+    locale:      "en_US",
+    images: [
+      {
+        url:    OG_IMAGE,
+        width:  1200,
+        height: 630,
+        alt:    "ClozeFlow — Lead management built for home service contractors",
+      },
+    ],
+  },
+
+  twitter: {
+    card:   "summary_large_image",
+    site:   "@clozeflow",
+    images: [OG_IMAGE],
+  },
+
+  icons: {
+    icon: "/favicon.ico",
   },
 };
 
@@ -38,7 +63,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body style={{ background: "#05091a" }}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

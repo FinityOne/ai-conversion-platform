@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 interface Props {
   leadId: string;
@@ -30,12 +31,15 @@ export default function SendFollowUpButton({ leadId, hasEmail }: Props) {
     setLoading(false);
 
     if (!res.ok) {
-      setError(body.error ?? "Failed to send. Try again.");
+      const msg = body.error ?? "Failed to send follow-up email. Try again.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
     setSent(true);
     setProjectUrl(body.projectUrl ?? null);
+    toast.success("Follow-up email sent! Lead moved to Follow-Up stage.");
     router.refresh();
   }
 

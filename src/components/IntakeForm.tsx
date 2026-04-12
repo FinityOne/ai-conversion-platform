@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import PhoneInput from "@/components/PhoneInput";
+import { formatPhoneE164 } from "@/lib/phone";
 
 const JOB_TYPES = [
   "Roofing",
@@ -77,7 +79,7 @@ export default function IntakeForm({ slug, businessName, accent }: Props) {
     const res = await fetch("/api/intake", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug, name, phone, email, jobType, description }),
+      body: JSON.stringify({ slug, name, phone: formatPhoneE164(phone) ?? phone, email, jobType, description }),
     });
 
     setLoading(false);
@@ -155,17 +157,13 @@ export default function IntakeForm({ slug, businessName, accent }: Props) {
       </Field>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <Field label="Phone">
-          <input
-            style={inputStyle(accent, focusedField === "phone")}
-            type="tel"
-            inputMode="tel"
-            placeholder="(555) 000-0000"
+        <Field label="🇺🇸 Phone">
+          <PhoneInput
             value={phone}
-            onChange={e => setPhone(e.target.value)}
+            onChange={setPhone}
+            inputStyle={inputStyle(accent, focusedField === "phone")}
             onFocus={() => setFocusedField("phone")}
             onBlur={() => setFocusedField(null)}
-            autoComplete="tel"
           />
         </Field>
         <Field label="Email">

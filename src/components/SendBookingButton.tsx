@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "@/lib/toast";
 
 interface Props { leadId: string; hasEmail: boolean }
 
@@ -22,9 +23,15 @@ export default function SendBookingButton({ leadId, hasEmail }: Props) {
     });
     const body = await res.json().catch(() => ({}));
     setLoading(false);
-    if (!res.ok) { setError(body.error ?? "Failed to send."); return; }
+    if (!res.ok) {
+      const msg = body.error ?? "Failed to send booking request. Try again.";
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
     setSent(true);
     setBookingUrl(body.bookingUrl ?? null);
+    toast.success("Booking request sent! Lead moved to Booked.");
     router.refresh();
   }
 

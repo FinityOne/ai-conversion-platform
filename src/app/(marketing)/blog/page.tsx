@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { blogPosts } from "@/lib/blog-posts";
+
+export const metadata: Metadata = {
+  title: "Blog — Contractor Growth & Lead Conversion Tips",
+  description:
+    "Practical advice for home service contractors: how to win more leads, follow up faster, and grow your business without hiring more staff.",
+};
 
 const BG = "#faf9f7";
 const TEXT = "#1c1917";

@@ -4,6 +4,7 @@ import { getLeads, getLeadStats, buildSummaryBlurb, type Lead } from "@/lib/lead
 import { getStageConfig, scoreColor, scoreBgColor, scoreBorderColor, type LeadStatus } from "@/lib/scoring";
 import { getSubscription, getLeadCountThisMonth, PLANS, type PlanId } from "@/lib/subscriptions";
 import AddLeadModal from "@/components/AddLeadModal";
+import ImportLeadsModal from "@/components/ImportLeadsModal";
 import PipelineInfoModal from "@/components/PipelineInfoModal";
 
 const TEXT   = "#1c1917";
@@ -151,7 +152,10 @@ export default async function LeadsPage() {
           </div>
           <PipelineInfoModal />
         </div>
-        <AddLeadModal />
+        <div style={{ display: "flex", gap: 10 }}>
+          <ImportLeadsModal />
+          <AddLeadModal />
+        </div>
       </div>
 
       {/* AI Summary */}

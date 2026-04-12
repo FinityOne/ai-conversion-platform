@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
@@ -40,8 +40,19 @@ const MARKETING_LINKS = [
 ];
 
 export default function Nav({ variant = "marketing", userName }: NavProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileOpen,  setMobileOpen]  = useState(false);
+  const [isLoggedIn,  setIsLoggedIn]  = useState(false);
   const router = useRouter();
+
+  // Detect auth state on the client so we can swap CTAs if already signed in
+  useEffect(() => {
+    const sb = createSupabaseBrowserClient();
+    sb.auth.getSession().then(({ data: { session } }) => setIsLoggedIn(!!session));
+    const { data: { subscription } } = sb.auth.onAuthStateChange((_, session) => {
+      setIsLoggedIn(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
@@ -164,36 +175,63 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
 
           {/* Desktop CTAs */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }} className="hidden-mobile">
-            <Link
-              href="/login"
-              style={{
-                color: "#78716c",
-                fontSize: 14,
-                fontWeight: 500,
-                textDecoration: "none",
-                padding: "8px 16px",
-                borderRadius: 8,
-                border: "1px solid #e6e2db",
-              }}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              style={{
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
-                color: "#fff",
-                fontSize: 14,
-                fontWeight: 700,
-                textDecoration: "none",
-                padding: "10px 20px",
-                borderRadius: 8,
-                boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Start Free — No Card Needed →
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                style={{
+                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  color: "#fff",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Go to Dashboard →
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  style={{
+                    color: "#78716c",
+                    fontSize: 14,
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    padding: "8px 16px",
+                    borderRadius: 8,
+                    border: "1px solid #e6e2db",
+                  }}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  style={{
+                    background: "linear-gradient(135deg,#ea580c,#f97316)",
+                    color: "#fff",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    padding: "10px 20px",
+                    borderRadius: 8,
+                    boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Start Free — No Card Needed →
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -282,38 +320,68 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
               </Link>
             ))}
             <div style={{ height: 1, background: "#e6e2db", margin: "8px 0" }} />
-            <Link
-              href="/login"
-              style={{
-                color: "#78716c",
-                fontSize: 16,
-                fontWeight: 500,
-                textDecoration: "none",
-                padding: "12px 12px",
-                borderRadius: 8,
-              }}
-              onClick={() => setMobileOpen(false)}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              style={{
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
-                color: "#fff",
-                fontSize: 16,
-                fontWeight: 700,
-                textDecoration: "none",
-                padding: "14px 20px",
-                borderRadius: 8,
-                textAlign: "center",
-                marginTop: 8,
-                boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
-              }}
-              onClick={() => setMobileOpen(false)}
-            >
-              Start Free — No Card Needed →
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                style={{
+                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  color: "#fff",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  padding: "14px 20px",
+                  borderRadius: 8,
+                  textAlign: "center",
+                  marginTop: 8,
+                  boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+                onClick={() => setMobileOpen(false)}
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Go to Dashboard →
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  style={{
+                    color: "#78716c",
+                    fontSize: 16,
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    padding: "12px 12px",
+                    borderRadius: 8,
+                  }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  style={{
+                    background: "linear-gradient(135deg,#ea580c,#f97316)",
+                    color: "#fff",
+                    fontSize: 16,
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    padding: "14px 20px",
+                    borderRadius: 8,
+                    textAlign: "center",
+                    marginTop: 8,
+                    boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                  }}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Start Free — No Card Needed →
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

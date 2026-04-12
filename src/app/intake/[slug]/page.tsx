@@ -22,12 +22,22 @@ function accentFromSlug(slug: string): string {
 
 async function getProfile(slug: string) {
   const sb = createSupabaseServiceClient();
-  const { data } = await sb
+
+  // Try custom intake_slug first
+  const { data: bySlug } = await sb
     .from("profiles")
-    .select("business_name, first_name")
+    .select("id, business_name, first_name")
+    .eq("intake_slug", slug)
+    .maybeSingle();
+  if (bySlug) return bySlug;
+
+  // Fall back to raw UUID (existing links keep working)
+  const { data: byId } = await sb
+    .from("profiles")
+    .select("id, business_name, first_name")
     .eq("id", slug)
-    .single();
-  return data;
+    .maybeSingle();
+  return byId ?? null;
 }
 
 export async function generateMetadata(
@@ -64,6 +74,8 @@ export default async function IntakePage(
 
   const businessName = profile.business_name ?? "Your Local Pro";
   const accent       = accentFromSlug(slug);
+  // Always pass the stable user UUID to the form POST — not the custom slug
+  const ownerId      = profile.id;
 
   return (
     <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 16px 60px" }}>
@@ -131,7 +143,7 @@ export default async function IntakePage(
         padding: "28px 22px",
         boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
       }}>
-        <IntakeForm slug={slug} businessName={businessName} accent={accent} />
+        <IntakeForm slug={ownerId} businessName={businessName} accent={accent} />
       </div>
 
       {/* Footer note */}

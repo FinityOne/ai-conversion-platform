@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "About — Our Story",
+  description:
+    "Meet the founders behind ClozeFlow. We built this because we watched great contractors lose jobs to slower competitors who just picked up the phone first. That ends now.",
+};
 
 const BG = "#faf9f7";
 const TEXT = "#1c1917";
