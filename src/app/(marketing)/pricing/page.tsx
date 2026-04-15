@@ -14,8 +14,8 @@ const PLANS = [
   {
     name: "Pro",
     tagline: "Solo operators & small crews",
-    annualPrice: 99,
-    monthlyPrice: 129,
+    annualPrice: 79,
+    monthlyPrice: 99,
     features: [
       "Up to 50 leads/month",
       "Custom intake form with photo upload",
@@ -33,8 +33,8 @@ const PLANS = [
   {
     name: "Growth",
     tagline: "Growing businesses ready to scale",
-    annualPrice: 299,
-    monthlyPrice: 389,
+    annualPrice: 149,
+    monthlyPrice: 299,
     badge: "Most Popular",
     features: [
       "Everything in Pro",
@@ -51,8 +51,8 @@ const PLANS = [
   {
     name: "Max",
     tagline: "High-volume & multi-location",
-    annualPrice: 999,
-    monthlyPrice: 1299,
+    annualPrice: 799,
+    monthlyPrice: 999,
     features: [
       "Everything in Growth",
       "Unlimited leads",
@@ -159,7 +159,7 @@ const FAQS = [
   },
   {
     q: "What does 'annual billing' mean exactly?",
-    a: "Annual plans are billed once per year at the discounted rate. So the Pro plan at $99/mo annual = $1,188 billed once per year. Monthly plans are charged month-to-month with no long-term commitment.",
+    a: "Annual plans are billed once per year at the discounted rate. So the Pro plan at $79/mo annual = $948 billed once per year. Monthly plans are charged month-to-month with no long-term commitment.",
   },
   {
     q: "How is the Growth plan different from Starter?",
@@ -227,7 +227,7 @@ export default function PricingPage() {
                   fontWeight: 700,
                 }}
               >
-                Save 30%
+                Save up to 50%
               </span>
             </button>
             <button
@@ -300,6 +300,14 @@ export default function PricingPage() {
               <h2 style={{ fontSize: 26, fontWeight: 900, color: TEXT, marginBottom: 20 }}>{plan.name}</h2>
 
               <div style={{ marginBottom: 28 }}>
+                {annual && (
+                  <p style={{ fontSize: 14, color: MUTED, marginBottom: 4 }}>
+                    <span style={{ textDecoration: "line-through" }}>${plan.monthlyPrice}/mo</span>
+                    <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 700, color: GREEN }}>
+                      Save ${plan.monthlyPrice - plan.annualPrice}/mo
+                    </span>
+                  </p>
+                )}
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
                   <span style={{ fontSize: 48, fontWeight: 900, color: TEXT, lineHeight: 1 }}>
                     ${annual ? plan.annualPrice : plan.monthlyPrice}
@@ -308,7 +316,7 @@ export default function PricingPage() {
                 </div>
                 <p style={{ fontSize: 13, color: MUTED }}>
                   {annual
-                    ? `Billed annually · Save vs. monthly`
+                    ? `Billed annually · ${Math.round((1 - plan.annualPrice / plan.monthlyPrice) * 100)}% off vs. monthly`
                     : "Billed monthly · No commitment"}
                 </p>
               </div>

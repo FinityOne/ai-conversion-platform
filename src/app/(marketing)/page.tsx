@@ -110,10 +110,10 @@ function MiniCalculator() {
     const monthlyGap    = Math.max(0, cfRev - currentRev);
     const annualGap     = monthlyGap * 12;
     const extraJobs     = Math.max(0, cfJobs - jobs);
-    // Starter plan: $99/mo billed annually
-    const roi           = monthlyGap > 0 ? Math.round(monthlyGap / 99) : 0;
+    // Pro plan: $79/mo billed annually
+    const planPrice     = impliedLeads <= 50 ? 79 : impliedLeads <= 500 ? 149 : 799;
+    const roi           = monthlyGap > 0 ? Math.round(monthlyGap / planPrice) : 0;
     const isPlan        = impliedLeads <= 50 ? "Pro" : impliedLeads <= 500 ? "Growth" : "Max";
-    const planPrice     = impliedLeads <= 50 ? 99 : impliedLeads <= 500 ? 299 : 999;
     return { impliedLeads, currentRev, cfRev, monthlyGap, annualGap, extraJobs, roi, isPlan, planPrice };
   }, [trade, jobs, closeRate]);
 

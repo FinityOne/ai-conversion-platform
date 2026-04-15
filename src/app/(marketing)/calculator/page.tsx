@@ -32,9 +32,9 @@ const CALC_PLANS = [
     color: "#D35400",
     bg: "rgba(211,84,0,0.06)",
     border: "rgba(211,84,0,0.25)",
-    monthlyPrice: 129,
-    annualMonthly: 99,
-    annualTotal: 1188,
+    monthlyPrice: 99,
+    annualMonthly: 79,
+    annualTotal: 948,
     leadLimit: 50,
     threshold: 50,   // recommend when implied leads ≤ 50
     features: [
@@ -58,9 +58,9 @@ const CALC_PLANS = [
     color: "#7c3aed",
     bg: "rgba(124,58,237,0.06)",
     border: "rgba(124,58,237,0.25)",
-    monthlyPrice: 389,
-    annualMonthly: 299,
-    annualTotal: 3588,
+    monthlyPrice: 299,
+    annualMonthly: 149,
+    annualTotal: 1788,
     leadLimit: null,
     threshold: 500,  // recommend when 51–500 leads
     features: [
@@ -82,9 +82,9 @@ const CALC_PLANS = [
     color: "#0891b2",
     bg: "rgba(8,145,178,0.06)",
     border: "rgba(8,145,178,0.25)",
-    monthlyPrice: 1299,
-    annualMonthly: 999,
-    annualTotal: 11988,
+    monthlyPrice: 999,
+    annualMonthly: 799,
+    annualTotal: 9588,
     leadLimit: null,
     threshold: Infinity,
     features: [
