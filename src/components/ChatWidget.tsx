@@ -446,6 +446,10 @@ export default function ChatWidget() {
           0%, 100% { transform: scale(1); }
           50%      { transform: scale(1.12); }
         }
+        @keyframes cfFloatIn {
+          from { opacity: 0; transform: translateX(16px); }
+          to   { opacity: 1; transform: translateX(0);    }
+        }
       `}</style>
 
       {/* ── Chat panel ── */}
@@ -560,6 +564,75 @@ export default function ChatWidget() {
               Powered by <span style={{ color: "#D35400", fontWeight: 700 }}>ClozeFlow</span>
             </p>
           </div>
+        </div>
+      )}
+
+      {/* ── Floating CTA pills (shown when chat is closed) ── */}
+      {!open && (
+        <div style={{
+          position: "fixed", bottom: 92, right: 20, zIndex: 9998,
+          display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8,
+        }}>
+          {[
+            { label: "📅 Book a demo",        value: "book_demo",    delay: "0.1s"  },
+            { label: "💬 Speak to an expert", value: "speak_expert", delay: "0.22s" },
+          ].map(({ label, value, delay }) => (
+            <button
+              key={value}
+              onClick={() => {
+                setOpen(true);
+                setNotifDot(false);
+                // Kick off that branch after chat opens + greeting finishes (~2s)
+                setTimeout(() => {
+                  setMessages(prev => [...prev, { id: uid(), role: "user", text: label }]);
+                  const branch = BRANCH[value];
+                  const intentKey = value as Intent;
+                  setIntent(intentKey);
+                  setStep("form");
+                  queueMessages([
+                    { text: branch.messages[0] },
+                    { text: branch.messages[1] },
+                    { text: FORM_INTROS[value], showForm: true },
+                  ]);
+                }, 2600);
+              }}
+              style={{
+                padding: "10px 18px",
+                borderRadius: 24,
+                border: "none",
+                background: "#fff",
+                color: "#2C3E50",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow: "0 4px 18px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.07)",
+                whiteSpace: "nowrap",
+                animation: `cfFloatIn 0.35s ${delay} cubic-bezier(0.34,1.56,0.64,1) both`,
+                display: "flex", alignItems: "center", gap: 6,
+                transition: "box-shadow 0.15s, transform 0.15s",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 6px 24px rgba(211,84,0,0.2), 0 1px 4px rgba(0,0,0,0.08)";
+                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 18px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.07)";
+                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+              }}
+            >
+              {label}
+              <span style={{
+                width: 18, height: 18, borderRadius: "50%",
+                background: "linear-gradient(135deg,#D35400,#e8641c)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+              }}>
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </button>
+          ))}
         </div>
       )}
 
