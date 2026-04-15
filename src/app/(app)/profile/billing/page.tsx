@@ -5,7 +5,7 @@ import Link from "next/link";
 import { PLANS, cardBrandIcon, type PlanId, type BillingCycle, type Subscription } from "@/lib/subscriptions";
 import { useRouter } from "next/navigation";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
 
@@ -29,8 +29,8 @@ function TabBar({ active }: { active: "account" | "billing" | "flyer" }) {
           style={{
             padding: "10px 16px", fontSize: 14, fontWeight: 700,
             textDecoration: "none",
-            color: active === tab.id ? "#ea580c" : MUTED,
-            borderBottom: active === tab.id ? "2px solid #ea580c" : "2px solid transparent",
+            color: active === tab.id ? "#D35400" : MUTED,
+            borderBottom: active === tab.id ? "2px solid #D35400" : "2px solid transparent",
             marginBottom: -1,
             transition: "color 0.15s",
             whiteSpace: "nowrap",
@@ -105,10 +105,10 @@ export default function BillingPage() {
             href="/onboarding"
             style={{
               display: "inline-flex", alignItems: "center", gap: 8,
-              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              background: "linear-gradient(135deg,#D35400,#e8641c)",
               color: "#fff", fontSize: 15, fontWeight: 700,
               padding: "13px 28px", borderRadius: 14, textDecoration: "none",
-              boxShadow: "0 4px 14px rgba(234,88,12,0.25)",
+              boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
             }}
           >
             <i className="fa-solid fa-rocket" />
@@ -176,7 +176,7 @@ export default function BillingPage() {
           {sub.current_period_end && (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f9f7f4", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <i className="fa-solid fa-calendar-check" style={{ fontSize: 15, color: "#16a34a" }} />
+                <i className="fa-solid fa-calendar-check" style={{ fontSize: 15, color: "#27AE60" }} />
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: 11, color: MUTED, textTransform: "uppercase", letterSpacing: "0.5px" }}>Next renewal</p>
@@ -269,7 +269,7 @@ export default function BillingPage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <div>
               <p style={{ margin: "0 0 3px", fontSize: 15, fontWeight: 800, color: TEXT }}>
-                <i className="fa-solid fa-arrows-up-down" style={{ marginRight: 7, color: "#ea580c" }} />
+                <i className="fa-solid fa-arrows-up-down" style={{ marginRight: 7, color: "#D35400" }} />
                 Change your plan
               </p>
               <p style={{ margin: 0, fontSize: 13, color: MUTED }}>
@@ -283,9 +283,9 @@ export default function BillingPage() {
               }}
               style={{
                 flexShrink: 0, padding: "10px 18px", borderRadius: 12, border: "none",
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                background: "linear-gradient(135deg,#D35400,#e8641c)",
                 color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer",
-                boxShadow: "0 3px 12px rgba(234,88,12,0.2)",
+                boxShadow: "0 3px 12px rgba(211,84,0,0.2)",
               }}
             >
               Change plan →
@@ -313,7 +313,7 @@ export default function BillingPage() {
                 style={{
                   padding: "7px 16px", borderRadius: 20, fontSize: 13, fontWeight: 700, cursor: "pointer",
                   border: upgradeCycle === c ? "none" : `1px solid ${BORDER}`,
-                  background: upgradeCycle === c ? "linear-gradient(90deg,#ea580c,#f97316)" : "#fff",
+                  background: upgradeCycle === c ? "linear-gradient(90deg,#D35400,#e8641c)" : "#fff",
                   color: upgradeCycle === c ? "#fff" : MUTED,
                 }}
               >
@@ -347,8 +347,8 @@ export default function BillingPage() {
                       <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: TEXT }}>{p.name}</p>
                       <span style={{
                         fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 20,
-                        background: isUpgrade ? "rgba(234,88,12,0.1)" : "rgba(100,116,139,0.1)",
-                        color: isUpgrade ? "#ea580c" : "#64748b",
+                        background: isUpgrade ? "rgba(211,84,0,0.1)" : "rgba(100,116,139,0.1)",
+                        color: isUpgrade ? "#D35400" : "#64748b",
                       }}>
                         {isUpgrade ? "↑ UPGRADE" : "↓ DOWNGRADE"}
                       </span>
@@ -359,7 +359,7 @@ export default function BillingPage() {
                     <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: p.color }}>
                       ${newPrice.toLocaleString()}<span style={{ fontSize: 11, fontWeight: 500 }}>/mo</span>
                     </p>
-                    <p style={{ margin: 0, fontSize: 10, color: newPrice > curPrice ? "#16a34a" : newPrice < curPrice ? "#64748b" : MUTED }}>
+                    <p style={{ margin: 0, fontSize: 10, color: newPrice > curPrice ? "#27AE60" : newPrice < curPrice ? "#64748b" : MUTED }}>
                       {newPrice > curPrice
                         ? `+$${(newPrice - curPrice).toLocaleString()} more`
                         : newPrice < curPrice
@@ -425,16 +425,16 @@ export default function BillingPage() {
       }}>
         <div style={{
           width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-          background: "rgba(234,88,12,0.06)", border: "1px solid rgba(234,88,12,0.15)",
+          background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.15)",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <i className="fa-solid fa-headset" style={{ fontSize: 18, color: "#ea580c" }} />
+          <i className="fa-solid fa-headset" style={{ fontSize: 18, color: "#D35400" }} />
         </div>
         <div>
           <p style={{ margin: "0 0 3px", fontSize: 15, fontWeight: 700, color: TEXT }}>Questions about your plan?</p>
           <p style={{ margin: 0, fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
             We're happy to help. Reach out anytime at{" "}
-            <a href="mailto:hello@clozeflow.com" style={{ color: "#ea580c", fontWeight: 600, textDecoration: "none" }}>
+            <a href="mailto:hello@clozeflow.com" style={{ color: "#D35400", fontWeight: 600, textDecoration: "none" }}>
               hello@clozeflow.com
             </a>
           </p>

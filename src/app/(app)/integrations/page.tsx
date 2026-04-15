@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import ImportLeadsModal from "@/components/ImportLeadsModal";
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
-const BG     = "#f5f3ee";
-const ORANGE = "#ea580c";
+const BG     = "#F9F7F2";
+const ORANGE = "#D35400";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface WebhookEndpoint {
@@ -52,7 +52,7 @@ function CopyButton({ text }: { text: string }) {
         flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 6,
         padding: "8px 14px", borderRadius: 8, border: `1.5px solid ${BORDER}`,
         background: copied ? "#f0fdf4" : "#fff",
-        color: copied ? "#16a34a" : TEXT,
+        color: copied ? "#27AE60" : TEXT,
         fontSize: 13, fontWeight: 700, cursor: "pointer",
         transition: "all 0.15s",
       }}
@@ -241,7 +241,7 @@ function WebhookTab({
         }}>
           <div style={{
             width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-            background: "linear-gradient(135deg,#ea580c,#f97316)",
+            background: "linear-gradient(135deg,#D35400,#e8641c)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
             <i className="fa-solid fa-bolt" style={{ color: "#fff", fontSize: 17 }} />
@@ -261,8 +261,8 @@ function WebhookTab({
             }}>
               <div style={{
                 width: 7, height: 7, borderRadius: "50%",
-                background: endpoint.is_active ? "#16a34a" : "#dc2626",
-                boxShadow: endpoint.is_active ? "0 0 0 2px rgba(22,163,74,0.2)" : "none",
+                background: endpoint.is_active ? "#27AE60" : "#dc2626",
+                boxShadow: endpoint.is_active ? "0 0 0 2px rgba(39,174,96,0.2)" : "none",
               }} />
               <span style={{ fontSize: 12, fontWeight: 700, color: endpoint.is_active ? "#15803d" : "#b91c1c" }}>
                 {endpoint.is_active ? "Active" : "Disabled"}
@@ -286,9 +286,9 @@ function WebhookTab({
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 8,
                   padding: "13px 28px", borderRadius: 12, border: "none",
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer",
-                  boxShadow: "0 4px 14px rgba(234,88,12,0.25)",
+                  boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
                   opacity: genLoading ? 0.7 : 1,
                 }}
               >
@@ -347,8 +347,8 @@ function WebhookTab({
                     padding: "12px 16px", borderRadius: 10, border: "none",
                     background: testState === "ok"   ? "#f0fdf4"
                                : testState === "fail" ? "#fef2f2"
-                               : "linear-gradient(135deg,#ea580c,#f97316)",
-                    color: testState === "ok"   ? "#16a34a"
+                               : "linear-gradient(135deg,#D35400,#e8641c)",
+                    color: testState === "ok"   ? "#27AE60"
                          : testState === "fail" ? "#dc2626"
                          : "#fff",
                     fontSize: 14, fontWeight: 700, cursor: testState === "loading" ? "wait" : "pointer",
@@ -381,7 +381,7 @@ function WebhookTab({
               {testDetail && (
                 <p style={{
                   margin: "10px 0 0", fontSize: 13,
-                  color: testState === "ok" ? "#16a34a" : "#dc2626",
+                  color: testState === "ok" ? "#27AE60" : "#dc2626",
                 }}>
                   {testDetail}
                 </p>
@@ -535,7 +535,7 @@ function IntegrationGuide({
               <div key={s.n} style={{ display: "flex", gap: 14 }}>
                 <div style={{
                   width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: "#fff", fontSize: 12, fontWeight: 800,
                 }}>
@@ -559,7 +559,7 @@ function IntegrationGuide({
                   {s.code && (
                     <pre style={{
                       margin: "8px 0 0", padding: "12px 14px", borderRadius: 9,
-                      background: "#1c1917", color: "#f5f0eb",
+                      background: "#2C3E50", color: "#f5f0eb",
                       fontSize: 12, lineHeight: 1.6, overflow: "auto",
                       fontFamily: "ui-monospace, 'SF Mono', monospace",
                     }}>
@@ -612,7 +612,7 @@ function CsvTab() {
       }}>
         <div style={{
           width: 52, height: 52, borderRadius: 14, flexShrink: 0,
-          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          background: "linear-gradient(135deg,#D35400,#e8641c)",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <i className="fa-solid fa-file-arrow-up" style={{ color: "#fff", fontSize: 22 }} />
@@ -760,7 +760,7 @@ function MoreSourcesTab() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div style={{
-        background: "rgba(234,88,12,0.06)", border: "1px solid rgba(234,88,12,0.18)",
+        background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.18)",
         borderRadius: 12, padding: "12px 16px",
         display: "flex", alignItems: "center", gap: 10,
       }}>
@@ -782,7 +782,7 @@ function MoreSourcesTab() {
                     Native — coming soon
                   </span>
                 ) : (
-                  <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "#f0fdf4", color: "#27AE60", border: "1px solid #bbf7d0" }}>
                     Works now
                   </span>
                 )}

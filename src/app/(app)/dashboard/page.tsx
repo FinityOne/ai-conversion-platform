@@ -7,10 +7,10 @@ import ShareLinkButton from "@/components/ShareLinkButton";
 import DailyEmailChart from "@/components/DailyEmailChart";
 import PlanGate from "@/components/PlanGate";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 // ── Funnel stage config ────────────────────────────────────────────────────────
 const FUNNEL_STAGES = [
@@ -18,7 +18,7 @@ const FUNNEL_STAGES = [
   { key: "reached",   label: "Contacted",  color: "#2563eb", bg: "rgba(37,99,235,0.1)"    },
   { key: "engaged",   label: "Engaged",    color: "#7c3aed", bg: "rgba(124,58,237,0.1)"   },
   { key: "booked",    label: "Booked",     color: "#f59e0b", bg: "rgba(245,158,11,0.1)"   },
-  { key: "won",       label: "Won",        color: "#16a34a", bg: "rgba(22,163,74,0.1)"    },
+  { key: "won",       label: "Won",        color: "#27AE60", bg: "rgba(39,174,96,0.1)"    },
 ] as const;
 
 function pct(n: number, of: number) {
@@ -29,7 +29,7 @@ function pct(n: number, of: number) {
 function OpenRateRing({ rate }: { rate: number }) {
   const filled = rate;
   const empty  = 100 - rate;
-  const color  = rate >= 30 ? "#16a34a" : rate >= 15 ? "#f59e0b" : "#ea580c";
+  const color  = rate >= 30 ? "#27AE60" : rate >= 15 ? "#f59e0b" : "#D35400";
   return (
     <div style={{ position: "relative", width: 80, height: 80, flexShrink: 0 }}>
       <div style={{
@@ -161,7 +161,7 @@ export default async function DashboardPage(
           {
             label: closeRate !== null ? "Close Rate" : "Won",
             value: closeRate !== null ? `${closeRate}%` : stats.closedWon,
-            color: "#16a34a", icon: "fa-trophy",
+            color: "#27AE60", icon: "fa-trophy",
           },
         ].map(s => (
           <div key={s.label} style={{
@@ -194,8 +194,8 @@ export default async function DashboardPage(
             <Link href="/leads" style={{
               fontSize: 12, fontWeight: 700, color: ORANGE, textDecoration: "none",
               padding: "5px 12px", borderRadius: 20,
-              border: "1px solid rgba(234,88,12,0.2)",
-              background: "rgba(234,88,12,0.05)",
+              border: "1px solid rgba(211,84,0,0.2)",
+              background: "rgba(211,84,0,0.05)",
             }}>
               View all →
             </Link>
@@ -206,7 +206,7 @@ export default async function DashboardPage(
               <p style={{ fontSize: 14, color: MUTED }}>No leads yet.</p>
               <Link href="/leads" style={{
                 display: "inline-flex", alignItems: "center", gap: 6, marginTop: 10,
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                background: "linear-gradient(135deg,#D35400,#e8641c)",
                 color: "#fff", fontSize: 13, fontWeight: 700,
                 padding: "9px 16px", borderRadius: 8, textDecoration: "none",
               }}>
@@ -310,9 +310,9 @@ export default async function DashboardPage(
 
           {/* Opened / Awaiting */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            <div style={{ background: "rgba(22,163,74,0.05)", border: "1px solid rgba(22,163,74,0.15)", borderRadius: 10, padding: "10px 12px" }}>
-              <p style={{ margin: "0 0 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "#16a34a" }}>Opened</p>
-              <p style={{ margin: 0, fontSize: 20, fontWeight: 900, color: "#16a34a" }}>{emailStats.openedCount}</p>
+            <div style={{ background: "rgba(39,174,96,0.05)", border: "1px solid rgba(39,174,96,0.15)", borderRadius: 10, padding: "10px 12px" }}>
+              <p style={{ margin: "0 0 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "#27AE60" }}>Opened</p>
+              <p style={{ margin: 0, fontSize: 20, fontWeight: 900, color: "#27AE60" }}>{emailStats.openedCount}</p>
               <p style={{ margin: 0, fontSize: 10, color: MUTED }}>emails opened</p>
             </div>
             <div style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 10, padding: "10px 12px" }}>
@@ -323,7 +323,7 @@ export default async function DashboardPage(
           </div>
 
           {/* Month total chip */}
-          <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "#faf9f7", borderRadius: 8, border: `1px solid ${BORDER}` }}>
+          <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "#F9F7F2", borderRadius: 8, border: `1px solid ${BORDER}` }}>
             <span style={{ fontSize: 12, color: MUTED }}>This month</span>
             <span style={{ fontSize: 13, fontWeight: 800, color: TEXT }}>{emailStats.sentThisMonth} emails</span>
           </div>
@@ -343,7 +343,7 @@ export default async function DashboardPage(
             </span>
             <span style={{
               fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
-              background: "rgba(234,88,12,0.08)", color: ORANGE, border: "1px solid rgba(234,88,12,0.15)",
+              background: "rgba(211,84,0,0.08)", color: ORANGE, border: "1px solid rgba(211,84,0,0.15)",
             }}>
               {emailStats.sentThisMonth} this month
             </span>
@@ -358,7 +358,7 @@ export default async function DashboardPage(
         {/* Quick actions */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {[
-            { href: "/leads",        icon: "fa-bolt-lightning", label: "Leads Pipeline",  sub: `${stats.total} lead${stats.total !== 1 ? "s" : ""} in your pipeline`, color: ORANGE,   bg: "rgba(234,88,12,0.09)"   },
+            { href: "/leads",        icon: "fa-bolt-lightning", label: "Leads Pipeline",  sub: `${stats.total} lead${stats.total !== 1 ? "s" : ""} in your pipeline`, color: ORANGE,   bg: "rgba(211,84,0,0.09)"   },
             { href: "/integrations", icon: "fa-plug",           label: "Integrations",    sub: "Webhook, CSV import, Zapier",                                         color: "#2563eb", bg: "rgba(37,99,235,0.08)"  },
           ].map(item => (
             <Link key={item.href} href={item.href} style={{
@@ -381,12 +381,12 @@ export default async function DashboardPage(
         {/* Get Leads CTA */}
         <div style={{
           background: "linear-gradient(135deg, #fff7ed, #fff)",
-          border: "1.5px solid rgba(234,88,12,0.25)",
+          border: "1.5px solid rgba(211,84,0,0.25)",
           borderRadius: 12, padding: "18px",
           display: "flex", flexDirection: "column", gap: 12,
         }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 9, flexShrink: 0, background: "rgba(234,88,12,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 9, flexShrink: 0, background: "rgba(211,84,0,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <i className="fa-solid fa-bullhorn" style={{ fontSize: 15, color: ORANGE }} />
             </div>
             <div>
@@ -404,7 +404,7 @@ export default async function DashboardPage(
             style={{
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
               padding: "9px 14px", borderRadius: 9,
-              background: "rgba(234,88,12,0.08)", border: "1px solid rgba(234,88,12,0.18)",
+              background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.18)",
               textDecoration: "none", fontSize: 13, fontWeight: 700, color: ORANGE,
             }}
           >

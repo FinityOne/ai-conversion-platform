@@ -25,7 +25,7 @@ const fieldStyle = (focused: boolean): React.CSSProperties => ({
   width: "100%", padding: "14px 16px", borderRadius: 10,
   border: focused ? `2px solid ${ACCENT}` : "2px solid #e6e2db",
   boxShadow: focused ? `0 0 0 3px ${ACCENT}18` : "none",
-  background: "#fff", fontSize: 16, color: "#1c1917",
+  background: "#fff", fontSize: 16, color: "#2C3E50",
   outline: "none", boxSizing: "border-box",
   transition: "border-color 0.15s, box-shadow 0.15s",
   WebkitAppearance: "none",
@@ -106,7 +106,7 @@ export default function ProjectDetailsForm({ token, initialJobType, initialDescr
           background: "#faf5ff", border: `2px solid #ddd6fe`,
           display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32,
         }}>✅</div>
-        <h2 style={{ margin: "0 0 10px", fontSize: 24, fontWeight: 900, color: "#1c1917" }}>
+        <h2 style={{ margin: "0 0 10px", fontSize: 24, fontWeight: 900, color: "#2C3E50" }}>
           Details submitted!
         </h2>
         <p style={{ margin: 0, fontSize: 16, color: "#57534e", lineHeight: 1.6 }}>

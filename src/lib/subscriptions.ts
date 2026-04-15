@@ -21,7 +21,7 @@ export interface Subscription {
 
 export const PLANS = {
   starter: {
-    name: "Starter",
+    name: "Pro",
     emoji: "⚡",
     tagline: "Perfect for getting started",
     annualMonthly: 99,
@@ -62,7 +62,7 @@ export const PLANS = {
     badgeBg: "rgba(124,58,237,0.1)",
     badgeBorder: "rgba(124,58,237,0.25)",
     features: [
-      "Everything in Starter",
+      "Everything in Pro",
       "Up to 500 leads / month",
       "Smart AI reply detection",
       "Full multi-step follow-up sequences",
@@ -77,7 +77,7 @@ export const PLANS = {
     },
   },
   pro: {
-    name: "Pro",
+    name: "Max",
     emoji: "💎",
     tagline: "For high-volume operators",
     annualMonthly: 999,

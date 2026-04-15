@@ -18,8 +18,8 @@ const CSS = `
     100% { transform: scale(2.8); opacity: 0;    }
   }
   @keyframes cf-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(234,88,12,0.0); }
-    50%       { box-shadow: 0 0 0 10px rgba(234,88,12,0.15); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(211,84,0,0.0); }
+    50%       { box-shadow: 0 0 0 10px rgba(211,84,0,0.15); }
   }
   @keyframes cf-spin {
     to { transform: rotate(360deg); }
@@ -64,7 +64,7 @@ const STAGES = [
 ];
 
 // ── Inline spinner ────────────────────────────────────────────────────────────
-export function InlineSpinner({ size = 18, color = "#ea580c" }: { size?: number; color?: string }) {
+export function InlineSpinner({ size = 18, color = "#D35400" }: { size?: number; color?: string }) {
   return (
     <>
       <style>{`@keyframes cf-spin { to { transform: rotate(360deg); } }`}</style>
@@ -202,7 +202,7 @@ function PageLoaderView({ messages }: { messages: string[] }) {
           {[0, 350, 700].map((delay, i) => (
             <div key={i} style={{
               position: "absolute", inset: 0, borderRadius: "50%",
-              border: "2px solid rgba(234,88,12,0.45)",
+              border: "2px solid rgba(211,84,0,0.45)",
               animation: `cf-ripple 1.8s ease-out ${delay}ms infinite`,
               pointerEvents: "none",
             }} />
@@ -210,7 +210,7 @@ function PageLoaderView({ messages }: { messages: string[] }) {
           {/* Outer glow ring (spinning) */}
           <div style={{
             position: "absolute", inset: -3, borderRadius: "50%",
-            background: "conic-gradient(from 0deg, #ea580c, #f97316, transparent 60%, transparent 80%, #ea580c)",
+            background: "conic-gradient(from 0deg, #D35400, #e8641c, transparent 60%, transparent 80%, #D35400)",
             animation: "cf-ring-spin 1.6s linear infinite",
             opacity: 0.7,
           }} />
@@ -223,7 +223,7 @@ function PageLoaderView({ messages }: { messages: string[] }) {
             zIndex: 1,
           }}>
             <svg
-              style={{ width: 32, height: 32, color: "#ea580c" }}
+              style={{ width: 32, height: 32, color: "#D35400" }}
               fill="none" stroke="currentColor" viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
@@ -250,12 +250,12 @@ function PageLoaderView({ messages }: { messages: string[] }) {
                     height: isActive ? 40 : 32,
                     borderRadius: "50%",
                     background: isActive
-                      ? "linear-gradient(135deg,#ea580c,#f97316)"
+                      ? "linear-gradient(135deg,#D35400,#e8641c)"
                       : isDone ? "#f0fdf4" : "#f8f8f7",
                     border: `2px solid ${isActive ? "transparent" : isDone ? "#bbf7d0" : "#e6e2db"}`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: isActive ? 18 : 14,
-                    boxShadow: isActive ? "0 4px 14px rgba(234,88,12,0.4)" : "none",
+                    boxShadow: isActive ? "0 4px 14px rgba(211,84,0,0.4)" : "none",
                     transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
                     animation: isActive ? "cf-dot-bounce 0.6s ease-in-out" : "none",
                   }}>
@@ -263,7 +263,7 @@ function PageLoaderView({ messages }: { messages: string[] }) {
                   </div>
                   <span style={{
                     fontSize: 9, fontWeight: isActive ? 800 : 500, whiteSpace: "nowrap",
-                    color: isActive ? "#ea580c" : isDone ? "#16a34a" : "#c4bfb8",
+                    color: isActive ? "#D35400" : isDone ? "#27AE60" : "#c4bfb8",
                     transition: "color 0.3s",
                   }}>
                     {s.label}
@@ -297,13 +297,13 @@ function PageLoaderView({ messages }: { messages: string[] }) {
 
         {/* ── Brand tag ─────────────────────────────────────────── */}
         <div style={{ marginTop: 28, display: "flex", alignItems: "center", gap: 6, opacity: 0.35 }}>
-          <div style={{ width: 14, height: 14, borderRadius: 4, background: "linear-gradient(135deg,#ea580c,#f97316)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 14, height: 14, borderRadius: 4, background: "linear-gradient(135deg,#D35400,#e8641c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg style={{ width: 8, height: 8, color: "#fff" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <span style={{ fontSize: 11, fontWeight: 700, color: "#78716c", letterSpacing: "0.3px" }}>
-            Cloze<span style={{ color: "#ea580c" }}>Flow</span>
+            Cloze<span style={{ color: "#D35400" }}>Flow</span>
           </span>
         </div>
 

@@ -21,9 +21,9 @@ const JOB_TYPES = [
 ];
 
 const BORDER = "#e6e2db";
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
-const BG     = "#f5f3ee";
+const BG     = "#F9F7F2";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "14px 16px", borderRadius: 10,
@@ -119,10 +119,10 @@ export default function AddLeadModal() {
         style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "13px 22px", borderRadius: 12,
-          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          background: "linear-gradient(135deg,#D35400,#e8641c)",
           color: "#fff", fontSize: 15, fontWeight: 700,
           border: "none", cursor: "pointer",
-          boxShadow: "0 4px 14px rgba(234,88,12,0.25)",
+          boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
         }}
       >
         <i className="fa-solid fa-plus" />
@@ -197,7 +197,7 @@ export default function AddLeadModal() {
 
               {email && (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "#f0fdf4", borderRadius: 10, border: "1px solid #bbf7d0" }}>
-                  <i className="fa-solid fa-paper-plane" style={{ fontSize: 13, color: "#16a34a" }} />
+                  <i className="fa-solid fa-paper-plane" style={{ fontSize: 13, color: "#27AE60" }} />
                   <span style={{ fontSize: 13, color: "#15803d" }}>A confirmation email will be sent to this address</span>
                 </div>
               )}
@@ -223,11 +223,11 @@ export default function AddLeadModal() {
                 disabled={loading}
                 style={{
                   marginTop: 4, padding: "16px", borderRadius: 12, border: "none",
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   color: "#fff", fontSize: 16, fontWeight: 700,
                   cursor: loading ? "not-allowed" : "pointer",
                   opacity: loading ? 0.7 : 1,
-                  boxShadow: "0 4px 14px rgba(234,88,12,0.25)",
+                  boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
                 }}
               >
                 {loading ? "Saving…" : "Save Lead →"}

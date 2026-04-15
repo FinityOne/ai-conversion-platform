@@ -23,8 +23,8 @@ const inputStyle = {
 
 const inputFocusStyle = {
   ...inputStyle,
-  border: "1px solid rgba(234,88,12,0.6)",
-  boxShadow: "0 0 0 3px rgba(234,88,12,0.12)",
+  border: "1px solid rgba(211,84,0,0.6)",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.12)",
 };
 
 function FocusInput({

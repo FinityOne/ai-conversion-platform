@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
@@ -11,25 +12,6 @@ interface NavProps {
   variant?: NavVariant;
   userName?: string;
 }
-
-const LOGO_ICON = (
-  <div
-    style={{
-      width: 32,
-      height: 32,
-      borderRadius: 8,
-      background: "linear-gradient(135deg,#ea580c,#f97316)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexShrink: 0,
-    }}
-  >
-    <svg width="16" height="16" fill="none" stroke="white" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-    </svg>
-  </div>
-);
 
 const MARKETING_LINKS = [
   { href: "/how-it-works", label: "How It Works" },
@@ -88,11 +70,15 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
               height: 64,
             }}
           >
-            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-              {LOGO_ICON}
-              <span style={{ fontWeight: 900, fontSize: 18, color: "#fff", letterSpacing: "-0.02em" }}>
-                Cloze<span style={{ color: "#f97316" }}>Flow</span>
-              </span>
+            <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+              <div style={{ width: 140, height: 40, position: "relative", flexShrink: 0 }}>
+                <Image
+                  src="/logo/ClozeFlow Logo - Transparent.png"
+                  alt="ClozeFlow"
+                  fill
+                  style={{ objectFit: "contain"}}
+                />
+              </div>
             </Link>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <Link href="/dashboard" style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, textDecoration: "none" }}>Dashboard</Link>
@@ -145,11 +131,15 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
           }}
         >
           {/* Logo */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            {LOGO_ICON}
-            <span style={{ fontWeight: 900, fontSize: 18, color: "#1c1917", letterSpacing: "-0.02em" }}>
-              Cloze<span style={{ fontWeight: 900, color: "#1c1917" }}>Flow</span>
-            </span>
+          <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+            <div style={{ width: 140, height: 40, position: "relative", flexShrink: 0 }}>
+              <Image
+                src="/logo/ClozeFlow - Horizontal Logo.png"
+                alt="ClozeFlow"
+                fill
+                style={{ objectFit: "contain" }}
+              />
+            </div>
           </Link>
 
           {/* Desktop nav links */}
@@ -179,14 +169,14 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
               <Link
                 href="/dashboard"
                 style={{
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   color: "#fff",
                   fontSize: 14,
                   fontWeight: 700,
                   textDecoration: "none",
                   padding: "10px 20px",
                   borderRadius: 8,
-                  boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                  boxShadow: "0 4px 20px rgba(211,84,0,0.25)",
                   whiteSpace: "nowrap",
                   display: "flex",
                   alignItems: "center",
@@ -217,14 +207,14 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
                 <Link
                   href="/signup"
                   style={{
-                    background: "linear-gradient(135deg,#ea580c,#f97316)",
+                    background: "linear-gradient(135deg,#D35400,#e8641c)",
                     color: "#fff",
                     fontSize: 14,
                     fontWeight: 700,
                     textDecoration: "none",
                     padding: "10px 20px",
                     borderRadius: 8,
-                    boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                    boxShadow: "0 4px 20px rgba(211,84,0,0.25)",
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -255,7 +245,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
                 height: 2,
                 width: 24,
                 borderRadius: 2,
-                background: "#1c1917",
+                background: "#2C3E50",
                 transition: "all 0.2s",
                 transform: mobileOpen ? "translateY(7px) rotate(45deg)" : "none",
               }}
@@ -266,7 +256,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
                 height: 2,
                 width: 24,
                 borderRadius: 2,
-                background: "#1c1917",
+                background: "#2C3E50",
                 transition: "all 0.2s",
                 opacity: mobileOpen ? 0 : 1,
               }}
@@ -277,7 +267,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
                 height: 2,
                 width: 24,
                 borderRadius: 2,
-                background: "#1c1917",
+                background: "#2C3E50",
                 transition: "all 0.2s",
                 transform: mobileOpen ? "translateY(-7px) rotate(-45deg)" : "none",
               }}
@@ -307,7 +297,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
                 key={href}
                 href={href}
                 style={{
-                  color: "#1c1917",
+                  color: "#2C3E50",
                   fontSize: 16,
                   fontWeight: 500,
                   textDecoration: "none",
@@ -324,7 +314,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
               <Link
                 href="/dashboard"
                 style={{
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   color: "#fff",
                   fontSize: 16,
                   fontWeight: 700,
@@ -333,7 +323,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
                   borderRadius: 8,
                   textAlign: "center",
                   marginTop: 8,
-                  boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                  boxShadow: "0 4px 20px rgba(211,84,0,0.25)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -365,7 +355,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
                 <Link
                   href="/signup"
                   style={{
-                    background: "linear-gradient(135deg,#ea580c,#f97316)",
+                    background: "linear-gradient(135deg,#D35400,#e8641c)",
                     color: "#fff",
                     fontSize: 16,
                     fontWeight: 700,
@@ -374,7 +364,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
                     borderRadius: 8,
                     textAlign: "center",
                     marginTop: 8,
-                    boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+                    boxShadow: "0 4px 20px rgba(211,84,0,0.25)",
                   }}
                   onClick={() => setMobileOpen(false)}
                 >

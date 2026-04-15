@@ -7,7 +7,7 @@ import AddLeadModal from "@/components/AddLeadModal";
 import ImportLeadsModal from "@/components/ImportLeadsModal";
 import PipelineInfoModal from "@/components/PipelineInfoModal";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
 
@@ -81,7 +81,7 @@ function LeadCard({ lead }: { lead: Lead }) {
           <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800, color: TEXT, lineHeight: 1.2 }}>
             {lead.name}
           </h3>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#ea580c" }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#D35400" }}>
             {lead.job_type ?? "No job type"}
           </span>
           <p style={{ margin: "4px 0 0", fontSize: 12, color: "#a8a29e" }}>
@@ -145,7 +145,7 @@ export default async function LeadsPage() {
       <div style={{ marginBottom: 20, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div>
-            <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#ea580c" }}>
+            <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#D35400" }}>
               Your Pipeline
             </p>
             <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: TEXT }}>Leads</h1>
@@ -161,14 +161,14 @@ export default async function LeadsPage() {
       {/* AI Summary */}
       <div style={{
         background: "#fff", border: `1px solid ${BORDER}`,
-        borderLeft: "4px solid #ea580c",
+        borderLeft: "4px solid #D35400",
         borderRadius: "0 12px 12px 0",
         padding: "14px 16px", marginBottom: 18,
         display: "flex", alignItems: "flex-start", gap: 10,
       }}>
         <span style={{ fontSize: 20, flexShrink: 0 }}>✨</span>
         <div>
-          <p style={{ margin: "0 0 1px", fontSize: 11, fontWeight: 700, color: "#ea580c", textTransform: "uppercase", letterSpacing: "1px" }}>
+          <p style={{ margin: "0 0 1px", fontSize: 11, fontWeight: 700, color: "#D35400", textTransform: "uppercase", letterSpacing: "1px" }}>
             Today's Summary
           </p>
           <p style={{ margin: 0, fontSize: 14, color: "#44403c", lineHeight: 1.6 }}>{blurb}</p>
@@ -186,22 +186,22 @@ export default async function LeadsPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <i
                 className={`fa-solid ${atLimit ? "fa-circle-xmark" : nearLimit ? "fa-circle-exclamation" : "fa-circle-info"}`}
-                style={{ fontSize: 14, color: atLimit ? "#dc2626" : nearLimit ? "#d97706" : "#ea580c", flexShrink: 0 }}
+                style={{ fontSize: 14, color: atLimit ? "#dc2626" : nearLimit ? "#d97706" : "#D35400", flexShrink: 0 }}
               />
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: atLimit ? "#dc2626" : nearLimit ? "#d97706" : TEXT }}>
                 {atLimit
                   ? "Monthly lead limit reached"
                   : nearLimit
                     ? `Approaching your ${leadLimit}-lead monthly limit`
-                    : `Starter Plan · ${leadLimit} leads / month`}
+                    : `Pro Plan · ${leadLimit} leads / month`}
               </p>
             </div>
             <Link
               href="/profile/billing"
               style={{
                 flexShrink: 0, fontSize: 12, fontWeight: 700, padding: "5px 12px", borderRadius: 20,
-                background: atLimit ? "linear-gradient(135deg,#ea580c,#f97316)" : "#f9f7f4",
-                color: atLimit ? "#fff" : "#ea580c",
+                background: atLimit ? "linear-gradient(135deg,#D35400,#e8641c)" : "#f9f7f4",
+                color: atLimit ? "#fff" : "#D35400",
                 border: atLimit ? "none" : "1px solid #fed7aa",
                 textDecoration: "none",
               }}
@@ -217,7 +217,7 @@ export default async function LeadsPage() {
                 ? "linear-gradient(90deg,#dc2626,#ef4444)"
                 : nearLimit
                   ? "linear-gradient(90deg,#d97706,#f59e0b)"
-                  : "linear-gradient(90deg,#ea580c,#f97316)",
+                  : "linear-gradient(90deg,#D35400,#e8641c)",
             }} />
           </div>
           <p style={{ margin: "6px 0 0", fontSize: 11, color: MUTED }}>
@@ -233,7 +233,7 @@ export default async function LeadsPage() {
           {[
             { label: "Total",     value: stats.total,     color: TEXT },
             { label: "Contacted", value: stats.contacted, color: "#d97706" },
-            { label: "Replied",   value: stats.replied,   color: "#16a34a" },
+            { label: "Replied",   value: stats.replied,   color: "#27AE60" },
             { label: "Booked",    value: stats.booked,    color: "#0891b2" },
           ].map(s => (
             <div key={s.label} style={{

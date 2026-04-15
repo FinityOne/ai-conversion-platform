@@ -13,20 +13,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-const BG = "#faf9f7";
-const TEXT = "#1c1917";
+const BG = "#F9F7F2";
+const TEXT = "#2C3E50";
 const MUTED = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 const CATEGORY_COLORS: Record<string, string> = {
   Plumbing: "#0369a1",
   HVAC: "#d97706",
-  Landscaping: "#16a34a",
+  Landscaping: "#27AE60",
   Electrical: "#7c3aed",
   Roofing: "#dc2626",
   Cleaning: "#0891b2",
-  Handyman: "#ea580c",
+  Handyman: "#D35400",
 };
 
 export async function generateStaticParams() {
@@ -223,7 +223,7 @@ export default async function BlogPostPage({ params }: Props) {
         {/* In-article CTA */}
         <div
           style={{
-            background: "linear-gradient(135deg,#ea580c,#f97316)",
+            background: "linear-gradient(135deg,#D35400,#e8641c)",
             borderRadius: 16,
             padding: "36px 32px",
             marginTop: 40,

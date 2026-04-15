@@ -113,8 +113,8 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
           style={{
             padding: "10px 20px", borderRadius: 10, border: "none",
             background: saved
-              ? "linear-gradient(135deg,#16a34a,#22c55e)"
-              : "linear-gradient(135deg,#ea580c,#f97316)",
+              ? "linear-gradient(135deg,#27AE60,#2ecc71)"
+              : "linear-gradient(135deg,#D35400,#e8641c)",
             color: "#fff", fontSize: 13, fontWeight: 700,
             cursor: saving ? "not-allowed" : "pointer",
             opacity: saving ? 0.7 : 1,
@@ -137,13 +137,13 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
               const isToday = d === new Date().toISOString().slice(0, 10);
               return (
                 <div key={d} style={{ textAlign: "center" }}>
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: isToday ? "#ea580c" : "#78716c" }}>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: isToday ? "#D35400" : "#78716c" }}>
                     {DAY_NAMES[dt.getDay()]}
                   </p>
                   <p style={{
                     margin: "2px 0 4px",
                     fontSize: 15, fontWeight: 900,
-                    color: isToday ? "#ea580c" : "#1c1917",
+                    color: isToday ? "#D35400" : "#2C3E50",
                   }}>
                     {dt.getDate()}
                   </p>
@@ -198,7 +198,7 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
                           : !nextActive ? "0 0 6px 6px"
                           : 0)
                         : 4,
-                      background: active ? "#ea580c" : "#f0ede8",
+                      background: active ? "#D35400" : "#f0ede8",
                       cursor: "pointer",
                       transition: "background 0.1s",
                       border: active ? "none" : "1px solid #e6e2db",

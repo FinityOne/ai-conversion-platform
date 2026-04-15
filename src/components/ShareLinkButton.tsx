@@ -44,8 +44,8 @@ export default function ShareLinkButton({ url }: { url: string }) {
             flexShrink: 0,
             padding: "12px 18px",
             background: copied
-              ? "linear-gradient(135deg,#16a34a,#22c55e)"
-              : "linear-gradient(135deg,#ea580c,#f97316)",
+              ? "linear-gradient(135deg,#27AE60,#2ecc71)"
+              : "linear-gradient(135deg,#D35400,#e8641c)",
             border: "none",
             color: "#fff",
             fontSize: 13, fontWeight: 700,

@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
-const BG     = "#f5f3ee";
+const BG     = "#F9F7F2";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "13px 16px", borderRadius: 10,
@@ -15,8 +15,8 @@ const inputStyle: React.CSSProperties = {
 };
 const focusStyle: React.CSSProperties = {
   ...inputStyle,
-  border: "1.5px solid #ea580c",
-  boxShadow: "0 0 0 3px rgba(234,88,12,0.1)",
+  border: "1.5px solid #D35400",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.1)",
 };
 
 function strengthLabel(pw: string): { label: string; color: string; pct: number } {
@@ -29,7 +29,7 @@ function strengthLabel(pw: string): { label: string; color: string; pct: number 
   if (/[^A-Za-z0-9]/.test(pw))               score++;
   if (score <= 1) return { label: "Weak",   color: "#ef4444", pct: 25 };
   if (score <= 2) return { label: "Fair",   color: "#f59e0b", pct: 50 };
-  if (score <= 3) return { label: "Good",   color: "#22c55e", pct: 75 };
+  if (score <= 3) return { label: "Good",   color: "#2ecc71", pct: 75 };
   return           { label: "Strong", color: "#10b981", pct: 100 };
 }
 
@@ -122,10 +122,10 @@ export default function ChangePasswordForm() {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{
             width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-            background: "rgba(234,88,12,0.08)", border: "1px solid rgba(234,88,12,0.18)",
+            background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.18)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <i className="fa-solid fa-lock" style={{ fontSize: 15, color: "#ea580c" }} />
+            <i className="fa-solid fa-lock" style={{ fontSize: 15, color: "#D35400" }} />
           </div>
           <div>
             <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: TEXT }}>Change Password</p>
@@ -147,10 +147,10 @@ export default function ChangePasswordForm() {
               padding: "14px 16px", borderRadius: 12,
               background: "#f0fdf4", border: "1px solid #bbf7d0",
             }}>
-              <i className="fa-solid fa-circle-check" style={{ color: "#16a34a", fontSize: 18, flexShrink: 0 }} />
+              <i className="fa-solid fa-circle-check" style={{ color: "#27AE60", fontSize: 18, flexShrink: 0 }} />
               <div>
                 <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#15803d" }}>Password updated successfully!</p>
-                <p style={{ margin: 0, fontSize: 13, color: "#16a34a" }}>Your new password is now active.</p>
+                <p style={{ margin: 0, fontSize: 13, color: "#27AE60" }}>Your new password is now active.</p>
               </div>
             </div>
           ) : (
@@ -196,13 +196,13 @@ export default function ChangePasswordForm() {
                   style={{
                     flex: 2, padding: "14px", borderRadius: 12, border: "none",
                     background: password.length >= 8 && !mismatch
-                      ? "linear-gradient(135deg,#ea580c,#f97316)"
+                      ? "linear-gradient(135deg,#D35400,#e8641c)"
                       : "#e5e5e5",
                     color: password.length >= 8 && !mismatch ? "#fff" : "#a8a29e",
                     fontSize: 15, fontWeight: 700,
                     cursor: loading || password.length < 8 || mismatch ? "not-allowed" : "pointer",
                     opacity: loading ? 0.7 : 1,
-                    boxShadow: password.length >= 8 && !mismatch ? "0 4px 14px rgba(234,88,12,0.25)" : "none",
+                    boxShadow: password.length >= 8 && !mismatch ? "0 4px 14px rgba(211,84,0,0.25)" : "none",
                   }}
                 >
                   {loading ? "Updating…" : "Update Password"}

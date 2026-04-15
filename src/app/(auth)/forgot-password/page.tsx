@@ -21,8 +21,8 @@ const inputStyle: React.CSSProperties = {
 
 const inputFocusStyle: React.CSSProperties = {
   ...inputStyle,
-  border: "1px solid rgba(234,88,12,0.6)",
-  boxShadow: "0 0 0 3px rgba(234,88,12,0.12)",
+  border: "1px solid rgba(211,84,0,0.6)",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.12)",
 };
 
 export default function ForgotPasswordPage() {
@@ -62,8 +62,8 @@ export default function ForgotPasswordPage() {
               className="mx-auto mb-6 flex items-center justify-center"
               style={{
                 width: 72, height: 72, borderRadius: "50%",
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
-                boxShadow: "0 8px 24px rgba(234,88,12,0.35)",
+                background: "linear-gradient(135deg,#D35400,#e8641c)",
+                boxShadow: "0 8px 24px rgba(211,84,0,0.35)",
               }}
             >
               <i className="fa-solid fa-paper-plane" style={{ fontSize: 28, color: "#fff" }} />
@@ -93,11 +93,11 @@ export default function ForgotPasswordPage() {
                 className="mx-auto mb-5 flex items-center justify-center"
                 style={{
                   width: 52, height: 52, borderRadius: 14,
-                  background: "rgba(234,88,12,0.12)",
-                  border: "1px solid rgba(234,88,12,0.25)",
+                  background: "rgba(211,84,0,0.12)",
+                  border: "1px solid rgba(211,84,0,0.25)",
                 }}
               >
-                <i className="fa-solid fa-lock-open" style={{ fontSize: 20, color: "#f97316" }} />
+                <i className="fa-solid fa-lock-open" style={{ fontSize: 20, color: "#e8641c" }} />
               </div>
               <h1 className="text-2xl font-black text-white mb-2">Forgot your password?</h1>
               <p className="text-sm" style={{ color: MUTED, lineHeight: 1.6 }}>

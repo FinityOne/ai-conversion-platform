@@ -93,7 +93,7 @@ export default function SendFollowUpButton({ leadId, hasEmail }: Props) {
           background: "#f0fdf4", border: "1px solid #bbf7d0",
           display: "flex", alignItems: "center", gap: 8,
         }}>
-          <i className="fa-solid fa-check" style={{ color: "#16a34a" }} />
+          <i className="fa-solid fa-check" style={{ color: "#27AE60" }} />
           <span style={{ fontSize: 14, color: "#15803d", fontWeight: 600 }}>
             Follow-up email sent! Lead advanced to Follow-Up stage.
           </span>
@@ -111,7 +111,7 @@ export default function SendFollowUpButton({ leadId, hasEmail }: Props) {
             style={{
               flexShrink: 0, padding: "11px 16px", border: "none",
               background: copied
-                ? "linear-gradient(135deg,#16a34a,#22c55e)"
+                ? "linear-gradient(135deg,#27AE60,#2ecc71)"
                 : "linear-gradient(135deg,#7c3aed,#9333ea)",
               color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer",
               display: "flex", alignItems: "center", gap: 5,

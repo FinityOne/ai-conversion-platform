@@ -3,12 +3,12 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 
-const BG     = "#faf9f7";
-const TEXT   = "#1c1917";
+const BG     = "#F9F7F2";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
-const GREEN  = "#16a34a";
+const ORANGE = "#D35400";
+const GREEN  = "#27AE60";
 
 const INDUSTRIES = [
   { label: "Plumbing",           avgJob: 350   },
@@ -27,11 +27,11 @@ const INDUSTRIES = [
 const CALC_PLANS = [
   {
     id: "starter",
-    name: "Starter",
+    name: "Pro",
     emoji: "⚡",
-    color: "#ea580c",
-    bg: "rgba(234,88,12,0.06)",
-    border: "rgba(234,88,12,0.25)",
+    color: "#D35400",
+    bg: "rgba(211,84,0,0.06)",
+    border: "rgba(211,84,0,0.25)",
     monthlyPrice: 129,
     annualMonthly: 99,
     annualTotal: 1188,
@@ -49,7 +49,7 @@ const CALC_PLANS = [
       "Email support",
     ],
     pitch: (leads: number) =>
-      `Your business generates ~${leads} implied lead${leads !== 1 ? "s" : ""}/month — a perfect fit for Starter's 50-lead cap.`,
+      `Your business generates ~${leads} implied lead${leads !== 1 ? "s" : ""}/month — a perfect fit for Pro's 50-lead cap.`,
   },
   {
     id: "growth",
@@ -64,7 +64,7 @@ const CALC_PLANS = [
     leadLimit: null,
     threshold: 500,  // recommend when 51–500 leads
     features: [
-      "Everything in Starter",
+      "Everything in Pro",
       "Up to 500 leads / month",
       "Smart AI reply detection",
       "Full multi-step follow-up sequences",
@@ -77,7 +77,7 @@ const CALC_PLANS = [
   },
   {
     id: "pro",
-    name: "Pro",
+    name: "Max",
     emoji: "💎",
     color: "#0891b2",
     bg: "rgba(8,145,178,0.06)",
@@ -202,7 +202,7 @@ export default function CalculatorPage() {
                       padding: "10px 12px",
                       borderRadius: 8,
                       border: `1px solid ${industryIdx === idx ? ORANGE : BORDER}`,
-                      background: industryIdx === idx ? "rgba(234,88,12,0.06)" : "#faf9f7",
+                      background: industryIdx === idx ? "rgba(211,84,0,0.06)" : "#F9F7F2",
                       color: industryIdx === idx ? ORANGE : MUTED,
                       fontWeight: industryIdx === idx ? 700 : 500,
                       fontSize: 13,
@@ -225,7 +225,7 @@ export default function CalculatorPage() {
                 </label>
                 <span style={{
                   fontSize: 36, fontWeight: 900,
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                   lineHeight: 1,
                 }}>
@@ -256,7 +256,7 @@ export default function CalculatorPage() {
                 </div>
                 <span style={{
                   fontSize: 32, fontWeight: 900,
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                   lineHeight: 1, whiteSpace: "nowrap", marginLeft: 16,
                 }}>
@@ -282,7 +282,7 @@ export default function CalculatorPage() {
                 </label>
                 <span style={{
                   fontSize: 36, fontWeight: 900,
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                   lineHeight: 1,
                 }}>
@@ -306,7 +306,7 @@ export default function CalculatorPage() {
           </div>
 
           {/* ── Results ── */}
-          <div style={{ background: "#faf9f7", borderTop: `1px solid ${BORDER}`, padding: "40px 40px" }}>
+          <div style={{ background: "#F9F7F2", borderTop: `1px solid ${BORDER}`, padding: "40px 40px" }}>
             <h2 style={{ fontSize: 20, fontWeight: 800, color: TEXT, marginBottom: 28 }}>Your results</h2>
 
             {/* Three comparison cards */}
@@ -330,12 +330,12 @@ export default function CalculatorPage() {
               <div style={{
                 background: "#fff", border: `2px solid ${ORANGE}`,
                 borderRadius: 14, padding: "24px 20px",
-                boxShadow: "0 4px 20px rgba(234,88,12,0.10)",
+                boxShadow: "0 4px 20px rgba(211,84,0,0.10)",
                 position: "relative",
               }}>
                 <div style={{
                   position: "absolute", top: -11, left: "50%", transform: "translateX(-50%)",
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   color: "#fff", fontSize: 11, fontWeight: 800,
                   padding: "2px 12px", borderRadius: 100, whiteSpace: "nowrap",
                 }}>
@@ -352,8 +352,8 @@ export default function CalculatorPage() {
 
               {/* Revenue gap */}
               <div style={{
-                background: showGap ? "rgba(22,163,74,0.04)" : "#fff",
-                border: `1px solid ${showGap ? "rgba(22,163,74,0.2)" : BORDER}`,
+                background: showGap ? "rgba(39,174,96,0.04)" : "#fff",
+                border: `1px solid ${showGap ? "rgba(39,174,96,0.2)" : BORDER}`,
                 borderRadius: 14, padding: "24px 20px",
               }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>
@@ -380,8 +380,8 @@ export default function CalculatorPage() {
             {/* Annual opportunity banner */}
             {showGap && results.annualGap > 0 && (
               <div style={{
-                background: "linear-gradient(135deg,rgba(234,88,12,0.06),rgba(249,115,22,0.04))",
-                border: "1px solid rgba(234,88,12,0.2)",
+                background: "linear-gradient(135deg,rgba(211,84,0,0.06),rgba(232,100,28,0.04))",
+                border: "1px solid rgba(211,84,0,0.2)",
                 borderRadius: 14, padding: "28px 24px",
                 textAlign: "center", marginBottom: 28,
               }}>
@@ -469,8 +469,8 @@ export default function CalculatorPage() {
                       {showGap && results.roiMonth > 0 && (
                         <div style={{
                           marginTop: 14,
-                          background: "rgba(22,163,74,0.06)",
-                          border: "1px solid rgba(22,163,74,0.2)",
+                          background: "rgba(39,174,96,0.06)",
+                          border: "1px solid rgba(39,174,96,0.2)",
                           borderRadius: 8, padding: "10px 14px",
                           display: "inline-flex", alignItems: "center", gap: 8,
                         }}>
@@ -511,10 +511,10 @@ export default function CalculatorPage() {
             <div style={{ textAlign: "center" }}>
               <Link href="/signup" style={{
                 display: "inline-block",
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                background: "linear-gradient(135deg,#D35400,#e8641c)",
                 color: "#fff", fontWeight: 800, fontSize: 17,
                 padding: "16px 32px", borderRadius: 12, textDecoration: "none",
-                boxShadow: "0 4px 20px rgba(234,88,12,0.25)", marginBottom: 12,
+                boxShadow: "0 4px 20px rgba(211,84,0,0.25)", marginBottom: 12,
               }}>
                 {showGap && results.monthlyGap > 0
                   ? `I want that ${formatDollar(results.monthlyGap)}/month back →`
@@ -541,11 +541,11 @@ export default function CalculatorPage() {
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
             {[
-              { quote: "First month with ClozeFlow I got 9 extra estimate appointments — automatically. Closed 6 of them.", name: "Jake R.",  result: "+$80K extra revenue", initials: "JR", color: "#c2410c" },
+              { quote: "First month with ClozeFlow I got 9 extra estimate appointments — automatically. Closed 6 of them.", name: "Jake R.",  result: "+$80K extra revenue", initials: "JR", color: "#D35400" },
               { quote: "We were spending $2,800/mo on Angi. ClozeFlow responds in under a minute. Our ROI literally tripled.",  name: "Maria C.", result: "3× ROI on leads",     initials: "MC", color: "#1e40af" },
               { quote: "My close rate went from 22% to 58% in one quarter. Same leads. Better follow-up system.",              name: "Derek M.", result: "22%→58% close rate",  initials: "DM", color: "#5b21b6" },
             ].map(t => (
-              <div key={t.name} style={{ background: "#faf9f7", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "20px 18px" }}>
+              <div key={t.name} style={{ background: "#F9F7F2", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "20px 18px" }}>
                 <p style={{ fontSize: 14, fontWeight: 700, color: ORANGE, marginBottom: 8 }}>{t.result}</p>
                 <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.65, marginBottom: 14 }}>&ldquo;{t.quote}&rdquo;</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

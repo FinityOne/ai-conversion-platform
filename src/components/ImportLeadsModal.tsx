@@ -6,9 +6,9 @@ import Papa from "papaparse";
 
 // ─── Design tokens (matches AddLeadModal) ────────────────────────────────────
 const BORDER = "#e6e2db";
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
-const BG     = "#f5f3ee";
+const BG     = "#F9F7F2";
 
 // ─── Target fields we want to capture ────────────────────────────────────────
 export type TargetField = "name" | "email" | "phone" | "job_type" | "description" | "__skip__";
@@ -263,7 +263,7 @@ export default function ImportLeadsModal() {
           border: `1.5px solid ${BORDER}`, cursor: "pointer",
         }}
       >
-        <i className="fa-solid fa-file-arrow-up" style={{ color: "#ea580c" }} />
+        <i className="fa-solid fa-file-arrow-up" style={{ color: "#D35400" }} />
         Import CSV
       </button>
 
@@ -382,7 +382,7 @@ function StepBar({ step }: { step: Step }) {
             width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 12, fontWeight: 800,
-            background: i <= idx ? "linear-gradient(135deg,#ea580c,#f97316)" : "#f0ede8",
+            background: i <= idx ? "linear-gradient(135deg,#D35400,#e8641c)" : "#f0ede8",
             color: i <= idx ? "#fff" : "#c4bfb8",
           }}>
             {i < idx ? <i className="fa-solid fa-check" style={{ fontSize: 11 }} /> : i + 1}
@@ -391,7 +391,7 @@ function StepBar({ step }: { step: Step }) {
             {s.label}
           </span>
           {i < steps.length - 1 && (
-            <div style={{ flex: 1, height: 2, background: i < idx ? "#ea580c" : "#e6e2db", borderRadius: 2, marginRight: 6 }} />
+            <div style={{ flex: 1, height: 2, background: i < idx ? "#D35400" : "#e6e2db", borderRadius: 2, marginRight: 6 }} />
           )}
         </div>
       ))}
@@ -420,13 +420,13 @@ function UploadStep({
         onDrop={onDrop}
         onClick={() => fileRef.current?.click()}
         style={{
-          border: `2px dashed ${dragging ? "#ea580c" : BORDER}`,
+          border: `2px dashed ${dragging ? "#D35400" : BORDER}`,
           borderRadius: 14, padding: "40px 24px", textAlign: "center",
           cursor: "pointer", transition: "border-color 0.15s",
           background: dragging ? "#fff7ed" : "#fafaf9",
         }}
       >
-        <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 36, color: "#ea580c", marginBottom: 12, display: "block" }} />
+        <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 36, color: "#D35400", marginBottom: 12, display: "block" }} />
         <p style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700, color: TEXT }}>
           Drop your CSV here, or click to browse
         </p>
@@ -570,7 +570,7 @@ function MappingStep({
           disabled={!nameOk}
           style={{
             flex: 2, padding: "14px", borderRadius: 12, border: "none",
-            background: nameOk ? "linear-gradient(135deg,#ea580c,#f97316)" : "#e5e5e5",
+            background: nameOk ? "linear-gradient(135deg,#D35400,#e8641c)" : "#e5e5e5",
             color: nameOk ? "#fff" : "#a8a29e", fontSize: 15, fontWeight: 700,
             cursor: nameOk ? "pointer" : "not-allowed",
           }}
@@ -598,7 +598,7 @@ function PreviewStep({
       {/* Summary */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
-          <p style={{ margin: "0 0 2px", fontSize: 26, fontWeight: 900, color: "#16a34a" }}>{validCount}</p>
+          <p style={{ margin: "0 0 2px", fontSize: 26, fontWeight: 900, color: "#27AE60" }}>{validCount}</p>
           <p style={{ margin: 0, fontSize: 12, color: "#15803d", fontWeight: 600 }}>Leads ready to import</p>
         </div>
         <div style={{ background: skippedCount > 0 ? "#fef2f2" : BG, border: `1px solid ${skippedCount > 0 ? "#fee2e2" : BORDER}`, borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
@@ -656,11 +656,11 @@ function PreviewStep({
           disabled={loading || validCount === 0}
           style={{
             flex: 2, padding: "14px", borderRadius: 12, border: "none",
-            background: validCount > 0 ? "linear-gradient(135deg,#ea580c,#f97316)" : "#e5e5e5",
+            background: validCount > 0 ? "linear-gradient(135deg,#D35400,#e8641c)" : "#e5e5e5",
             color: validCount > 0 ? "#fff" : "#a8a29e", fontSize: 15, fontWeight: 700,
             cursor: loading || validCount === 0 ? "not-allowed" : "pointer",
             opacity: loading ? 0.7 : 1,
-            boxShadow: validCount > 0 ? "0 4px 14px rgba(234,88,12,0.25)" : "none",
+            boxShadow: validCount > 0 ? "0 4px 14px rgba(211,84,0,0.25)" : "none",
           }}
         >
           {loading ? "Importing…" : `Import ${validCount} Leads →`}
@@ -680,9 +680,9 @@ function DoneStep({
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: "20px 0" }}>
       <div style={{
         width: 72, height: 72, borderRadius: "50%",
-        background: result.imported > 0 ? "linear-gradient(135deg,#ea580c,#f97316)" : "#e5e5e5",
+        background: result.imported > 0 ? "linear-gradient(135deg,#D35400,#e8641c)" : "#e5e5e5",
         display: "flex", alignItems: "center", justifyContent: "center",
-        boxShadow: result.imported > 0 ? "0 8px 24px rgba(234,88,12,0.3)" : "none",
+        boxShadow: result.imported > 0 ? "0 8px 24px rgba(211,84,0,0.3)" : "none",
       }}>
         <i
           className={`fa-solid ${result.imported > 0 ? "fa-check" : "fa-xmark"}`}
@@ -708,9 +708,9 @@ function DoneStep({
         onClick={onClose}
         style={{
           padding: "14px 40px", borderRadius: 12, border: "none",
-          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          background: "linear-gradient(135deg,#D35400,#e8641c)",
           color: "#fff", fontSize: 15, fontWeight: 700,
-          cursor: "pointer", boxShadow: "0 4px 14px rgba(234,88,12,0.25)",
+          cursor: "pointer", boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
         }}
       >
         View My Leads

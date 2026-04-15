@@ -72,7 +72,7 @@ export default function SendBookingButton({ leadId, hasEmail }: Props) {
         </button>
       ) : (
         <div style={{ padding: "11px 14px", borderRadius: 10, background: "#f0fdf4", border: "1px solid #bbf7d0", display: "flex", alignItems: "center", gap: 8 }}>
-          <i className="fa-solid fa-check" style={{ color: "#16a34a" }} />
+          <i className="fa-solid fa-check" style={{ color: "#27AE60" }} />
           <span style={{ fontSize: 14, color: "#15803d", fontWeight: 600 }}>Booking request sent!</span>
         </div>
       )}
@@ -85,7 +85,7 @@ export default function SendBookingButton({ leadId, hasEmail }: Props) {
             onClick={copyLink}
             style={{
               flexShrink: 0, padding: "10px 14px", border: "none",
-              background: copied ? "linear-gradient(135deg,#16a34a,#22c55e)" : "linear-gradient(135deg,#0891b2,#06b6d4)",
+              background: copied ? "linear-gradient(135deg,#27AE60,#2ecc71)" : "linear-gradient(135deg,#0891b2,#06b6d4)",
               color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer",
               display: "flex", alignItems: "center", gap: 5, transition: "background 0.2s",
             }}

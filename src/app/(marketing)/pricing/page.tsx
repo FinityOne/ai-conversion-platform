@@ -3,16 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const BG = "#faf9f7";
-const TEXT = "#1c1917";
+const BG = "#F9F7F2";
+const TEXT = "#2C3E50";
 const MUTED = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
-const GREEN = "#16a34a";
+const ORANGE = "#D35400";
+const GREEN = "#27AE60";
 
 const PLANS = [
   {
-    name: "Starter",
+    name: "Pro",
     tagline: "Solo operators & small crews",
     annualPrice: 99,
     monthlyPrice: 129,
@@ -37,7 +37,7 @@ const PLANS = [
     monthlyPrice: 389,
     badge: "Most Popular",
     features: [
-      "Everything in Starter",
+      "Everything in Pro",
       "Up to 500 leads/month",
       "Smart AI reply detection",
       "Full multi-step follow-up sequences",
@@ -49,7 +49,7 @@ const PLANS = [
     cta: "Start Free — No Card Needed",
   },
   {
-    name: "Pro",
+    name: "Max",
     tagline: "High-volume & multi-location",
     annualPrice: 999,
     monthlyPrice: 1299,
@@ -68,6 +68,82 @@ const PLANS = [
   },
 ];
 
+// ── Comparison table helpers ─────────────────────────────────────────────────
+const TABLE_PLANS = {
+  starter: { label: "Pro",    color: "#D35400", bg: "rgba(211,84,0,0.08)",    border: "rgba(211,84,0,0.2)",    emoji: "⚡" },
+  growth:  { label: "Growth", color: "#7c3aed", bg: "rgba(124,58,237,0.08)", border: "rgba(124,58,237,0.2)", emoji: "🚀" },
+  pro:     { label: "Max",    color: "#0891b2", bg: "rgba(8,145,178,0.08)",   border: "rgba(8,145,178,0.2)",  emoji: "💎" },
+};
+
+function Check({ color }: { color: string }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="9" cy="9" r="9" fill={color} fillOpacity="0.12" />
+      <path d="M5.5 9l2.5 2.5 4.5-5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function Lock() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="9" cy="9" r="9" fill="#e6e2db" />
+      <path d="M6.5 8V6.5a2.5 2.5 0 015 0V8M5.5 8h7a1 1 0 011 1v4a1 1 0 01-1 1h-7a1 1 0 01-1-1V9a1 1 0 011-1z" stroke="#a8a29e" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const COMPARISON = [
+  {
+    category: "Lead Capture",
+    rows: [
+      { feature: "Custom intake form",           starter: true,  growth: true,  pro: true  },
+      { feature: "Photo upload on intake form",  starter: true,  growth: true,  pro: true  },
+      { feature: "Custom intake link (slug)",    starter: true,  growth: true,  pro: true  },
+      { feature: "White-label booking page",     starter: false, growth: false, pro: true  },
+    ],
+  },
+  {
+    category: "Response & Follow-Up",
+    rows: [
+      { feature: "60-second automated response", starter: true,  growth: true,  pro: true  },
+      { feature: "Email follow-up sequences",    starter: true,  growth: true,  pro: true  },
+      { feature: "Full multi-step sequences",    starter: false, growth: true,  pro: true  },
+      { feature: "Smart AI reply detection",     starter: false, growth: true,  pro: true  },
+    ],
+  },
+  {
+    category: "Pipeline & Intelligence",
+    rows: [
+      { feature: "Lead inbox with AI scoring",       starter: true,  growth: true,  pro: true  },
+      { feature: "AI-powered custom messaging",      starter: true,  growth: true,  pro: true  },
+      { feature: "Flyer generator",                  starter: true,  growth: true,  pro: true  },
+      { feature: "Hot lead SMS alerts",              starter: false, growth: false, pro: true  },
+      { feature: "Performance tracking",             starter: false, growth: true,  pro: true  },
+      { feature: "Daily lead digest email",          starter: false, growth: true,  pro: true  },
+      { feature: "Advanced analytics",               starter: false, growth: false, pro: true  },
+    ],
+  },
+  {
+    category: "Scheduling",
+    rows: [
+      { feature: "Seamless calendar bookings", starter: true, growth: true,  pro: true  },
+      { feature: "Automatic reminders",         starter: true, growth: true,  pro: true  },
+    ],
+  },
+  {
+    category: "Scale & Support",
+    rows: [
+      { feature: "Monthly leads",             starter: false, growth: false, pro: false, values: ["50", "500", "Unlimited"] },
+      { feature: "Custom integrations",       starter: false, growth: false, pro: true  },
+      { feature: "Dedicated account manager", starter: false, growth: false, pro: true  },
+      { feature: "Email support",             starter: true,  growth: true,  pro: true  },
+      { feature: "Priority support",          starter: false, growth: true,  pro: true  },
+      { feature: "Phone support",             starter: false, growth: false, pro: true  },
+    ],
+  },
+];
+
 const FAQS = [
   {
     q: "Is there really no credit card required?",
@@ -83,11 +159,11 @@ const FAQS = [
   },
   {
     q: "What does 'annual billing' mean exactly?",
-    a: "Annual plans are billed once per year at the discounted rate. So the Starter plan at $99/mo annual = $1,188 billed once per year. Monthly plans are charged month-to-month with no long-term commitment.",
+    a: "Annual plans are billed once per year at the discounted rate. So the Pro plan at $99/mo annual = $1,188 billed once per year. Monthly plans are charged month-to-month with no long-term commitment.",
   },
   {
     q: "How is the Growth plan different from Starter?",
-    a: "Growth gives you 500 leads/month (vs. 50 on Starter), smart AI reply detection, full multi-step follow-up sequences, performance tracking, a daily lead digest email, and priority support.",
+    a: "Growth gives you 500 leads/month (vs. 50 on Pro), smart AI reply detection, full multi-step follow-up sequences, performance tracking, a daily lead digest email, and priority support.",
   },
   {
     q: "Do you offer a money-back guarantee?",
@@ -134,7 +210,7 @@ export default function PricingPage() {
                 cursor: "pointer",
                 fontSize: 14,
                 fontWeight: 700,
-                background: annual ? "linear-gradient(135deg,#ea580c,#f97316)" : "transparent",
+                background: annual ? "linear-gradient(135deg,#D35400,#e8641c)" : "transparent",
                 color: annual ? "#fff" : MUTED,
                 transition: "all 0.2s",
               }}
@@ -144,7 +220,7 @@ export default function PricingPage() {
                 style={{
                   marginLeft: 6,
                   fontSize: 11,
-                  background: annual ? "rgba(255,255,255,0.25)" : "rgba(22,163,74,0.1)",
+                  background: annual ? "rgba(255,255,255,0.25)" : "rgba(39,174,96,0.1)",
                   color: annual ? "#fff" : GREEN,
                   padding: "2px 7px",
                   borderRadius: 100,
@@ -163,7 +239,7 @@ export default function PricingPage() {
                 cursor: "pointer",
                 fontSize: 14,
                 fontWeight: 700,
-                background: !annual ? "linear-gradient(135deg,#ea580c,#f97316)" : "transparent",
+                background: !annual ? "linear-gradient(135deg,#D35400,#e8641c)" : "transparent",
                 color: !annual ? "#fff" : MUTED,
                 transition: "all 0.2s",
               }}
@@ -195,7 +271,7 @@ export default function PricingPage() {
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",
-                boxShadow: plan.highlight ? "0 8px 40px rgba(234,88,12,0.12)" : "none",
+                boxShadow: plan.highlight ? "0 8px 40px rgba(211,84,0,0.12)" : "none",
               }}
             >
               {plan.badge && (
@@ -205,7 +281,7 @@ export default function PricingPage() {
                     top: -14,
                     left: "50%",
                     transform: "translateX(-50%)",
-                    background: "linear-gradient(135deg,#ea580c,#f97316)",
+                    background: "linear-gradient(135deg,#D35400,#e8641c)",
                     color: "#fff",
                     fontSize: 12,
                     fontWeight: 800,
@@ -258,10 +334,10 @@ export default function PricingPage() {
                   fontWeight: 700,
                   fontSize: 15,
                   textDecoration: "none",
-                  background: plan.highlight ? "linear-gradient(135deg,#ea580c,#f97316)" : "#faf9f7",
+                  background: plan.highlight ? "linear-gradient(135deg,#D35400,#e8641c)" : "#F9F7F2",
                   color: plan.highlight ? "#fff" : TEXT,
                   border: plan.highlight ? "none" : `1px solid ${BORDER}`,
-                  boxShadow: plan.highlight ? "0 4px 20px rgba(234,88,12,0.25)" : "none",
+                  boxShadow: plan.highlight ? "0 4px 20px rgba(211,84,0,0.25)" : "none",
                 }}
               >
                 {plan.cta} →
@@ -273,6 +349,82 @@ export default function PricingPage() {
               )}
             </div>
           ))}
+        </div>
+
+        {/* ── Feature comparison table ── */}
+        <div style={{
+          background: "#fff", border: `1px solid ${BORDER}`,
+          borderRadius: 16, overflow: "hidden", marginTop: 40,
+        }}>
+          <div style={{ padding: "40px 40px 0", textAlign: "center" }}>
+            <h2 style={{ fontSize: "clamp(22px,4vw,30px)", fontWeight: 900, color: TEXT, marginBottom: 8 }}>
+              The full picture
+            </h2>
+            <p style={{ color: MUTED, fontSize: 15, marginBottom: 40, lineHeight: 1.6 }}>
+              Every feature, every plan — see exactly what you get and what unlocks as you grow.
+            </p>
+          </div>
+          <div style={{ overflowX: "auto", padding: "0 40px 40px" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
+              <thead>
+                <tr>
+                  <th style={{ width: "40%", padding: "0 0 20px", textAlign: "left" }} />
+                  {(["starter", "growth", "pro"] as const).map(p => (
+                    <th key={p} style={{ padding: "0 12px 20px", textAlign: "center", width: "20%" }}>
+                      <div style={{
+                        display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 4,
+                        background: TABLE_PLANS[p].bg, border: `1.5px solid ${TABLE_PLANS[p].border}`,
+                        borderRadius: 12, padding: "10px 16px",
+                      }}>
+                        <span style={{ fontSize: 18 }}>{TABLE_PLANS[p].emoji}</span>
+                        <span style={{ fontSize: 13, fontWeight: 900, color: TABLE_PLANS[p].color }}>{TABLE_PLANS[p].label}</span>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARISON.map((cat, ci) => (
+                  <>
+                    <tr key={`cat-${ci}`}>
+                      <td colSpan={4} style={{ padding: "20px 0 8px" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.07em", color: MUTED }}>
+                          {cat.category}
+                        </span>
+                      </td>
+                    </tr>
+                    {cat.rows.map((row, ri) => (
+                      <tr key={`${ci}-${ri}`} style={{ borderTop: `1px solid ${BORDER}` }}>
+                        <td style={{ padding: "13px 0", fontSize: 14, color: TEXT, fontWeight: 500 }}>{row.feature}</td>
+                        {(["starter", "growth", "pro"] as const).map((plan, pi) => (
+                          <td key={plan} style={{ padding: "13px 12px", textAlign: "center" }}>
+                            {row.values
+                              ? <span style={{ fontSize: 13, fontWeight: 800, color: TABLE_PLANS[plan].color }}>{row.values[pi]}</span>
+                              : row[plan]
+                                ? <Check color={TABLE_PLANS[plan].color} />
+                                : <Lock />
+                            }
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </>
+                ))}
+              </tbody>
+            </table>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginTop: 32, paddingTop: 24, borderTop: `1px solid ${BORDER}` }}>
+              {(["starter", "growth", "pro"] as const).map(p => (
+                <Link key={p} href={`/signup?plan=${p}`} style={{
+                  display: "block", textAlign: "center", padding: "13px 16px", borderRadius: 10,
+                  fontWeight: 800, fontSize: 14, textDecoration: "none",
+                  background: TABLE_PLANS[p].bg, border: `1.5px solid ${TABLE_PLANS[p].border}`,
+                  color: TABLE_PLANS[p].color,
+                }}>
+                  Start {TABLE_PLANS[p].label} →
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Enterprise callout */}
@@ -338,8 +490,8 @@ export default function PricingPage() {
               width: 48,
               height: 48,
               borderRadius: "50%",
-              background: "rgba(22,163,74,0.08)",
-              border: "1px solid rgba(22,163,74,0.2)",
+              background: "rgba(39,174,96,0.08)",
+              border: "1px solid rgba(39,174,96,0.2)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -374,7 +526,7 @@ export default function PricingPage() {
               <div
                 key={i}
                 style={{
-                  background: "#faf9f7",
+                  background: "#F9F7F2",
                   border: `1px solid ${BORDER}`,
                   borderRadius: 12,
                   overflow: "hidden",
@@ -432,7 +584,7 @@ export default function PricingPage() {
           <Link
             href="/signup"
             style={{
-              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              background: "linear-gradient(135deg,#D35400,#e8641c)",
               color: "#fff",
               fontWeight: 800,
               fontSize: 16,
@@ -440,7 +592,7 @@ export default function PricingPage() {
               borderRadius: 10,
               textDecoration: "none",
               display: "inline-block",
-              boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+              boxShadow: "0 4px 20px rgba(211,84,0,0.25)",
             }}
           >
             Create Free Account →

@@ -20,8 +20,8 @@ const baseInput: React.CSSProperties = {
 };
 const focusInput: React.CSSProperties = {
   ...baseInput,
-  border: "1px solid rgba(234,88,12,0.6)",
-  boxShadow: "0 0 0 3px rgba(234,88,12,0.12)",
+  border: "1px solid rgba(211,84,0,0.6)",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.12)",
 };
 
 function PasswordInput({
@@ -74,7 +74,7 @@ function strengthLabel(pw: string): { label: string; color: string; pct: number 
   if (/[^A-Za-z0-9]/.test(pw))                score++;
   if (score <= 1) return { label: "Weak",   color: "#ef4444", pct: 25 };
   if (score <= 2) return { label: "Fair",   color: "#f59e0b", pct: 50 };
-  if (score <= 3) return { label: "Good",   color: "#22c55e", pct: 75 };
+  if (score <= 3) return { label: "Good",   color: "#2ecc71", pct: 75 };
   return           { label: "Strong", color: "#10b981", pct: 100 };
 }
 
@@ -120,7 +120,7 @@ export default function UpdatePasswordPage() {
               className="mx-auto mb-6 flex items-center justify-center"
               style={{
                 width: 72, height: 72, borderRadius: "50%",
-                background: "linear-gradient(135deg,#22c55e,#16a34a)",
+                background: "linear-gradient(135deg,#2ecc71,#27AE60)",
                 boxShadow: "0 8px 24px rgba(34,197,94,0.35)",
               }}
             >
@@ -139,11 +139,11 @@ export default function UpdatePasswordPage() {
                 className="mx-auto mb-5 flex items-center justify-center"
                 style={{
                   width: 52, height: 52, borderRadius: 14,
-                  background: "rgba(234,88,12,0.12)",
-                  border: "1px solid rgba(234,88,12,0.25)",
+                  background: "rgba(211,84,0,0.12)",
+                  border: "1px solid rgba(211,84,0,0.25)",
                 }}
               >
-                <i className="fa-solid fa-lock" style={{ fontSize: 20, color: "#f97316" }} />
+                <i className="fa-solid fa-lock" style={{ fontSize: 20, color: "#e8641c" }} />
               </div>
               <h1 className="text-2xl font-black text-white mb-2">Set a new password</h1>
               <p className="text-sm" style={{ color: MUTED, lineHeight: 1.6 }}>

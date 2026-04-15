@@ -7,11 +7,11 @@ export const metadata: Metadata = {
     "Meet the founders behind ClozeFlow. We built this because we watched great contractors lose jobs to slower competitors who just picked up the phone first. That ends now.",
 };
 
-const BG = "#faf9f7";
-const TEXT = "#1c1917";
+const BG = "#F9F7F2";
+const TEXT = "#2C3E50";
 const MUTED = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 export default function AboutPage() {
   return (
@@ -47,7 +47,7 @@ export default function AboutPage() {
                   width: 56,
                   height: 56,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -107,8 +107,8 @@ export default function AboutPage() {
 
           <div
             style={{
-              background: "linear-gradient(135deg, rgba(234,88,12,0.06), rgba(249,115,22,0.04))",
-              border: `1px solid rgba(234,88,12,0.15)`,
+              background: "linear-gradient(135deg, rgba(211,84,0,0.06), rgba(232,100,28,0.04))",
+              border: `1px solid rgba(211,84,0,0.15)`,
               borderRadius: 16,
               padding: "36px 32px",
             }}
@@ -202,7 +202,7 @@ export default function AboutPage() {
                 initials: "MR",
                 name: "Marco Rivera",
                 role: "Co-Founder & CEO",
-                color: "linear-gradient(135deg,#ea580c,#f97316)",
+                color: "linear-gradient(135deg,#D35400,#e8641c)",
                 bio: "Marco grew up watching his father's plumbing business struggle with follow-up. After a decade in B2B sales and operations, he left a VP role to build the tool he wished his dad had. He leads product vision and customer success.",
               },
               {
@@ -216,7 +216,7 @@ export default function AboutPage() {
               <div
                 key={name}
                 style={{
-                  background: "#faf9f7",
+                  background: "#F9F7F2",
                   border: `1px solid ${BORDER}`,
                   borderRadius: 16,
                   padding: "32px 28px",
@@ -266,7 +266,7 @@ export default function AboutPage() {
                 style={{
                   fontSize: 44,
                   fontWeight: 900,
-                  background: "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: "linear-gradient(135deg,#D35400,#e8641c)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -285,7 +285,7 @@ export default function AboutPage() {
       {/* CTA */}
       <section
         style={{
-          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          background: "linear-gradient(135deg,#D35400,#e8641c)",
           padding: "72px 24px",
           textAlign: "center",
         }}

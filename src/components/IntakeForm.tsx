@@ -32,7 +32,7 @@ const inputStyle = (accent: string, focused: boolean): React.CSSProperties => ({
   boxShadow: focused ? `0 0 0 3px ${accent}22` : "none",
   background: "#fff",
   fontSize: 17,
-  color: "#1c1917",
+  color: "#2C3E50",
   outline: "none",
   boxSizing: "border-box",
   transition: "border-color 0.15s, box-shadow 0.15s",
@@ -111,7 +111,7 @@ export default function IntakeForm({ slug, businessName, accent }: Props) {
         }}>
           ✅
         </div>
-        <h2 style={{ margin: "0 0 10px", fontSize: 26, fontWeight: 900, color: "#1c1917" }}>
+        <h2 style={{ margin: "0 0 10px", fontSize: 26, fontWeight: 900, color: "#2C3E50" }}>
           You&apos;re all set!
         </h2>
         <p style={{ margin: "0 0 6px", fontSize: 17, color: "#44403c", lineHeight: 1.6 }}>

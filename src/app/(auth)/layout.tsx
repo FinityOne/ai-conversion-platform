@@ -11,14 +11,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <Link href="/" className="flex items-center gap-2">
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg,#ea580c,#f97316)" }}
+            style={{ background: "linear-gradient(135deg,#D35400,#e8641c)" }}
           >
             <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <span className="font-black text-base tracking-tight text-white">
-            Cloze<span style={{ background: "linear-gradient(90deg,#ea580c,#f97316)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Flow</span>
+            Cloze<span style={{ background: "linear-gradient(90deg,#D35400,#e8641c)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Flow</span>
           </span>
         </Link>
       </header>

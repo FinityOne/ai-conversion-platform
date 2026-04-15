@@ -31,10 +31,10 @@ const STATUSES: { value: LeadStatus; label: string; emoji: string }[] = [
   { value: "closed_lost",       label: "Closed (Lost)",     emoji: "❌" },
 ];
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 export default function EditLeadModal({ lead }: Props) {
   const router = useRouter();
@@ -260,11 +260,11 @@ export default function EditLeadModal({ lead }: Props) {
                 disabled={saving}
                 style={{
                   padding: "11px 24px", borderRadius: 10, border: "none",
-                  background: saving ? "#fed7aa" : "linear-gradient(135deg,#ea580c,#f97316)",
+                  background: saving ? "#fed7aa" : "linear-gradient(135deg,#D35400,#e8641c)",
                   color: "#fff", fontSize: 14, fontWeight: 700,
                   cursor: saving ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", gap: 8,
-                  boxShadow: saving ? "none" : "0 4px 14px rgba(234,88,12,0.25)",
+                  boxShadow: saving ? "none" : "0 4px 14px rgba(211,84,0,0.25)",
                   transition: "opacity 0.15s",
                 }}
               >
@@ -282,8 +282,8 @@ export default function EditLeadModal({ lead }: Props) {
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "11px 13px",
   borderRadius: 10, border: "1.5px solid #e6e2db",
-  fontSize: 14, color: "#1c1917",
-  background: "#faf9f7",
+  fontSize: 14, color: "#2C3E50",
+  background: "#F9F7F2",
   outline: "none", boxSizing: "border-box",
   fontFamily: "inherit",
 };

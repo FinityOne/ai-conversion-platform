@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: "#faf9f7", minHeight: "100vh" }}>
+    <div style={{ background: "#F9F7F2", minHeight: "100vh" }}>
       <Nav variant="marketing" />
       <main style={{ paddingTop: 64 }}>{children}</main>
       <MarketingFooter />

@@ -13,12 +13,12 @@ export async function generateMetadata({ params }: { params: Promise<{ feature: 
   };
 }
 
-const BG = "#faf9f7";
-const TEXT = "#1c1917";
+const BG = "#F9F7F2";
+const TEXT = "#2C3E50";
 const MUTED = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
-const GREEN = "#16a34a";
+const ORANGE = "#D35400";
+const GREEN = "#27AE60";
 
 export async function generateStaticParams() {
   return features.map((f) => ({ feature: f.slug }));
@@ -57,8 +57,8 @@ export default async function FeatureDetailPage({ params }: Props) {
               width: 64,
               height: 64,
               borderRadius: 16,
-              background: "rgba(234,88,12,0.08)",
-              border: "1px solid rgba(234,88,12,0.15)",
+              background: "rgba(211,84,0,0.08)",
+              border: "1px solid rgba(211,84,0,0.15)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -120,7 +120,7 @@ export default async function FeatureDetailPage({ params }: Props) {
                       width: 36,
                       height: 36,
                       borderRadius: "50%",
-                      background: "linear-gradient(135deg,#ea580c,#f97316)",
+                      background: "linear-gradient(135deg,#D35400,#e8641c)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -170,7 +170,7 @@ export default async function FeatureDetailPage({ params }: Props) {
                   width: 24,
                   height: 24,
                   borderRadius: "50%",
-                  background: "rgba(22,163,74,0.1)",
+                  background: "rgba(39,174,96,0.1)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -208,7 +208,7 @@ export default async function FeatureDetailPage({ params }: Props) {
                   key={f.slug}
                   href={`/features/${f.slug}`}
                   style={{
-                    background: "#faf9f7",
+                    background: "#F9F7F2",
                     border: `1px solid ${BORDER}`,
                     borderRadius: 10,
                     padding: "16px 18px",
@@ -223,7 +223,7 @@ export default async function FeatureDetailPage({ params }: Props) {
                       width: 36,
                       height: 36,
                       borderRadius: 8,
-                      background: "rgba(234,88,12,0.08)",
+                      background: "rgba(211,84,0,0.08)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -242,7 +242,7 @@ export default async function FeatureDetailPage({ params }: Props) {
       {/* CTA */}
       <section
         style={{
-          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          background: "linear-gradient(135deg,#D35400,#e8641c)",
           padding: "72px 24px",
           textAlign: "center",
         }}

@@ -9,7 +9,7 @@ import EditLeadModal from "@/components/EditLeadModal";
 import { createSupabaseServiceClient } from "@/lib/supabase-service";
 import { formatDateFull, formatTime12 } from "@/lib/bookings";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
 
@@ -78,7 +78,7 @@ function PipelineTrack({ status }: { status: LeadStatus }) {
 
             const dotBg     = isDone    ? "#dcfce7" : isCurrent ? sc.bg  : "#f5f4f2";
             const dotBorder = isDone    ? "#86efac" : isCurrent ? sc.border : BORDER;
-            const dotColor  = isDone    ? "#16a34a" : isCurrent ? sc.color : "#c4bfb8";
+            const dotColor  = isDone    ? "#27AE60" : isCurrent ? sc.color : "#c4bfb8";
             const labelW    = isCurrent ? 700       : isDone    ? 600     : 400;
             const lineColor = isDone    ? "#86efac" : BORDER;
 
@@ -101,7 +101,7 @@ function PipelineTrack({ status }: { status: LeadStatus }) {
                   </div>
                   <span style={{
                     fontSize: 10, fontWeight: labelW,
-                    color: isCurrent ? sc.color : isDone ? "#16a34a" : "#c4bfb8",
+                    color: isCurrent ? sc.color : isDone ? "#27AE60" : "#c4bfb8",
                     textAlign: "center", lineHeight: 1.2, whiteSpace: "nowrap",
                   }}>
                     {SHORT_LABELS[s]}
@@ -165,7 +165,7 @@ function EmailLogTable({ logs }: { logs: EmailLogEntry[] }) {
   const statusConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
     sent:    { label: "Sent",    color: "#2563eb", bg: "#eff6ff", border: "#dbeafe" },
     opened:  { label: "Opened", color: "#d97706", bg: "#fffbeb", border: "#fde68a" },
-    clicked: { label: "Clicked",color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
+    clicked: { label: "Clicked",color: "#27AE60", bg: "#f0fdf4", border: "#bbf7d0" },
     failed:  { label: "Failed", color: "#dc2626", bg: "#fef2f2", border: "#fee2e2" },
   };
 
@@ -189,7 +189,7 @@ function EmailLogTable({ logs }: { logs: EmailLogEntry[] }) {
               </div>
               <p style={{ margin: 0, fontSize: 12, color: MUTED }}>{formatDateTime(log.created_at)}</p>
               {log.opened_at && (
-                <p style={{ margin: "3px 0 0", fontSize: 12, color: "#16a34a" }}>
+                <p style={{ margin: "3px 0 0", fontSize: 12, color: "#27AE60" }}>
                   <i className="fa-solid fa-eye" style={{ marginRight: 4 }} />
                   Opened {formatDateTime(log.opened_at)}
                 </p>
@@ -226,10 +226,10 @@ function EmailLogTable({ logs }: { logs: EmailLogEntry[] }) {
                     {sc.label}
                   </span>
                 </td>
-                <td style={{ padding: "13px 16px", fontSize: 13, color: log.opened_at ? "#16a34a" : "#c4bfb8" }}>
+                <td style={{ padding: "13px 16px", fontSize: 13, color: log.opened_at ? "#27AE60" : "#c4bfb8" }}>
                   {log.opened_at ? formatDateTime(log.opened_at) : "—"}
                 </td>
-                <td style={{ padding: "13px 16px", fontSize: 13, color: log.clicked_at ? "#16a34a" : "#c4bfb8" }}>
+                <td style={{ padding: "13px 16px", fontSize: 13, color: log.clicked_at ? "#27AE60" : "#c4bfb8" }}>
                   {log.clicked_at ? formatDateTime(log.clicked_at) : "—"}
                 </td>
               </tr>
@@ -268,8 +268,8 @@ function ProjectDetailsMini({ pd, siteUrl }: { pd: ProjectDetails; siteUrl: stri
   }
 
   const fields = [
-    { icon: "fa-briefcase",    color: "#ea580c", label: "Service",  value: pd.job_type },
-    { icon: "fa-house",        color: "#16a34a", label: "Property", value: pd.property_type },
+    { icon: "fa-briefcase",    color: "#D35400", label: "Service",  value: pd.job_type },
+    { icon: "fa-house",        color: "#27AE60", label: "Property", value: pd.property_type },
     { icon: "fa-coins",        color: "#d97706", label: "Budget",   value: pd.budget_range },
     { icon: "fa-clock",        color: "#0891b2", label: "Timeline", value: pd.timeline },
     { icon: "fa-location-dot", color: "#7c3aed", label: "Location", value: pd.address },
@@ -473,7 +473,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             {stageCfg.emoji} {stageCfg.label}
           </span>
           {lead.job_type && (
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, color: "#ea580c", fontWeight: 600 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, color: "#D35400", fontWeight: 600 }}>
               <i className="fa-solid fa-briefcase" style={{ fontSize: 11 }} />
               {lead.job_type}
             </span>
@@ -495,7 +495,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
         <div style={{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "center" }}>
           {lead.phone && (
             <a href={`tel:${lead.phone}`} style={{ display: "flex", alignItems: "center", gap: 6, textDecoration: "none", fontSize: 14, fontWeight: 500, color: TEXT }}>
-              <i className="fa-solid fa-phone" style={{ fontSize: 11, color: "#16a34a" }} />
+              <i className="fa-solid fa-phone" style={{ fontSize: 11, color: "#27AE60" }} />
               {formatPhoneDisplay(lead.phone)}
             </a>
           )}
@@ -506,7 +506,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             </a>
           )}
           {lead.job_type && (
-            <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "#ea580c" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "#D35400" }}>
               <i className="fa-solid fa-briefcase" style={{ fontSize: 11 }} />
               {lead.job_type}
             </span>
@@ -621,7 +621,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
       <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, overflow: "hidden" }}>
         <div style={{ padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${BORDER}` }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT }}>
-            <i className="fa-solid fa-envelope-open-text" style={{ marginRight: 8, color: "#ea580c" }} />
+            <i className="fa-solid fa-envelope-open-text" style={{ marginRight: 8, color: "#D35400" }} />
             Email Activity
           </p>
           <span style={{ fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: "#f0ede8", color: MUTED }}>

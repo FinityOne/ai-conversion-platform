@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import SignOutButton from "@/components/SignOutButton";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
 
@@ -38,7 +38,7 @@ export default async function ProfilePage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#ea580c" }}>
+        <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#D35400" }}>
           Account
         </p>
         <h1 style={{ margin: "0 0 16px", fontSize: 28, fontWeight: 900, color: TEXT }}>Your Profile</h1>
@@ -55,8 +55,8 @@ export default async function ProfilePage() {
               style={{
                 padding: "10px 16px", fontSize: 14, fontWeight: 700,
                 textDecoration: "none",
-                color: tab.href === "/profile" ? "#ea580c" : MUTED,
-                borderBottom: tab.href === "/profile" ? "2px solid #ea580c" : "2px solid transparent",
+                color: tab.href === "/profile" ? "#D35400" : MUTED,
+                borderBottom: tab.href === "/profile" ? "2px solid #D35400" : "2px solid transparent",
                 marginBottom: -1, transition: "color 0.15s",
                 whiteSpace: "nowrap",
               }}
@@ -75,7 +75,7 @@ export default async function ProfilePage() {
       }}>
         <div style={{
           width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
-          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          background: "linear-gradient(135deg,#D35400,#e8641c)",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: "#fff", fontSize: 26, fontWeight: 900,
         }}>
@@ -86,7 +86,7 @@ export default async function ProfilePage() {
             {fullName || profile?.email || user?.email}
           </h2>
           {profile?.business_name && (
-            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600, color: "#ea580c" }}>{profile.business_name}</p>
+            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600, color: "#D35400" }}>{profile.business_name}</p>
           )}
           {memberSince && (
             <p style={{ margin: 0, fontSize: 13, color: MUTED }}>Member since {memberSince}</p>
@@ -126,7 +126,7 @@ export default async function ProfilePage() {
       }}>
         <div style={{
           width: 46, height: 46, borderRadius: 12, flexShrink: 0,
-          background: profile?.wants_setup_call ? "rgba(234,88,12,0.09)" : "rgba(0,0,0,0.04)",
+          background: profile?.wants_setup_call ? "rgba(211,84,0,0.09)" : "rgba(0,0,0,0.04)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 22,
         }}>

@@ -5,11 +5,11 @@ export const metadata: Metadata = {
   description: "ClozeFlow Terms of Service — the rules of the road for using our platform.",
 };
 
-const BG = "#faf9f7";
-const TEXT = "#1c1917";
+const BG = "#F9F7F2";
+const TEXT = "#2C3E50";
 const MUTED = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 export default function TermsPage() {
   return (

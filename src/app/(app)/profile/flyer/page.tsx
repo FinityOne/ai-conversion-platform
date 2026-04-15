@@ -8,10 +8,10 @@ import {
   type FlyerData, type ColorTheme,
 } from "@/lib/flyer";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 // ── Shared tab bar ────────────────────────────────────────────────────────────
 function TabBar({ active }: { active: "account" | "billing" | "flyer" }) {
@@ -167,7 +167,7 @@ function CopyButton({ text }: { text: string }) {
       style={{
         padding: "5px 12px", borderRadius: 8, border: `1px solid ${BORDER}`,
         background: copied ? "#f0fdf4" : "#fff", cursor: "pointer",
-        fontSize: 12, fontWeight: 700, color: copied ? "#16a34a" : MUTED,
+        fontSize: 12, fontWeight: 700, color: copied ? "#27AE60" : MUTED,
         flexShrink: 0, transition: "all 0.15s",
       }}
     >
@@ -315,13 +315,13 @@ export default function FlyerPage() {
             {/* QR link info banner */}
             {intakeUrl && (
               <div style={{
-                background: "rgba(234,88,12,0.05)", border: "1px solid rgba(234,88,12,0.2)",
+                background: "rgba(211,84,0,0.05)", border: "1px solid rgba(211,84,0,0.2)",
                 borderRadius: 14, padding: "14px 16px", marginBottom: 14,
                 display: "flex", alignItems: "flex-start", gap: 12,
               }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                  background: "rgba(234,88,12,0.1)",
+                  background: "rgba(211,84,0,0.1)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={ORANGE} strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="4" height="4" /></svg>
@@ -336,7 +336,7 @@ export default function FlyerPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <p style={{
                       margin: 0, fontSize: 11, color: MUTED, fontFamily: "monospace",
-                      background: "#f5f3ee", padding: "4px 10px", borderRadius: 6,
+                      background: "#F9F7F2", padding: "4px 10px", borderRadius: 6,
                       overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1,
                     }}>
                       {intakeUrl}
@@ -463,9 +463,9 @@ export default function FlyerPage() {
                 onClick={async () => { await handleSave(); setStep("preview"); }}
                 style={{
                   flex: 1, padding: "13px", borderRadius: 12, border: "none",
-                  background: `linear-gradient(135deg, ${ORANGE}, #f97316)`,
+                  background: `linear-gradient(135deg, ${ORANGE}, #e8641c)`,
                   color: "#fff", fontSize: 15, fontWeight: 800, cursor: "pointer",
-                  boxShadow: "0 4px 14px rgba(234,88,12,0.25)",
+                  boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
                 }}
               >
                 Preview Flyer →
@@ -506,7 +506,7 @@ export default function FlyerPage() {
             </button>
             <div style={{
               display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 10,
-              background: "rgba(234,88,12,0.06)", border: "1px solid rgba(234,88,12,0.15)",
+              background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.15)",
             }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={ORANGE} strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8m-4-4v4" /></svg>
               <span style={{ fontSize: 12, color: ORANGE, fontWeight: 700 }}>Prints 4-up on letter paper · Cut along dotted lines</span>
@@ -558,11 +558,11 @@ export default function FlyerPage() {
             disabled={pdfLoading}
             style={{
               width: "100%", padding: "16px", borderRadius: 14, border: "none",
-              background: `linear-gradient(135deg, ${ORANGE}, #f97316)`,
+              background: `linear-gradient(135deg, ${ORANGE}, #e8641c)`,
               color: "#fff", fontSize: 16, fontWeight: 800,
               cursor: pdfLoading ? "not-allowed" : "pointer",
               opacity: pdfLoading ? 0.75 : 1,
-              boxShadow: "0 4px 20px rgba(234,88,12,0.3)",
+              boxShadow: "0 4px 20px rgba(211,84,0,0.3)",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
             }}
           >

@@ -7,11 +7,11 @@ export const metadata: Metadata = {
     "Learn why responding to leads within 60 seconds increases conversion by up to 391%. See exactly how ClozeFlow qualifies, responds, and books appointments automatically.",
 };
 
-const BG = "#faf9f7";
-const TEXT = "#1c1917";
+const BG = "#F9F7F2";
+const TEXT = "#2C3E50";
 const MUTED = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 export default function HowItWorksPage() {
   return (
@@ -48,7 +48,7 @@ export default function HowItWorksPage() {
                 width: 40,
                 height: 40,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                background: "linear-gradient(135deg,#D35400,#e8641c)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -70,7 +70,7 @@ export default function HowItWorksPage() {
           {/* Visual timeline */}
           <div
             style={{
-              background: "#faf9f7",
+              background: "#F9F7F2",
               border: `1px solid ${BORDER}`,
               borderRadius: 14,
               padding: "28px 24px",
@@ -81,7 +81,7 @@ export default function HowItWorksPage() {
               Likelihood of connecting with a lead (indexed)
             </p>
             {[
-              { label: "< 1 minute", width: "100%", value: "100×", color: "#16a34a" },
+              { label: "< 1 minute", width: "100%", value: "100×", color: "#27AE60" },
               { label: "5 minutes", width: "60%", value: "21×", color: "#65a30d" },
               { label: "30 minutes", width: "15%", value: "5×", color: "#d97706" },
               { label: "1 hour", width: "6%", value: "2×", color: "#dc2626" },
@@ -102,8 +102,8 @@ export default function HowItWorksPage() {
 
           <div
             style={{
-              background: "rgba(234,88,12,0.06)",
-              border: `1px solid rgba(234,88,12,0.15)`,
+              background: "rgba(211,84,0,0.06)",
+              border: `1px solid rgba(211,84,0,0.15)`,
               borderRadius: 10,
               padding: "16px 20px",
             }}
@@ -123,7 +123,7 @@ export default function HowItWorksPage() {
               width: 40,
               height: 40,
               borderRadius: "50%",
-              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              background: "linear-gradient(135deg,#D35400,#e8641c)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -144,7 +144,7 @@ export default function HowItWorksPage() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {[
-            { time: "Minute 1", action: "Text + email sent automatically", icon: "⚡", color: "#16a34a" },
+            { time: "Minute 1", action: "Text + email sent automatically", icon: "⚡", color: "#27AE60" },
             { time: "Hour 1", action: "Follow-up text (if no response)", icon: "📱", color: "#0369a1" },
             { time: "Day 1", action: "Personal-feeling email check-in", icon: "📧", color: "#7c3aed" },
             { time: "Day 3", action: "\"Just checking in\" text message", icon: "💬", color: "#d97706" },
@@ -188,7 +188,7 @@ export default function HowItWorksPage() {
                 width: 40,
                 height: 40,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                background: "linear-gradient(135deg,#D35400,#e8641c)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -216,7 +216,7 @@ export default function HowItWorksPage() {
               <div
                 key={title}
                 style={{
-                  background: "#faf9f7",
+                  background: "#F9F7F2",
                   border: `1px solid ${BORDER}`,
                   borderRadius: 10,
                   padding: "20px 18px",
@@ -240,7 +240,7 @@ export default function HowItWorksPage() {
               width: 40,
               height: 40,
               borderRadius: "50%",
-              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              background: "linear-gradient(135deg,#D35400,#e8641c)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -285,15 +285,15 @@ export default function HowItWorksPage() {
             </div>
             <div
               style={{
-                background: "rgba(22,163,74,0.05)",
-                border: "1px solid rgba(22,163,74,0.15)",
+                background: "rgba(39,174,96,0.05)",
+                border: "1px solid rgba(39,174,96,0.15)",
                 borderRadius: 10,
                 padding: "16px",
                 textAlign: "center",
               }}
             >
               <p style={{ fontSize: 13, color: MUTED, marginBottom: 6 }}>With ClozeFlow (55%)</p>
-              <p style={{ fontSize: 28, fontWeight: 900, color: "#16a34a", marginBottom: 4 }}>55 jobs</p>
+              <p style={{ fontSize: 28, fontWeight: 900, color: "#27AE60", marginBottom: 4 }}>55 jobs</p>
               <p style={{ fontSize: 12, color: MUTED }}>30 extra jobs<br />Same ad spend</p>
             </div>
           </div>
@@ -304,14 +304,14 @@ export default function HowItWorksPage() {
             href="/calculator"
             style={{
               display: "inline-block",
-              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              background: "linear-gradient(135deg,#D35400,#e8641c)",
               color: "#fff",
               fontWeight: 700,
               fontSize: 15,
               padding: "12px 24px",
               borderRadius: 8,
               textDecoration: "none",
-              boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+              boxShadow: "0 4px 20px rgba(211,84,0,0.25)",
             }}
           >
             Calculate your exact revenue gap →
@@ -335,7 +335,7 @@ export default function HowItWorksPage() {
                 width: 40,
                 height: 40,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg,#ea580c,#f97316)",
+                background: "linear-gradient(135deg,#D35400,#e8641c)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -390,7 +390,7 @@ export default function HowItWorksPage() {
                       width: 36,
                       height: 36,
                       borderRadius: "50%",
-                      background: "linear-gradient(135deg,#ea580c,#f97316)",
+                      background: "linear-gradient(135deg,#D35400,#e8641c)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -424,7 +424,7 @@ export default function HowItWorksPage() {
               width: 40,
               height: 40,
               borderRadius: "50%",
-              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              background: "linear-gradient(135deg,#D35400,#e8641c)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -481,7 +481,7 @@ export default function HowItWorksPage() {
       {/* Final CTA */}
       <section
         style={{
-          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          background: "linear-gradient(135deg,#D35400,#e8641c)",
           padding: "72px 24px",
           textAlign: "center",
         }}

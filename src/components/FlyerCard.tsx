@@ -124,7 +124,7 @@ const FlyerCard = forwardRef<HTMLDivElement, FlyerCardProps>(function FlyerCard(
         borderBottom: `2px solid ${theme.light}`,
         flexShrink: 0,
       }}>
-        <p style={{ margin: "0 0 2px", fontSize: 15, fontWeight: 900, color: "#1c1917", lineHeight: 1.2, letterSpacing: "-0.2px" }}>
+        <p style={{ margin: "0 0 2px", fontSize: 15, fontWeight: 900, color: "#2C3E50", lineHeight: 1.2, letterSpacing: "-0.2px" }}>
           {data.business_name || "Your Business Name"}
         </p>
         {data.tagline && (
@@ -200,13 +200,13 @@ const FlyerCard = forwardRef<HTMLDivElement, FlyerCardProps>(function FlyerCard(
         }}>
           <div style={{
             width: 13, height: 13, borderRadius: 3,
-            background: "linear-gradient(135deg,#ea580c,#f97316)",
+            background: "linear-gradient(135deg,#D35400,#e8641c)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
             <BoltIcon size={8} color="#fff" />
           </div>
           <span style={{ fontSize: 9, fontWeight: 700, color: "#78716c", letterSpacing: "0.3px" }}>
-            Cloze<span style={{ color: "#ea580c" }}>Flow</span>
+            Cloze<span style={{ color: "#D35400" }}>Flow</span>
           </span>
         </div>
       </div>

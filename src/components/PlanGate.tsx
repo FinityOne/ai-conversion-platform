@@ -113,8 +113,8 @@ export default function PlanGate({ hasPlan, children }: Props) {
               <div style={{ textAlign: "center", marginBottom: 24 }}>
                 <div style={{
                   width: 60, height: 60, borderRadius: 18, margin: "0 auto 16px",
-                  background: "linear-gradient(135deg,rgba(234,88,12,0.2),rgba(249,115,22,0.1))",
-                  border: "1px solid rgba(234,88,12,0.3)",
+                  background: "linear-gradient(135deg,rgba(211,84,0,0.2),rgba(232,100,28,0.1))",
+                  border: "1px solid rgba(211,84,0,0.3)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                   <i className="fa-solid fa-lock" style={{ fontSize: 24, color: "#fb923c" }} />
@@ -135,7 +135,7 @@ export default function PlanGate({ hasPlan, children }: Props) {
                     onClick={() => setCycle(c)}
                     style={{
                       padding: "7px 16px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", border: "none",
-                      background: cycle === c ? "linear-gradient(90deg,#ea580c,#f97316)" : "rgba(255,255,255,0.07)",
+                      background: cycle === c ? "linear-gradient(90deg,#D35400,#e8641c)" : "rgba(255,255,255,0.07)",
                       color: cycle === c ? "#fff" : "rgba(255,255,255,0.45)",
                       transition: "all 0.15s",
                     }}

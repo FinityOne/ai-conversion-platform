@@ -60,7 +60,7 @@ export default function DailyEmailChart({ data }: { data: DailyVolume[] }) {
                 {/* Count above bar */}
                 <span style={{
                   fontSize: 10, fontWeight: 700,
-                  color: d.count > 0 ? (isToday ? "#ea580c" : "#a8a29e") : "transparent",
+                  color: d.count > 0 ? (isToday ? "#D35400" : "#a8a29e") : "transparent",
                 }}>
                   {d.count}
                 </span>
@@ -71,12 +71,12 @@ export default function DailyEmailChart({ data }: { data: DailyVolume[] }) {
                   height: barH,
                   borderRadius: "4px 4px 2px 2px",
                   background: isToday
-                    ? "linear-gradient(180deg,#f97316,#ea580c)"
+                    ? "linear-gradient(180deg,#e8641c,#D35400)"
                     : d.count > 0
                       ? "linear-gradient(180deg,#e2ddd6,#d4cfc8)"
                       : "#f5f3f0",
                   transition: "height 0.4s ease",
-                  boxShadow: isToday ? "0 2px 8px rgba(234,88,12,0.2)" : "none",
+                  boxShadow: isToday ? "0 2px 8px rgba(211,84,0,0.2)" : "none",
                 }} />
               </div>
             );
@@ -91,7 +91,7 @@ export default function DailyEmailChart({ data }: { data: DailyVolume[] }) {
             <span style={{
               fontSize: 10,
               fontWeight: d.label === "Today" ? 800 : 500,
-              color: d.label === "Today" ? "#ea580c" : "#c4bfb8",
+              color: d.label === "Today" ? "#D35400" : "#c4bfb8",
             }}>
               {d.label}
             </span>

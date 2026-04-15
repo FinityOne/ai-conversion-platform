@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 // ─── Slug helpers (mirrors server validation) ─────────────────────────────────
 
@@ -38,10 +38,10 @@ const PLATFORMS: Platform[] = [
   { id: "instagram", name: "Instagram Bio",      icon: "fa-brands fa-instagram", iconColor: "#E1306C", iconBg: "#fdf2f8", tip: "Instagram only allows ONE clickable link — make it this one. Go to Edit Profile → Website.", url: "https://www.instagram.com/accounts/edit/", cta: "Open Instagram" },
   { id: "facebook",  name: "Facebook Page",      icon: "fa-brands fa-facebook",  iconColor: "#1877F2", iconBg: "#eff6ff", tip: "Add it to your Facebook Page About section, or pin a post with the link to the top of your profile.", url: "https://www.facebook.com/", cta: "Open Facebook" },
   { id: "google",    name: "Google Business",    icon: "fa-brands fa-google",    iconColor: "#4285F4", iconBg: "#f0f4ff", tip: "Set this as your website in Google Business Profile. Anyone on Google Maps can request a quote in seconds.", url: "https://business.google.com/", cta: "Open Google Business" },
-  { id: "nextdoor",  name: "Nextdoor",           icon: "fa-solid fa-house-flag", iconColor: "#16a34a", iconBg: "#f0fdf4", tip: "Neighbors actively search for local pros. Add your link to your Nextdoor business profile.", url: "https://nextdoor.com/business/", cta: "Open Nextdoor" },
+  { id: "nextdoor",  name: "Nextdoor",           icon: "fa-solid fa-house-flag", iconColor: "#27AE60", iconBg: "#f0fdf4", tip: "Neighbors actively search for local pros. Add your link to your Nextdoor business profile.", url: "https://nextdoor.com/business/", cta: "Open Nextdoor" },
   { id: "yelp",      name: "Yelp",               icon: "fa-brands fa-yelp",      iconColor: "#D32323", iconBg: "#fef2f2", tip: "Your Yelp page keeps getting traffic even when you're offline. Add this link so visitors can request a direct quote.", url: "https://biz.yelp.com/", cta: "Open Yelp" },
-  { id: "angi",      name: "Angi / HomeAdvisor", icon: "fa-solid fa-hammer",     iconColor: "#ea580c", iconBg: "#fff7ed", tip: "Leads browsing Angi often compare contractors. Drop your link in your profile so they can reach you directly.", url: "https://pro.angi.com/", cta: "Open Angi" },
-  { id: "tiktok",    name: "TikTok Bio",         icon: "fa-brands fa-tiktok",    iconColor: "#010101", iconBg: "#f5f3ee", tip: "Posting before/after videos or job walk-throughs? Your bio is the only place viewers can click — put the link there.", url: "https://www.tiktok.com/setting/", cta: "Open TikTok" },
+  { id: "angi",      name: "Angi / HomeAdvisor", icon: "fa-solid fa-hammer",     iconColor: "#D35400", iconBg: "#fff7ed", tip: "Leads browsing Angi often compare contractors. Drop your link in your profile so they can reach you directly.", url: "https://pro.angi.com/", cta: "Open Angi" },
+  { id: "tiktok",    name: "TikTok Bio",         icon: "fa-brands fa-tiktok",    iconColor: "#010101", iconBg: "#F9F7F2", tip: "Posting before/after videos or job walk-throughs? Your bio is the only place viewers can click — put the link there.", url: "https://www.tiktok.com/setting/", cta: "Open TikTok" },
   { id: "linkedin",  name: "LinkedIn",           icon: "fa-brands fa-linkedin",  iconColor: "#0A66C2", iconBg: "#eff6ff", tip: "Property managers, landlords, and builders are on LinkedIn. Add your intake link to your profile's website field.", url: "https://www.linkedin.com/in/", cta: "Open LinkedIn" },
 ];
 
@@ -56,7 +56,7 @@ function CopyOpenButton({ intakeUrl, platformUrl, label }: { intakeUrl: string; 
     window.open(platformUrl, "_blank", "noopener,noreferrer");
   }
   return (
-    <button onClick={handle} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 8, border: `1.5px solid ${state === "copied" ? "#bbf7d0" : BORDER}`, background: state === "copied" ? "#f0fdf4" : "#fff", color: state === "copied" ? "#16a34a" : TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}>
+    <button onClick={handle} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 8, border: `1.5px solid ${state === "copied" ? "#bbf7d0" : BORDER}`, background: state === "copied" ? "#f0fdf4" : "#fff", color: state === "copied" ? "#27AE60" : TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}>
       <i className={`fa-solid ${state === "copied" ? "fa-check" : "fa-arrow-up-right-from-square"}`} style={{ fontSize: 11 }} />
       {state === "copied" ? "Copied!" : label}
     </button>
@@ -71,7 +71,7 @@ function CopyButton({ intakeUrl }: { intakeUrl: string }) {
     setTimeout(() => setCopied(false), 2500);
   }
   return (
-    <button onClick={handle} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 8, border: `1.5px solid ${copied ? "#bbf7d0" : BORDER}`, background: copied ? "#f0fdf4" : "#fff", color: copied ? "#16a34a" : TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }}>
+    <button onClick={handle} style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 8, border: `1.5px solid ${copied ? "#bbf7d0" : BORDER}`, background: copied ? "#f0fdf4" : "#fff", color: copied ? "#27AE60" : TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.15s" }}>
       <i className={`fa-solid ${copied ? "fa-check" : "fa-copy"}`} style={{ fontSize: 11 }} />
       {copied ? "Copied!" : "Copy Link"}
     </button>
@@ -146,10 +146,10 @@ function SlugEditor({
     idle:      null,
     typing:    { icon: "fa-ellipsis", color: MUTED },
     checking:  { icon: "fa-spinner fa-spin", color: MUTED },
-    available: { icon: "fa-circle-check", color: "#16a34a" },
+    available: { icon: "fa-circle-check", color: "#27AE60" },
     taken:     { icon: "fa-circle-xmark", color: "#dc2626" },
     invalid:   { icon: "fa-circle-exclamation", color: "#d97706" },
-    saved:     { icon: "fa-circle-check", color: "#16a34a" },
+    saved:     { icon: "fa-circle-check", color: "#27AE60" },
   };
   const ind = indicator[checkState];
   const canSave = checkState === "available" && value !== currentSlug && !saving;
@@ -188,7 +188,7 @@ function SlugEditor({
           style={{
             flexShrink: 0, padding: "12px 18px", border: "none",
             background: canSave
-              ? "linear-gradient(135deg,#ea580c,#f97316)"
+              ? "linear-gradient(135deg,#D35400,#e8641c)"
               : "#e6e2db",
             color: canSave ? "#fff" : "#a8a29e",
             fontSize: 13, fontWeight: 700,
@@ -202,7 +202,7 @@ function SlugEditor({
 
       {/* Status message */}
       {message && (
-        <p style={{ margin: "6px 0 0", fontSize: 12, fontWeight: 600, color: checkState === "taken" || checkState === "invalid" ? "#dc2626" : checkState === "available" || checkState === "saved" ? "#16a34a" : MUTED }}>
+        <p style={{ margin: "6px 0 0", fontSize: 12, fontWeight: 600, color: checkState === "taken" || checkState === "invalid" ? "#dc2626" : checkState === "available" || checkState === "saved" ? "#27AE60" : MUTED }}>
           {message}
         </p>
       )}
@@ -290,7 +290,7 @@ export default function IntakeLinkPage({
           </span>
           <button
             onClick={copyMain}
-            style={{ flexShrink: 0, padding: "13px 20px", background: mainCopied ? "linear-gradient(135deg,#16a34a,#22c55e)" : "linear-gradient(135deg,#ea580c,#f97316)", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, transition: "background 0.2s" }}
+            style={{ flexShrink: 0, padding: "13px 20px", background: mainCopied ? "linear-gradient(135deg,#27AE60,#2ecc71)" : "linear-gradient(135deg,#D35400,#e8641c)", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, transition: "background 0.2s" }}
           >
             <i className={`fa-solid ${mainCopied ? "fa-check" : "fa-copy"}`} />
             {mainCopied ? "Copied!" : "Copy"}
@@ -348,9 +348,9 @@ export default function IntakeLinkPage({
       <p style={{ margin: "0 0 14px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.2px", color: MUTED }}>More ways to use it</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {[
-          { icon: "fa-globe",    bg: "#f0fdf4", color: "#16a34a", title: "Your Website",         body: <span>Add a <strong style={{ color: TEXT }}>&quot;Get a Free Estimate&quot;</strong> button on your homepage and contact page pointing to this link. Works with Wix, Squarespace, WordPress, or any site builder.</span> },
+          { icon: "fa-globe",    bg: "#f0fdf4", color: "#27AE60", title: "Your Website",         body: <span>Add a <strong style={{ color: TEXT }}>&quot;Get a Free Estimate&quot;</strong> button on your homepage and contact page pointing to this link. Works with Wix, Squarespace, WordPress, or any site builder.</span> },
           { icon: "fa-envelope", bg: "#eff6ff", color: "#2563eb", title: "Email Signature",       body: <span>Add <strong style={{ color: TEXT }}>&quot;Request a free estimate →&quot;</strong> with this link at the bottom of every email. Every reply you write is an opportunity.</span> },
-          { icon: "fa-comments", bg: "#f0fdf4", color: "#16a34a", title: "Text or WhatsApp",      body: <span>Text the link to past customers for referrals: <strong style={{ color: TEXT }}>&quot;If you know anyone who needs [service], they can get a free estimate here.&quot;</strong></span> },
+          { icon: "fa-comments", bg: "#f0fdf4", color: "#27AE60", title: "Text or WhatsApp",      body: <span>Text the link to past customers for referrals: <strong style={{ color: TEXT }}>&quot;If you know anyone who needs [service], they can get a free estimate here.&quot;</strong></span> },
           { icon: "fa-qrcode",   bg: "#faf5ff", color: "#7c3aed", title: "Business Cards & Flyers", body: <span>Generate a free QR code at <strong style={{ color: TEXT }}>qrcode-monkey.com</strong> and print it on cards, yard signs, or door hangers. Anyone scans → instant quote request.</span> },
         ].map(item => (
           <div key={item.title} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px" }}>

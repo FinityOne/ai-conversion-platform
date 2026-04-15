@@ -28,8 +28,8 @@ const inputStyle = {
 
 const inputFocusStyle = {
   ...inputStyle,
-  border: "1px solid rgba(234,88,12,0.6)",
-  boxShadow: "0 0 0 3px rgba(234,88,12,0.12)",
+  border: "1px solid rgba(211,84,0,0.6)",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.12)",
 };
 
 function GoogleButton({ onClick, label }: { onClick: () => void; label: string }) {
@@ -231,7 +231,7 @@ export default function SignupPage() {
             <span className="text-xs font-semibold" style={{ color: MUTED }}>
               Step {step} of {TOTAL_STEPS}
             </span>
-            <span className="text-xs font-semibold" style={{ color: "rgba(234,88,12,0.8)" }}>
+            <span className="text-xs font-semibold" style={{ color: "rgba(211,84,0,0.8)" }}>
               {progressPct}%
             </span>
           </div>
@@ -240,7 +240,7 @@ export default function SignupPage() {
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${progressPct}%`,
-                background: "linear-gradient(90deg,#ea580c,#f97316)",
+                background: "linear-gradient(90deg,#D35400,#e8641c)",
               }}
             />
           </div>
@@ -391,8 +391,8 @@ export default function SignupPage() {
                 onClick={() => setWantsSetupCall((v) => !v)}
                 className="w-full text-left p-5 rounded-2xl transition-all active:scale-[0.99]"
                 style={{
-                  background: wantsSetupCall ? "rgba(234,88,12,0.1)" : "rgba(255,255,255,0.04)",
-                  border: wantsSetupCall ? "1px solid rgba(234,88,12,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                  background: wantsSetupCall ? "rgba(211,84,0,0.1)" : "rgba(255,255,255,0.04)",
+                  border: wantsSetupCall ? "1px solid rgba(211,84,0,0.4)" : "1px solid rgba(255,255,255,0.1)",
                 }}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -400,8 +400,8 @@ export default function SignupPage() {
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
                       style={{
-                        background: wantsSetupCall ? "rgba(234,88,12,0.15)" : "rgba(255,255,255,0.06)",
-                        border: wantsSetupCall ? "1px solid rgba(234,88,12,0.3)" : "1px solid rgba(255,255,255,0.08)",
+                        background: wantsSetupCall ? "rgba(211,84,0,0.15)" : "rgba(255,255,255,0.06)",
+                        border: wantsSetupCall ? "1px solid rgba(211,84,0,0.3)" : "1px solid rgba(255,255,255,0.08)",
                       }}
                     >
                       📞
@@ -417,7 +417,7 @@ export default function SignupPage() {
                   <div
                     className="relative shrink-0 w-11 h-6 rounded-full transition-all duration-200"
                     style={{
-                      background: wantsSetupCall ? "linear-gradient(90deg,#ea580c,#f97316)" : "rgba(255,255,255,0.12)",
+                      background: wantsSetupCall ? "linear-gradient(90deg,#D35400,#e8641c)" : "rgba(255,255,255,0.12)",
                     }}
                   >
                     <div

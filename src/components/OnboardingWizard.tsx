@@ -22,7 +22,7 @@ function PipelineStep({ emoji, label, isLast }: { emoji: string; label: string; 
         <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.55)", textAlign: "center", maxWidth: 70, lineHeight: 1.3 }}>{label}</p>
       </div>
       {!isLast && (
-        <div style={{ width: 24, height: 2, background: "rgba(234,88,12,0.4)", margin: "0 4px", marginTop: -16, flexShrink: 0 }} />
+        <div style={{ width: 24, height: 2, background: "rgba(211,84,0,0.4)", margin: "0 4px", marginTop: -16, flexShrink: 0 }} />
       )}
     </div>
   );
@@ -33,13 +33,13 @@ function TimelineRow({ time, text, done }: { time: string; text: string; done?: 
     <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
       <div style={{
         width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-        background: done ? "rgba(234,88,12,0.15)" : "rgba(255,255,255,0.05)",
-        border: `1px solid ${done ? "rgba(234,88,12,0.35)" : "rgba(255,255,255,0.1)"}`,
+        background: done ? "rgba(211,84,0,0.15)" : "rgba(255,255,255,0.05)",
+        border: `1px solid ${done ? "rgba(211,84,0,0.35)" : "rgba(255,255,255,0.1)"}`,
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: 12, fontWeight: 800, color: done ? "#fb923c" : "rgba(255,255,255,0.4)",
       }}>{done ? "✓" : "⏱"}</div>
       <div>
-        <p style={{ margin: "0 0 2px", fontSize: 11, fontWeight: 700, color: "rgba(234,88,12,0.8)", textTransform: "uppercase", letterSpacing: "1px" }}>{time}</p>
+        <p style={{ margin: "0 0 2px", fontSize: 11, fontWeight: 700, color: "rgba(211,84,0,0.8)", textTransform: "uppercase", letterSpacing: "1px" }}>{time}</p>
         <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>{text}</p>
       </div>
     </div>
@@ -222,7 +222,7 @@ export default function OnboardingWizard({ firstName }: Props) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
         {[
-          { icon: "fa-bolt-lightning", color: "#ea580c", title: "Instant response", desc: "Email sent within 60 seconds of a lead coming in — before your competitor even picks up the phone." },
+          { icon: "fa-bolt-lightning", color: "#D35400", title: "Instant response", desc: "Email sent within 60 seconds of a lead coming in — before your competitor even picks up the phone." },
           { icon: "fa-robot",          color: "#7c3aed", title: "Fully automated",  desc: "Follow-ups, project forms, booking requests — all on autopilot while you're on the job." },
           { icon: "fa-chart-line",     color: "#0891b2", title: "AI lead scoring",  desc: "Every lead gets a score so you always know who to call first." },
         ].map(item => (
@@ -274,13 +274,13 @@ export default function OnboardingWizard({ firstName }: Props) {
       </div>
 
       <div style={{
-        background: "linear-gradient(135deg, rgba(234,88,12,0.12), rgba(249,115,22,0.06))",
-        border: "1px solid rgba(234,88,12,0.2)", borderRadius: 16, padding: "16px 18px",
+        background: "linear-gradient(135deg, rgba(211,84,0,0.12), rgba(232,100,28,0.06))",
+        border: "1px solid rgba(211,84,0,0.2)", borderRadius: 16, padding: "16px 18px",
         display: "flex", alignItems: "center", gap: 14,
       }}>
         <div style={{
           width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-          background: "rgba(234,88,12,0.15)", border: "1px solid rgba(234,88,12,0.3)",
+          background: "rgba(211,84,0,0.15)", border: "1px solid rgba(211,84,0,0.3)",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <i className="fa-solid fa-stopwatch" style={{ fontSize: 18, color: "#fb923c" }} />
@@ -334,8 +334,8 @@ export default function OnboardingWizard({ firstName }: Props) {
 
       {/* ROI badge */}
       <div style={{
-        background: "linear-gradient(135deg, rgba(234,88,12,0.15), rgba(124,58,237,0.1))",
-        border: "1px solid rgba(234,88,12,0.25)", borderRadius: 18, padding: "20px",
+        background: "linear-gradient(135deg, rgba(211,84,0,0.15), rgba(124,58,237,0.1))",
+        border: "1px solid rgba(211,84,0,0.25)", borderRadius: 18, padding: "20px",
         textAlign: "center", marginBottom: 24,
       }}>
         <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "1px" }}>
@@ -379,7 +379,7 @@ export default function OnboardingWizard({ firstName }: Props) {
             onClick={() => setCycle(c)}
             style={{
               padding: "7px 18px", borderRadius: 20, fontSize: 13, fontWeight: 700, cursor: "pointer", border: "none",
-              background: billingCycle === c ? "linear-gradient(90deg,#ea580c,#f97316)" : "rgba(255,255,255,0.07)",
+              background: billingCycle === c ? "linear-gradient(90deg,#D35400,#e8641c)" : "rgba(255,255,255,0.07)",
               color: billingCycle === c ? "#fff" : "rgba(255,255,255,0.5)",
               transition: "all 0.15s",
             }}
@@ -537,7 +537,7 @@ export default function OnboardingWizard({ firstName }: Props) {
 
   const ctaBg = isLastPhase
     ? `linear-gradient(135deg, ${plan.color}, ${plan.color}cc)`
-    : "linear-gradient(90deg,#ea580c,#f97316)";
+    : "linear-gradient(90deg,#D35400,#e8641c)";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", minHeight: "100vh", padding: "32px 20px 60px" }}>
@@ -545,13 +545,13 @@ export default function OnboardingWizard({ firstName }: Props) {
 
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 32, justifyContent: "center" }}>
-          <div style={{ width: 32, height: 32, borderRadius: 9, background: "linear-gradient(135deg,#ea580c,#f97316)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 32, height: 32, borderRadius: 9, background: "linear-gradient(135deg,#D35400,#e8641c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg style={{ width: 16, height: 16, color: "#fff" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <span style={{ fontSize: 17, fontWeight: 900, color: "#fff", letterSpacing: "-0.3px" }}>
-            Cloze<span style={{ color: "#ea580c" }}>Flow</span>
+            Cloze<span style={{ color: "#D35400" }}>Flow</span>
           </span>
         </div>
 
@@ -562,7 +562,7 @@ export default function OnboardingWizard({ firstName }: Props) {
               key={n}
               style={{
                 width: n === phase ? 24 : 8, height: 8, borderRadius: 4,
-                background: n < phase ? "#ea580c" : n === phase ? "linear-gradient(90deg,#ea580c,#f97316)" : "rgba(255,255,255,0.15)",
+                background: n < phase ? "#D35400" : n === phase ? "linear-gradient(90deg,#D35400,#e8641c)" : "rgba(255,255,255,0.15)",
                 transition: "all 0.3s",
               }}
             />
@@ -587,7 +587,7 @@ export default function OnboardingWizard({ firstName }: Props) {
             color: "#fff", fontSize: 15, fontWeight: 800,
             cursor: loading ? "not-allowed" : "pointer",
             opacity: loading ? 0.75 : 1,
-            boxShadow: "0 4px 20px rgba(234,88,12,0.35)",
+            boxShadow: "0 4px 20px rgba(211,84,0,0.35)",
             marginBottom: 16,
           }}
         >

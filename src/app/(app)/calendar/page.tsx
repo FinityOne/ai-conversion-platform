@@ -4,7 +4,7 @@ import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import Link from "next/link";
 import { formatDateFull, formatTime12 } from "@/lib/bookings";
 
-const TEXT   = "#1c1917";
+const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
 
@@ -50,7 +50,7 @@ export default async function CalendarPage() {
     <div>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#ea580c" }}>
+        <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#D35400" }}>
           Calendar
         </p>
         <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: TEXT }}>Availability & Bookings</h1>
@@ -60,7 +60,7 @@ export default async function CalendarPage() {
       <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "22px 20px", marginBottom: 28 }}>
         <div style={{ marginBottom: 16 }}>
           <p style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 800, color: TEXT }}>
-            <i className="fa-solid fa-clock" style={{ marginRight: 8, color: "#ea580c" }} />
+            <i className="fa-solid fa-clock" style={{ marginRight: 8, color: "#D35400" }} />
             Set Your Available Times
           </p>
           <p style={{ margin: 0, fontSize: 13, color: MUTED }}>
@@ -120,7 +120,7 @@ export default async function CalendarPage() {
                         {lead?.name ?? "Lead"}
                       </p>
                       {lead?.job_type && (
-                        <p style={{ margin: 0, fontSize: 12, color: "#ea580c", fontWeight: 600 }}>
+                        <p style={{ margin: 0, fontSize: 12, color: "#D35400", fontWeight: 600 }}>
                           {lead.job_type}
                         </p>
                       )}

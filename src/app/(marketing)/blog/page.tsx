@@ -8,20 +8,20 @@ export const metadata: Metadata = {
     "Practical advice for home service contractors: how to win more leads, follow up faster, and grow your business without hiring more staff.",
 };
 
-const BG = "#faf9f7";
-const TEXT = "#1c1917";
+const BG = "#F9F7F2";
+const TEXT = "#2C3E50";
 const MUTED = "#78716c";
 const BORDER = "#e6e2db";
-const ORANGE = "#ea580c";
+const ORANGE = "#D35400";
 
 const CATEGORY_COLORS: Record<string, string> = {
   Plumbing: "#0369a1",
   HVAC: "#d97706",
-  Landscaping: "#16a34a",
+  Landscaping: "#27AE60",
   Electrical: "#7c3aed",
   Roofing: "#dc2626",
   Cleaning: "#0891b2",
-  Handyman: "#ea580c",
+  Handyman: "#D35400",
 };
 
 export default function BlogPage() {
@@ -144,7 +144,7 @@ export default function BlogPage() {
           <Link
             href="/signup"
             style={{
-              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              background: "linear-gradient(135deg,#D35400,#e8641c)",
               color: "#fff",
               fontWeight: 800,
               fontSize: 16,
@@ -152,7 +152,7 @@ export default function BlogPage() {
               borderRadius: 10,
               textDecoration: "none",
               display: "inline-block",
-              boxShadow: "0 4px 20px rgba(234,88,12,0.25)",
+              boxShadow: "0 4px 20px rgba(211,84,0,0.25)",
             }}
           >
             Start Free — No Card Needed →

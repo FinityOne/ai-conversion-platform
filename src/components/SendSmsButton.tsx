@@ -25,16 +25,16 @@ const CONFIG: Record<SmsType, {
     loadingText: "Sending…",
     successText: "Contact SMS sent! Lead moved to Contacted.",
     icon:        "fa-solid fa-message",
-    gradient:    "linear-gradient(135deg,#16a34a,#22c55e)",
-    shadow:      "0 4px 14px rgba(22,163,74,0.25)",
+    gradient:    "linear-gradient(135deg,#27AE60,#2ecc71)",
+    shadow:      "0 4px 14px rgba(39,174,96,0.25)",
   },
   followup: {
     label:       "Send Follow-Up SMS",
     loadingText: "Sending…",
     successText: "Follow-up SMS sent! Lead moved to Follow-Up.",
     icon:        "fa-solid fa-rotate-right",
-    gradient:    "linear-gradient(135deg,#ea580c,#f97316)",
-    shadow:      "0 4px 14px rgba(234,88,12,0.25)",
+    gradient:    "linear-gradient(135deg,#D35400,#e8641c)",
+    shadow:      "0 4px 14px rgba(211,84,0,0.25)",
   },
   booking: {
     label:       "Send Booking SMS",
@@ -122,7 +122,7 @@ export default function SendSmsButton({ leadId, hasPhone, type }: Props) {
           background: "#f0fdf4", border: "1px solid #bbf7d0",
           display: "flex", alignItems: "center", gap: 8,
         }}>
-          <i className="fa-solid fa-check" style={{ color: "#16a34a" }} />
+          <i className="fa-solid fa-check" style={{ color: "#27AE60" }} />
           <span style={{ fontSize: 13, color: "#15803d", fontWeight: 600 }}>
             {cfg.successText}
           </span>

@@ -15,7 +15,7 @@ const STYLES: Record<ToastType, { bg: string; border: string; icon: string; icon
     bg:        "#f0fdf4",
     border:    "#bbf7d0",
     icon:      "fa-solid fa-circle-check",
-    iconColor: "#16a34a",
+    iconColor: "#27AE60",
     textColor: "#15803d",
   },
   error: {
