@@ -11,10 +11,11 @@ interface AdminShellProps {
 }
 
 const NAV = [
-  { href: "/admin/dashboard", label: "Dashboard", fa: "fa-solid fa-gauge-high",       desc: "Platform overview"   },
-  { href: "/admin/activity",  label: "Activity",  fa: "fa-solid fa-wave-square",       desc: "Live event stream"   },
-  { href: "/admin/users",     label: "Users",     fa: "fa-solid fa-users",             desc: "All accounts"        },
-  { href: "/admin/payments",  label: "Payments",  fa: "fa-solid fa-credit-card",       desc: "Revenue & billing"   },
+  { href: "/admin/dashboard",   label: "Dashboard",   fa: "fa-solid fa-gauge-high",       desc: "Platform overview"   },
+  { href: "/admin/activity",    label: "Activity",    fa: "fa-solid fa-wave-square",       desc: "Live event stream"   },
+  { href: "/admin/users",       label: "Users",       fa: "fa-solid fa-users",             desc: "All accounts"        },
+  { href: "/admin/payments",    label: "Payments",    fa: "fa-solid fa-credit-card",       desc: "Revenue & billing"   },
+  { href: "/admin/chat-leads",  label: "Chat Leads",  fa: "fa-solid fa-message",           desc: "Widget submissions"  },
 ];
 
 // Dark sidebar palette
@@ -240,7 +241,7 @@ export default function AdminShell({ firstName, email, children }: AdminShellPro
         style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
           background: NAV_BG, borderTop: `1px solid ${NAV_BORDER}`,
-          display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
+          display: "grid", gridTemplateColumns: "repeat(5, 1fr)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
