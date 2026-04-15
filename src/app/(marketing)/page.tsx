@@ -580,10 +580,26 @@ export default function Home() {
               </Link>
             </div>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
               {["✓ Free to start", "✓ Setup in one day", "✓ No tech skills needed"].map(chip => (
                 <span key={chip} style={{ fontSize: 13, color: MUTED, fontWeight: 500 }}>{chip}</span>
               ))}
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 7,
+                background: "rgba(39,174,96,0.07)",
+                border: "1px solid rgba(39,174,96,0.25)",
+                borderRadius: 100, padding: "5px 12px 5px 8px",
+              }}>
+                <span style={{
+                  width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
+                  background: "rgba(39,174,96,0.15)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 12,
+                }}>🛡️</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: GREEN }}>
+                  30-day money-back guarantee
+                </span>
+              </div>
             </div>
           </div>
 
