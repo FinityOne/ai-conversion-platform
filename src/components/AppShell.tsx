@@ -241,14 +241,17 @@ export default function AppShell({ firstName, businessName, email, plan, leadCou
       </main>
 
       {/* ── Mobile Bottom Nav ────────────────────── */}
+      <style>{`
+        .app-bottom-nav { display: flex; }
+        @media (min-width: 768px) { .app-bottom-nav { display: none; } }
+      `}</style>
       <nav
-        className="flex md:hidden"
+        className="app-bottom-nav"
         style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
           background: WHITE,
           borderTop: `1px solid ${BORDER}`,
           alignItems: "stretch",
-          // respect iPhone home-indicator safe area
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >

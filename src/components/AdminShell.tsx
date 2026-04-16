@@ -238,12 +238,16 @@ export default function AdminShell({ firstName, email, children }: AdminShellPro
       </main>
 
       {/* ── Mobile bottom nav ──────────────────────────────────── */}
+      <style>{`
+        .admin-bottom-nav { display: grid; }
+        @media (min-width: 768px) { .admin-bottom-nav { display: none; } }
+      `}</style>
       <nav
-        className="md:hidden"
+        className="admin-bottom-nav"
         style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
           background: NAV_BG, borderTop: `1px solid ${NAV_BORDER}`,
-          display: "grid", gridTemplateColumns: "repeat(7, 1fr)",
+          gridTemplateColumns: "repeat(7, 1fr)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
