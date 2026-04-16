@@ -65,24 +65,61 @@ const HIW_STEPS = [
   },
 ];
 
-const TRADES = [
-  { emoji: "🔧", label: "Plumbers"           },
-  { emoji: "❄️", label: "HVAC & Cooling"     },
-  { emoji: "🏠", label: "Roofers"            },
-  { emoji: "🌿", label: "Landscapers"        },
-  { emoji: "🔨", label: "General Contractors"},
-  { emoji: "🎨", label: "Painters"           },
-  { emoji: "⚡", label: "Electricians"       },
-  { emoji: "🪵", label: "Flooring Pros"      },
-  { emoji: "🪟", label: "Windows & Doors"    },
-  { emoji: "🏊", label: "Pool & Spa"         },
-  { emoji: "🛠️", label: "Handymen"           },
-  { emoji: "💧", label: "Pressure Washing"   },
-  { emoji: "🧱", label: "Concrete & Paving"  },
-  { emoji: "🌳", label: "Tree Services"      },
-  { emoji: "🐛", label: "Pest Control"       },
-  { emoji: "✨", label: "Cleaning Services"  },
-  { emoji: "🏥", label: "Local Clinics"      },
+const TRADE_GROUPS = [
+  {
+    label: "Core Home Trades",
+    icon: "fa-solid fa-house-chimney-crack",
+    color: "#D35400",
+    bg: "rgba(211,84,0,0.06)",
+    border: "rgba(211,84,0,0.15)",
+    services: [
+      { icon: "fa-solid fa-wind",           label: "HVAC & Cooling"   },
+      { icon: "fa-solid fa-faucet-drip",    label: "Plumbing"         },
+      { icon: "fa-solid fa-bolt",           label: "Electrical"       },
+      { icon: "fa-solid fa-house-chimney",  label: "Roofing"          },
+    ],
+  },
+  {
+    label: "Project-Based Trades",
+    icon: "fa-solid fa-helmet-safety",
+    color: "#6366f1",
+    bg: "rgba(99,102,241,0.06)",
+    border: "rgba(99,102,241,0.15)",
+    services: [
+      { icon: "fa-solid fa-person-digging",      label: "General Contractors" },
+      { icon: "fa-solid fa-layer-group",         label: "Flooring"            },
+      { icon: "fa-solid fa-paint-roller",        label: "Painting"            },
+      { icon: "fa-solid fa-border-all",          label: "Windows & Doors"     },
+      { icon: "fa-solid fa-road",                label: "Concrete & Paving"   },
+    ],
+  },
+  {
+    label: "Outdoor & Recurring Services",
+    icon: "fa-solid fa-seedling",
+    color: "#16a34a",
+    bg: "rgba(22,163,74,0.06)",
+    border: "rgba(22,163,74,0.15)",
+    services: [
+      { icon: "fa-solid fa-leaf",           label: "Landscaping"       },
+      { icon: "fa-solid fa-tree",           label: "Tree Services"     },
+      { icon: "fa-solid fa-bug-slash",      label: "Pest Control"      },
+      { icon: "fa-solid fa-water-ladder",   label: "Pool & Spa"        },
+      { icon: "fa-solid fa-spray-can",      label: "Pressure Washing"  },
+      { icon: "fa-solid fa-broom",          label: "Cleaning Services" },
+    ],
+  },
+  {
+    label: "Local Service Businesses",
+    icon: "fa-solid fa-store",
+    color: "#0891b2",
+    bg: "rgba(8,145,178,0.06)",
+    border: "rgba(8,145,178,0.15)",
+    services: [
+      { icon: "fa-solid fa-stethoscope",    label: "Local Clinics"     },
+      { icon: "fa-solid fa-calendar-check", label: "Appointment-Based" },
+    ],
+    footnote: "Also works for select local clinics and appointment-based businesses.",
+  },
 ];
 
 function fmt$(n: number) {
@@ -895,47 +932,89 @@ export default function Home() {
       </section>
 
       {/* ── Who We Serve ─────────────────────────────────── */}
-      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
-          Who We Serve
-        </p>
-        <h2 style={{
-          fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT,
-          marginBottom: 12, lineHeight: 1.15,
-        }}>
-          Built for every home service trade
-        </h2>
-        <p style={{ fontSize: 16, color: MUTED, marginBottom: 48, maxWidth: 520, margin: "0 auto 48px" }}>
-          If customers find you online and you want more of them to book — ClozeFlow was built for you.
-        </p>
+      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
+            Who We Serve
+          </p>
+          <h2 style={{
+            fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT,
+            marginBottom: 12, lineHeight: 1.15,
+          }}>
+            Built for service businesses that rely on leads
+          </h2>
+          <p style={{ fontSize: 16, color: MUTED, maxWidth: 480, margin: "0 auto" }}>
+            If your phone is how you get paid, ClozeFlow was built for you.
+          </p>
+        </div>
 
+        {/* Trade group cards grid */}
         <div style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 10,
-          justifyContent: "center",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: 16,
         }}>
-          {TRADES.map(t => (
-            <div key={t.label} style={{
-              display: "flex", alignItems: "center", gap: 8,
+          {TRADE_GROUPS.map(group => (
+            <div key={group.label} style={{
               background: "#ffffff",
               border: `1px solid ${BORDER}`,
-              borderRadius: 100,
-              padding: "10px 18px",
-              fontSize: 14, fontWeight: 600, color: TEXT,
-              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-              transition: "border-color 0.15s",
+              borderRadius: 16,
+              overflow: "hidden",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
             }}>
-              <span style={{ fontSize: 16 }}>{t.emoji}</span>
-              {t.label}
+              {/* Card header */}
+              <div style={{
+                padding: "16px 20px",
+                background: group.bg,
+                borderBottom: `1px solid ${group.border}`,
+                display: "flex", alignItems: "center", gap: 10,
+              }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                  background: group.color,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <i className={group.icon} style={{ fontSize: 13, color: "#fff" }} />
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 800, color: group.color, letterSpacing: "-0.01em" }}>
+                  {group.label}
+                </span>
+              </div>
+
+              {/* Service rows */}
+              <ul style={{ margin: 0, padding: "10px 0", listStyle: "none" }}>
+                {group.services.map(svc => (
+                  <li key={svc.label} style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "9px 20px",
+                  }}>
+                    <div style={{
+                      width: 28, height: 28, borderRadius: 7, flexShrink: 0,
+                      background: group.bg,
+                      border: `1px solid ${group.border}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <i className={svc.icon} style={{ fontSize: 11, color: group.color }} />
+                    </div>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: TEXT }}>{svc.label}</span>
+                  </li>
+                ))}
+                {group.footnote && (
+                  <li style={{ padding: "8px 20px 4px" }}>
+                    <p style={{ margin: 0, fontSize: 11, color: MUTED, lineHeight: 1.5 }}>
+                      {group.footnote}
+                    </p>
+                  </li>
+                )}
+              </ul>
             </div>
           ))}
         </div>
 
-        <p style={{ marginTop: 32, fontSize: 14, color: MUTED }}>
-          Don&apos;t see your trade?{" "}
+        <p style={{ marginTop: 28, fontSize: 14, color: MUTED, textAlign: "center" }}>
+          Don&apos;t see your category?{" "}
           <Link href="/signup" style={{ color: ORANGE, fontWeight: 700, textDecoration: "none" }}>
-            Sign up free — it works for any service business →
+            ClozeFlow works for any service business that depends on fast follow-up →
           </Link>
         </p>
       </section>
