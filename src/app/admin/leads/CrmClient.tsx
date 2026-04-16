@@ -640,6 +640,18 @@ export default function CrmClient({
     refresh();
   }
 
+  async function sendOutreach(id: string, email: string | null) {
+    if (!email) { alert("This lead has no email address."); return; }
+    const res = await fetch(`/api/admin/leads/${id}/outreach`, { method: "POST" });
+    if (res.ok) {
+      setLeads(prev => prev.map(l => l.id === id ? { ...l, last_contacted_at: new Date().toISOString() } : l));
+      alert(`Outreach email sent to ${email} ✓`);
+    } else {
+      const d = await res.json();
+      alert(`Failed to send: ${d.error}`);
+    }
+  }
+
   async function deleteLead(id: string) {
     if (!confirm("Delete this lead permanently?")) return;
     setLeads(prev => prev.filter(l => l.id !== id));
@@ -849,6 +861,15 @@ export default function CrmClient({
                 </div>
                 {/* Actions */}
                 <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }} onClick={e => e.stopPropagation()}>
+                  {lead.email && (
+                    <button
+                      onClick={() => sendOutreach(lead.id, lead.email)}
+                      title={`Send outreach to ${lead.email}`}
+                      style={{ padding: "6px 8px", borderRadius: 7, border: "1px solid rgba(249,115,22,0.3)", background: "rgba(249,115,22,0.06)", color: "#f97316", fontSize: 12, cursor: "pointer" }}
+                    >
+                      <i className="fa-solid fa-paper-plane" />
+                    </button>
+                  )}
                   <button onClick={() => setViewLead(lead)} style={{ padding: "6px 8px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 12, cursor: "pointer" }}>
                     <i className="fa-solid fa-pen" />
                   </button>
@@ -932,6 +953,65 @@ export default function CrmClient({
           onDelete={(id) => { setLeads(prev => prev.filter(l => l.id !== id)); setViewLead(null); refresh(); }}
         />
       )}
+    </div>
+  );
+}
+
+// ── Outreach Button ───────────────────────────────────────────────────────────
+function OutreachButton({
+  leadId, email, firstName,
+  onSent,
+}: {
+  leadId:    string;
+  email:     string;
+  firstName: string;
+  onSent:    (updated: InternalLead) => void;
+}) {
+  const [sending,  setSending]  = useState(false);
+  const [sent,     setSent]     = useState(false);
+  const [err,      setErr]      = useState("");
+
+  async function send() {
+    setSending(true); setErr("");
+    const res = await fetch(`/api/admin/leads/${leadId}/outreach`, { method: "POST" });
+    if (res.ok) {
+      setSent(true);
+      // Refresh the lead so last_contacted_at updates in the drawer
+      const d = await fetch(`/api/admin/leads/${leadId}`).then(r => r.json());
+      onSent(d.lead);
+    } else {
+      const d = await res.json();
+      setErr(d.error ?? "Failed to send");
+    }
+    setSending(false);
+  }
+
+  if (sent) {
+    return (
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 8, background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)", color: "#16a34a", fontSize: 13, fontWeight: 700 }}>
+        <i className="fa-solid fa-circle-check" /> Outreach sent to {email}
+      </span>
+    );
+  }
+
+  return (
+    <div>
+      <button
+        onClick={send}
+        disabled={sending}
+        style={{
+          display: "inline-flex", alignItems: "center", gap: 8,
+          padding: "9px 18px", borderRadius: 8, cursor: "pointer",
+          background: "linear-gradient(135deg,#ea580c,#f97316)",
+          color: "#fff", fontSize: 13, fontWeight: 700, border: "none",
+          boxShadow: "0 4px 12px rgba(234,88,12,0.25)",
+          opacity: sending ? 0.7 : 1,
+        }}
+      >
+        <i className="fa-solid fa-paper-plane" />
+        {sending ? "Sending…" : `Send Outreach to ${firstName}`}
+      </button>
+      {err && <p style={{ margin: "6px 0 0", fontSize: 12, color: "#dc2626" }}>{err}</p>}
     </div>
   );
 }
@@ -1189,9 +1269,15 @@ function LeadDrawer({
                 )}
               </div>
 
-              {/* Delete */}
-              <div style={{ marginTop: 24, paddingTop: 16, borderTop: `1px solid ${BORDER}` }}>
-                <button onClick={() => { if (confirm("Delete this lead permanently?")) { onDelete(lead.id); fetch(`/api/admin/leads/${lead.id}`, { method: "DELETE" }); } }} style={{ padding: "9px 16px", borderRadius: 8, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.05)", color: "#dc2626", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+              {/* Actions row */}
+              <div style={{ marginTop: 24, paddingTop: 16, borderTop: `1px solid ${BORDER}`, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+                {lead.email && (
+                  <OutreachButton leadId={lead.id} email={lead.email} firstName={lead.first_name} onSent={(updatedLead) => onUpdate(updatedLead)} />
+                )}
+                <button
+                  onClick={() => { if (confirm("Delete this lead permanently?")) { onDelete(lead.id); fetch(`/api/admin/leads/${lead.id}`, { method: "DELETE" }); } }}
+                  style={{ padding: "9px 16px", borderRadius: 8, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.05)", color: "#dc2626", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                >
                   <i className="fa-solid fa-trash" style={{ marginRight: 6 }} />Delete Lead
                 </button>
               </div>
