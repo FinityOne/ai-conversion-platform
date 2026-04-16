@@ -802,7 +802,7 @@ export default function Home() {
               marginBottom: 24,
             }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: ORANGE }} />
-              ⚡ 500+ contractors already growing faster
+              ⚡ 100+ contractors. Zero missed leads.
             </div>
 
             <h1 style={{
@@ -1154,7 +1154,7 @@ export default function Home() {
             Ready to fill your calendar this week?
           </h2>
           <p style={{ fontSize: 17, color: MUTED, lineHeight: 1.65, marginBottom: 36 }}>
-            Join 500+ contractors who stopped losing leads and started booking more jobs — with zero extra ad spend.
+            Join 100+ contractors who've stopped missing leads and started booking more jobs — without spending another dollar on ads.
           </p>
           <Link href="/signup" style={{
             background: "linear-gradient(135deg,#D35400,#e8641c)",
