@@ -509,19 +509,14 @@ export default function CalculatorPage() {
               );
             })()}
 
-            {/* Final CTA */}
-            <Link href="/signup" style={{
-              display: "block", textAlign: "center",
-              background: "linear-gradient(135deg,#D35400,#e8641c)",
-              color: "#fff", fontWeight: 800, fontSize: 15,
-              padding: "14px", borderRadius: 10, textDecoration: "none",
-              boxShadow: "0 3px 16px rgba(211,84,0,0.22)", marginBottom: 8,
-            }}>
-              {showGap && results.monthlyGap > 0
-                ? `I want that ${fmt$(results.monthlyGap)}/month back →`
-                : "Start Free — No Card Needed →"}
-            </Link>
-            <p style={{ fontSize: 11, color: MUTED, textAlign: "center" }}>No credit card · Free to start · Cancel anytime</p>
+            {/* Subtle gap reminder */}
+            {showGap && results.monthlyGap > 0 && (
+              <p style={{ fontSize: 12, color: MUTED, textAlign: "center", marginTop: 4 }}>
+                You&apos;re currently leaving an estimated{" "}
+                <strong style={{ color: TEXT }}>{fmt$(results.annualGap)}/yr</strong> on the table.
+                {" "}No credit card · Free to start · Cancel anytime.
+              </p>
+            )}
           </div>
         </div>
 
