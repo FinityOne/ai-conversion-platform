@@ -454,8 +454,11 @@ export default function FeaturesPage() {
           .stats-item:nth-child(odd) { border-right: 1px solid #e6e2db !important; }
           .stats-item:nth-last-child(-n+2) { border-bottom: none !important; }
 
-          /* Plan nav */
-          .plan-nav-grid { grid-template-columns: 1fr !important; }
+          /* Plan nav — horizontal scroll on mobile */
+          .plan-nav-grid { grid-template-columns: repeat(3, minmax(200px, 1fr)) !important; overflow-x: auto !important; }
+          .plan-nav-wrap { overflow-x: visible !important; }
+          .plan-nav-scroll { overflow-x: auto !important; padding-bottom: 4px !important; }
+          .plan-nav-scroll .plan-nav-grid { display: flex !important; flex-wrap: nowrap !important; }
 
           /* Feature grids */
           .feat-grid-lg, .feat-grid-sm { grid-template-columns: 1fr !important; }
@@ -467,19 +470,28 @@ export default function FeaturesPage() {
 
           /* Include banner */
           .incl-banner { gap: 8px !important; }
+          .incl-banner span { font-size: 12px !important; }
+
+          /* Section pill — wrap the price below on very small screens */
+          .section-pill { flex-wrap: wrap !important; justify-content: center !important; padding: 10px 16px !important; }
 
           /* Hero */
           .feat-hero-pad { padding: 52px 20px 40px !important; }
-          .plan-nav-wrap { margin-bottom: 36px !important; padding: 0 20px !important; }
+          .plan-nav-wrap { margin-bottom: 36px !important; padding: 0 16px !important; }
           .sect-pad { padding: 0 20px 56px !important; }
           .growth-sect { padding: 48px 0 !important; }
+          .growth-sect > div { padding: 0 20px !important; }
           .pro-sect { padding: 48px 0 !important; }
+          .pro-sect > div { padding: 0 20px !important; }
           .enterprise-sect { padding: 48px 20px !important; }
           .bottom-cta-sect { padding: 48px 20px !important; }
 
           /* Big feature card — stat badge goes below on mobile */
           .feat-card-header { flex-direction: column !important; gap: 14px !important; }
           .feat-stat-badge { align-self: flex-start !important; }
+
+          /* Hero stats font */
+          .feat-hero-pad p:first-child { font-size: 10px !important; }
         }
       `}</style>
 
@@ -522,13 +534,14 @@ export default function FeaturesPage() {
           <p style={{ fontSize: 12, color: MUTED, fontWeight: 700, marginBottom: 14, textAlign: "center", textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Jump to a plan tier
           </p>
-          <div className="plan-nav-grid">
+          <div className="plan-nav-scroll">
+          <div className="plan-nav-grid" style={{ gap: 12 }}>
             {[
               { id: "starter", tier: "starter" as const, desc: "Core features for solo operators", price: "$99/mo" },
               { id: "growth",  tier: "growth"  as const, desc: "Scale tools for growing crews",    price: "$299/mo" },
               { id: "pro",     tier: "pro"      as const, desc: "Full power for high-volume ops",   price: "$999/mo" },
             ].map(p => (
-              <a key={p.id} href={`#${p.id}`} style={{ textDecoration: "none" }}>
+              <a key={p.id} href={`#${p.id}`} style={{ textDecoration: "none", flexShrink: 0, minWidth: 180 }}>
                 <div style={{
                   padding: "14px 16px", borderRadius: 12,
                   background: TIERS[p.tier].bg, border: `1.5px solid ${TIERS[p.tier].border}`,
@@ -543,6 +556,7 @@ export default function FeaturesPage() {
                 </div>
               </a>
             ))}
+          </div>
           </div>
         </div>
       </div>
