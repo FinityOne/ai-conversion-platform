@@ -178,12 +178,14 @@ export default function PlanGate({ hasPlan, children }: Props) {
                         </div>
                       )}
 
-                      {/* Emoji */}
+                      {/* Plan icon */}
                       <div style={{
                         width: 42, height: 42, borderRadius: 12, flexShrink: 0,
                         background: `${p.color}18`, border: `1px solid ${p.color}30`,
-                        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
-                      }}>{p.emoji}</div>
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        <i className={`fa-solid ${p.icon}`} style={{ fontSize: 18, color: p.color }} />
+                      </div>
 
                       {/* Name + tagline */}
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -228,7 +230,7 @@ export default function PlanGate({ hasPlan, children }: Props) {
                   transition: "all 0.15s",
                 }}
               >
-                {plan.emoji} Get started with {plan.name} — ${price.toLocaleString()}/mo →
+                Get started with {plan.name} — ${price.toLocaleString()}/mo →
               </button>
 
               <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
@@ -250,7 +252,13 @@ export default function PlanGate({ hasPlan, children }: Props) {
                 background: `${plan.color}15`, border: `1px solid ${plan.color}30`,
                 display: "flex", alignItems: "center", gap: 12,
               }}>
-                <span style={{ fontSize: 22, flexShrink: 0 }}>{plan.emoji}</span>
+                <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: `${plan.color}18`, border: `1px solid ${plan.color}30`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 16, color: plan.color }} />
+                  </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ margin: "0 0 1px", fontSize: 14, fontWeight: 800, color: "#fff" }}>
                     {plan.name} Plan · {cycle === "annual" ? "Annual" : "Monthly"}

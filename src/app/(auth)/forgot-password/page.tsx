@@ -4,25 +4,28 @@ import { useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
-const MUTED      = "rgba(255,255,255,0.4)";
-const VERY_MUTED = "rgba(255,255,255,0.22)";
+const TEXT = "#2C3E50";
+const MUTED = "#78716c";
+const VERY_MUTED = "#a8a29e";
+const BORDER = "#e6e2db";
 
 const inputStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.12)",
+  background: "#ffffff",
+  border: `1px solid ${BORDER}`,
   borderRadius: "14px",
-  color: "#f1f5f9",
+  color: TEXT,
   fontSize: "17px",
   padding: "18px 20px",
   width: "100%",
   outline: "none",
   boxSizing: "border-box",
+  transition: "border-color 0.2s, box-shadow 0.2s",
 };
 
 const inputFocusStyle: React.CSSProperties = {
   ...inputStyle,
-  border: "1px solid rgba(211,84,0,0.6)",
-  boxShadow: "0 0 0 3px rgba(211,84,0,0.12)",
+  border: "1px solid rgba(211,84,0,0.55)",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.1)",
 };
 
 export default function ForgotPasswordPage() {
@@ -63,23 +66,23 @@ export default function ForgotPasswordPage() {
               style={{
                 width: 72, height: 72, borderRadius: "50%",
                 background: "linear-gradient(135deg,#D35400,#e8641c)",
-                boxShadow: "0 8px 24px rgba(211,84,0,0.35)",
+                boxShadow: "0 8px 24px rgba(211,84,0,0.25)",
               }}
             >
               <i className="fa-solid fa-paper-plane" style={{ fontSize: 28, color: "#fff" }} />
             </div>
-            <h1 className="text-2xl font-black text-white mb-3">Check your inbox</h1>
+            <h1 className="text-2xl font-black mb-3" style={{ color: TEXT }}>Check your inbox</h1>
             <p className="text-sm mb-2" style={{ color: MUTED, lineHeight: 1.7 }}>
               We sent a password reset link to
             </p>
-            <p className="text-base font-semibold text-white mb-6">{email}</p>
+            <p className="text-base font-semibold mb-6" style={{ color: TEXT }}>{email}</p>
             <p className="text-sm mb-8" style={{ color: MUTED, lineHeight: 1.7 }}>
               Click the link in the email to choose a new password. Check your spam folder if you don't see it within a minute.
             </p>
             <button
               onClick={() => { setSent(false); setEmail(""); }}
-              className="text-sm transition-colors hover:text-white"
-              style={{ color: MUTED, background: "none", border: "none", cursor: "pointer" }}
+              className="text-sm transition-opacity hover:opacity-70"
+              style={{ color: "#D35400", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
             >
               Try a different email address
             </button>
@@ -93,13 +96,13 @@ export default function ForgotPasswordPage() {
                 className="mx-auto mb-5 flex items-center justify-center"
                 style={{
                   width: 52, height: 52, borderRadius: 14,
-                  background: "rgba(211,84,0,0.12)",
-                  border: "1px solid rgba(211,84,0,0.25)",
+                  background: "rgba(211,84,0,0.08)",
+                  border: "1px solid rgba(211,84,0,0.2)",
                 }}
               >
-                <i className="fa-solid fa-lock-open" style={{ fontSize: 20, color: "#e8641c" }} />
+                <i className="fa-solid fa-lock-open" style={{ fontSize: 20, color: "#D35400" }} />
               </div>
-              <h1 className="text-2xl font-black text-white mb-2">Forgot your password?</h1>
+              <h1 className="text-2xl font-black mb-2" style={{ color: TEXT }}>Forgot your password?</h1>
               <p className="text-sm" style={{ color: MUTED, lineHeight: 1.6 }}>
                 No worries — enter your email and we'll send you a reset link.
               </p>
@@ -109,7 +112,7 @@ export default function ForgotPasswordPage() {
             {error && (
               <div
                 className="mb-4 px-4 py-3 rounded-xl text-sm"
-                style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#fca5a5" }}
+                style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", color: "#b91c1c" }}
               >
                 {error}
               </div>
@@ -145,13 +148,13 @@ export default function ForgotPasswordPage() {
 
             {/* Back to login */}
             <div className="flex items-center gap-3 mt-8">
-              <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+              <div className="flex-1 h-px" style={{ background: BORDER }} />
               <span className="text-xs font-medium" style={{ color: VERY_MUTED }}>or</span>
-              <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+              <div className="flex-1 h-px" style={{ background: BORDER }} />
             </div>
             <p className="text-center text-sm mt-5" style={{ color: MUTED }}>
               Remember it?{" "}
-              <Link href="/login" className="font-semibold text-white hover:text-orange-400 transition-colors">
+              <Link href="/login" className="font-semibold hover:opacity-70 transition-opacity" style={{ color: "#D35400" }}>
                 Sign in
               </Link>
             </p>

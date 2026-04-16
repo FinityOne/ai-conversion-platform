@@ -11,15 +11,17 @@ const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
 const BG     = "#F9F7F2";
+const ORANGE = "#D35400";
 
-const PLANS = {
-  starter: { label: "Pro",    color: "#D35400", bg: "rgba(211,84,0,0.08)", border: "rgba(211,84,0,0.2)",  emoji: "⚡" },
-  growth:  { label: "Growth", color: "#7c3aed", bg: "rgba(124,58,237,0.08)", border: "rgba(124,58,237,0.2)", emoji: "🚀" },
-  pro:     { label: "Max",    color: "#0891b2", bg: "rgba(8,145,178,0.08)",  border: "rgba(8,145,178,0.2)",  emoji: "💎" },
+// ── Plan tiers ────────────────────────────────────────────────────────────────
+const TIERS = {
+  starter: { label: "Pro",    color: ORANGE,   bg: "rgba(211,84,0,0.08)", border: "rgba(211,84,0,0.2)",  icon: "fa-bolt-lightning" },
+  growth:  { label: "Growth", color: ORANGE,   bg: "rgba(211,84,0,0.08)", border: "rgba(211,84,0,0.2)",  icon: "fa-chart-line"     },
+  pro:     { label: "Max",    color: TEXT,     bg: "rgba(44,62,80,0.07)", border: "rgba(44,62,80,0.18)", icon: "fa-star"           },
 };
 
-function PlanBadge({ plan }: { plan: keyof typeof PLANS }) {
-  const p = PLANS[plan];
+function PlanBadge({ plan }: { plan: keyof typeof TIERS }) {
+  const p = TIERS[plan];
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 5,
@@ -27,7 +29,7 @@ function PlanBadge({ plan }: { plan: keyof typeof PLANS }) {
       background: p.bg, border: `1px solid ${p.border}`,
       fontSize: 11, fontWeight: 800, color: p.color,
     }}>
-      {p.emoji} {p.label}
+      <i className={`fa-solid ${p.icon}`} style={{ fontSize: 9 }} /> {p.label}
     </span>
   );
 }
@@ -37,15 +39,6 @@ function Check({ color }: { color: string }) {
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
       <circle cx="9" cy="9" r="9" fill={color} fillOpacity="0.12" />
       <path d="M5.5 9l2.5 2.5 4.5-5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function Lock() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
-      <circle cx="9" cy="9" r="9" fill="#e6e2db" />
-      <path d="M6.5 8V6.5a2.5 2.5 0 015 0V8M5.5 8h7a1 1 0 011 1v4a1 1 0 01-1 1h-7a1 1 0 01-1-1V9a1 1 0 011-1z" stroke="#a8a29e" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -61,7 +54,9 @@ function MockInstantResponse() {
         <span style={{ marginLeft: "auto", color: MUTED, fontSize: 10 }}>just now</span>
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#f0ede8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, flexShrink: 0 }}>👤</div>
+        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#f0ede8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <i className="fa-solid fa-user" style={{ fontSize: 11, color: MUTED }} />
+        </div>
         <div style={{ background: "#f0ede8", borderRadius: "0 10px 10px 10px", padding: "7px 11px", color: MUTED, lineHeight: 1.4 }}>
           Hi, I need a quote for my AC unit ASAP...
         </div>
@@ -89,13 +84,13 @@ function MockIntakeForm() {
       ].map(f => (
         <div key={f.label} style={{ marginBottom: 8 }}>
           <p style={{ color: MUTED, fontSize: 10, marginBottom: 3 }}>{f.label}</p>
-          <div style={{ background: "#F9F7F2", border: `1px solid ${BORDER}`, borderRadius: 7, padding: "6px 10px", color: TEXT, fontWeight: 600 }}>{f.value}</div>
+          <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 7, padding: "6px 10px", color: TEXT, fontWeight: 600 }}>{f.value}</div>
         </div>
       ))}
       <div style={{ marginBottom: 10 }}>
         <p style={{ color: MUTED, fontSize: 10, marginBottom: 3 }}>Photos</p>
-        <div style={{ background: "rgba(211,84,0,0.05)", border: "1.5px dashed rgba(211,84,0,0.3)", borderRadius: 7, padding: "8px", textAlign: "center", color: "#D35400", fontSize: 10, fontWeight: 600 }}>
-          📎 2 photos attached
+        <div style={{ background: "rgba(211,84,0,0.05)", border: "1.5px dashed rgba(211,84,0,0.3)", borderRadius: 7, padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: ORANGE, fontSize: 10, fontWeight: 600 }}>
+          <i className="fa-solid fa-paperclip" style={{ fontSize: 11 }} /> 2 photos attached
         </div>
       </div>
       <div style={{ background: "linear-gradient(135deg,#D35400,#e8641c)", borderRadius: 8, padding: "8px", textAlign: "center", color: "#fff", fontWeight: 800, fontSize: 11 }}>
@@ -107,22 +102,22 @@ function MockIntakeForm() {
 
 function MockAIScore() {
   const leads = [
-    { name: "Marcus T.", score: 94, tag: "Hot", color: "#dc2626", bar: "#dc2626" },
-    { name: "Jennifer K.", score: 71, tag: "Warm", color: "#d97706", bar: "#d97706" },
-    { name: "Chris B.", score: 38, tag: "Cold", color: "#6b7280", bar: "#94a3b8" },
+    { name: "Marcus T.", score: 94, tag: "Hot", color: "#dc2626" },
+    { name: "Jennifer K.", score: 71, tag: "Warm", color: "#d97706" },
+    { name: "Chris B.", score: 38, tag: "Cold", color: "#6b7280" },
   ];
   return (
     <div style={{ padding: "16px", background: "#fff", borderRadius: 12, border: `1px solid ${BORDER}`, fontSize: 12 }}>
       <p style={{ fontWeight: 800, color: TEXT, marginBottom: 10, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.05em" }}>Lead Inbox</p>
       {leads.map(l => (
-        <div key={l.name} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "8px 10px", background: "#F9F7F2", borderRadius: 8 }}>
+        <div key={l.name} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, padding: "8px 10px", background: BG, borderRadius: 8 }}>
           <div style={{ width: 28, height: 28, borderRadius: "50%", background: `${l.color}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: l.color, flexShrink: 0 }}>
             {l.name[0]}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontWeight: 700, color: TEXT, marginBottom: 3 }}>{l.name}</p>
-            <div style={{ height: 4, borderRadius: 2, background: "#e6e2db" }}>
-              <div style={{ height: "100%", borderRadius: 2, background: l.bar, width: `${l.score}%` }} />
+            <div style={{ height: 4, borderRadius: 2, background: BORDER }}>
+              <div style={{ height: "100%", borderRadius: 2, background: l.color, width: `${l.score}%` }} />
             </div>
           </div>
           <span style={{ fontSize: 10, fontWeight: 800, color: l.color, background: `${l.color}12`, padding: "2px 8px", borderRadius: 100, flexShrink: 0 }}>{l.tag}</span>
@@ -145,7 +140,7 @@ function MockCalendar() {
         <span style={{ fontSize: 10, color: "#27AE60", fontWeight: 700, background: "rgba(39,174,96,0.08)", padding: "2px 8px", borderRadius: 100 }}>3 slots open</span>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4, marginBottom: 6 }}>
-        {days.map(d => <div key={d} style={{ textAlign: "center", fontSize: 10, fontWeight: 700, color: MUTED }}>{d}</div>)}
+        {days.map((d, i) => <div key={i} style={{ textAlign: "center", fontSize: 10, fontWeight: 700, color: MUTED }}>{d}</div>)}
       </div>
       {slots.map((row, ri) => (
         <div key={ri} style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4, marginBottom: 4 }}>
@@ -155,7 +150,7 @@ function MockCalendar() {
               background: open ? "rgba(211,84,0,0.08)" : "#f0ede8",
               border: open ? "1px solid rgba(211,84,0,0.3)" : `1px solid ${BORDER}`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 10, color: open ? "#D35400" : MUTED, fontWeight: open ? 700 : 400,
+              fontSize: 10, color: open ? ORANGE : MUTED, fontWeight: open ? 700 : 400,
             }}>
               {open ? "✓" : "—"}
             </div>
@@ -173,24 +168,26 @@ function MockDigest() {
   return (
     <div style={{ padding: "16px", background: "#fff", borderRadius: 12, border: `1px solid ${BORDER}`, fontSize: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, paddingBottom: 8, borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ width: 28, height: 28, borderRadius: 7, background: "rgba(124,58,237,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>📬</div>
+        <div style={{ width: 28, height: 28, borderRadius: 7, background: "rgba(211,84,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <i className="fa-solid fa-envelope" style={{ fontSize: 12, color: ORANGE }} />
+        </div>
         <div>
           <p style={{ fontWeight: 800, color: TEXT, fontSize: 11 }}>Your Morning Digest</p>
           <p style={{ color: MUTED, fontSize: 10 }}>Friday, April 11 · 7:00 AM</p>
         </div>
       </div>
       {[
-        { emoji: "🔥", label: "3 hot leads ready to close", color: "#dc2626" },
-        { emoji: "📅", label: "2 bookings confirmed today", color: "#27AE60" },
-        { emoji: "💤", label: "4 leads need a nudge", color: "#d97706" },
+        { icon: "fa-fire",      label: "3 hot leads ready to close",  color: "#dc2626" },
+        { icon: "fa-calendar",  label: "2 bookings confirmed today",   color: "#27AE60" },
+        { icon: "fa-bell-slash", label: "4 leads need a nudge",        color: "#d97706" },
       ].map(r => (
         <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: `1px solid ${BORDER}` }}>
-          <span style={{ fontSize: 14 }}>{r.emoji}</span>
+          <i className={`fa-solid ${r.icon}`} style={{ fontSize: 12, color: r.color, flexShrink: 0, width: 14, textAlign: "center" }} />
           <span style={{ color: r.color, fontWeight: 700, fontSize: 11 }}>{r.label}</span>
         </div>
       ))}
       <div style={{ marginTop: 8, textAlign: "center" }}>
-        <span style={{ fontSize: 10, color: "#7c3aed", fontWeight: 700 }}>View full pipeline →</span>
+        <span style={{ fontSize: 10, color: ORANGE, fontWeight: 700 }}>View full pipeline →</span>
       </div>
     </div>
   );
@@ -203,7 +200,7 @@ function MockAnalytics() {
     <div style={{ padding: "16px", background: "#fff", borderRadius: 12, border: `1px solid ${BORDER}`, fontSize: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
         <p style={{ fontWeight: 800, color: TEXT, fontSize: 11 }}>Close Rate Trend</p>
-        <span style={{ fontSize: 13, fontWeight: 900, color: "#7c3aed" }}>+49%</span>
+        <span style={{ fontSize: 13, fontWeight: 900, color: ORANGE }}>+49%</span>
       </div>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 60, marginBottom: 6 }}>
         {bars.map((h, i) => (
@@ -212,8 +209,8 @@ function MockAnalytics() {
               width: "100%", borderRadius: "4px 4px 0 0",
               height: `${h}%`,
               background: i === bars.length - 1
-                ? "linear-gradient(to top,#7c3aed,#a855f7)"
-                : "rgba(124,58,237,0.15)",
+                ? "linear-gradient(to top,#D35400,#e8641c)"
+                : "rgba(211,84,0,0.15)",
             }} />
           </div>
         ))}
@@ -228,29 +225,29 @@ function MockAnalytics() {
 function MockHotAlert() {
   return (
     <div style={{ padding: "16px", background: "#fff", borderRadius: 12, border: `1px solid ${BORDER}`, fontSize: 12 }}>
-      {/* Phone notification mockup */}
       <div style={{ background: "#2C3E50", borderRadius: 16, padding: "16px", marginBottom: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#dc2626", animation: "pulse-dot 1.5s infinite" }} />
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#dc2626" }} />
           <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 600 }}>ClozeFlow · now</span>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#dc2626,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-            🔥
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#dc2626,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <i className="fa-solid fa-fire" style={{ fontSize: 16, color: "#fff" }} />
           </div>
           <div>
             <p style={{ fontWeight: 800, color: "#fff", fontSize: 13, marginBottom: 3 }}>Hot Lead Alert</p>
             <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, lineHeight: 1.4 }}>
-              Marcus T. just viewed your booking page 3× in 10 min. Score: <span style={{ color: "#e8641c", fontWeight: 900 }}>96</span> 🔥 — call now!
+              Marcus T. just viewed your booking page 3× in 10 min. Score: <span style={{ color: "#e8641c", fontWeight: 900 }}>96</span> — call now!
             </p>
           </div>
         </div>
       </div>
       <div style={{ display: "flex", gap: 8 }}>
-        <div style={{ flex: 1, background: "rgba(220,38,38,0.07)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 8, padding: "8px 10px", textAlign: "center" }}>
-          <span style={{ fontSize: 11, fontWeight: 800, color: "#dc2626" }}>📞 Call Marcus</span>
+        <div style={{ flex: 1, background: "rgba(220,38,38,0.07)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 8, padding: "8px 10px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+          <i className="fa-solid fa-phone" style={{ fontSize: 10, color: "#dc2626" }} />
+          <span style={{ fontSize: 11, fontWeight: 800, color: "#dc2626" }}>Call Marcus</span>
         </div>
-        <div style={{ flex: 1, background: "#F9F7F2", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "8px 10px", textAlign: "center" }}>
+        <div style={{ flex: 1, background: BG, border: `1px solid ${BORDER}`, borderRadius: 8, padding: "8px 10px", textAlign: "center" }}>
           <span style={{ fontSize: 11, fontWeight: 600, color: MUTED }}>View Lead</span>
         </div>
       </div>
@@ -262,7 +259,7 @@ function MockWhiteLabel() {
   return (
     <div style={{ padding: "16px", background: "#fff", borderRadius: 12, border: `1px solid ${BORDER}`, fontSize: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, paddingBottom: 8, borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#0891b2,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 900 }}>A</div>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#2C3E50,#44607a)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 900 }}>A</div>
         <div>
           <p style={{ fontWeight: 900, color: TEXT, fontSize: 12 }}>Ace Plumbing Co.</p>
           <p style={{ color: MUTED, fontSize: 9 }}>ace-plumbing.com/book</p>
@@ -271,10 +268,10 @@ function MockWhiteLabel() {
       <p style={{ color: TEXT, fontWeight: 700, fontSize: 12, marginBottom: 6 }}>Book Your Free Estimate</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
         {["Name", "Service", "Preferred Date"].map(f => (
-          <div key={f} style={{ background: "#F9F7F2", border: `1px solid ${BORDER}`, borderRadius: 6, padding: "5px 8px", color: MUTED, fontSize: 10 }}>{f}</div>
+          <div key={f} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 6, padding: "5px 8px", color: MUTED, fontSize: 10 }}>{f}</div>
         ))}
       </div>
-      <div style={{ marginTop: 8, background: "linear-gradient(135deg,#0891b2,#06b6d4)", borderRadius: 7, padding: "7px", textAlign: "center", color: "#fff", fontWeight: 800, fontSize: 11 }}>
+      <div style={{ marginTop: 8, background: "linear-gradient(135deg,#2C3E50,#44607a)", borderRadius: 7, padding: "7px", textAlign: "center", color: "#fff", fontWeight: 800, fontSize: 11 }}>
         Book Now →
       </div>
       <p style={{ textAlign: "center", fontSize: 9, color: MUTED, marginTop: 6 }}>Powered by Ace Plumbing</p>
@@ -282,7 +279,7 @@ function MockWhiteLabel() {
   );
 }
 
-// ── Feature sections ──────────────────────────────────────────────────────────
+// ── Feature data ──────────────────────────────────────────────────────────────
 
 const STARTER_FEATURES = [
   {
@@ -296,7 +293,7 @@ const STARTER_FEATURES = [
   {
     icon: "fa-solid fa-clipboard-list",
     title: "Custom Intake Form with Photo Upload",
-    desc: "A branded form at your own link (clozeflow.com/intake/your-business) captures name, job details, and photos — so you have everything you need before calling.",
+    desc: "A branded form at your own link captures name, job details, and photos — so you have everything you need before calling.",
     stat: "3×",
     statLabel: "more info vs. a basic contact form",
     mock: <MockIntakeForm />,
@@ -368,7 +365,7 @@ const PRO_FEATURES = [
   {
     icon: "fa-solid fa-fire",
     title: "Hot Lead SMS Alerts",
-    desc: "When a lead's engagement score crosses a high-conversion threshold, ClozeFlow fires an instant SMS straight to your phone. Strike while the iron is hot — before they move on.",
+    desc: "When a lead's engagement score crosses a high-conversion threshold, ClozeFlow fires an instant SMS straight to your phone. Strike while the iron is hot.",
     mock: <MockHotAlert />,
   },
   {
@@ -402,7 +399,6 @@ export default function FeaturesPage() {
   return (
     <div style={{ background: BG, color: TEXT }}>
 
-      {/* ── Keyframe animations ── */}
       <style>{`
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
@@ -412,37 +408,104 @@ export default function FeaturesPage() {
           0%, 100% { opacity: 1; }
           50%       { opacity: 0.4; }
         }
-        .feat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.08) !important; }
         .feat-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .feat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.08) !important; }
+
+        /* ── Responsive grid helpers ── */
+        .feat-grid-lg {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+          gap: 20px;
+        }
+        .feat-grid-sm {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+          gap: 16px;
+        }
+        .plan-nav-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+        }
+        .stats-strip {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        .stats-item {
+          padding: 20px 28px;
+          text-align: center;
+          border-right: 1px solid #e6e2db;
+        }
+        .stats-item:last-child { border-right: none; }
+
+        .section-line { flex: 1; height: 1px; }
+        .section-pill { display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-radius: 100px; }
+        .incl-banner { display: flex; align-items: center; gap: 12px; border-radius: 12px; padding: 14px 20px; margin-bottom: 28px; flex-wrap: wrap; }
+
+        @media (max-width: 640px) {
+          /* Stats */
+          .stats-item {
+            width: 50%;
+            padding: 16px 12px;
+            border-right: none !important;
+            border-bottom: 1px solid #e6e2db;
+          }
+          .stats-item:nth-child(odd) { border-right: 1px solid #e6e2db !important; }
+          .stats-item:nth-last-child(-n+2) { border-bottom: none !important; }
+
+          /* Plan nav */
+          .plan-nav-grid { grid-template-columns: 1fr !important; }
+
+          /* Feature grids */
+          .feat-grid-lg, .feat-grid-sm { grid-template-columns: 1fr !important; }
+
+          /* Section divider lines */
+          .section-line { display: none !important; }
+          .section-pill { font-size: 13px; }
+          .section-pill .pill-price { font-size: 13px !important; }
+
+          /* Include banner */
+          .incl-banner { gap: 8px !important; }
+
+          /* Hero */
+          .feat-hero-pad { padding: 52px 20px 40px !important; }
+          .plan-nav-wrap { margin-bottom: 36px !important; padding: 0 20px !important; }
+          .sect-pad { padding: 0 20px 56px !important; }
+          .growth-sect { padding: 48px 0 !important; }
+          .pro-sect { padding: 48px 0 !important; }
+          .enterprise-sect { padding: 48px 20px !important; }
+          .bottom-cta-sect { padding: 48px 20px !important; }
+
+          /* Big feature card — stat badge goes below on mobile */
+          .feat-card-header { flex-direction: column !important; gap: 14px !important; }
+          .feat-stat-badge { align-self: flex-start !important; }
+        }
       `}</style>
 
       {/* ── Hero ── */}
-      <section style={{ padding: "80px 24px 64px", textAlign: "center" }}>
+      <section className="feat-hero-pad" style={{ padding: "80px 24px 64px", textAlign: "center" }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#D35400", marginBottom: 14 }}>
+          <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
             The Full Feature Set
           </p>
-          <h1 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 900, color: TEXT, marginBottom: 18, letterSpacing: "-0.025em", lineHeight: 1.1 }}>
+          <h1 style={{ fontSize: "clamp(28px, 5vw, 52px)", fontWeight: 900, color: TEXT, marginBottom: 18, letterSpacing: "-0.025em", lineHeight: 1.1 }}>
             Every tool to turn leads<br />into booked jobs — automatically
           </h1>
-          <p style={{ fontSize: 17, color: MUTED, lineHeight: 1.7, marginBottom: 48 }}>
+          <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.7, marginBottom: 48 }}>
             Built specifically for home service contractors. Start with the essentials on Pro, unlock growth tools when you scale, and go full-power on Max.
           </p>
 
           {/* Stats strip */}
-          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 0 }}>
+          <div className="stats-strip" style={{ border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden", background: "#fff" }}>
             {[
               { stat: "< 60s",  label: "Response time" },
               { stat: "55%",    label: "Avg. close rate" },
               { stat: "24/7",   label: "Always on" },
               { stat: "0",      label: "Leads left behind" },
             ].map((s, i) => (
-              <div key={i} style={{
-                padding: "20px 28px",
-                borderRight: i < 3 ? `1px solid ${BORDER}` : "none",
-                textAlign: "center",
-              }}>
-                <p style={{ fontSize: "clamp(22px,3vw,30px)", fontWeight: 900, color: TEXT, lineHeight: 1, marginBottom: 4,
+              <div key={i} className="stats-item">
+                <p style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 900, lineHeight: 1, marginBottom: 4,
                   background: "linear-gradient(135deg,#D35400,#e8641c)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 }}>{s.stat}</p>
@@ -454,27 +517,27 @@ export default function FeaturesPage() {
       </section>
 
       {/* ── Plan ladder nav ── */}
-      <div style={{ maxWidth: 900, margin: "0 auto 56px", padding: "0 24px" }}>
+      <div className="plan-nav-wrap" style={{ maxWidth: 900, margin: "0 auto 56px", padding: "0 24px" }}>
         <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "24px 28px" }}>
           <p style={{ fontSize: 12, color: MUTED, fontWeight: 700, marginBottom: 14, textAlign: "center", textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Jump to a plan tier
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
+          <div className="plan-nav-grid">
             {[
-              { id: "starter", ...PLANS.starter, desc: "Core features for solo operators", price: "$99/mo" },
-              { id: "growth",  ...PLANS.growth,  desc: "Scale tools for growing crews",    price: "$299/mo" },
-              { id: "pro",     ...PLANS.pro,     desc: "Full power for high-volume ops",   price: "$999/mo" },
+              { id: "starter", tier: "starter" as const, desc: "Core features for solo operators", price: "$99/mo" },
+              { id: "growth",  tier: "growth"  as const, desc: "Scale tools for growing crews",    price: "$299/mo" },
+              { id: "pro",     tier: "pro"      as const, desc: "Full power for high-volume ops",   price: "$999/mo" },
             ].map(p => (
               <a key={p.id} href={`#${p.id}`} style={{ textDecoration: "none" }}>
                 <div style={{
                   padding: "14px 16px", borderRadius: 12,
-                  background: p.bg, border: `1.5px solid ${p.border}`,
+                  background: TIERS[p.tier].bg, border: `1.5px solid ${TIERS[p.tier].border}`,
                   transition: "transform 0.15s",
                 }} className="feat-card">
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 18 }}>{p.emoji}</span>
-                    <span style={{ fontWeight: 900, fontSize: 15, color: p.color }}>{p.label}</span>
-                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: p.color }}>{p.price}</span>
+                    <i className={`fa-solid ${TIERS[p.tier].icon}`} style={{ fontSize: 14, color: TIERS[p.tier].color }} />
+                    <span style={{ fontWeight: 900, fontSize: 14, color: TIERS[p.tier].color }}>{TIERS[p.tier].label}</span>
+                    <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: TIERS[p.tier].color }}>{p.price}</span>
                   </div>
                   <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.4 }}>{p.desc}</p>
                 </div>
@@ -484,34 +547,35 @@ export default function FeaturesPage() {
         </div>
       </div>
 
-      {/* ══ STARTER SECTION ══════════════════════════════════════════════════ */}
-      <section id="starter" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 80px" }}>
+      {/* ══ PRO / STARTER SECTION ════════════════════════════════════════════ */}
+      <section id="starter" className="sect-pad" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 80px" }}>
+
         {/* Section header */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 36 }}>
-          <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(211,84,0,0.3))" }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", background: "rgba(211,84,0,0.06)", border: "1.5px solid rgba(211,84,0,0.2)", borderRadius: 100 }}>
-            <span style={{ fontSize: 20 }}>⚡</span>
+          <div className="section-line" style={{ background: "linear-gradient(to right, transparent, rgba(211,84,0,0.3))" }} />
+          <div className="section-pill" style={{ background: "rgba(211,84,0,0.06)", border: "1.5px solid rgba(211,84,0,0.2)" }}>
+            <i className="fa-solid fa-bolt-lightning" style={{ fontSize: 16, color: ORANGE }} />
             <div>
-              <p style={{ fontSize: 13, fontWeight: 900, color: "#D35400", margin: 0 }}>Pro Plan</p>
+              <p style={{ fontSize: 13, fontWeight: 900, color: ORANGE, margin: 0 }}>Pro Plan</p>
               <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>Everything you need from day one</p>
             </div>
-            <span style={{ fontSize: 14, fontWeight: 900, color: "#D35400", marginLeft: 8 }}>$99/mo</span>
+            <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: ORANGE, marginLeft: 8 }}>$99/mo</span>
           </div>
-          <div style={{ flex: 1, height: 1, background: "linear-gradient(to left, transparent, rgba(211,84,0,0.3))" }} />
+          <div className="section-line" style={{ background: "linear-gradient(to left, transparent, rgba(211,84,0,0.3))" }} />
         </div>
 
         {/* Big feature cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(460px, 1fr))", gap: 20, marginBottom: 20 }}>
+        <div className="feat-grid-lg" style={{ marginBottom: 20 }}>
           {STARTER_FEATURES.map(f => (
             <div key={f.title} className="feat-card" style={{
               background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16,
               overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
             }}>
               <div style={{ padding: "24px 24px 0" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
-                  <div>
+                <div className="feat-card-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 16 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                      <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#D35400", fontSize: 16 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: ORANGE, fontSize: 16, flexShrink: 0 }}>
                         <i className={f.icon} />
                       </div>
                       <PlanBadge plan="starter" />
@@ -519,8 +583,8 @@ export default function FeaturesPage() {
                     <h3 style={{ fontSize: 17, fontWeight: 800, color: TEXT, marginBottom: 8 }}>{f.title}</h3>
                     <p style={{ fontSize: 13, color: MUTED, lineHeight: 1.65 }}>{f.desc}</p>
                   </div>
-                  <div style={{ textAlign: "center", flexShrink: 0, background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.15)", borderRadius: 12, padding: "10px 14px", minWidth: 70 }}>
-                    <p style={{ fontSize: 22, fontWeight: 900, color: "#D35400", lineHeight: 1, margin: 0 }}>{f.stat}</p>
+                  <div className="feat-stat-badge" style={{ textAlign: "center", flexShrink: 0, background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.15)", borderRadius: 12, padding: "10px 14px", minWidth: 70 }}>
+                    <p style={{ fontSize: 22, fontWeight: 900, color: ORANGE, lineHeight: 1, margin: 0 }}>{f.stat}</p>
                     <p style={{ fontSize: 9, color: MUTED, marginTop: 4, lineHeight: 1.3, fontWeight: 600 }}>{f.statLabel}</p>
                   </div>
                 </div>
@@ -533,14 +597,14 @@ export default function FeaturesPage() {
         </div>
 
         {/* Extras row */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+        <div className="feat-grid-sm">
           {STARTER_EXTRAS.map(f => (
             <div key={f.title} className="feat-card" style={{
               background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "22px 20px",
               boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#D35400", fontSize: 14 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 9, background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: ORANGE, fontSize: 14 }}>
                   <i className={f.icon} />
                 </div>
                 <PlanBadge plan="starter" />
@@ -553,40 +617,38 @@ export default function FeaturesPage() {
       </section>
 
       {/* ══ GROWTH SECTION ═══════════════════════════════════════════════════ */}
-      <section id="growth" style={{ background: "rgba(124,58,237,0.03)", borderTop: "1px solid rgba(124,58,237,0.12)", borderBottom: "1px solid rgba(124,58,237,0.12)", padding: "72px 0" }}>
+      <section id="growth" className="growth-sect" style={{ background: "rgba(211,84,0,0.03)", borderTop: "1px solid rgba(211,84,0,0.12)", borderBottom: "1px solid rgba(211,84,0,0.12)", padding: "72px 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
 
-          {/* Section header */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 36 }}>
-            <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(124,58,237,0.3))" }} />
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", background: "rgba(124,58,237,0.07)", border: "1.5px solid rgba(124,58,237,0.2)", borderRadius: 100 }}>
-              <span style={{ fontSize: 20 }}>🚀</span>
+            <div className="section-line" style={{ background: "linear-gradient(to right, transparent, rgba(211,84,0,0.3))" }} />
+            <div className="section-pill" style={{ background: "rgba(211,84,0,0.07)", border: "1.5px solid rgba(211,84,0,0.2)" }}>
+              <i className="fa-solid fa-chart-line" style={{ fontSize: 16, color: ORANGE }} />
               <div>
-                <p style={{ fontSize: 13, fontWeight: 900, color: "#7c3aed", margin: 0 }}>Growth Plan</p>
+                <p style={{ fontSize: 13, fontWeight: 900, color: ORANGE, margin: 0 }}>Growth Plan</p>
                 <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>Unlocks when you&apos;re ready to scale</p>
               </div>
-              <span style={{ fontSize: 14, fontWeight: 900, color: "#7c3aed", marginLeft: 8 }}>$299/mo</span>
+              <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: ORANGE, marginLeft: 8 }}>$299/mo</span>
             </div>
-            <div style={{ flex: 1, height: 1, background: "linear-gradient(to left, transparent, rgba(124,58,237,0.3))" }} />
+            <div className="section-line" style={{ background: "linear-gradient(to left, transparent, rgba(211,84,0,0.3))" }} />
           </div>
 
-          {/* "Everything in Starter +" banner */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(124,58,237,0.05)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 12, padding: "14px 20px", marginBottom: 28 }}>
-            <i className="fa-solid fa-circle-check" style={{ color: "#7c3aed", fontSize: 16 }} />
+          <div className="incl-banner" style={{ background: "rgba(211,84,0,0.05)", border: "1px solid rgba(211,84,0,0.15)" }}>
+            <i className="fa-solid fa-circle-check" style={{ color: ORANGE, fontSize: 16, flexShrink: 0 }} />
             <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>Includes everything in Pro</span>
             <span style={{ color: MUTED, fontSize: 13 }}>+</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>these powerful upgrades:</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: ORANGE }}>these powerful upgrades:</span>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(460px, 1fr))", gap: 20 }}>
+          <div className="feat-grid-lg">
             {GROWTH_FEATURES.map(f => (
               <div key={f.title} className="feat-card" style={{
-                background: "#fff", border: "1px solid rgba(124,58,237,0.18)", borderRadius: 16,
-                overflow: "hidden", boxShadow: "0 2px 16px rgba(124,58,237,0.06)",
+                background: "#fff", border: "1px solid rgba(211,84,0,0.18)", borderRadius: 16,
+                overflow: "hidden", boxShadow: "0 2px 16px rgba(211,84,0,0.06)",
               }}>
                 <div style={{ padding: f.mock ? "24px 24px 0" : "24px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#7c3aed", fontSize: 16 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: ORANGE, fontSize: 16 }}>
                       <i className={f.icon} />
                     </div>
                     <PlanBadge plan="growth" />
@@ -601,41 +663,39 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* ══ PRO SECTION ══════════════════════════════════════════════════════ */}
-      <section id="pro" style={{ padding: "72px 0" }}>
+      {/* ══ MAX / PRO SECTION ════════════════════════════════════════════════ */}
+      <section id="pro" className="pro-sect" style={{ padding: "72px 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
 
-          {/* Section header */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 36 }}>
-            <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(8,145,178,0.3))" }} />
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", background: "rgba(8,145,178,0.07)", border: "1.5px solid rgba(8,145,178,0.2)", borderRadius: 100 }}>
-              <span style={{ fontSize: 20 }}>💎</span>
+            <div className="section-line" style={{ background: `linear-gradient(to right, transparent, rgba(44,62,80,0.3))` }} />
+            <div className="section-pill" style={{ background: "rgba(44,62,80,0.06)", border: `1.5px solid rgba(44,62,80,0.2)` }}>
+              <i className="fa-solid fa-star" style={{ fontSize: 16, color: TEXT }} />
               <div>
-                <p style={{ fontSize: 13, fontWeight: 900, color: "#0891b2", margin: 0 }}>Max Plan</p>
+                <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, margin: 0 }}>Max Plan</p>
                 <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>For high-volume operators</p>
               </div>
-              <span style={{ fontSize: 14, fontWeight: 900, color: "#0891b2", marginLeft: 8 }}>$999/mo</span>
+              <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: TEXT, marginLeft: 8 }}>$999/mo</span>
             </div>
-            <div style={{ flex: 1, height: 1, background: "linear-gradient(to left, transparent, rgba(8,145,178,0.3))" }} />
+            <div className="section-line" style={{ background: `linear-gradient(to left, transparent, rgba(44,62,80,0.3))` }} />
           </div>
 
-          {/* "Everything in Growth +" banner */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(8,145,178,0.05)", border: "1px solid rgba(8,145,178,0.15)", borderRadius: 12, padding: "14px 20px", marginBottom: 28 }}>
-            <i className="fa-solid fa-circle-check" style={{ color: "#0891b2", fontSize: 16 }} />
+          <div className="incl-banner" style={{ background: "rgba(44,62,80,0.04)", border: "1px solid rgba(44,62,80,0.14)" }}>
+            <i className="fa-solid fa-circle-check" style={{ color: TEXT, fontSize: 16, flexShrink: 0 }} />
             <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>Includes everything in Growth</span>
             <span style={{ color: MUTED, fontSize: 13 }}>+</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#0891b2" }}>these operator-grade tools:</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>these operator-grade tools:</span>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(460px, 1fr))", gap: 20 }}>
+          <div className="feat-grid-lg">
             {PRO_FEATURES.map(f => (
               <div key={f.title} className="feat-card" style={{
-                background: "#fff", border: "1px solid rgba(8,145,178,0.18)", borderRadius: 16,
-                overflow: "hidden", boxShadow: "0 2px 16px rgba(8,145,178,0.06)",
+                background: "#fff", border: "1px solid rgba(44,62,80,0.14)", borderRadius: 16,
+                overflow: "hidden", boxShadow: "0 2px 16px rgba(44,62,80,0.04)",
               }}>
                 <div style={{ padding: f.mock ? "24px 24px 0" : "24px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(8,145,178,0.08)", border: "1px solid rgba(8,145,178,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#0891b2", fontSize: 16 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(44,62,80,0.07)", border: "1px solid rgba(44,62,80,0.14)", display: "flex", alignItems: "center", justifyContent: "center", color: TEXT, fontSize: 16 }}>
                       <i className={f.icon} />
                     </div>
                     <PlanBadge plan="pro" />
@@ -651,15 +711,15 @@ export default function FeaturesPage() {
       </section>
 
       {/* ══ ENTERPRISE ═══════════════════════════════════════════════════════ */}
-      <section style={{ padding: "72px 24px", textAlign: "center" }}>
+      <section className="enterprise-sect" style={{ padding: "72px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <div style={{
             background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 20,
             padding: "40px 36px",
             boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
           }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: BG, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px", fontSize: 24 }}>
-              🏢
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(44,62,80,0.07)", border: `1px solid rgba(44,62,80,0.14)`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
+              <i className="fa-solid fa-building" style={{ fontSize: 20, color: TEXT }} />
             </div>
             <h3 style={{ fontSize: 22, fontWeight: 900, color: TEXT, marginBottom: 10 }}>
               Need enterprise-grade?
@@ -684,24 +744,26 @@ export default function FeaturesPage() {
       </section>
 
       {/* ══ BOTTOM CTA ═══════════════════════════════════════════════════════ */}
-      <section style={{ background: "linear-gradient(135deg,#D35400,#e8641c)", padding: "72px 24px", textAlign: "center" }}>
+      <section className="bottom-cta-sect" style={{ background: "linear-gradient(135deg,#D35400,#e8641c)", padding: "72px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 520, margin: "0 auto" }}>
-          <h2 style={{ fontSize: "clamp(24px,4vw,36px)", fontWeight: 900, color: "#fff", marginBottom: 14 }}>
+          <h2 style={{ fontSize: "clamp(22px,4vw,36px)", fontWeight: 900, color: "#fff", marginBottom: 14 }}>
             Start free. Upgrade when you&apos;re ready.
           </h2>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,0.85)", marginBottom: 32, lineHeight: 1.6 }}>
             No credit card required. Every plan starts free so you can see the results before you commit.
           </p>
           <Link href="/signup" style={{
-            background: "#fff", color: "#D35400", fontWeight: 900, fontSize: 16,
+            background: "#fff", color: ORANGE, fontWeight: 900, fontSize: 16,
             padding: "15px 32px", borderRadius: 10, textDecoration: "none", display: "inline-block",
             boxShadow: "0 6px 24px rgba(0,0,0,0.15)",
           }}>
             Create Free Account →
           </Link>
-          <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 20 }}>
+          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "8px 24px", marginTop: 20 }}>
             {["Free to start", "No credit card", "Cancel anytime"].map(t => (
-              <span key={t} style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 600 }}>✓ {t}</span>
+              <span key={t} style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 600 }}>
+                <i className="fa-solid fa-check" style={{ marginRight: 5 }} />{t}
+              </span>
             ))}
           </div>
         </div>

@@ -127,7 +127,7 @@ export default async function DashboardPage(
               Welcome to ClozeFlow, {firstName}!
             </p>
             <p style={{ margin: 0, fontSize: 13, color: MUTED }}>
-              You&apos;re on <strong style={{ color: PLANS[plan].color }}>{PLANS[plan].emoji} {PLANS[plan].name}</strong> — add your first lead to get started.
+              You&apos;re on <strong style={{ color: PLANS[plan].color }}>{PLANS[plan].name}</strong> — add your first lead to get started.
             </p>
           </div>
         </div>

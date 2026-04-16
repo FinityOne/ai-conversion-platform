@@ -134,7 +134,9 @@ export default function AppShell({ firstName, businessName, email, plan, leadCou
               <Link href="/profile/billing" style={{ textDecoration: "none", display: "block", marginBottom: 8 }}>
                 <div style={{ padding: "10px 12px", borderRadius: 10, background: p.badgeBg, border: `1px solid ${p.badgeBorder}` }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: p.color }}>{p.emoji} {p.name} Plan</span>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: p.color, display: "flex", alignItems: "center", gap: 4 }}>
+                      <i className={`fa-solid ${p.icon}`} style={{ fontSize: 10 }} /> {p.name} Plan
+                    </span>
                     <span style={{ fontSize: 10, color: p.color, fontWeight: 600 }}>Manage →</span>
                   </div>
                   {leadLimit && (

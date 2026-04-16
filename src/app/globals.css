@@ -8,8 +8,6 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 html {
@@ -19,7 +17,7 @@ html {
 body {
   background: #05091a;
   color: #f1f5f9;
-  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-family: var(--font-sans), sans-serif;
 }
 
 /* ── Gradient text ────────────────────────────────────── */

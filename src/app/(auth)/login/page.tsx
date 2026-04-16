@@ -5,26 +5,28 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
-const MUTED = "rgba(255,255,255,0.4)";
-const VERY_MUTED = "rgba(255,255,255,0.22)";
+const TEXT = "#2C3E50";
+const MUTED = "#78716c";
+const VERY_MUTED = "#a8a29e";
+const BORDER = "#e6e2db";
 
 const inputStyle = {
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.12)",
+  background: "#ffffff",
+  border: `1px solid ${BORDER}`,
   borderRadius: "14px",
-  color: "#f1f5f9",
+  color: TEXT,
   fontSize: "17px",
   padding: "18px 20px",
   width: "100%",
   outline: "none",
-  transition: "border-color 0.2s",
+  transition: "border-color 0.2s, box-shadow 0.2s",
   WebkitAppearance: "none" as const,
 };
 
 const inputFocusStyle = {
   ...inputStyle,
-  border: "1px solid rgba(211,84,0,0.6)",
-  boxShadow: "0 0 0 3px rgba(211,84,0,0.12)",
+  border: "1px solid rgba(211,84,0,0.55)",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.1)",
 };
 
 function FocusInput({
@@ -114,7 +116,7 @@ export default function LoginPage() {
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-black text-white mb-2">Welcome back</h1>
+          <h1 className="text-2xl font-black mb-2" style={{ color: TEXT }}>Welcome back</h1>
           <p className="text-sm" style={{ color: MUTED }}>
             Sign in to your ClozeFlow account
           </p>
@@ -126,10 +128,11 @@ export default function LoginPage() {
           onClick={handleGoogleSignIn}
           className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98] mb-5"
           style={{
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            color: "#f1f5f9",
+            background: "#ffffff",
+            border: `1px solid ${BORDER}`,
+            color: TEXT,
             fontSize: "15px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
           }}
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0">
@@ -143,16 +146,16 @@ export default function LoginPage() {
 
         {/* Divider */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+          <div className="flex-1 h-px" style={{ background: BORDER }} />
           <span className="text-xs font-medium" style={{ color: VERY_MUTED }}>or</span>
-          <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+          <div className="flex-1 h-px" style={{ background: BORDER }} />
         </div>
 
         {/* Error */}
         {error && (
           <div
             className="mb-4 px-4 py-3 rounded-xl text-sm"
-            style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#fca5a5" }}
+            style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", color: "#b91c1c" }}
           >
             {error}
           </div>
@@ -178,7 +181,7 @@ export default function LoginPage() {
           />
 
           <div className="flex justify-end">
-            <Link href="/forgot-password" className="text-sm transition-colors hover:text-white" style={{ color: MUTED }}>
+            <Link href="/forgot-password" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: "#D35400" }}>
               Forgot password?
             </Link>
           </div>
@@ -196,7 +199,7 @@ export default function LoginPage() {
         {/* Sign up link */}
         <p className="text-center text-sm mt-8" style={{ color: MUTED }}>
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-semibold text-white hover:text-orange-400 transition-colors">
+          <Link href="/signup" className="font-semibold hover:opacity-70 transition-opacity" style={{ color: "#D35400" }}>
             Get started free
           </Link>
         </p>

@@ -125,7 +125,7 @@ export default async function PaymentsPage() {
           return (
             <div key={key} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "20px 22px", borderTop: `3px solid ${plan.color}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <span style={{ fontSize: 18 }}>{plan.emoji}</span>
+                <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 14, color: plan.color }} />
                 <span style={{ fontSize: 15, fontWeight: 800, color: TEXT }}>{plan.name}</span>
                 <span style={{
                   fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10,
@@ -205,7 +205,7 @@ export default async function PaymentsPage() {
                       <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.user_email}</p>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 14 }}>{plan?.emoji}</span>
+                      {plan && <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 11, color: plan.color }} />}
                       <span style={{ fontSize: 13, fontWeight: 700, color: plan?.color ?? TEXT }}>{plan?.name ?? s.plan}</span>
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 600, padding: "3px 8px", borderRadius: 20, background: s.billing_cycle === "annual" ? "rgba(34,197,94,0.1)" : BG, color: s.billing_cycle === "annual" ? "#15803d" : MUTED, border: `1px solid ${s.billing_cycle === "annual" ? "rgba(34,197,94,0.2)" : BORDER}`, display: "inline-block" }}>
@@ -243,7 +243,9 @@ export default async function PaymentsPage() {
                       <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: plan?.color ?? TEXT }}>{fmtMoney(mp)}/mo</p>
                     </div>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan ? `${plan.color}18` : BG, color: plan?.color ?? MUTED }}>{plan?.emoji} {plan?.name}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan ? `${plan.color}18` : BG, color: plan?.color ?? MUTED }}>
+                        {plan && <i className={`fa-solid ${plan.icon}`} style={{ marginRight: 4 }} />}{plan?.name}
+                      </span>
                       <span style={{ fontSize: 12, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: statusSt.bg, color: statusSt.color, border: `1px solid ${statusSt.border}` }}>{s.status}</span>
                       <span style={{ fontSize: 12, color: MUTED, padding: "2px 8px" }}>Renews {formatDate(s.current_period_end)}</span>
                     </div>
@@ -298,7 +300,7 @@ export default async function PaymentsPage() {
                       <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.user_email}</p>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 13 }}>{plan?.emoji}</span>
+                      {plan && <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 11, color: plan.color }} />}
                       <span style={{ fontSize: 13, fontWeight: 700, color: plan?.color ?? TEXT }}>{plan?.name}</span>
                     </div>
                     <span style={{
@@ -339,7 +341,9 @@ export default async function PaymentsPage() {
                       <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: "#16a34a" }}>{fmtMoney(t.amount)}</p>
                     </div>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan ? `${plan.color}18` : BG, color: plan?.color ?? MUTED }}>{plan?.emoji} {plan?.name}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan ? `${plan.color}18` : BG, color: plan?.color ?? MUTED }}>
+                        {plan && <i className={`fa-solid ${plan.icon}`} style={{ marginRight: 4 }} />}{plan?.name}
+                      </span>
                       <span style={{ fontSize: 12, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: isAnnual ? "rgba(34,197,94,0.1)" : "rgba(99,102,241,0.08)", color: isAnnual ? "#15803d" : INDIGO }}>
                         {isAnnual ? "Annual" : "Monthly"}
                       </span>

@@ -5,23 +5,26 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
-const MUTED = "rgba(255,255,255,0.4)";
+const TEXT = "#2C3E50";
+const MUTED = "#78716c";
+const BORDER = "#e6e2db";
 
 const baseInput: React.CSSProperties = {
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.12)",
+  background: "#ffffff",
+  border: `1px solid ${BORDER}`,
   borderRadius: "14px",
-  color: "#f1f5f9",
+  color: TEXT,
   fontSize: "17px",
   padding: "18px 20px",
   width: "100%",
   outline: "none",
   boxSizing: "border-box",
+  transition: "border-color 0.2s, box-shadow 0.2s",
 };
 const focusInput: React.CSSProperties = {
   ...baseInput,
-  border: "1px solid rgba(211,84,0,0.6)",
-  boxShadow: "0 0 0 3px rgba(211,84,0,0.12)",
+  border: "1px solid rgba(211,84,0,0.55)",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.1)",
 };
 
 function PasswordInput({
@@ -53,7 +56,7 @@ function PasswordInput({
           style={{
             position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)",
             background: "none", border: "none", cursor: "pointer",
-            color: "rgba(255,255,255,0.35)", fontSize: 16,
+            color: MUTED, fontSize: 16,
           }}
           tabIndex={-1}
         >
@@ -72,10 +75,10 @@ function strengthLabel(pw: string): { label: string; color: string; pct: number 
   if (/[A-Z]/.test(pw) && /[a-z]/.test(pw))   score++;
   if (/\d/.test(pw))                           score++;
   if (/[^A-Za-z0-9]/.test(pw))                score++;
-  if (score <= 1) return { label: "Weak",   color: "#ef4444", pct: 25 };
-  if (score <= 2) return { label: "Fair",   color: "#f59e0b", pct: 50 };
-  if (score <= 3) return { label: "Good",   color: "#2ecc71", pct: 75 };
-  return           { label: "Strong", color: "#10b981", pct: 100 };
+  if (score <= 1) return { label: "Weak",   color: "#dc2626", pct: 25 };
+  if (score <= 2) return { label: "Fair",   color: "#d97706", pct: 50 };
+  if (score <= 3) return { label: "Good",   color: "#16a34a", pct: 75 };
+  return           { label: "Strong", color: "#15803d", pct: 100 };
 }
 
 export default function UpdatePasswordPage() {
@@ -120,13 +123,13 @@ export default function UpdatePasswordPage() {
               className="mx-auto mb-6 flex items-center justify-center"
               style={{
                 width: 72, height: 72, borderRadius: "50%",
-                background: "linear-gradient(135deg,#2ecc71,#27AE60)",
-                boxShadow: "0 8px 24px rgba(34,197,94,0.35)",
+                background: "linear-gradient(135deg,#16a34a,#15803d)",
+                boxShadow: "0 8px 24px rgba(22,163,74,0.25)",
               }}
             >
               <i className="fa-solid fa-check" style={{ fontSize: 30, color: "#fff" }} />
             </div>
-            <h1 className="text-2xl font-black text-white mb-3">Password updated!</h1>
+            <h1 className="text-2xl font-black mb-3" style={{ color: TEXT }}>Password updated!</h1>
             <p className="text-sm" style={{ color: MUTED, lineHeight: 1.7 }}>
               Your password has been changed successfully. Redirecting you to the dashboard…
             </p>
@@ -139,13 +142,13 @@ export default function UpdatePasswordPage() {
                 className="mx-auto mb-5 flex items-center justify-center"
                 style={{
                   width: 52, height: 52, borderRadius: 14,
-                  background: "rgba(211,84,0,0.12)",
-                  border: "1px solid rgba(211,84,0,0.25)",
+                  background: "rgba(211,84,0,0.08)",
+                  border: "1px solid rgba(211,84,0,0.2)",
                 }}
               >
-                <i className="fa-solid fa-lock" style={{ fontSize: 20, color: "#e8641c" }} />
+                <i className="fa-solid fa-lock" style={{ fontSize: 20, color: "#D35400" }} />
               </div>
-              <h1 className="text-2xl font-black text-white mb-2">Set a new password</h1>
+              <h1 className="text-2xl font-black mb-2" style={{ color: TEXT }}>Set a new password</h1>
               <p className="text-sm" style={{ color: MUTED, lineHeight: 1.6 }}>
                 Choose something strong — at least 8 characters.
               </p>
@@ -154,7 +157,7 @@ export default function UpdatePasswordPage() {
             {error && (
               <div
                 className="mb-4 px-4 py-3 rounded-xl text-sm"
-                style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#fca5a5" }}
+                style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", color: "#b91c1c" }}
               >
                 {error}
               </div>
@@ -171,7 +174,7 @@ export default function UpdatePasswordPage() {
               {/* Strength meter */}
               {password.length > 0 && (
                 <div style={{ marginTop: -8 }}>
-                  <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+                  <div style={{ height: 4, borderRadius: 2, background: BORDER, overflow: "hidden" }}>
                     <div style={{ height: "100%", borderRadius: 2, width: `${strength.pct}%`, background: strength.color, transition: "width 0.3s, background 0.3s" }} />
                   </div>
                   <p style={{ margin: "4px 0 0", fontSize: 12, color: strength.color, fontWeight: 600 }}>{strength.label}</p>
@@ -187,7 +190,7 @@ export default function UpdatePasswordPage() {
               />
 
               {mismatch && (
-                <p style={{ margin: "-8px 0 0", fontSize: 13, color: "#fca5a5" }}>
+                <p style={{ margin: "-8px 0 0", fontSize: 13, color: "#dc2626" }}>
                   Passwords don't match
                 </p>
               )}
@@ -203,7 +206,7 @@ export default function UpdatePasswordPage() {
             </form>
 
             <p className="text-center text-sm mt-8" style={{ color: MUTED }}>
-              <Link href="/login" className="font-semibold text-white hover:text-orange-400 transition-colors">
+              <Link href="/login" className="font-semibold hover:opacity-70 transition-opacity" style={{ color: "#D35400" }}>
                 ← Back to sign in
               </Link>
             </p>

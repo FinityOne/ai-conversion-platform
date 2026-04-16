@@ -96,7 +96,13 @@ export default function BillingPage() {
           background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 20,
           padding: "40px 24px", textAlign: "center",
         }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+          <div style={{
+            width: 64, height: 64, borderRadius: 16, margin: "0 auto 16px",
+            background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.18)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <i className="fa-solid fa-bolt-lightning" style={{ fontSize: 26, color: "#D35400" }} />
+          </div>
           <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900, color: TEXT }}>No active plan</h2>
           <p style={{ margin: "0 0 24px", fontSize: 15, color: MUTED }}>
             Choose a plan to unlock your full pipeline.
@@ -144,9 +150,11 @@ export default function BillingPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{
               width: 52, height: 52, borderRadius: 14, flexShrink: 0,
-              background: `${plan.color}20`, border: `1px solid ${plan.color}35`,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
-            }}>{plan.emoji}</div>
+              background: plan.badgeBg, border: `1px solid ${plan.badgeBorder}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 22, color: plan.color }} />
+            </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <p style={{ margin: 0, fontSize: 20, fontWeight: 900, color: TEXT }}>{plan.name} Plan</p>
@@ -175,8 +183,8 @@ export default function BillingPage() {
         <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
           {sub.current_period_end && (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f9f7f4", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <i className="fa-solid fa-calendar-check" style={{ fontSize: 15, color: "#27AE60" }} />
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: "#F9F7F2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <i className="fa-solid fa-calendar-check" style={{ fontSize: 15, color: "#16a34a" }} />
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: 11, color: MUTED, textTransform: "uppercase", letterSpacing: "0.5px" }}>Next renewal</p>
@@ -187,7 +195,7 @@ export default function BillingPage() {
 
           {sub.card_last4 && (
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f9f7f4", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: "#F9F7F2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <i className={cardBrandIcon(sub.card_brand ?? "card")} style={{ fontSize: 20, color: TEXT }} />
               </div>
               <div>
@@ -245,7 +253,7 @@ export default function BillingPage() {
                 onClick={() => setDigestEnabled(v => !v)}
                 style={{
                   position: "relative", width: 44, height: 24, borderRadius: 12, border: "none",
-                  background: digestEnabled ? "linear-gradient(90deg,#7c3aed,#a855f7)" : "rgba(0,0,0,0.12)",
+                  background: digestEnabled ? "linear-gradient(90deg,#D35400,#e8641c)" : BORDER,
                   cursor: "pointer", flexShrink: 0, transition: "background 0.2s",
                 }}
               >
@@ -255,7 +263,7 @@ export default function BillingPage() {
                   transition: "left 0.2s", left: digestEnabled ? 22 : 2,
                 }} />
               </button>
-              <span style={{ fontSize: 13, color: digestEnabled ? "#7c3aed" : MUTED, fontWeight: 600 }}>
+              <span style={{ fontSize: 13, color: digestEnabled ? "#D35400" : MUTED, fontWeight: 600 }}>
                 {digestEnabled ? "Daily digest active — emails every morning at 7 AM" : "Daily digest paused"}
               </span>
             </div>
@@ -341,7 +349,13 @@ export default function BillingPage() {
                     transition: "all 0.15s",
                   }}
                 >
-                  <span style={{ fontSize: 22, flexShrink: 0 }}>{p.emoji}</span>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: p.badgeBg, border: `1px solid ${p.badgeBorder}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <i className={`fa-solid ${p.icon}`} style={{ fontSize: 16, color: p.color }} />
+                  </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
                       <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: TEXT }}>{p.name}</p>

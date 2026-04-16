@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,47 +13,56 @@ const GREEN  = "#27AE60";
 
 const TESTIMONIALS = [
   {
-    result: "+$80K",
-    resultLabel: "extra revenue, first month",
-    quote:
-      "First month with ClozeFlow I got 9 extra estimate appointments — automatically. Closed 6 of them. It paid for itself in week one.",
+    quote: "First month with ClozeFlow I got 9 extra estimate appointments — automatically. Closed 6 of them. It paid for itself in week one.",
     name: "Jake R.",
     title: "Owner, Ridge Line Remodeling",
     location: "Phoenix, AZ",
     initials: "JR",
-    avatarColor: "#D35400",
+    photo: "https://images.pexels.com/photos/30450838/pexels-photo-30450838.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
   },
   {
-    result: "3× ROI",
-    resultLabel: "on Angi leads, overnight",
-    quote:
-      "We were spending $2,800/mo on Angi and barely converting. ClozeFlow responds in under a minute. Our ROI on those leads literally tripled.",
+    quote: "We were spending $2,800/mo on Angi and barely converting. ClozeFlow responds in under a minute. Our ROI on those leads literally tripled.",
     name: "Maria C.",
     title: "Operations Manager, Summit Renovations",
     location: "Denver, CO",
     initials: "MC",
-    avatarColor: "#1e40af",
+    photo: "https://images.pexels.com/photos/27086758/pexels-photo-27086758.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
   },
   {
-    result: "22%→58%",
-    resultLabel: "close rate in one quarter",
-    quote:
-      "I used to drive 40 minutes to meet tire-kickers. That doesn't happen anymore. My close rate nearly tripled in one quarter.",
+    quote: "I used to drive 40 minutes to meet tire-kickers. That doesn't happen anymore. My close rate nearly tripled in one quarter.",
     name: "Derek M.",
     title: "Owner, Keystone Builders",
     location: "Columbus, OH",
     initials: "DM",
-    avatarColor: "#5b21b6",
+    photo: "https://images.pexels.com/photos/32064778/pexels-photo-32064778.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
   },
 ];
 
 const FEATURES = [
-  { icon: "⚡", title: "Lightning Fast Response",  desc: "Every lead gets a reply in under 60 seconds — around the clock." },
-  { icon: "🧠", title: "Smart Lead Qualification",  desc: "AI asks the right questions so you only talk to serious buyers." },
-  { icon: "🔁", title: "Automatic Follow-Up",       desc: "5-touch sequences nurture leads over days so none fall through." },
-  { icon: "📅", title: "Calendar Booking",           desc: "Qualified leads book themselves straight onto your schedule." },
-  { icon: "📊", title: "Pipeline Tracking",          desc: "See every lead's status in one clean dashboard." },
-  { icon: "📄", title: "Flyer Marketing Tools",      desc: "Create trackable flyers and see exactly which campaigns convert." },
+  { title: "60-Second Response",   desc: "Every lead gets a personal reply the moment they reach out — day or night, 365 days a year. First response wins the job." },
+  { title: "Smart Qualification",  desc: "AI asks the right questions upfront so your time only goes to serious, ready-to-book buyers. No more tire-kickers." },
+  { title: "Automated Follow-Up",  desc: "A structured 5-touch sequence follows up over 5 days. No lead goes cold while you're on the job." },
+  { title: "Calendar Booking",     desc: "Qualified leads pick a time directly from your availability. No back-and-forth calls, no missed connections." },
+  { title: "Pipeline Dashboard",   desc: "Every lead, every status, one clean view. Know exactly where each job stands without digging through texts." },
+  { title: "Campaign Tracking",    desc: "See which flyers, ads, and sources are actually converting — tracked down to the booked job." },
+];
+
+const HIW_STEPS = [
+  {
+    n: "01",
+    title: "Connect your lead sources",
+    desc: "Website, Google, Angi, Thumbtack — anywhere customers find you. Our team handles the full setup in one day. No tech skills needed.",
+  },
+  {
+    n: "02",
+    title: "AI responds in under 60 seconds",
+    desc: "Every inquiry gets a personal, intelligent reply the moment it arrives — day or night. The AI qualifies job type, budget, and timeline while you're on the job.",
+  },
+  {
+    n: "03",
+    title: "Qualified jobs land on your calendar",
+    desc: "Ready-to-book customers schedule themselves. You get a notification, show up, and do the work you love.",
+  },
 ];
 
 const TRADES = [
@@ -73,293 +82,232 @@ const TRADES = [
   { emoji: "🌳", label: "Tree Services"      },
   { emoji: "🐛", label: "Pest Control"       },
   { emoji: "✨", label: "Cleaning Services"  },
+  { emoji: "🏥", label: "Local Clinics"      },
 ];
-
-// ── Mini Calculator data ─────────────────────────────────────────────────────
-const CALC_TRADES = [
-  { label: "Plumbing",     avgJob: 350   },
-  { label: "HVAC",         avgJob: 800   },
-  { label: "Electrical",   avgJob: 500   },
-  { label: "Roofing",      avgJob: 6500  },
-  { label: "Landscaping",  avgJob: 200   },
-  { label: "Painting",     avgJob: 1400  },
-  { label: "Flooring",     avgJob: 2800  },
-  { label: "Handyman",     avgJob: 175   },
-  { label: "Cleaning",     avgJob: 200   },
-  { label: "Contractor",   avgJob: 12000 },
-];
-const CF_CLOSE = 55; // ClozeFlow avg close rate
 
 function fmt$(n: number) {
   return "$" + Math.round(n).toLocaleString("en-US");
 }
 
-function MiniCalculator() {
-  const [tradeIdx,  setTradeIdx]  = useState(1);          // HVAC default
-  const [jobs,      setJobs]      = useState(10);          // 10 jobs/mo
-  const [closeRate, setCloseRate] = useState(25);          // 25% close → 40 implied leads → Starter
+function ScrollCalculator() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
 
-  const trade = CALC_TRADES[tradeIdx];
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      const scrolled   = -el.getBoundingClientRect().top;
+      const scrollable = el.offsetHeight - window.innerHeight;
+      if (scrollable <= 0) return;
+      setProgress(Math.min(1, Math.max(0, scrolled / scrollable)));
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+    return () => window.removeEventListener("scroll", update);
+  }, []);
 
-  const results = useMemo(() => {
-    const avgJob        = trade.avgJob;
-    const impliedLeads  = closeRate > 0 ? Math.round(jobs / (closeRate / 100)) : 0;
-    const currentRev    = jobs * avgJob;
-    const cfJobs        = Math.round((impliedLeads * CF_CLOSE) / 100);
-    const cfRev         = cfJobs * avgJob;
-    const monthlyGap    = Math.max(0, cfRev - currentRev);
-    const annualGap     = monthlyGap * 12;
-    const extraJobs     = Math.max(0, cfJobs - jobs);
-    // Pro plan: $79/mo billed annually
-    const planPrice     = impliedLeads <= 50 ? 79 : impliedLeads <= 500 ? 149 : 799;
-    const roi           = monthlyGap > 0 ? Math.round(monthlyGap / planPrice) : 0;
-    const isPlan        = impliedLeads <= 50 ? "Pro" : impliedLeads <= 500 ? "Growth" : "Max";
-    return { impliedLeads, currentRev, cfRev, monthlyGap, annualGap, extraJobs, roi, isPlan, planPrice };
-  }, [trade, jobs, closeRate]);
+  // Scroll-driven values
+  const closeRate = 20 - progress * 15;             // 20% → 5%
+  const leads     = Math.round(50 + progress * 50); // 50  → 100
+  const yourJobs  = leads * (closeRate / 100);
+  const cfJobs    = leads * 0.55;
+  const annualGap = Math.max(0, cfJobs - yourJobs) * 1000 * 12;
 
-  const showGap = closeRate < CF_CLOSE;
+  // Close-rate danger colours
+  const crColor  = closeRate > 15 ? "#fbbf24" : closeRate > 10 ? "#f97316" : "#ef4444";
+  const crBorder = closeRate > 15 ? "rgba(251,191,36,0.22)" : closeRate > 10 ? "rgba(249,115,22,0.28)" : "rgba(239,68,68,0.35)";
+  const crGlow   = closeRate <= 10 ? "0 0 28px rgba(239,68,68,0.18)" : "none";
+
+  // Reveal opacities
+  const gapOpacity  = Math.min(1, progress * 10);
+  const rowOpacity  = Math.min(1, Math.max(0, (progress - 0.2)  * 5));
+  const ctaOpacity  = Math.min(1, Math.max(0, (progress - 0.75) * 4));
+  const hintOpacity = Math.max(0, 1 - progress * 7);
+  const glowPx      = Math.round(progress * 32);
+
+  const phaseLabel =
+    progress < 0.25 ? "Here's your situation right now" :
+    progress < 0.55 ? "Your leads are slipping through the cracks" :
+    progress < 0.80 ? "This is how much you're leaving behind" :
+                      "ClozeFlow closes this gap — starting today";
 
   return (
-    <section style={{ background: TEXT, padding: "80px 24px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+    <div ref={containerRef} style={{ height: "350vh", position: "relative" }}>
+      {/* Sticky full-screen card */}
+      <div style={{
+        position: "sticky", top: 0,
+        height: "100dvh",
+        background: TEXT,
+        display: "flex", flexDirection: "column",
+        overflow: "hidden",
+      }}>
 
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
+        {/* Top progress bar */}
+        <div style={{ height: 3, background: "rgba(255,255,255,0.06)", flexShrink: 0 }}>
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(211,84,0,0.15)", border: "1px solid rgba(211,84,0,0.35)",
-            borderRadius: 100, padding: "6px 14px", marginBottom: 16,
-            fontSize: 12, fontWeight: 700, color: "#e8641c", letterSpacing: "0.05em",
-          }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#D35400" }} />
-            REVENUE GAP CALCULATOR
-          </div>
-          <h2 style={{
-            fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900,
-            color: "#F9F7F2", letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: 12,
-          }}>
-            How much revenue are you leaving on the table?
-          </h2>
-          <p style={{ fontSize: 16, color: "rgba(249,247,242,0.55)", maxWidth: 520, margin: "0 auto" }}>
-            Adjust the sliders to match your business — see your exact numbers instantly.
-          </p>
+            height: "100%", width: `${progress * 100}%`,
+            background: "linear-gradient(90deg,#D35400,#e8641c)",
+            transition: "width 0.05s linear",
+          }} />
         </div>
 
-        {/* Card */}
+        {/* Scroll hint — fades out immediately */}
         <div style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: 20,
-          overflow: "hidden",
+          position: "absolute", top: 18, left: 0, right: 0,
+          display: "flex", justifyContent: "center", alignItems: "center", gap: 6,
+          opacity: hintOpacity, transition: "opacity 0.3s",
+          pointerEvents: "none",
         }}>
+          <span className="cf-bounce" style={{ fontSize: 13, color: "rgba(249,247,242,0.35)" }}>↓</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(249,247,242,0.3)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            Scroll to see your revenue gap
+          </span>
+        </div>
+
+        {/* Body */}
+        <div style={{
+          flex: 1, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          padding: "52px 24px 16px",
+          gap: 12,
+          width: "100%", maxWidth: 480, margin: "0 auto",
+        }}>
+
+          {/* Phase label */}
+          <p style={{
+            fontSize: 13, fontWeight: 600, color: "rgba(249,247,242,0.42)",
+            textAlign: "center", lineHeight: 1.4,
+            minHeight: "2.6em", display: "flex", alignItems: "center",
+            transition: "opacity 0.4s",
+          }}>
+            {phaseLabel}
+          </p>
+
+          {/* Stat boxes: Leads + Close Rate */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%" }}>
+            {/* Leads */}
+            <div style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 16, padding: "18px 12px", textAlign: "center",
+            }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(249,247,242,0.38)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
+                Leads / month
+              </p>
+              <p style={{
+                fontSize: "clamp(42px, 10vw, 60px)", fontWeight: 900, color: "#F9F7F2", lineHeight: 1,
+                fontVariantNumeric: "tabular-nums", transition: "all 0.08s linear",
+              }}>
+                {leads}
+              </p>
+            </div>
+
+            {/* Close rate */}
+            <div style={{
+              background: "rgba(255,255,255,0.05)",
+              border: `1px solid ${crBorder}`,
+              borderRadius: 16, padding: "18px 12px", textAlign: "center",
+              transition: "border-color 0.4s, box-shadow 0.4s",
+              boxShadow: crGlow,
+            }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(249,247,242,0.38)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
+                Your close rate
+              </p>
+              <p style={{
+                fontSize: "clamp(42px, 10vw, 60px)", fontWeight: 900, lineHeight: 1,
+                color: crColor, transition: "color 0.25s",
+                fontVariantNumeric: "tabular-nums",
+              }}>
+                {Math.round(closeRate)}%
+              </p>
+            </div>
+          </div>
+
+          {/* Annual gap — the hero number */}
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 0,
-          }} className="calc-grid">
+            width: "100%",
+            background: "rgba(39,174,96,0.07)", border: "1px solid rgba(39,174,96,0.18)",
+            borderRadius: 18, padding: "20px 16px", textAlign: "center",
+            opacity: gapOpacity, transition: "opacity 0.3s",
+          }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(39,174,96,0.6)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
+              You&apos;re leaving on the table every year
+            </p>
+            <p style={{
+              fontSize: "clamp(38px, 10vw, 62px)", fontWeight: 900, lineHeight: 1,
+              background: "linear-gradient(135deg,#27AE60,#2ecc71)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              fontVariantNumeric: "tabular-nums",
+              filter: `drop-shadow(0 0 ${glowPx}px rgba(39,174,96,0.55))`,
+              transition: "filter 0.2s",
+              marginBottom: 4,
+            }}>
+              {fmt$(annualGap)}
+            </p>
+            <p style={{ fontSize: 11, color: "rgba(39,174,96,0.38)", fontWeight: 500 }}>
+              based on $1,000 avg job · <Link href="/calculator" style={{ color: "rgba(39,174,96,0.6)", textDecoration: "none", fontWeight: 700 }}>use your real numbers →</Link>
+            </p>
+          </div>
 
-            {/* ── LEFT: Inputs ── */}
-            <div style={{ padding: "40px 40px", borderRight: "1px solid rgba(255,255,255,0.08)" }} className="calc-inputs">
-
-              {/* Trade selector */}
-              <div style={{ marginBottom: 32 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: "rgba(249,247,242,0.45)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12 }}>
-                  Your trade
-                </p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {CALC_TRADES.map((t, i) => (
-                    <button key={t.label} onClick={() => setTradeIdx(i)} style={{
-                      padding: "7px 14px", borderRadius: 100, fontSize: 13, fontWeight: 600, cursor: "pointer",
-                      border: `1px solid ${i === tradeIdx ? ORANGE : "rgba(255,255,255,0.12)"}`,
-                      background: i === tradeIdx ? "rgba(211,84,0,0.18)" : "transparent",
-                      color: i === tradeIdx ? "#e8641c" : "rgba(249,247,242,0.55)",
-                      transition: "all 0.15s",
-                    }}>
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Jobs slider */}
-              <div style={{ marginBottom: 32 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(249,247,242,0.65)", margin: 0 }}>
-                    Jobs completed last month
-                  </p>
-                  <span style={{
-                    fontSize: 32, fontWeight: 900, lineHeight: 1,
-                    background: "linear-gradient(135deg,#D35400,#e8641c)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                  }}>
-                    {jobs}
-                  </span>
-                </div>
-                <input type="range" min={1} max={100} value={jobs}
-                  onChange={e => setJobs(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: ORANGE, height: 6, cursor: "pointer" }}
-                />
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
-                  <span style={{ fontSize: 11, color: "rgba(249,247,242,0.3)" }}>1 job</span>
-                  <span style={{ fontSize: 11, color: "rgba(249,247,242,0.3)" }}>100 jobs</span>
-                </div>
-              </div>
-
-              {/* Close rate slider */}
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(249,247,242,0.65)", margin: 0 }}>
-                    Your current close rate
-                  </p>
-                  <span style={{
-                    fontSize: 32, fontWeight: 900, lineHeight: 1,
-                    background: "linear-gradient(135deg,#D35400,#e8641c)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                  }}>
-                    {closeRate}%
-                  </span>
-                </div>
-                <input type="range" min={5} max={75} value={closeRate}
-                  onChange={e => setCloseRate(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: ORANGE, height: 6, cursor: "pointer" }}
-                />
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
-                  <span style={{ fontSize: 11, color: "rgba(249,247,242,0.3)" }}>5%</span>
-                  <span style={{ fontSize: 11, color: "rgba(249,247,242,0.3)" }}>75%</span>
-                </div>
-                <p style={{ fontSize: 12, color: "rgba(249,247,242,0.3)", marginTop: 8 }}>
-                  Implies ≈ <strong style={{ color: "rgba(249,247,242,0.55)" }}>{results.impliedLeads} leads/month</strong> reaching your business
-                </p>
-              </div>
+          {/* Without vs With row */}
+          <div style={{
+            display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 8,
+            width: "100%", alignItems: "center",
+            opacity: rowOpacity, transition: "opacity 0.3s",
+          }}>
+            <div style={{ textAlign: "center", background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "12px 8px" }}>
+              <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(249,247,242,0.28)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Without ClozeFlow</p>
+              <p style={{ fontSize: 28, fontWeight: 900, color: "rgba(249,247,242,0.4)", fontVariantNumeric: "tabular-nums", transition: "all 0.08s linear" }}>
+                {Math.round(yourJobs)}
+              </p>
+              <p style={{ fontSize: 10, color: "rgba(249,247,242,0.2)" }}>jobs / mo</p>
             </div>
-
-            {/* ── RIGHT: Live results ── */}
-            <div style={{ padding: "40px 40px", display: "flex", flexDirection: "column", justifyContent: "space-between" }} className="calc-results">
-
-              {/* Before / After */}
-              <div style={{ marginBottom: 24 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-                  {/* Without */}
-                  <div style={{
-                    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: 12, padding: "16px 16px",
-                  }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(249,247,242,0.35)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
-                      Right now
-                    </p>
-                    <p style={{ fontSize: 22, fontWeight: 900, color: "rgba(249,247,242,0.6)", marginBottom: 2 }}>
-                      {fmt$(results.currentRev)}
-                    </p>
-                    <p style={{ fontSize: 11, color: "rgba(249,247,242,0.3)" }}>/month · {closeRate}% close</p>
-                  </div>
-                  {/* With CF */}
-                  <div style={{
-                    background: "rgba(211,84,0,0.1)", border: "1px solid rgba(211,84,0,0.35)",
-                    borderRadius: 12, padding: "16px 16px",
-                  }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, color: "#e8641c", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
-                      With ClozeFlow
-                    </p>
-                    <p style={{ fontSize: 22, fontWeight: 900, color: "#e8641c", marginBottom: 2 }}>
-                      {fmt$(results.cfRev)}
-                    </p>
-                    <p style={{ fontSize: 11, color: "rgba(211,84,0,0.6)" }}>/month · 55% close</p>
-                  </div>
-                </div>
-
-                {/* Annual gap — the hero number */}
-                {showGap && results.annualGap > 0 ? (
-                  <div style={{
-                    background: "rgba(39,174,96,0.08)", border: "1px solid rgba(39,174,96,0.25)",
-                    borderRadius: 14, padding: "20px 20px", textAlign: "center", marginBottom: 16,
-                  }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(39,174,96,0.7)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>
-                      You could be earning an extra
-                    </p>
-                    <p style={{
-                      fontSize: "clamp(36px, 5vw, 52px)", fontWeight: 900, lineHeight: 1, marginBottom: 4,
-                      background: "linear-gradient(135deg,#27AE60,#2ecc71)",
-                      WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                    }}>
-                      {fmt$(results.annualGap)}
-                    </p>
-                    <p style={{ fontSize: 12, color: "rgba(39,174,96,0.6)" }}>
-                      per year &nbsp;·&nbsp; {fmt$(results.monthlyGap)}/mo &nbsp;·&nbsp; +{results.extraJobs} jobs/mo
-                    </p>
-                  </div>
-                ) : (
-                  <div style={{
-                    background: "rgba(39,174,96,0.08)", border: "1px solid rgba(39,174,96,0.25)",
-                    borderRadius: 14, padding: "20px 20px", textAlign: "center", marginBottom: 16,
-                  }}>
-                    <p style={{ fontSize: 14, color: "rgba(39,174,96,0.8)", lineHeight: 1.55 }}>
-                      Your close rate is already strong — ClozeFlow helps you maintain it consistently at scale, without manual follow-up.
-                    </p>
-                  </div>
-                )}
-
-                {/* Plan chip + ROI */}
-                <div style={{
-                  background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.2)",
-                  borderRadius: 10, padding: "12px 16px",
-                  display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8,
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>⚡</span>
-                    <div>
-                      <p style={{ margin: 0, fontSize: 11, color: "rgba(249,247,242,0.4)", fontWeight: 600 }}>Suggested plan</p>
-                      <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#e8641c" }}>
-                        {results.isPlan} · {fmt$(results.planPrice)}/mo
-                        <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(249,247,242,0.4)" }}> billed annually</span>
-                      </p>
-                    </div>
-                  </div>
-                  {showGap && results.roi > 1 && (
-                    <div style={{
-                      background: "rgba(39,174,96,0.12)", border: "1px solid rgba(39,174,96,0.2)",
-                      borderRadius: 8, padding: "6px 12px", textAlign: "center",
-                    }}>
-                      <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: "#27AE60", lineHeight: 1 }}>{results.roi}×</p>
-                      <p style={{ margin: 0, fontSize: 10, color: "rgba(39,174,96,0.6)", fontWeight: 600 }}>est. ROI</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* CTAs */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <Link href="/signup" style={{
-                  background: "linear-gradient(135deg,#D35400,#e8641c)",
-                  color: "#fff", fontWeight: 800, fontSize: 15,
-                  padding: "14px 24px", borderRadius: 10, textDecoration: "none",
-                  textAlign: "center",
-                  boxShadow: "0 4px 20px rgba(211,84,0,0.35)",
-                }}>
-                  {showGap && results.monthlyGap > 0
-                    ? `Unlock ${fmt$(results.monthlyGap)}/month — Start Free →`
-                    : "Start Free — No Card Needed →"}
-                </Link>
-                <Link href="/calculator" style={{
-                  color: "rgba(249,247,242,0.4)", fontSize: 13, textDecoration: "none",
-                  textAlign: "center", fontWeight: 500,
-                }}>
-                  See full breakdown with all plan options →
-                </Link>
-              </div>
+            <p style={{ textAlign: "center", fontSize: 12, color: "rgba(249,247,242,0.18)", fontWeight: 700 }}>vs</p>
+            <div style={{ textAlign: "center", background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.18)", borderRadius: 12, padding: "12px 8px" }}>
+              <p style={{ fontSize: 9, fontWeight: 700, color: "#e8641c", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>With ClozeFlow</p>
+              <p style={{ fontSize: 28, fontWeight: 900, color: "#e8641c", fontVariantNumeric: "tabular-nums", transition: "all 0.08s linear" }}>
+                {Math.round(cfJobs)}
+              </p>
+              <p style={{ fontSize: 10, color: "rgba(211,84,0,0.4)" }}>jobs / mo</p>
             </div>
+          </div>
+
+          {/* CTA — fades in near end */}
+          <div style={{
+            opacity: ctaOpacity, transition: "opacity 0.4s",
+            pointerEvents: ctaOpacity > 0.3 ? "auto" : "none",
+          }}>
+            <Link href="/signup" style={{
+              background: "linear-gradient(135deg,#D35400,#e8641c)",
+              color: "#fff", fontWeight: 800, fontSize: 15,
+              padding: "13px 28px", borderRadius: 10, textDecoration: "none",
+              display: "inline-block",
+              boxShadow: "0 4px 24px rgba(211,84,0,0.45)",
+            }}>
+              Stop Losing Jobs — Start Free →
+            </Link>
           </div>
         </div>
 
+        {/* Bottom progress dots */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 6, paddingBottom: 14, flexShrink: 0 }}>
+          {[0.25, 0.5, 0.75, 1].map(t => (
+            <div key={t} style={{
+              height: 5, borderRadius: 3,
+              width: progress >= t - 0.01 ? 18 : 5,
+              background: progress >= t - 0.01 ? ORANGE : "rgba(255,255,255,0.14)",
+              transition: "all 0.3s",
+            }} />
+          ))}
+        </div>
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          .calc-grid { grid-template-columns: 1fr !important; }
-          .calc-inputs { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
-          .calc-inputs, .calc-results { padding: 28px 24px !important; }
-        }
+        .cf-bounce { display: inline-block; animation: cf-bounce-y 1.6s ease-in-out infinite; }
+        @keyframes cf-bounce-y { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
       `}</style>
-    </section>
+    </div>
   );
 }
 
@@ -369,6 +317,317 @@ const PIPELINE_LEADS = [
   { initials: "TB", name: "Tom B.",   job: "Kitchen Remodel",  status: "Qualified",  statusColor: "#6366f1", statusBg: "rgba(99,102,241,0.12)",  detail: "Score: 92 / 100"   },
   { initials: "MR", name: "Mike R.",  job: "Deck Build",       status: "New",        statusColor: "#3b82f6", statusBg: "rgba(59,130,246,0.12)",  detail: "Just arrived"      },
 ];
+
+// ── How It Works phone screens ───────────────────────────────────────────────
+
+function ConnectScreenContent() {
+  const sources = [
+    { name: "Angi",         color: "#16a34a" },
+    { name: "Thumbtack",    color: "#0891b2" },
+    { name: "Google Local", color: "#ea580c" },
+    { name: "Your Website", color: "#7c3aed" },
+  ];
+  return (
+    <div>
+      <div style={{ background: "#fff", padding: "12px 14px 10px", borderBottom: "1px solid #f1f5f9" }}>
+        <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, marginBottom: 4 }}>Lead Sources</p>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(39,174,96,0.1)", borderRadius: 100, padding: "3px 9px" }}>
+          <div style={{ width: 5, height: 5, borderRadius: "50%", background: GREEN }} />
+          <span style={{ fontSize: 9, fontWeight: 700, color: GREEN }}>All Active</span>
+        </div>
+      </div>
+      <div style={{ padding: "8px 10px", display: "flex", flexDirection: "column", gap: 5 }}>
+        {sources.map(s => (
+          <div key={s.name} style={{
+            background: "#fff", borderRadius: 10, padding: "10px 12px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: TEXT }}>{s.name}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: s.color }} />
+              <span style={{ fontSize: 9, fontWeight: 600, color: s.color }}>Active</span>
+            </div>
+          </div>
+        ))}
+        <div style={{ background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.12)", borderRadius: 10, padding: "9px 12px", textAlign: "center", marginTop: 4 }}>
+          <p style={{ fontSize: 10, fontWeight: 800, color: ORANGE, margin: 0 }}>8 leads captured today</p>
+          <p style={{ fontSize: 8, color: "rgba(211,84,0,0.5)", marginTop: 2 }}>All responded to within 60s</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChatScreenContent() {
+  return (
+    <div>
+      <div style={{ background: "#fff", padding: "10px 14px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(99,102,241,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#6366f1", flexShrink: 0 }}>
+          SM
+        </div>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, margin: 0 }}>Sarah M.</p>
+          <p style={{ fontSize: 8, color: MUTED, margin: 0 }}>Angi · just now</p>
+        </div>
+        <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 100, padding: "2px 7px" }}>
+          <span style={{ fontSize: 8, fontWeight: 700, color: "#f59e0b" }}>AI Active</span>
+        </div>
+      </div>
+      <div style={{ padding: "10px 10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          <div style={{ background: "#2C3E50", borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
+            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;Need a roof quote. Saw your Angi ad.&rdquo;</p>
+          </div>
+          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:14 PM</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+          <span style={{ fontSize: 7, fontWeight: 700, color: ORANGE, marginBottom: 2 }}>ClozeFlow · 47s</span>
+          <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "7px 10px", maxWidth: "85%", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
+            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Hi Sarah! What&apos;s your address and best day for an estimate?&rdquo;</p>
+          </div>
+          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:14 PM</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          <div style={{ background: "#2C3E50", borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
+            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;123 Oak St. Any day this week.&rdquo;</p>
+          </div>
+          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:16 PM</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+          <span style={{ fontSize: 7, fontWeight: 700, color: ORANGE, marginBottom: 2 }}>ClozeFlow · 12s</span>
+          <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "7px 10px", maxWidth: "85%", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
+            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Perfect — Thursday 2–4 PM for a free estimate?&rdquo;</p>
+          </div>
+          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:16 PM</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+          <span style={{ fontSize: 7, fontWeight: 700, color: ORANGE, marginBottom: 2 }}>ClozeFlow</span>
+          <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "9px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.08)", display: "flex", gap: 4, alignItems: "center" }}>
+            <div className="hiw-td hiw-td-0" style={{ width: 5, height: 5, borderRadius: "50%", background: "#d1d5db" }} />
+            <div className="hiw-td hiw-td-1" style={{ width: 5, height: 5, borderRadius: "50%", background: "#d1d5db" }} />
+            <div className="hiw-td hiw-td-2" style={{ width: 5, height: 5, borderRadius: "50%", background: "#d1d5db" }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CalendarScreenContent() {
+  const weekDates = [13, 14, 15, 16, 17, 18, 19];
+  const days      = ["S", "M", "T", "W", "T", "F", "S"];
+  return (
+    <div>
+      <div style={{ background: "#fff", padding: "12px 14px 10px", borderBottom: "1px solid #f1f5f9" }}>
+        <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, marginBottom: 8 }}>April 2025</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 4 }}>
+          {days.map((d, i) => (
+            <p key={i} style={{ fontSize: 8, fontWeight: 700, color: "#a8a29e", textAlign: "center", margin: 0 }}>{d}</p>
+          ))}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2 }}>
+          {weekDates.map(d => (
+            <div key={d} style={{
+              height: 22, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6,
+              background: d === 17 ? "linear-gradient(135deg,#D35400,#e8641c)" : "transparent",
+            }}>
+              <p style={{ fontSize: 9, fontWeight: d === 17 ? 800 : 400, color: d === 17 ? "#fff" : TEXT, margin: 0 }}>{d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ padding: "10px 10px" }}>
+        <p style={{ fontSize: 9, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Thursday, Apr 17</p>
+        <div style={{ background: "#fff", borderRadius: 12, padding: "12px 12px", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", borderLeft: `3px solid ${ORANGE}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: ORANGE, flexShrink: 0 }} />
+            <p style={{ fontSize: 10, fontWeight: 800, color: ORANGE, margin: 0 }}>2:00 PM</p>
+          </div>
+          <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, marginBottom: 1 }}>Sarah M.</p>
+          <p style={{ fontSize: 9, color: MUTED, marginBottom: 1 }}>Roof Inspection</p>
+          <p style={{ fontSize: 9, color: "#a8a29e" }}>123 Oak St</p>
+        </div>
+        <div style={{ marginTop: 8, background: "rgba(39,174,96,0.08)", border: "1px solid rgba(39,174,96,0.18)", borderRadius: 8, padding: "7px 10px", textAlign: "center" }}>
+          <p style={{ fontSize: 9, fontWeight: 700, color: GREEN, margin: 0 }}>Booked automatically · ClozeFlow</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepPhone({ step }: { step: number }) {
+  return (
+    <div style={{ position: "relative" }}>
+      <div style={{
+        position: "absolute", width: 260, height: 260, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(211,84,0,0.12) 0%, transparent 70%)",
+        bottom: -40, left: "50%", transform: "translateX(-50%)",
+        pointerEvents: "none",
+      }} />
+      <div style={{
+        position: "relative", width: 256, background: "#111827", borderRadius: 44,
+        padding: "10px 10px 14px",
+        boxShadow: "0 40px 80px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.06)",
+      }}>
+        <div style={{ position:"absolute", left:-3, top:88, width:3, height:26, background:"#374151", borderRadius:"2px 0 0 2px" }} />
+        <div style={{ position:"absolute", left:-3, top:124, width:3, height:40, background:"#374151", borderRadius:"2px 0 0 2px" }} />
+        <div style={{ position:"absolute", right:-3, top:116, width:3, height:52, background:"#374151", borderRadius:"0 2px 2px 0" }} />
+        <div style={{ background: "#f8f9fb", borderRadius: 36, overflow: "hidden" }}>
+          {/* Status bar */}
+          <div style={{ height: 38, background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 18px" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, color: "#1c1917" }}>9:41</span>
+            <div style={{ width: 68, height: 18, background: "#111827", borderRadius: 10 }} />
+            <div style={{ display: "flex", gap: 3, alignItems: "center" }}>
+              {[3,4,5,5].map((h,i) => (
+                <div key={i} style={{ width: 3, height: h, background: "#1c1917", borderRadius: 1, opacity: i < 3 ? 1 : 0.3 }} />
+              ))}
+              <div style={{ width: 16, height: 8, border: "1.5px solid rgba(28,25,23,0.7)", borderRadius: 2, marginLeft: 4, display: "flex", alignItems: "center", padding: "0 1px" }}>
+                <div style={{ width: 9, height: 4, background: "#1c1917", borderRadius: 1 }} />
+              </div>
+            </div>
+          </div>
+          {/* Screen content — key forces re-mount + fade animation */}
+          <div key={step} className="hiw-screen" style={{ minHeight: 420 }}>
+            {step === 0 && <ConnectScreenContent />}
+            {step === 1 && <ChatScreenContent />}
+            {step === 2 && <CalendarScreenContent />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FeatureIcon({ index }: { index: number }) {
+  const paths: React.ReactNode[] = [
+    // 0 — clock (speed)
+    <><circle key="c" cx="12" cy="12" r="9"/><polyline key="p" points="12 7 12 12 15 14"/></>,
+    // 1 — funnel (qualify)
+    <path key="p" d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>,
+    // 2 — message (follow-up)
+    <path key="p" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>,
+    // 3 — calendar
+    <><rect key="r" x="3" y="4" width="18" height="18" rx="2"/><line key="l1" x1="16" y1="2" x2="16" y2="6"/><line key="l2" x1="8" y1="2" x2="8" y2="6"/><line key="l3" x1="3" y1="10" x2="21" y2="10"/></>,
+    // 4 — bar chart (pipeline)
+    <><line key="l1" x1="18" y1="20" x2="18" y2="10"/><line key="l2" x1="12" y1="20" x2="12" y2="4"/><line key="l3" x1="6" y1="20" x2="6" y2="14"/><line key="l4" x1="3" y1="20" x2="21" y2="20"/></>,
+    // 5 — target (campaigns)
+    <><circle key="c1" cx="12" cy="12" r="10"/><circle key="c2" cx="12" cy="12" r="5"/><circle key="c3" cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></>,
+  ];
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {paths[index]}
+    </svg>
+  );
+}
+
+function HowItWorks() {
+  const [active, setActive] = useState(0);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
+
+  useEffect(() => {
+    if (window.innerWidth > 768) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const idx = stepRefs.current.findIndex(r => r === entry.target);
+            if (idx !== -1) setActive(idx);
+          }
+        });
+      },
+      { rootMargin: "-20% 0px -50% 0px" }
+    );
+    stepRefs.current.forEach(r => r && observer.observe(r));
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section style={{ background: BG, borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 72 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
+            How It Works
+          </p>
+          <h2 style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 900, color: TEXT, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+            Set it up once. Let it run forever.
+          </h2>
+        </div>
+
+        <div className="hiw-grid">
+          {/* Left: clickable steps */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {HIW_STEPS.map((step, i) => (
+              <div
+                key={step.n}
+                ref={el => { stepRefs.current[i] = el; }}
+                onClick={() => setActive(i)}
+                style={{
+                  padding: "24px 24px",
+                  borderRadius: 14,
+                  cursor: "pointer",
+                  background: active === i ? "#fff" : "transparent",
+                  border: `1px solid ${active === i ? BORDER : "transparent"}`,
+                  borderLeft: `3px solid ${active === i ? ORANGE : "transparent"}`,
+                  boxShadow: active === i ? "0 4px 16px rgba(0,0,0,0.06)" : "none",
+                  transition: "all 0.25s ease",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: active === i ? 10 : 0 }}>
+                  <span style={{
+                    fontSize: 11, fontWeight: 800, letterSpacing: "0.05em", flexShrink: 0,
+                    color: active === i ? ORANGE : "rgba(44,62,80,0.28)",
+                    transition: "color 0.25s",
+                  }}>
+                    {step.n}
+                  </span>
+                  <h3 style={{
+                    fontSize: 17, lineHeight: 1.3,
+                    fontWeight: active === i ? 800 : 500,
+                    color: active === i ? TEXT : MUTED,
+                    transition: "all 0.25s",
+                  }}>
+                    {step.title}
+                  </h3>
+                </div>
+                {active === i && (
+                  <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.65, marginLeft: 28 }}>
+                    {step.desc}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Right: live phone demo */}
+          <div className="hiw-phone-col" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <StepPhone step={active} />
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .hiw-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 80px;
+          align-items: center;
+        }
+        @media (max-width: 768px) {
+          .hiw-grid { grid-template-columns: 1fr !important; gap: 0 !important; }
+          .hiw-phone-col { display: none !important; }
+        }
+        .hiw-screen { animation: hiwFade 0.3s ease; }
+        @keyframes hiwFade { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+        .hiw-td { animation: hiwDot 1.4s ease-in-out infinite; opacity: 0.4; }
+        .hiw-td-0 { animation-delay: 0s; }
+        .hiw-td-1 { animation-delay: 0.2s; }
+        .hiw-td-2 { animation-delay: 0.4s; }
+        @keyframes hiwDot { 0%,60%,100% { transform:translateY(0); opacity:0.4; } 30% { transform:translateY(-4px); opacity:1; } }
+      `}</style>
+    </section>
+  );
+}
 
 function PhoneMockup() {
   return (
@@ -681,234 +940,206 @@ export default function Home() {
         </p>
       </section>
 
-      {/* ── Mini Revenue Gap Calculator ──────────────────── */}
-      <MiniCalculator />
+      {/* ── Scroll Revenue Gap Calculator ────────────────── */}
+      <ScrollCalculator />
 
       {/* ── Pain / Solution ──────────────────────────────── */}
-      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 80px" }}>
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <h2 style={{
-            fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT,
-            lineHeight: 1.2, maxWidth: 640, margin: "0 auto",
-          }}>
-            Most home service businesses lose 60–70% of their leads — not because of bad work, but bad follow-up.
-          </h2>
-        </div>
+      <section style={{ background: "#fff", borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#ef4444", marginBottom: 4 }}>
-              The Problem
+          {/* Section header */}
+          <div style={{ marginBottom: 72 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
+              The Real Problem
             </p>
-            {[
-              "You're busy on a job when a hot lead texts. By the time you reply, they hired someone else.",
-              "You spent money on ads. The leads came in. Nobody followed up within the hour. Money wasted.",
-              "Estimates go out but never come back. No system. No reminders. Deals die on the vine.",
-            ].map(pain => (
-              <div key={pain} style={{
-                background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)",
-                borderRadius: 12, padding: "20px 20px",
-                display: "flex", gap: 12, alignItems: "flex-start",
-              }}>
-                <span style={{ fontSize: 18, flexShrink: 0, marginTop: 2 }}>❌</span>
-                <p style={{ fontSize: 15, color: TEXT, lineHeight: 1.55 }}>{pain}</p>
-              </div>
-            ))}
+            <h2 style={{
+              fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 900, color: TEXT,
+              lineHeight: 1.1, letterSpacing: "-0.02em", maxWidth: 560,
+            }}>
+              You&apos;re not losing jobs because of bad work.
+            </h2>
+            <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.6, marginTop: 16, maxWidth: 500 }}>
+              You&apos;re losing them in the hour before you call back.
+            </p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: GREEN, marginBottom: 4 }}>
-              With ClozeFlow
-            </p>
-            {[
-              "Every lead gets a text + email in under 60 seconds. First response wins.",
-              "Automated follow-up sequence nudges leads every 24–48 hours until they book or say no.",
-              "Your calendar fills automatically. You just show up and do the work you love.",
-            ].map(solution => (
-              <div key={solution} style={{
-                background: "rgba(22,163,74,0.05)", border: "1px solid rgba(22,163,74,0.15)",
-                borderRadius: 12, padding: "20px 20px",
-                display: "flex", gap: 12, alignItems: "flex-start",
-              }}>
-                <span style={{ fontSize: 18, flexShrink: 0, marginTop: 2 }}>✅</span>
-                <p style={{ fontSize: 15, color: TEXT, lineHeight: 1.55 }}>{solution}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Numbers ──────────────────────────────────────── */}
-      <section style={{
-        background: "#fff",
-        borderTop: `1px solid ${BORDER}`,
-        borderBottom: `1px solid ${BORDER}`,
-        padding: "72px 24px",
-      }}>
-        <div style={{
-          maxWidth: 900, margin: "0 auto",
-          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 40,
-        }}>
-          {[
-            { stat: "< 60 sec", label: "Average response time to every new lead",       sub: "day or night, 365 days/year"             },
-            { stat: "3× more",  label: "Booked jobs compared to manual follow-up",      sub: "vs. industry average"                    },
-            { stat: "$0 extra", label: "No extra ad spend needed",                       sub: "just convert what you already pay for"   },
-          ].map(({ stat, label, sub }) => (
-            <div key={stat} style={{ textAlign: "center" }}>
-              <p style={{
-                fontSize: 44, fontWeight: 900,
-                background: "linear-gradient(135deg,#D35400,#e8641c)",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                marginBottom: 8, lineHeight: 1,
-              }}>
-                {stat}
-              </p>
-              <p style={{ fontWeight: 700, fontSize: 15, color: TEXT, marginBottom: 4 }}>{label}</p>
-              <p style={{ fontSize: 13, color: MUTED }}>{sub}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── How It Works ─────────────────────────────────── */}
-      <section style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
-          How It Works
-        </p>
-        <h2 style={{ fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT, marginBottom: 48 }}>
-          Three steps to a full calendar
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24, textAlign: "left" }}>
+          {/* Three moments */}
           {[
             {
               n: "01",
-              title: "Connect your lead sources",
-              body: "Website, Google Ads, Angi, Thumbtack — wherever your customers find you. Our team handles the setup.",
+              scene: "2:14 PM — A lead texts while you're mid-job",
+              pain: "By the time you see it, they've already booked someone who answered first. The job was yours to lose.",
+              fix: "ClozeFlow responds in under 60 seconds, qualifies their budget and timeline, and holds the conversation until you're free.",
             },
             {
               n: "02",
-              title: "ClozeFlow qualifies every inquiry",
-              body: "Every lead gets a response in under 60 seconds, 24/7. AI asks the right questions to filter real buyers.",
+              scene: "You spent $600 on Angi leads this month",
+              pain: "You followed up on 11 out of 40 inquiries. The other 29 never heard from you. That's money you already spent — and jobs you'll never see.",
+              fix: "Every single lead gets an immediate reply and a 5-touch follow-up sequence over the next 5 days. Not one goes cold.",
             },
             {
               n: "03",
-              title: "Bookings land on your calendar",
-              body: "Ready-to-book customers schedule themselves. You show up and do the work you love.",
+              scene: "You sent 14 estimates last week",
+              pain: "Seven haven't responded. You keep meaning to follow up. Two of them booked a competitor yesterday while you were on the job.",
+              fix: "Automated nudges follow up every 24–48 hours on your behalf. You fill the silence before someone else does.",
             },
-          ].map(step => (
-            <div key={step.n} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "28px 24px" }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 10,
-                background: "linear-gradient(135deg,#D35400,#e8641c)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#fff", fontWeight: 900, fontSize: 14, marginBottom: 18,
-              }}>
-                {step.n}
+          ].map((row, i) => (
+            <div key={row.n} style={{
+              paddingTop: i === 0 ? 0 : 56,
+              borderTop: i === 0 ? "none" : `1px solid ${BORDER}`,
+              marginTop: i === 0 ? 0 : 56,
+            }}>
+              {/* Scene label */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+                <span style={{
+                  fontSize: 11, fontWeight: 800, color: "rgba(44,62,80,0.25)",
+                  letterSpacing: "0.06em",
+                }}>
+                  {row.n}
+                </span>
+                <span style={{
+                  fontSize: 12, fontWeight: 700, color: MUTED,
+                  letterSpacing: "0.04em",
+                }}>
+                  {row.scene}
+                </span>
               </div>
-              <h3 style={{ fontWeight: 800, fontSize: 17, color: TEXT, marginBottom: 8 }}>{step.title}</h3>
-              <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.6 }}>{step.body}</p>
+
+              {/* Pain */}
+              <p style={{
+                fontSize: "clamp(18px, 2.8vw, 22px)", fontWeight: 700, color: TEXT,
+                lineHeight: 1.4, marginBottom: 20,
+              }}>
+                {row.pain}
+              </p>
+
+              {/* Divider */}
+              <div style={{
+                height: 1,
+                background: `linear-gradient(90deg, ${ORANGE}, transparent)`,
+                marginBottom: 20,
+                opacity: 0.35,
+              }} />
+
+              {/* Fix */}
+              <p style={{
+                fontSize: 15, color: MUTED, lineHeight: 1.65,
+                paddingLeft: 16,
+                borderLeft: `2px solid ${ORANGE}`,
+              }}>
+                {row.fix}
+              </p>
             </div>
           ))}
+
         </div>
       </section>
 
-      {/* ── Calculator Teaser ────────────────────────────── */}
-      <section style={{ background: "linear-gradient(135deg,#D35400,#e8641c)", padding: "72px 24px", textAlign: "center" }}>
-        <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          <h2 style={{ fontSize: "clamp(24px, 4vw, 34px)", fontWeight: 900, color: "#fff", marginBottom: 16 }}>
-            How much revenue are you leaving on the table every month?
-          </h2>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.85)", lineHeight: 1.65, marginBottom: 32 }}>
-            100 leads a month at 25% close rate = 25 jobs. With ClozeFlow at 55%? That&apos;s 55 jobs.
-            Use our free calculator to see your exact numbers.
-          </p>
-          <Link href="/calculator" style={{
-            background: "#fff", color: ORANGE, fontWeight: 800, fontSize: 16,
-            padding: "14px 28px", borderRadius: 10, textDecoration: "none", display: "inline-block",
-          }}>
-            Calculate My Revenue Gap →
-          </Link>
-        </div>
-      </section>
+      <HowItWorks />
 
       {/* ── Testimonials ─────────────────────────────────── */}
-      <section style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
-            Real Results
-          </p>
-          <h2 style={{ fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT }}>
-            Skeptical at first. Then they saw the numbers.
-          </h2>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
-          {TESTIMONIALS.map(t => (
-            <div key={t.name} style={{
-              background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "28px 24px",
-              display: "flex", flexDirection: "column",
-            }}>
-              <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: `1px solid ${BORDER}` }}>
-                <p style={{
-                  fontSize: 36, fontWeight: 900,
-                  background: "linear-gradient(135deg,#D35400,#e8641c)",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                  lineHeight: 1, marginBottom: 4,
-                }}>
-                  {t.result}
-                </p>
-                <p style={{ fontSize: 12, fontWeight: 600, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  {t.resultLabel}
-                </p>
-              </div>
-              <div style={{ display: "flex", gap: 2, marginBottom: 14 }}>
-                {[...Array(5)].map((_, i) => <span key={i} style={{ color: "#f59e0b", fontSize: 14 }}>★</span>)}
-              </div>
-              <blockquote style={{ fontSize: 14, color: MUTED, lineHeight: 1.65, flexGrow: 1, marginBottom: 20 }}>
-                &ldquo;{t.quote}&rdquo;
-              </blockquote>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, borderTop: `1px solid ${BORDER}`, paddingTop: 16 }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: "50%", background: t.avatarColor,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#fff", fontSize: 12, fontWeight: 700, flexShrink: 0,
-                }}>
-                  {t.initials}
-                </div>
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: 14, color: TEXT }}>{t.name}</p>
-                  <p style={{ fontSize: 12, color: MUTED }}>{t.title} · {t.location}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Features Preview ─────────────────────────────── */}
-      <section style={{ background: "#fff", borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`, padding: "80px 24px" }}>
+      <section style={{ background: BG, borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
-              Features
+          <div style={{ textAlign: "center", marginBottom: 64 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
+              Real Results
             </p>
-            <h2 style={{ fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT }}>
-              Everything you need to fill your calendar
+            <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+              Contractors who stopped losing leads.
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
-            {FEATURES.map(f => (
-              <div key={f.title} style={{ background: "#F9F7F2", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "24px 20px" }}>
-                <span style={{ fontSize: 28, display: "block", marginBottom: 12 }}>{f.icon}</span>
-                <h3 style={{ fontWeight: 700, fontSize: 16, color: TEXT, marginBottom: 6 }}>{f.title}</h3>
-                <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.55 }}>{f.desc}</p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
+            {TESTIMONIALS.map(t => (
+              <div key={t.name} style={{
+                background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "32px 28px",
+                display: "flex", flexDirection: "column",
+              }}>
+                {/* Stars */}
+                <div style={{ display: "flex", gap: 3, marginBottom: 22 }}>
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  ))}
+                </div>
+
+                {/* Quote */}
+                <blockquote style={{
+                  fontSize: 17, color: TEXT, lineHeight: 1.65, fontWeight: 500,
+                  fontStyle: "normal", flexGrow: 1, marginBottom: 28,
+                }}>
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+
+                {/* Person */}
+                <div style={{ display: "flex", alignItems: "center", gap: 14, paddingTop: 20, borderTop: `1px solid ${BORDER}` }}>
+                  <div style={{
+                    width: 48, height: 48, borderRadius: "50%", overflow: "hidden",
+                    flexShrink: 0, background: "#e5e7eb",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <img
+                      src={t.photo}
+                      alt={t.name}
+                      width={48}
+                      height={48}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                      onError={e => {
+                        const el = e.currentTarget;
+                        el.style.display = "none";
+                        const parent = el.parentElement;
+                        if (parent) parent.innerHTML = `<span style="font-size:13px;font-weight:700;color:#9ca3af">${t.initials}</span>`;
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <p style={{ fontWeight: 800, fontSize: 14, color: TEXT, marginBottom: 2 }}>{t.name}</p>
+                    <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.4 }}>{t.title}<br />{t.location}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-          <div style={{ textAlign: "center", marginTop: 32 }}>
+        </div>
+      </section>
+
+      {/* ── Features ─────────────────────────────────────── */}
+      <section style={{ background: "#fff", borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 64 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
+              Features
+            </p>
+            <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+              Everything you need. Nothing you don&apos;t.
+            </h2>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+            {FEATURES.map((f, i) => (
+              <div key={f.title} style={{
+                background: BG, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "32px 28px",
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12, marginBottom: 20,
+                  background: "rgba(211,84,0,0.07)", border: "1px solid rgba(211,84,0,0.14)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: ORANGE, flexShrink: 0,
+                }}>
+                  <FeatureIcon index={i} />
+                </div>
+                <h3 style={{ fontWeight: 800, fontSize: 17, color: TEXT, marginBottom: 10, letterSpacing: "-0.01em" }}>{f.title}</h3>
+                <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.65 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ textAlign: "center", marginTop: 40 }}>
             <Link href="/features" style={{
               color: ORANGE, fontWeight: 700, fontSize: 15, textDecoration: "none",
-              border: `1px solid rgba(211,84,0,0.3)`, padding: "10px 24px", borderRadius: 8,
+              border: `1px solid rgba(211,84,0,0.25)`, padding: "11px 28px",
+              borderRadius: 8, display: "inline-block",
             }}>
               See all features →
             </Link>

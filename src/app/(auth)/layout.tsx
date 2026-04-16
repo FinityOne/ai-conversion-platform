@@ -4,10 +4,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: "#05091a", color: "#f1f5f9" }}
+      style={{ background: "#F9F7F2", color: "#2C3E50" }}
     >
       {/* Minimal auth header */}
-      <header className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      <header className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #e6e2db", background: "#ffffff" }}>
         <Link href="/" className="flex items-center gap-2">
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center"
@@ -17,7 +17,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <span className="font-black text-base tracking-tight text-white">
+          <span className="font-black text-base tracking-tight" style={{ color: "#2C3E50" }}>
             Cloze<span style={{ background: "linear-gradient(90deg,#D35400,#e8641c)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Flow</span>
           </span>
         </Link>

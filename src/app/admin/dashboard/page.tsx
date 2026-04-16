@@ -162,7 +162,7 @@ export default async function AdminDashboard() {
                 <div key={key}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 12 }}>{plan.emoji}</span>
+                      <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 11, color: plan.color }} />
                       <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>{plan.name}</span>
                       <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 8, background: isAnnual ? "rgba(34,197,94,0.1)" : "rgba(99,102,241,0.1)", color: isAnnual ? "#16a34a" : INDIGO }}>
                         {isAnnual ? "Annual" : "Monthly"}

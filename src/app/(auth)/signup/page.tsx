@@ -10,26 +10,28 @@ import { formatPhoneE164 } from "@/lib/phone";
 // Steps: email → firstName → lastName → phone → businessName → password
 const TOTAL_STEPS = 6;
 
-const MUTED = "rgba(255,255,255,0.4)";
-const VERY_MUTED = "rgba(255,255,255,0.22)";
+const TEXT = "#2C3E50";
+const MUTED = "#78716c";
+const VERY_MUTED = "#a8a29e";
+const BORDER = "#e6e2db";
 
 const inputStyle = {
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.12)",
+  background: "#ffffff",
+  border: `1px solid ${BORDER}`,
   borderRadius: "14px",
-  color: "#f1f5f9",
+  color: TEXT,
   fontSize: "17px",
   padding: "18px 20px",
   width: "100%",
   outline: "none",
-  transition: "border-color 0.2s",
+  transition: "border-color 0.2s, box-shadow 0.2s",
   WebkitAppearance: "none" as const,
 };
 
 const inputFocusStyle = {
   ...inputStyle,
-  border: "1px solid rgba(211,84,0,0.6)",
-  boxShadow: "0 0 0 3px rgba(211,84,0,0.12)",
+  border: "1px solid rgba(211,84,0,0.55)",
+  boxShadow: "0 0 0 3px rgba(211,84,0,0.1)",
 };
 
 function GoogleButton({ onClick, label }: { onClick: () => void; label: string }) {
@@ -39,13 +41,13 @@ function GoogleButton({ onClick, label }: { onClick: () => void; label: string }
       onClick={onClick}
       className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
       style={{
-        background: "rgba(255,255,255,0.06)",
-        border: "1px solid rgba(255,255,255,0.12)",
-        color: "#f1f5f9",
+        background: "#ffffff",
+        border: `1px solid ${BORDER}`,
+        color: TEXT,
         fontSize: "15px",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
       }}
     >
-      {/* Google G logo */}
       <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -174,7 +176,6 @@ export default function SignupPage() {
     }
 
     if (data.user) {
-      // Upsert profile with all fields
       await supabase.from("profiles").upsert({
         id: data.user.id,
         email,
@@ -185,8 +186,6 @@ export default function SignupPage() {
         wants_setup_call: wantsSetupCall,
       });
 
-      // Send branded welcome email — await before navigating so the
-      // request isn't cancelled when the page unmounts.
       try {
         await fetch("/api/email/welcome", {
           method: "POST",
@@ -194,7 +193,7 @@ export default function SignupPage() {
           body: JSON.stringify({ email, firstName, businessName }),
         });
       } catch {
-        // non-fatal — don't block the user from reaching the dashboard
+        // non-fatal
       }
     }
 
@@ -231,11 +230,11 @@ export default function SignupPage() {
             <span className="text-xs font-semibold" style={{ color: MUTED }}>
               Step {step} of {TOTAL_STEPS}
             </span>
-            <span className="text-xs font-semibold" style={{ color: "rgba(211,84,0,0.8)" }}>
+            <span className="text-xs font-semibold" style={{ color: "#D35400" }}>
               {progressPct}%
             </span>
           </div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.07)" }}>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: BORDER }}>
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
@@ -248,7 +247,7 @@ export default function SignupPage() {
 
         {/* Step title */}
         <div className="mb-6">
-          <h1 className="text-2xl font-black text-white mb-1">{stepTitles[step - 1]}</h1>
+          <h1 className="text-2xl font-black mb-1" style={{ color: TEXT }}>{stepTitles[step - 1]}</h1>
           {step === 1 && (
             <p className="text-sm" style={{ color: MUTED }}>
               Get started free — no credit card needed.
@@ -261,9 +260,9 @@ export default function SignupPage() {
           <>
             <GoogleButton onClick={handleGoogleSignIn} label="Continue with Google" />
             <div className="flex items-center gap-3 my-5">
-              <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+              <div className="flex-1 h-px" style={{ background: BORDER }} />
               <span className="text-xs font-medium" style={{ color: VERY_MUTED }}>or</span>
-              <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+              <div className="flex-1 h-px" style={{ background: BORDER }} />
             </div>
           </>
         )}
@@ -272,7 +271,7 @@ export default function SignupPage() {
         {error && (
           <div
             className="mb-4 px-4 py-3 rounded-xl text-sm"
-            style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#fca5a5" }}
+            style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", color: "#b91c1c" }}
           >
             {error}
           </div>
@@ -354,8 +353,8 @@ export default function SignupPage() {
                   value={phone}
                   onChange={setPhone}
                   inputStyle={inputStyle}
-                  prefixColor="rgba(255,255,255,0.55)"
-                  dividerColor="rgba(255,255,255,0.12)"
+                  prefixColor={MUTED}
+                  dividerColor={BORDER}
                   placeholder="(555) 000-0000"
                   autoFocus
                   onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); if (phone.trim()) advanceTo(5); } }}
@@ -391,23 +390,26 @@ export default function SignupPage() {
                 onClick={() => setWantsSetupCall((v) => !v)}
                 className="w-full text-left p-5 rounded-2xl transition-all active:scale-[0.99]"
                 style={{
-                  background: wantsSetupCall ? "rgba(211,84,0,0.1)" : "rgba(255,255,255,0.04)",
-                  border: wantsSetupCall ? "1px solid rgba(211,84,0,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                  background: wantsSetupCall ? "rgba(211,84,0,0.06)" : "#ffffff",
+                  border: wantsSetupCall ? "1px solid rgba(211,84,0,0.35)" : `1px solid ${BORDER}`,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
                 }}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                       style={{
-                        background: wantsSetupCall ? "rgba(211,84,0,0.15)" : "rgba(255,255,255,0.06)",
-                        border: wantsSetupCall ? "1px solid rgba(211,84,0,0.3)" : "1px solid rgba(255,255,255,0.08)",
+                        background: wantsSetupCall ? "rgba(211,84,0,0.1)" : "#F9F7F2",
+                        border: wantsSetupCall ? "1px solid rgba(211,84,0,0.25)" : `1px solid ${BORDER}`,
                       }}
                     >
-                      📞
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: wantsSetupCall ? "#D35400" : MUTED }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                      </svg>
                     </div>
                     <div>
-                      <p className="font-bold text-sm text-white">Free setup call</p>
+                      <p className="font-bold text-sm" style={{ color: TEXT }}>Free setup call</p>
                       <p className="text-xs mt-0.5" style={{ color: MUTED }}>
                         15 min with our team — we&apos;ll configure everything for you
                       </p>
@@ -417,7 +419,7 @@ export default function SignupPage() {
                   <div
                     className="relative shrink-0 w-11 h-6 rounded-full transition-all duration-200"
                     style={{
-                      background: wantsSetupCall ? "linear-gradient(90deg,#D35400,#e8641c)" : "rgba(255,255,255,0.12)",
+                      background: wantsSetupCall ? "linear-gradient(90deg,#D35400,#e8641c)" : "#e6e2db",
                     }}
                   >
                     <div
@@ -472,9 +474,9 @@ export default function SignupPage() {
               {/* ToS note */}
               <p className="text-center text-xs leading-relaxed" style={{ color: VERY_MUTED }}>
                 By creating an account, you agree to our{" "}
-                <a href="#" className="underline hover:text-white transition-colors">Terms of Service</a>{" "}
+                <a href="#" className="underline hover:opacity-70 transition-opacity" style={{ color: MUTED }}>Terms of Service</a>{" "}
                 and{" "}
-                <a href="#" className="underline hover:text-white transition-colors">Privacy Policy</a>.
+                <a href="#" className="underline hover:opacity-70 transition-opacity" style={{ color: MUTED }}>Privacy Policy</a>.
               </p>
             </>
           )}
@@ -486,7 +488,7 @@ export default function SignupPage() {
           <button
             type="button"
             onClick={() => { setError(""); setStep((s) => s - 1); }}
-            className="mt-5 flex items-center gap-1.5 text-sm transition-colors hover:text-white"
+            className="mt-5 flex items-center gap-1.5 text-sm transition-colors hover:opacity-70"
             style={{ color: MUTED }}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -499,7 +501,7 @@ export default function SignupPage() {
         {/* Sign in link */}
         <p className="text-center text-sm mt-8" style={{ color: MUTED }}>
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-white hover:text-orange-400 transition-colors">
+          <Link href="/login" className="font-semibold hover:opacity-70 transition-opacity" style={{ color: "#D35400" }}>
             Sign&nbsp;in
           </Link>
         </p>
