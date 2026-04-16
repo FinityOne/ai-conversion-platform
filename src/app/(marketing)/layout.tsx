@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import MarketingFooter from "@/components/MarketingFooter";
 import ChatWidget from "@/components/ChatWidget";
+import TopBanner from "@/components/TopBanner";
 
 export const metadata: Metadata = {
   // Title template applies to every child page in this route group.
@@ -31,8 +32,9 @@ export const metadata: Metadata = {
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ background: "#F9F7F2", minHeight: "100vh" }}>
+      <TopBanner />
       <Nav variant="marketing" />
-      <main style={{ paddingTop: 64 }}>{children}</main>
+      <main style={{ paddingTop: "calc(64px + var(--banner-h, 36px))" }}>{children}</main>
       <MarketingFooter />
       <ChatWidget />
     </div>

@@ -110,7 +110,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
       <header
         style={{
           position: "fixed",
-          top: 0,
+          top: "var(--banner-h, 36px)" as unknown as number,
           left: 0,
           right: 0,
           zIndex: 50,
