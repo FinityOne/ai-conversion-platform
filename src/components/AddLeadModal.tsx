@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import PhoneInput from "@/components/PhoneInput";
 import { formatPhoneE164 } from "@/lib/phone";
+import { useAnalytics } from "@/lib/analytics";
 
 const JOB_TYPES = [
   "Roofing",
@@ -46,6 +47,7 @@ export default function AddLeadModal() {
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
   const [emailNote, setEmailNote] = useState("");
+  const { track } = useAnalytics();
 
   const [name,        setName]        = useState("");
   const [phone,       setPhone]       = useState("");
@@ -106,6 +108,7 @@ export default function AddLeadModal() {
       }
     }
 
+    track({ event: "lead_created", properties: { source: "manual", job_type: jobType || undefined } });
     setLoading(false);
     resetAndClose();
     router.refresh();

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { useAnalytics } from "@/lib/analytics";
 
 const TEXT = "#2C3E50";
 const MUTED = "#78716c";
@@ -80,6 +81,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const supabase = createSupabaseBrowserClient();
+  const { track } = useAnalytics();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -97,11 +99,13 @@ export default function LoginPage() {
       return;
     }
 
+    track({ event: "login", properties: { method: "email" } });
     router.push("/dashboard");
     router.refresh();
   }
 
   async function handleGoogleSignIn() {
+    track({ event: "login", properties: { method: "google" } });
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

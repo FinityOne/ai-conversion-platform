@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import PhoneInput from "@/components/PhoneInput";
 import { formatPhoneE164 } from "@/lib/phone";
+import { useAnalytics } from "@/lib/analytics";
 
 // Steps: email → firstName → lastName → phone → businessName → password
 const TOTAL_STEPS = 6;
@@ -110,6 +111,8 @@ function StepInput({
   );
 }
 
+const STEP_NAMES = ["email", "first_name", "last_name", "phone", "business_name", "password"];
+
 export default function SignupPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -125,6 +128,13 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const supabase = createSupabaseBrowserClient();
+  const { track } = useAnalytics();
+
+  // Track signup funnel start once on mount
+  useEffect(() => {
+    track({ event: "signup_started" });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function validateEmail(v: string) {
     return v.includes("@") && v.includes(".");
@@ -132,6 +142,8 @@ export default function SignupPage() {
 
   function advanceTo(next: number) {
     setError("");
+    // Track completion of the current step before advancing
+    track({ event: "signup_step_completed", properties: { step, step_name: STEP_NAMES[step - 1] } });
     setStep(next);
   }
 
@@ -186,6 +198,11 @@ export default function SignupPage() {
         wants_setup_call: wantsSetupCall,
       });
 
+      track({
+        event: "signup_completed",
+        properties: { email, business_name: businessName, wants_setup_call: wantsSetupCall },
+      });
+
       try {
         await fetch("/api/email/welcome", {
           method: "POST",
@@ -201,6 +218,7 @@ export default function SignupPage() {
   }
 
   async function handleGoogleSignIn() {
+    track({ event: "signup_google" });
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import { PLANS, type PlanId } from "@/lib/subscriptions";
 import Toaster from "@/components/Toaster";
+import { useAnalytics } from "@/lib/analytics";
 
 interface AppShellProps {
   firstName?: string | null;
@@ -42,10 +44,26 @@ const ORANGE = "#D35400";
 export default function AppShell({ firstName, businessName, email, plan, leadCount = 0, leadLimit, isAdmin, children }: AppShellProps) {
   const pathname = usePathname();
   const router   = useRouter();
+  const { identify, reset } = useAnalytics();
+
+  // Identify the logged-in user in PostHog so all events are tied to their profile.
+  useEffect(() => {
+    if (!email) return;
+    // Use email as the stable distinct_id for contractors (no anonymous ID needed).
+    identify(email, {
+      email,
+      name: [firstName, ""].join(" ").trim() || undefined,
+      business_name: businessName ?? undefined,
+      plan: plan ?? "none",
+      is_admin: isAdmin ?? false,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email]);
 
   async function handleSignOut() {
     const sb = createSupabaseBrowserClient();
     await sb.auth.signOut();
+    reset();   // clear PostHog identity on sign-out
     router.push("/");
     router.refresh();
   }

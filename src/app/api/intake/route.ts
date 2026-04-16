@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { createSupabaseServiceClient } from "@/lib/supabase-service";
 import { buildLeadConfirmationEmail } from "@/lib/emails/lead-confirmation";
 import { computeScore } from "@/lib/scoring";
+import { trackServer } from "@/lib/analytics-server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -43,6 +44,14 @@ export async function POST(request: Request) {
     console.error("[intake] insert error", insertError);
     return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }
+
+  // Track the new lead in PostHog (attributed to the contractor, not the lead visitor).
+  trackServer(profile.id, "lead_created", {
+    source: "intake_form",
+    job_type: jobType || null,
+    lead_id: lead.id,
+    slug,
+  });
 
   // Send confirmation email to the lead if they provided one
   if (email?.trim()) {
