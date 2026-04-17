@@ -129,7 +129,7 @@ export default function MarketingFooter() {
           }}
         >
           <p style={{ color: "#78716c", fontSize: 13 }}>
-            © 2025 ClozeFlow. All rights reserved.
+            © 2026 ClozeFlow. All rights reserved.
           </p>
           <div style={{ display: "flex", gap: 24 }}>
             <Link href="/terms" style={{ color: "#78716c", fontSize: 13, textDecoration: "none" }}>Terms of Service</Link>
