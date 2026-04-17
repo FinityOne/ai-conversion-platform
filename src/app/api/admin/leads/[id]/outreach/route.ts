@@ -34,9 +34,11 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   const toName = [lead.first_name, lead.last_name].filter(Boolean).join(" ");
 
+  const toAddress = process.env.RESEND_TEST_TO ?? `${toName} <${lead.email}>`;
+
   const { error } = await resend.emails.send({
     from:    process.env.RESEND_FROM_EMAIL ?? "ClozeFlow <hello@clozeflow.com>",
-    to:      `${toName} <${lead.email}>`,
+    to:      toAddress,
     subject: `${lead.first_name}, you're losing jobs while you're on the job`,
     html,
     replyTo: "hello@clozeflow.com",
