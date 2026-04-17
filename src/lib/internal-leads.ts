@@ -8,7 +8,7 @@ export type LeadSource   =
   | "referral" | "google_ad" | "organic" | "linkedin"
   | "cold_outreach" | "trade_event" | "partner" | "csv_import" | "other";
 export type ActivityType =
-  | "note" | "call" | "email" | "meeting" | "demo"
+  | "note" | "call" | "email" | "meeting" | "in_person" | "demo"
   | "follow_up" | "status_change" | "import";
 
 export interface InternalLead {
@@ -33,19 +33,25 @@ export interface InternalLead {
   converted_at:      string | null;
   notes:             string | null;
   tags:              string[];
+  website:           string | null;
+  linkedin_url:      string | null;
   created_by:        string | null;
   created_at:        string;
   updated_at:        string;
 }
 
 export interface LeadActivity {
-  id:         string;
-  lead_id:    string;
-  type:       ActivityType;
-  title:      string;
-  body:       string | null;
-  created_by: string | null;
-  created_at: string;
+  id:               string;
+  lead_id:          string;
+  type:             ActivityType;
+  title:            string;
+  body:             string | null;
+  outcome:          string | null;
+  duration_minutes: number | null;
+  scheduled_at:     string | null;
+  pinned:           boolean;
+  created_by:       string | null;
+  created_at:       string;
 }
 
 export interface LeadFilter {
@@ -143,7 +149,8 @@ export async function getInternalLead(id: string): Promise<InternalLead | null> 
 }
 
 export async function createInternalLead(
-  fields: Omit<InternalLead, "id" | "created_at" | "updated_at" | "tags"> & { tags?: string[] }
+  fields: Omit<InternalLead, "id" | "created_at" | "updated_at" | "tags" | "website" | "linkedin_url">
+    & { tags?: string[]; website?: string | null; linkedin_url?: string | null }
 ): Promise<InternalLead> {
   const sb = createSupabaseServiceClient();
   const { data, error } = await sb
@@ -194,11 +201,23 @@ export async function addLeadActivity(
   title: string,
   body: string | null,
   createdBy: string | null,
+  extra?: {
+    outcome?: string;
+    duration_minutes?: number;
+    scheduled_at?: string;
+    pinned?: boolean;
+  },
 ): Promise<LeadActivity> {
   const sb = createSupabaseServiceClient();
   const { data, error } = await sb
     .from("internal_lead_activities")
-    .insert({ lead_id: leadId, type, title, body, created_by: createdBy })
+    .insert({
+      lead_id: leadId, type, title, body, created_by: createdBy,
+      outcome: extra?.outcome ?? null,
+      duration_minutes: extra?.duration_minutes ?? null,
+      scheduled_at: extra?.scheduled_at ?? null,
+      pinned: extra?.pinned ?? false,
+    })
     .select()
     .single();
   if (error) throw error;

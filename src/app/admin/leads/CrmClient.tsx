@@ -633,7 +633,7 @@ function LeadsListTab({
               <div
                 style={{ display: "grid", gridTemplateColumns: "2.5fr 1.8fr 1.2fr 1fr 1.2fr 90px", gap: 10, padding: "13px 20px", alignItems: "center", borderBottom: i < localLeads.length - 1 ? `1px solid ${BORDER}` : "none", cursor: "pointer" }}
                 className="hidden lg:grid hover:bg-[#f8f9fb]"
-                onClick={() => setViewLead(lead)}
+                onClick={() => window.open(`/admin/leads/${lead.id}`, "_blank")}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
                   <div style={{ width: 34, height: 34, borderRadius: "50%", flexShrink: 0, background: `${color}18`, border: `1.5px solid ${color}40`, display: "flex", alignItems: "center", justifyContent: "center", color, fontSize: 12, fontWeight: 800 }}>{inits}</div>
@@ -661,12 +661,13 @@ function LeadsListTab({
                       <i className="fa-solid fa-paper-plane" />
                     </button>
                   )}
-                  <button onClick={() => setViewLead(lead)} style={{ padding: "5px 7px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 11, cursor: "pointer" }}><i className="fa-solid fa-pen" /></button>
+                  <button onClick={() => setViewLead(lead)} title="Quick edit" style={{ padding: "5px 7px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 11, cursor: "pointer" }}><i className="fa-solid fa-pen" /></button>
+                  <a href={`/admin/leads/${lead.id}`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} title="Open detail page" style={{ padding: "5px 7px", borderRadius: 7, border: "1px solid rgba(99,102,241,0.3)", background: "rgba(99,102,241,0.06)", color: "#6366f1", fontSize: 11, cursor: "pointer", display: "inline-flex", alignItems: "center" }}><i className="fa-solid fa-arrow-up-right-from-square" /></a>
                   <button onClick={() => deleteLead(lead.id)} style={{ padding: "5px 7px", borderRadius: 7, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.04)", color: "#ef4444", fontSize: 11, cursor: "pointer" }}><i className="fa-solid fa-trash" /></button>
                 </div>
               </div>
               {/* Mobile card */}
-              <div className="lg:hidden" style={{ padding: "14px 16px", borderBottom: i < localLeads.length - 1 ? `1px solid ${BORDER}` : "none", cursor: "pointer" }} onClick={() => setViewLead(lead)}>
+              <div className="lg:hidden" style={{ padding: "14px 16px", borderBottom: i < localLeads.length - 1 ? `1px solid ${BORDER}` : "none", cursor: "pointer" }} onClick={() => window.open(`/admin/leads/${lead.id}`, "_blank")}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                   <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, background: `${color}18`, border: `1.5px solid ${color}40`, display: "flex", alignItems: "center", justifyContent: "center", color, fontSize: 13, fontWeight: 800 }}>{inits}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
