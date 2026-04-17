@@ -6,6 +6,7 @@ import {
   InternalLead, LeadActivity, LeadStatus, LeadPriority, ActivityType,
   STATUS_CONFIG, PRIORITY_CONFIG, SOURCE_LABELS, TRADE_OPTIONS, EMPLOYEE_COUNT_OPTIONS,
 } from "@/lib/internal-leads";
+import { ScheduledMeeting, MEETING_TYPE_CONFIG, MeetingType, formatMeetingDate, formatMeetingTime } from "@/lib/meetings";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -40,7 +41,7 @@ const CALL_OUTCOMES    = ["Answered", "Voicemail", "No Answer", "Callback Reques
 const MEETING_OUTCOMES = ["Completed", "No Show", "Rescheduled", "Cancelled"];
 const DEMO_OUTCOMES    = ["Completed", "No Show", "Rescheduled", "Converted"];
 
-const LOG_TYPES: ActivityType[] = ["call", "email", "meeting", "in_person", "demo", "note", "follow_up"];
+const LOG_TYPES: ActivityType[] = ["call", "email", "meeting", "in_person", "note", "follow_up"];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -778,20 +779,337 @@ function EditLeadModal({ lead, onClose, onSaved }: { lead: InternalLead; onClose
   );
 }
 
+// ── Schedule Demo Modal ───────────────────────────────────────────────────────
+
+const DURATION_OPTIONS = [15, 30, 45, 60, 90];
+const MEETING_TYPES: MeetingType[] = ["zoom", "teams", "meet", "phone", "other"];
+
+function ScheduleDemoModal({
+  lead,
+  onClose,
+  onScheduled,
+}: {
+  lead: InternalLead;
+  onClose: () => void;
+  onScheduled: (m: ScheduledMeeting) => void;
+}) {
+  const defaultTitle = `Demo Call — ${lead.first_name}${lead.company ? ` (${lead.company})` : ""}`;
+  const [title,       setTitle]       = useState(defaultTitle);
+  const [date,        setDate]        = useState("");
+  const [time,        setTime]        = useState("10:00");
+  const [duration,    setDuration]    = useState(30);
+  const [meetType,    setMeetType]    = useState<MeetingType>("zoom");
+  const [meetUrl,     setMeetUrl]     = useState("");
+  const [notes,       setNotes]       = useState("");
+  const [saving,      setSaving]      = useState(false);
+  const [error,       setError]       = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!date) { setError("Please pick a date."); return; }
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/leads/${lead.id}/meetings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          meeting_date:     date,
+          start_time:       time,
+          duration_minutes: duration,
+          meeting_type:     meetType,
+          meeting_url:      meetUrl || undefined,
+          notes:            notes   || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error ?? "Failed to schedule");
+      }
+      const meeting = await res.json();
+      onScheduled(meeting);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "9px 12px", borderRadius: 8,
+    border: `1.5px solid ${BORDER}`, background: CARD,
+    color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box",
+  };
+  const labelStyle: React.CSSProperties = {
+    fontSize: 11, fontWeight: 600, color: MUTED,
+    display: "block", marginBottom: 5, letterSpacing: 0.3,
+  };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 1000,
+      background: "rgba(15,23,42,0.5)", display: "flex",
+      alignItems: "center", justifyContent: "center", padding: 16,
+    }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{
+        width: "min(540px, 100%)", background: CARD, borderRadius: 16,
+        boxShadow: "0 24px 60px rgba(0,0,0,0.2)", overflow: "hidden",
+      }}>
+        {/* Header */}
+        <div style={{
+          background: "linear-gradient(135deg, #f59e0b, #f97316)",
+          padding: "20px 24px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 36, height: 36, background: "rgba(255,255,255,0.2)",
+              borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <i className="fa-solid fa-calendar-check" style={{ fontSize: 16, color: "#fff" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Schedule Demo Call</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}>
+                Invite will be emailed to {lead.first_name} & all admins
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 6 }}>
+            <i className="fa-solid fa-xmark" style={{ fontSize: 18, color: "rgba(255,255,255,0.8)" }} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ padding: "24px", maxHeight: "70vh", overflowY: "auto" }}>
+          {/* Title */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>MEETING TITLE</label>
+            <input value={title} onChange={e => setTitle(e.target.value)} required style={inputStyle} />
+          </div>
+
+          {/* Date + Time */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+            <div>
+              <label style={labelStyle}>DATE <span style={{ color: "#ef4444" }}>*</span></label>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} required
+                min={new Date().toISOString().slice(0, 10)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>TIME</label>
+              <input type="time" value={time} onChange={e => setTime(e.target.value)} required style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Duration */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>DURATION</label>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {DURATION_OPTIONS.map(d => (
+                <button key={d} type="button" onClick={() => setDuration(d)} style={{
+                  padding: "7px 14px", borderRadius: 8, cursor: "pointer",
+                  background: duration === d ? INDIGO : CARD,
+                  border: `1.5px solid ${duration === d ? INDIGO : BORDER}`,
+                  color: duration === d ? "#fff" : TEXT, fontSize: 13, fontWeight: 600,
+                }}>
+                  {d}m
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Meeting type */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>MEETING TYPE</label>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {MEETING_TYPES.map(t => {
+                const cfg = MEETING_TYPE_CONFIG[t];
+                return (
+                  <button key={t} type="button" onClick={() => setMeetType(t)} style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    padding: "7px 14px", borderRadius: 8, cursor: "pointer",
+                    background: meetType === t ? cfg.color + "15" : CARD,
+                    border: `1.5px solid ${meetType === t ? cfg.color : BORDER}`,
+                    color: meetType === t ? cfg.color : MUTED, fontSize: 13, fontWeight: 600,
+                  }}>
+                    <i className={cfg.icon} style={{ fontSize: 11 }} />
+                    {cfg.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Meeting URL */}
+          {meetType !== "phone" && (
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>
+                MEETING LINK
+                <span style={{ fontWeight: 400, color: MUTED, marginLeft: 4 }}>(Zoom, Teams, Google Meet…)</span>
+              </label>
+              <input type="url" value={meetUrl} onChange={e => setMeetUrl(e.target.value)}
+                placeholder="https://zoom.us/j/..." style={inputStyle} />
+            </div>
+          )}
+
+          {/* Notes */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>AGENDA / NOTES <span style={{ fontWeight: 400, color: MUTED }}>(included in invite)</span></label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
+              placeholder="What to cover on the call…"
+              style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit" }} />
+          </div>
+
+          {error && (
+            <div style={{
+              padding: "10px 14px", borderRadius: 8, marginBottom: 16,
+              background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+              fontSize: 13, color: "#dc2626",
+            }}>
+              <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 8 }} />
+              {error}
+            </div>
+          )}
+
+          <div style={{
+            borderTop: `1px solid ${BORDER}`,
+            background: "#fffbeb", margin: "0 -24px -24px", padding: "14px 24px",
+            fontSize: 12, color: "#92400e", display: "flex", gap: 8, alignItems: "flex-start",
+          }}>
+            <i className="fa-solid fa-circle-info" style={{ fontSize: 13, marginTop: 1, color: "#f59e0b" }} />
+            <span>
+              A calendar invite (.ics) will be emailed to <strong>{lead.first_name}</strong>
+              {lead.email ? ` at ${lead.email}` : ""} and all ClozeFlow admins with a Google Calendar link.
+            </span>
+          </div>
+
+          <div style={{ display: "flex", gap: 10, paddingTop: 16 }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: "11px", borderRadius: 8,
+              border: `1.5px solid ${BORDER}`, background: CARD,
+              color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer",
+            }}>Cancel</button>
+            <button type="submit" disabled={saving} style={{
+              flex: 2, padding: "11px", borderRadius: 8, border: "none",
+              background: "#f59e0b", color: "#fff", fontSize: 13, fontWeight: 700,
+              cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            }}>
+              {saving
+                ? "Scheduling…"
+                : <><i className="fa-solid fa-paper-plane" style={{ fontSize: 12 }} /> Schedule &amp; Send Invite</>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Meetings Card ─────────────────────────────────────────────────────────────
+
+function MeetingsCard({
+  meetings,
+  leadId,
+  onReminderSent,
+}: {
+  meetings: ScheduledMeeting[];
+  leadId: string;
+  onReminderSent: () => void;
+}) {
+  const [sending, setSending] = useState<string | null>(null);
+
+  async function sendReminder(m: ScheduledMeeting) {
+    setSending(m.id);
+    try {
+      await fetch(`/api/admin/leads/${leadId}/meetings/${m.id}/reminder`, { method: "POST" });
+      onReminderSent();
+    } finally {
+      setSending(null);
+    }
+  }
+
+  const upcoming = meetings.filter(m => m.status === "scheduled" && new Date(`${m.meeting_date}T${m.start_time}`) >= new Date());
+  const past     = meetings.filter(m => m.status !== "scheduled" || new Date(`${m.meeting_date}T${m.start_time}`) < new Date());
+
+  if (meetings.length === 0) return null;
+
+  return (
+    <Card title={`Scheduled Meetings (${meetings.length})`} icon="fa-solid fa-calendar-check">
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {[...upcoming, ...past].map(m => {
+          const cfg = MEETING_TYPE_CONFIG[m.meeting_type];
+          const isPast = new Date(`${m.meeting_date}T${m.start_time}`) < new Date();
+          const isUpcoming = !isPast && m.status === "scheduled";
+          return (
+            <div key={m.id} style={{
+              border: `1px solid ${isUpcoming ? "#fde68a" : BORDER}`,
+              borderRadius: 10,
+              background: isUpcoming ? "#fffbeb" : BG,
+              padding: "12px 14px",
+            }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
+                    <i className={cfg.icon} style={{ fontSize: 12, color: cfg.color }} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>{m.title}</span>
+                    {isUpcoming && (
+                      <span style={{
+                        fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 20,
+                        background: "#fef3c7", color: "#92400e", border: "1px solid #fde68a",
+                      }}>UPCOMING</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 12, color: MUTED }}>
+                    {formatMeetingDate(m.meeting_date)} · {formatMeetingTime(m.start_time)} · {m.duration_minutes}m
+                  </div>
+                  {m.meeting_url && (
+                    <a href={m.meeting_url} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: 12, color: INDIGO, display: "block", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {m.meeting_url}
+                    </a>
+                  )}
+                  {m.notes && <div style={{ fontSize: 12, color: MUTED, marginTop: 4, fontStyle: "italic" }}>{m.notes}</div>}
+                </div>
+                {isUpcoming && (
+                  <button onClick={() => sendReminder(m)} disabled={sending === m.id} title="Send reminder email to lead" style={{
+                    padding: "6px 10px", borderRadius: 8, border: `1px solid ${BORDER}`,
+                    background: CARD, color: MUTED, fontSize: 11, cursor: "pointer", flexShrink: 0,
+                    display: "flex", alignItems: "center", gap: 5,
+                  }}>
+                    <i className="fa-solid fa-bell" style={{ fontSize: 10 }} />
+                    {sending === m.id ? "…" : "Remind"}
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function LeadDetailClient({
   lead: initialLead,
   initialActivities,
+  initialMeetings = [],
 }: {
   lead: InternalLead;
   initialActivities: LeadActivity[];
+  initialMeetings?: ScheduledMeeting[];
 }) {
-  const [lead,       setLead]       = useState<InternalLead>(initialLead);
-  const [activities, setActivities] = useState(initialActivities);
-  const [showLog,    setShowLog]    = useState(false);
-  const [logDefault, setLogDefault] = useState<ActivityType>("note");
-  const [showEdit,   setShowEdit]   = useState(false);
+  const [lead,         setLead]         = useState<InternalLead>(initialLead);
+  const [activities,   setActivities]   = useState(initialActivities);
+  const [meetings,     setMeetings]     = useState<ScheduledMeeting[]>(initialMeetings);
+  const [showLog,      setShowLog]      = useState(false);
+  const [logDefault,   setLogDefault]   = useState<ActivityType>("note");
+  const [showEdit,     setShowEdit]     = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent,    setEmailSent]    = useState(false);
 
@@ -1198,7 +1516,7 @@ export default function LeadDetailClient({
                 <ActionBtn icon="fa-solid fa-phone"     label="Log a Call"         color="#0ea5e9" onClick={() => openLog("call")} />
                 <ActionBtn icon="fa-solid fa-video"     label="Log a Meeting"      color="#8b5cf6" onClick={() => openLog("meeting")} />
                 <ActionBtn icon="fa-solid fa-handshake" label="Log In-Person"      color="#f97316" onClick={() => openLog("in_person")} />
-                <ActionBtn icon="fa-solid fa-display"   label="Log a Demo"         color="#f59e0b" onClick={() => openLog("demo")} />
+                <ActionBtn icon="fa-solid fa-calendar-check" label="Schedule Demo Call" color="#f59e0b" onClick={() => setShowDemoModal(true)} />
                 <ActionBtn icon="fa-solid fa-note-sticky" label="Add a Note"       color="#64748b" onClick={() => openLog("note")} />
                 <ActionBtn icon="fa-solid fa-clock"     label="Schedule Follow-up" color="#22c55e" onClick={() => openLog("follow_up")} />
               </div>
@@ -1217,8 +1535,16 @@ export default function LeadDetailClient({
                 <IntelRow label="Source" value={SOURCE_LABELS[lead.source]} icon="fa-solid fa-radar" />
                 {lead.created_by && <IntelRow label="Added By" value={lead.created_by} icon="fa-solid fa-user-pen" />}
                 <IntelRow label="Total Activities" value={String(activities.length)} icon="fa-solid fa-list-check" />
+                <IntelRow label="Scheduled Meetings" value={String(meetings.length)} icon="fa-solid fa-calendar-check" />
               </div>
             </Card>
+
+            {/* Meetings card */}
+            <MeetingsCard
+              meetings={meetings}
+              leadId={lead.id}
+              onReminderSent={() => {}}
+            />
 
           </div>
         </div>
@@ -1230,6 +1556,22 @@ export default function LeadDetailClient({
           lead={lead}
           onClose={() => setShowEdit(false)}
           onSaved={(updated) => setLead(updated)}
+        />
+      )}
+
+      {/* Schedule Demo Modal */}
+      {showDemoModal && (
+        <ScheduleDemoModal
+          lead={lead}
+          onClose={() => setShowDemoModal(false)}
+          onScheduled={(m) => {
+            setMeetings(prev => [m, ...prev]);
+            // Also refresh activities to show the logged demo entry
+            fetch(`/api/admin/leads/${lead.id}/activities`)
+              .then(r => r.json())
+              .then(setActivities)
+              .catch(() => {});
+          }}
         />
       )}
     </div>

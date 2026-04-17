@@ -15,6 +15,7 @@ const NAV = [
   { href: "/admin/activity",    label: "Activity",    fa: "fa-solid fa-wave-square",       desc: "Live event stream"   },
   { href: "/admin/users",       label: "Users",       fa: "fa-solid fa-users",             desc: "All accounts"        },
   { href: "/admin/leads",       label: "CRM Leads",   fa: "fa-solid fa-address-card",      desc: "Internal pipeline"   },
+  { href: "/admin/calendar",    label: "Calendar",    fa: "fa-solid fa-calendar-days",     desc: "Demos & follow-ups"  },
   { href: "/admin/payments",    label: "Payments",    fa: "fa-solid fa-credit-card",       desc: "Revenue & billing"   },
   { href: "/admin/chat-leads",  label: "Chat Leads",  fa: "fa-solid fa-message",           desc: "Widget submissions"  },
   { href: "/admin/emails",      label: "Messages",    fa: "fa-solid fa-paper-plane",       desc: "Email & SMS catalogue" },
@@ -247,7 +248,7 @@ export default function AdminShell({ firstName, email, children }: AdminShellPro
         style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
           background: NAV_BG, borderTop: `1px solid ${NAV_BORDER}`,
-          gridTemplateColumns: "repeat(7, 1fr)",
+          gridTemplateColumns: "repeat(8, 1fr)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}
       >
