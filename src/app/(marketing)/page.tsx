@@ -67,6 +67,22 @@ const HIW_STEPS = [
 
 const TRADE_GROUPS = [
   {
+    label: "Health, Wellness & Med Services",
+    icon: "fa-solid fa-heart-pulse",
+    color: "#be185d",
+    bg: "rgba(190,24,93,0.06)",
+    border: "rgba(190,24,93,0.15)",
+    services: [
+      { icon: "fa-solid fa-spa",                 label: "Med Spa & Aesthetics"  },
+      { icon: "fa-solid fa-tooth",               label: "Dental & Orthodontics" },
+      { icon: "fa-solid fa-person-walking",       label: "Physical Therapy"      },
+      { icon: "fa-solid fa-hand-holding-medical", label: "Chiropractic Care"     },
+      { icon: "fa-solid fa-brain",               label: "Mental Health"         },
+      { icon: "fa-solid fa-stethoscope",         label: "Local Clinics"         },
+      { icon: "fa-solid fa-paw",                 label: "Veterinary"            },
+    ],
+  },
+  {
     label: "Core Home Trades",
     icon: "fa-solid fa-house-chimney-crack",
     color: "#D35400",
@@ -86,11 +102,11 @@ const TRADE_GROUPS = [
     bg: "rgba(99,102,241,0.06)",
     border: "rgba(99,102,241,0.15)",
     services: [
-      { icon: "fa-solid fa-person-digging",      label: "General Contractors" },
-      { icon: "fa-solid fa-layer-group",         label: "Flooring"            },
-      { icon: "fa-solid fa-paint-roller",        label: "Painting"            },
-      { icon: "fa-solid fa-border-all",          label: "Windows & Doors"     },
-      { icon: "fa-solid fa-road",                label: "Concrete & Paving"   },
+      { icon: "fa-solid fa-person-digging",  label: "General Contractors" },
+      { icon: "fa-solid fa-layer-group",     label: "Flooring"            },
+      { icon: "fa-solid fa-paint-roller",    label: "Painting"            },
+      { icon: "fa-solid fa-border-all",      label: "Windows & Doors"     },
+      { icon: "fa-solid fa-road",            label: "Concrete & Paving"   },
     ],
   },
   {
@@ -100,25 +116,13 @@ const TRADE_GROUPS = [
     bg: "rgba(22,163,74,0.06)",
     border: "rgba(22,163,74,0.15)",
     services: [
-      { icon: "fa-solid fa-leaf",           label: "Landscaping"       },
-      { icon: "fa-solid fa-tree",           label: "Tree Services"     },
-      { icon: "fa-solid fa-bug-slash",      label: "Pest Control"      },
-      { icon: "fa-solid fa-water-ladder",   label: "Pool & Spa"        },
-      { icon: "fa-solid fa-spray-can",      label: "Pressure Washing"  },
-      { icon: "fa-solid fa-broom",          label: "Cleaning Services" },
+      { icon: "fa-solid fa-leaf",         label: "Landscaping"       },
+      { icon: "fa-solid fa-tree",         label: "Tree Services"     },
+      { icon: "fa-solid fa-bug-slash",    label: "Pest Control"      },
+      { icon: "fa-solid fa-water-ladder", label: "Pool & Spa"        },
+      { icon: "fa-solid fa-spray-can",    label: "Pressure Washing"  },
+      { icon: "fa-solid fa-broom",        label: "Cleaning Services" },
     ],
-  },
-  {
-    label: "Local Service Businesses",
-    icon: "fa-solid fa-store",
-    color: "#0891b2",
-    bg: "rgba(8,145,178,0.06)",
-    border: "rgba(8,145,178,0.15)",
-    services: [
-      { icon: "fa-solid fa-stethoscope",    label: "Local Clinics"     },
-      { icon: "fa-solid fa-calendar-check", label: "Appointment-Based" },
-    ],
-    footnote: "Also works for select local clinics and appointment-based businesses.",
   },
 ];
 
