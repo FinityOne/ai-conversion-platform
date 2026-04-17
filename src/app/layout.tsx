@@ -42,7 +42,8 @@ export const metadata: Metadata = {
   },
 
   icons: {
-    icon: "/favicon.ico",
+    icon: [{ url: "/logo/ClozeFlow Icon - Transparent.png", type: "image/png" }],
+    apple: [{ url: "/logo/ClozeFlow Icon - Transparent.png", type: "image/png" }],
   },
 };
 
