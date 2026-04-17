@@ -4,20 +4,20 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 
 // ── Palette ───────────────────────────────────────────────────────────────────
-const ORANGE  = "#D35400";
-const ORANGE2 = "#e8641c";
-const DARK    = "#0f0d0b";
-const CARD    = "#1a1714";
-const BORDER  = "rgba(255,255,255,0.08)";
-const TEXT    = "#f5f0eb";
-const MUTED   = "#a09488";
-const GREEN   = "#22c55e";
-const RED     = "#ef4444";
+const ORANGE  = "#C0440A";
+const ORANGE2 = "#D35400";
+const BG      = "#F9F7F4";
+const CARD    = "#ffffff";
+const BORDER  = "#e5e0d8";
+const TEXT    = "#1a1614";
+const MUTED   = "#6b6560";
+const GREEN   = "#16a34a";
+const RED     = "#dc2626";
 
 // ── Global styles injected once ───────────────────────────────────────────────
 const GLOBAL_CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; }
+  html, body { height: 100%; overflow: hidden; background: #F9F7F4; }
   ::-webkit-scrollbar { display: none; }
 
   @keyframes ring        { 0%,100%{transform:rotate(-8deg)} 50%{transform:rotate(8deg)} }
@@ -136,14 +136,14 @@ function SlidePain({ active }: { active: boolean }) {
           className="s1-phone"
           style={{
             width: 80, height: 80, borderRadius: "50%",
-            background: step >= 1 && step < 3 ? RED : step >= 3 ? "#333" : "#222",
+            background: step >= 1 && step < 3 ? RED : step >= 3 ? "#d1c9c0" : "#e8e2db",
             display: "flex", alignItems: "center", justifyContent: "center",
             animation: step === 1 ? "ring 0.4s ease-in-out infinite, pulse-red 1.2s ease infinite" : "none",
             transition: "background 0.5s",
             margin: "0 auto",
           }}
         >
-          <i className="fa-solid fa-phone" style={{ fontSize: 32, color: step >= 3 ? "#555" : "#fff" }} />
+          <i className="fa-solid fa-phone" style={{ fontSize: 32, color: step >= 3 ? "#9a9088" : "#fff" }} />
         </div>
 
         {step >= 3 && (
@@ -308,7 +308,7 @@ function SlideFix({ active }: { active: boolean }) {
           >
             <div
               className="s2-card-icon"
-              style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(211,84,0,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}
+              style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(192,68,10,0.10)", display: "flex", alignItems: "center", justifyContent: "center" }}
             >
               <i className={icon} style={{ fontSize: 16, color: ORANGE }} />
             </div>
@@ -382,8 +382,8 @@ function SlideHowItWorks({ active }: { active: boolean }) {
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
                 padding: "18px 14px", width: 155,
-                background: step >= i ? CARD : "rgba(255,255,255,0.02)",
-                border: `1.5px solid ${step >= i ? s.color + "55" : BORDER}`,
+                background: step >= i ? CARD : "#f3f0ec",
+                border: `1.5px solid ${step >= i ? s.color + "66" : BORDER}`,
                 borderRadius: 16,
                 opacity: step >= i ? 1 : 0.25,
                 transform: step >= i ? "scale(1)" : "scale(0.92)",
@@ -396,7 +396,7 @@ function SlideHowItWorks({ active }: { active: boolean }) {
                 style={{
                   position: "absolute", top: -10,
                   width: 22, height: 22, borderRadius: "50%",
-                  background: step >= i ? s.color : "#333",
+                  background: step >= i ? s.color : "#c5bfb8",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 11, fontWeight: 900, color: "#fff",
                   transition: "background 0.4s",
@@ -412,16 +412,16 @@ function SlideHowItWorks({ active }: { active: boolean }) {
                   transition: "background 0.4s", flexShrink: 0,
                 }}
               >
-                <i className={s.icon} style={{ fontSize: 20, color: step >= i ? s.color : "#555" }} />
+                <i className={s.icon} style={{ fontSize: 20, color: step >= i ? s.color : "#b0a89e" }} />
               </div>
-              <span className="pipeline-lbl" style={{ fontSize: 12, fontWeight: 800, color: step >= i ? TEXT : "#555" }}>{s.label}</span>
+              <span className="pipeline-lbl" style={{ fontSize: 12, fontWeight: 800, color: step >= i ? TEXT : "#b0a89e" }}>{s.label}</span>
               <span className="pipeline-sub" style={{ fontSize: 10, color: MUTED, lineHeight: 1.4, textAlign: "center" }}>{s.sub}</span>
             </div>
 
             {/* Connector — hidden on mobile via CSS */}
             {i < stages.length - 1 && (
               <div className="pipeline-connector" style={{ position: "relative", width: 40, height: 4, flexShrink: 0 }}>
-                <div style={{ width: "100%", height: 4, background: "#2a2520", borderRadius: 2 }} />
+                <div style={{ width: "100%", height: 4, background: "#ddd8d0", borderRadius: 2 }} />
                 <div style={{
                   position: "absolute", top: 0, left: 0, height: 4, borderRadius: 2,
                   background: `linear-gradient(90deg,${stages[i].color},${stages[i+1].color})`,
@@ -643,7 +643,7 @@ function SlideGetStarted({ active }: { active: boolean }) {
             <Link href={`/signup?plan=${p.name.toLowerCase()}`} className="s5-plan-btn" style={{
               display: "block", textAlign: "center", padding: "9px 10px",
               borderRadius: 9, fontWeight: 700, fontSize: 12, textDecoration: "none",
-              background: p.highlight ? p.color : "rgba(255,255,255,0.06)",
+              background: p.highlight ? p.color : BG,
               color: p.highlight ? "#fff" : TEXT,
               border: p.highlight ? "none" : `1px solid ${BORDER}`,
             }}>
@@ -737,7 +737,7 @@ export default function DemoPage() {
   return (
     <div
       style={{
-        background: DARK, color: TEXT,
+        background: BG, color: TEXT,
         height: "100dvh",          // lock to viewport — no page scroll
         overflow: "hidden",
         display: "flex", flexDirection: "column",
@@ -755,6 +755,7 @@ export default function DemoPage() {
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "14px 24px",
           borderBottom: `1px solid ${BORDER}`,
+          background: "#ffffff",
           flexShrink: 0,
         }}
       >
@@ -767,7 +768,7 @@ export default function DemoPage() {
             <i className="fa-solid fa-bolt" style={{ color: "#fff", fontSize: 13 }} />
           </div>
           <span style={{ fontSize: 14, fontWeight: 800, color: TEXT }}>ClozeFlow</span>
-          <span style={{ fontSize: 10, fontWeight: 600, color: MUTED, background: "rgba(255,255,255,0.06)", padding: "2px 7px", borderRadius: 20, marginLeft: 2 }}>
+          <span style={{ fontSize: 10, fontWeight: 600, color: MUTED, background: BG, border: `1px solid ${BORDER}`, padding: "2px 7px", borderRadius: 20, marginLeft: 2 }}>
             Demo
           </span>
         </div>
@@ -777,7 +778,7 @@ export default function DemoPage() {
       </div>
 
       {/* Progress bar */}
-      <div className="demo-progress" style={{ display: "flex", gap: 5, padding: "10px 24px 0", flexShrink: 0 }}>
+      <div className="demo-progress" style={{ display: "flex", gap: 5, padding: "10px 24px 0", flexShrink: 0, background: "#ffffff" }}>
         {SLIDES.map((s, i) => (
           <button
             key={i}
@@ -793,7 +794,7 @@ export default function DemoPage() {
       </div>
 
       {/* Slide labels */}
-      <div className="demo-labels" style={{ display: "flex", gap: 0, padding: "6px 24px 0", flexShrink: 0 }}>
+      <div className="demo-labels" style={{ display: "flex", gap: 0, padding: "6px 24px 0", flexShrink: 0, background: "#ffffff", borderBottom: `1px solid ${BORDER}` }}>
         {SLIDES.map((s, i) => (
           <button
             key={i}
@@ -828,6 +829,7 @@ export default function DemoPage() {
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "14px 24px",
           borderTop: `1px solid ${BORDER}`,
+          background: "#ffffff",
           flexShrink: 0,
         }}
       >
@@ -837,9 +839,9 @@ export default function DemoPage() {
           className="demo-nav-btn"
           style={{
             display: "flex", alignItems: "center", gap: 6,
-            background: "rgba(255,255,255,0.06)", border: `1px solid ${BORDER}`,
+            background: BG, border: `1px solid ${BORDER}`,
             borderRadius: 10, padding: "9px 18px",
-            color: current === 0 ? "#333" : MUTED, fontSize: 13, fontWeight: 600,
+            color: current === 0 ? "#ccc4bb" : MUTED, fontSize: 13, fontWeight: 600,
             cursor: current === 0 ? "not-allowed" : "pointer",
             transition: "all 0.2s",
           }}
@@ -893,8 +895,8 @@ export default function DemoPage() {
       </div>
 
       {/* Keyboard hint — hidden on mobile via CSS */}
-      <div className="demo-keyhint" style={{ textAlign: "center", paddingBottom: 8, flexShrink: 0 }}>
-        <span style={{ fontSize: 10, color: "#2a2520" }}>← → arrow keys · swipe to navigate</span>
+      <div className="demo-keyhint" style={{ textAlign: "center", paddingBottom: 8, background: "#ffffff", flexShrink: 0 }}>
+        <span style={{ fontSize: 10, color: "#c5bfb8" }}>← → arrow keys · swipe to navigate</span>
       </div>
     </div>
   );
