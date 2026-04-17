@@ -6,7 +6,7 @@ import {
   InternalLead, LeadActivity, LeadStatus, LeadPriority, ActivityType,
   STATUS_CONFIG, PRIORITY_CONFIG, SOURCE_LABELS, TRADE_OPTIONS, EMPLOYEE_COUNT_OPTIONS,
 } from "@/lib/internal-leads";
-import { ScheduledMeeting, MEETING_TYPE_CONFIG, MeetingType, formatMeetingDate, formatMeetingTime } from "@/lib/meetings";
+import { ScheduledMeeting, MEETING_TYPE_CONFIG, MeetingType, US_TIMEZONES, formatMeetingDate, formatMeetingTime, formatMeetingTimeWithTZ } from "@/lib/meetings";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -797,6 +797,7 @@ function ScheduleDemoModal({
   const [title,       setTitle]       = useState(defaultTitle);
   const [date,        setDate]        = useState("");
   const [time,        setTime]        = useState("10:00");
+  const [timezone,    setTimezone]    = useState("America/New_York");
   const [duration,    setDuration]    = useState(30);
   const [meetType,    setMeetType]    = useState<MeetingType>("zoom");
   const [meetUrl,     setMeetUrl]     = useState("");
@@ -819,6 +820,7 @@ function ScheduleDemoModal({
           start_time:       time,
           duration_minutes: duration,
           meeting_type:     meetType,
+          timezone,
           meeting_url:      meetUrl || undefined,
           notes:            notes   || undefined,
         }),
@@ -890,7 +892,7 @@ function ScheduleDemoModal({
           </div>
 
           {/* Date + Time */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div>
               <label style={labelStyle}>DATE <span style={{ color: "#ef4444" }}>*</span></label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)} required
@@ -900,6 +902,33 @@ function ScheduleDemoModal({
               <label style={labelStyle}>TIME</label>
               <input type="time" value={time} onChange={e => setTime(e.target.value)} required style={inputStyle} />
             </div>
+          </div>
+
+          {/* Timezone */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelStyle}>TIMEZONE</label>
+            <div style={{ position: "relative" }}>
+              <select
+                value={timezone}
+                onChange={e => setTimezone(e.target.value)}
+                style={{ ...inputStyle, appearance: "none", paddingRight: 32, cursor: "pointer" }}
+              >
+                {US_TIMEZONES.map(tz => (
+                  <option key={tz.value} value={tz.value}>{tz.label}</option>
+                ))}
+              </select>
+              <i className="fa-solid fa-chevron-down" style={{
+                position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                fontSize: 11, color: MUTED, pointerEvents: "none",
+              }} />
+            </div>
+            {date && time && (
+              <p style={{ margin: "5px 0 0", fontSize: 12, color: INDIGO, fontWeight: 600 }}>
+                <i className="fa-solid fa-clock" style={{ marginRight: 5 }} />
+                {formatMeetingTimeWithTZ(time, date || new Date().toISOString().slice(0, 10), timezone)}
+                {" "}— this is what the lead will see in the email
+              </p>
+            )}
           </div>
 
           {/* Duration */}
@@ -1063,7 +1092,7 @@ function MeetingsCard({
                     )}
                   </div>
                   <div style={{ fontSize: 12, color: MUTED }}>
-                    {formatMeetingDate(m.meeting_date)} · {formatMeetingTime(m.start_time)} · {m.duration_minutes}m
+                    {formatMeetingDate(m.meeting_date)} · {formatMeetingTimeWithTZ(m.start_time, m.meeting_date, m.timezone || "America/New_York")} · {m.duration_minutes}m
                   </div>
                   {m.meeting_url && (
                     <a href={m.meeting_url} target="_blank" rel="noopener noreferrer"

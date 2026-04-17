@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { MEETING_TYPE_CONFIG, formatMeetingTime } from "@/lib/meetings";
+import { MEETING_TYPE_CONFIG, formatMeetingTimeWithTZ } from "@/lib/meetings";
 import type { ScheduledMeeting } from "@/lib/meetings";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -280,7 +280,7 @@ export default function CalendarClient() {
                         overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                         lineHeight: 1.4,
                       }}>
-                        {formatMeetingTime(m.start_time)} {m.lead_first_name}
+                        {formatMeetingTimeWithTZ(m.start_time, m.meeting_date, m.timezone || "America/New_York")} {m.lead_first_name}
                       </div>
                     ))}
                     {dayMeetings.length > 3 && (
@@ -352,7 +352,7 @@ export default function CalendarClient() {
                             {/* Time + status */}
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                               <span style={{ fontSize: 13, fontWeight: 800, color }}>
-                                {formatMeetingTime(m.start_time)}
+                                {formatMeetingTimeWithTZ(m.start_time, m.meeting_date, m.timezone || "America/New_York")}
                                 <span style={{ fontWeight: 500, color: MUTED, marginLeft: 6 }}>· {m.duration_minutes}m</span>
                               </span>
                               {statusBadge(m.status)}
@@ -468,7 +468,7 @@ export default function CalendarClient() {
                       <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>
                         {new Date(m.meeting_date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </div>
-                      <div style={{ fontSize: 12, color: MUTED }}>{formatMeetingTime(m.start_time)}</div>
+                      <div style={{ fontSize: 12, color: MUTED }}>{formatMeetingTimeWithTZ(m.start_time, m.meeting_date, m.timezone || "America/New_York")}</div>
                     </div>
 
                     {/* Lead + title */}

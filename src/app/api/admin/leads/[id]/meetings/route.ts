@@ -39,9 +39,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     start_time:       string;
     duration_minutes: number;
     meeting_type:     MeetingType;
+    timezone?:        string;
     meeting_url?:     string;
     notes?:           string;
   };
+
+  const tz = body.timezone ?? "America/New_York";
 
   const meeting = await createScheduledMeeting({
     lead_id:          id,
@@ -50,6 +53,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     start_time:       body.start_time,
     duration_minutes: body.duration_minutes,
     meeting_type:     body.meeting_type,
+    timezone:         tz,
     meeting_url:      body.meeting_url ?? null,
     notes:            body.notes ?? null,
     status:           "scheduled",
@@ -60,7 +64,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   await addLeadActivity(
     id,
     "demo",
-    `Demo scheduled — ${body.meeting_date} at ${body.start_time}`,
+    `Demo scheduled — ${body.meeting_date} at ${body.start_time} (${tz.split("/")[1]?.replace("_", " ") ?? tz})`,
     body.notes ?? null,
     admin.email,
     { scheduled_at: `${body.meeting_date}T${body.start_time}:00` },
