@@ -65,7 +65,7 @@ const HIW_STEPS = [
   },
 ];
 
-const TRADE_GROUPS = [
+const TRADE_GROUPS: { label: string; icon: string; color: string; bg: string; border: string; services: { icon: string; label: string }[]; footnote?: string }[] = [
   {
     label: "Health, Wellness & Med Services",
     icon: "fa-solid fa-heart-pulse",
