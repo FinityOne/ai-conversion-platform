@@ -839,7 +839,7 @@ export default function Home() {
               marginBottom: 24,
             }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: ORANGE }} />
-              ⚡ 100+ contractors. Zero missed leads.
+              ⚡ 100+ service businesses. Zero missed leads.
             </div>
 
             <h1 style={{
@@ -922,7 +922,7 @@ export default function Home() {
         textAlign: "center",
       }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: MUTED, marginBottom: 16 }}>
-          Trusted by contractors from
+          Trusted by service businesses on
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px 32px" }}>
           {["Angi", "Thumbtack", "HomeAdvisor", "Google Local", "Yelp"].map(name => (
@@ -1124,7 +1124,7 @@ export default function Home() {
               Real Results
             </p>
             <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
-              Contractors who stopped losing leads.
+              Service businesses that stopped losing leads.
             </h2>
           </div>
 
@@ -1233,7 +1233,7 @@ export default function Home() {
             Ready to fill your calendar this week?
           </h2>
           <p style={{ fontSize: 17, color: MUTED, lineHeight: 1.65, marginBottom: 36 }}>
-            Join 100+ contractors who've stopped missing leads and started booking more jobs — without spending another dollar on ads.
+            Join 100+ service businesses that have stopped missing leads and started booking more jobs — without spending another dollar on ads.
           </p>
           <Link href="/signup" style={{
             background: "linear-gradient(135deg,#D35400,#e8641c)",
