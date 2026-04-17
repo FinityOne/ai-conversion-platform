@@ -2,7 +2,9 @@ import { Resend } from "resend";
 import { createSupabaseServiceClient } from "./supabase-service";
 import { buildICS, googleCalendarUrl, toICSDateTime } from "./bookings";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -178,7 +180,7 @@ export async function sendMeetingInviteEmails(ctx: MeetingEmailContext): Promise
   const TEST  = process.env.RESEND_TEST_TO;
 
   // ── 1. Email to lead ──────────────────────────────────────────────────────
-  await resend.emails.send({
+  await getResend().emails.send({
     from:        FROM,
     to:          TEST ?? leadEmail,
     subject:     `${leadFirstName}, your demo call is confirmed — ${dateLabel}`,
@@ -192,7 +194,7 @@ export async function sendMeetingInviteEmails(ctx: MeetingEmailContext): Promise
   const adminEmails = (admins ?? []).map((a: { email: string }) => a.email).filter(Boolean);
 
   for (const email of adminEmails) {
-    await resend.emails.send({
+    await getResend().emails.send({
       from:        FROM,
       to:          TEST ?? email,
       subject:     `Demo scheduled — ${leadFirstName}${leadCompany ? ` (${leadCompany})` : ""} · ${dateLabel}`,
@@ -220,7 +222,7 @@ export async function sendMeetingReminderEmail(ctx: MeetingEmailContext): Promis
   const FROM = process.env.RESEND_FROM_EMAIL ?? "ClozeFlow <noreply@clozeflow.com>";
   const TEST = process.env.RESEND_TEST_TO;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from:    FROM,
     to:      TEST ?? leadEmail,
     subject: `Reminder: Your demo with ClozeFlow is coming up — ${dateLabel} at ${timeLabel}`,
