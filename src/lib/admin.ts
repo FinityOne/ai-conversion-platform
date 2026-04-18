@@ -27,6 +27,12 @@ export interface AdminSubscription {
   current_period_start:  string | null;
   current_period_end:    string | null;
   created_at:            string;
+  // Admin-granted
+  granted_by_admin:      boolean;
+  grant_type:            string | null;
+  grant_note:            string | null;
+  granted_at:            string | null;
+  granted_by:            string | null;
   // joined
   user_email:            string | null;
   user_name:             string | null;
@@ -109,7 +115,7 @@ export async function getAdminSubscriptions(): Promise<AdminSubscription[]> {
   // so PostgREST can't join them. Fetch both tables separately and merge.
   const [{ data: subsData }, { data: profilesData }] = await Promise.all([
     sb.from("subscriptions")
-      .select("id, user_id, plan, billing_cycle, status, stripe_subscription_id, card_last4, card_brand, current_period_start, current_period_end, created_at")
+      .select("id, user_id, plan, billing_cycle, status, stripe_subscription_id, card_last4, card_brand, current_period_start, current_period_end, created_at, granted_by_admin, grant_type, grant_note, granted_at, granted_by")
       .order("created_at", { ascending: false }),
     sb.from("profiles")
       .select("id, email, first_name, last_name, business_name"),
@@ -135,6 +141,11 @@ export async function getAdminSubscriptions(): Promise<AdminSubscription[]> {
       current_period_start:   r.current_period_start,
       current_period_end:     r.current_period_end,
       created_at:             r.created_at,
+      granted_by_admin:       r.granted_by_admin ?? false,
+      grant_type:             r.grant_type ?? null,
+      grant_note:             r.grant_note ?? null,
+      granted_at:             r.granted_at ?? null,
+      granted_by:             r.granted_by ?? null,
       user_email:             profile?.email       ?? null,
       user_name:              [firstName, lastName].filter(Boolean).join(" ") || null,
       business_name:          profile?.business_name ?? null,
@@ -171,7 +182,8 @@ export function deriveTransactions(subs: AdminSubscription[]): Transaction[] {
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const txns: Transaction[] = [];
 
-  for (const s of subs) {
+  // Never include admin-granted (non-revenue) subscriptions in financial data
+  for (const s of subs.filter(s => !s.granted_by_admin)) {
     const plan       = PLANS[s.plan];
     const periodStart = s.current_period_start ? new Date(s.current_period_start) : new Date(s.created_at);
     const periodEnd   = s.current_period_end   ? new Date(s.current_period_end)   : null;
@@ -255,7 +267,9 @@ export interface RevenueStats {
 }
 
 export function computeRevenue(subs: AdminSubscription[]): RevenueStats {
-  const active = subs.filter(s => s.status === "active");
+  // Revenue calculations always exclude admin-granted (complimentary) subscriptions
+  const billableSubs = subs.filter(s => !s.granted_by_admin);
+  const active = billableSubs.filter(s => s.status === "active");
 
   let mrr              = 0;
   let annualMrr        = 0;
@@ -288,19 +302,19 @@ export function computeRevenue(subs: AdminSubscription[]): RevenueStats {
     revenueByPlanCycle[key].count += 1;
   }
 
-  for (const s of subs) {
+  for (const s of billableSubs) {
     subsByStatus[s.status] = (subsByStatus[s.status] ?? 0) + 1;
   }
 
-  // New subs this calendar month
+  // New subs this calendar month (billable only)
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const newSubsThisMonth = subs.filter(
+  const newSubsThisMonth = billableSubs.filter(
     s => new Date(s.created_at) >= startOfMonth
   ).length;
 
-  // YTD revenue: sum of all derived transactions for the current year
-  const txns = deriveTransactions(subs);
+  // YTD revenue: sum of all derived transactions for the current year (billable only)
+  const txns = deriveTransactions(billableSubs);
   const ytdRevenue          = txns.reduce((sum, t) => sum + t.amount, 0);
   const ytdTransactionCount = txns.length;
 

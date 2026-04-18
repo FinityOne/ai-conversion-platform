@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { PLANS, cardBrandIcon, type PlanId, type BillingCycle, type Subscription } from "@/lib/subscriptions";
+import { PLANS, GRANT_LABELS, cardBrandIcon, type PlanId, type BillingCycle, type Subscription, type GrantType } from "@/lib/subscriptions";
 import { useRouter } from "next/navigation";
 
 const TEXT   = "#2C3E50";
@@ -120,6 +120,116 @@ export default function BillingPage() {
             <i className="fa-solid fa-rocket" />
             Pick a plan
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Granted / complimentary access view ──────────────────────────────────
+  if (sub.granted_by_admin) {
+    const plan = PLANS[sub.plan as PlanId];
+    const gt   = GRANT_LABELS[sub.grant_type as GrantType] ?? GRANT_LABELS.lifetime;
+
+    return (
+      <div>
+        <TabBar active="billing" />
+
+        {/* Hero card */}
+        <div style={{
+          background: `linear-gradient(135deg, ${gt.color}18 0%, ${gt.color}08 60%, #fff 100%)`,
+          border: `1.5px solid ${gt.color}30`,
+          borderRadius: 20, overflow: "hidden", marginBottom: 16,
+        }}>
+          {/* Top band */}
+          <div style={{
+            background: `linear-gradient(135deg, ${gt.color} 0%, ${gt.color}cc 100%)`,
+            padding: "24px 28px",
+            display: "flex", alignItems: "center", gap: 18,
+          }}>
+            <div style={{
+              width: 60, height: 60, borderRadius: 18, flexShrink: 0,
+              background: "rgba(255,255,255,0.2)", border: "1.5px solid rgba(255,255,255,0.35)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <i className={gt.icon} style={{ fontSize: 26, color: "#fff" }} />
+            </div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#fff" }}>{gt.headline}</h2>
+                <span style={{ fontSize: 10, fontWeight: 800, padding: "3px 10px", borderRadius: 20, background: "rgba(255,255,255,0.25)", color: "#fff", letterSpacing: "0.5px" }}>
+                  COMPLIMENTARY
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }}>{gt.subline}</p>
+            </div>
+          </div>
+
+          {/* Plan details */}
+          <div style={{ padding: "22px 28px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, padding: "14px 18px", background: "rgba(255,255,255,0.8)", borderRadius: 14, border: `1px solid ${gt.color}20` }}>
+              <div style={{
+                width: 46, height: 46, borderRadius: 13, flexShrink: 0,
+                background: plan?.badgeBg ?? "#f8f9fb", border: `1px solid ${plan?.badgeBorder ?? "#e2e8f0"}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {plan && <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 20, color: plan.color }} />}
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontSize: 17, fontWeight: 900, color: TEXT }}>{plan?.name ?? sub.plan} Plan</p>
+                <p style={{ margin: "2px 0 0", fontSize: 13, color: MUTED }}>Full access to all {plan?.name} features · No payment required</p>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <p style={{ margin: 0, fontSize: 22, fontWeight: 900, color: gt.color }}>$0</p>
+                <p style={{ margin: 0, fontSize: 11, color: MUTED }}>forever</p>
+              </div>
+            </div>
+
+            {/* What's included */}
+            {plan && (
+              <div>
+                <p style={{ margin: "0 0 12px", fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px" }}>Everything included</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
+                  {plan.features.map(f => (
+                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, background: `${gt.color}15`, border: `1px solid ${gt.color}25`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <i className="fa-solid fa-check" style={{ fontSize: 9, color: gt.color }} />
+                      </div>
+                      <span style={{ fontSize: 13, color: "#44403c" }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* No payment needed card */}
+        <div style={{
+          background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16,
+          padding: "18px 22px", marginBottom: 16,
+          display: "flex", alignItems: "center", gap: 14,
+        }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <i className="fa-solid fa-circle-check" style={{ fontSize: 20, color: "#16a34a" }} />
+          </div>
+          <div>
+            <p style={{ margin: "0 0 2px", fontSize: 15, fontWeight: 800, color: TEXT }}>No billing, ever</p>
+            <p style={{ margin: 0, fontSize: 13, color: MUTED }}>There's no credit card on file and you'll never be charged. Your access is a gift from the ClozeFlow team.</p>
+          </div>
+        </div>
+
+        {/* Support */}
+        <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "18px 22px", display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <i className="fa-solid fa-headset" style={{ fontSize: 18, color: "#D35400" }} />
+          </div>
+          <div>
+            <p style={{ margin: "0 0 2px", fontSize: 15, fontWeight: 700, color: TEXT }}>Questions? We've got you.</p>
+            <p style={{ margin: 0, fontSize: 13, color: MUTED }}>
+              Reach us anytime at{" "}
+              <a href="mailto:hello@clozeflow.com" style={{ color: "#D35400", fontWeight: 600, textDecoration: "none" }}>hello@clozeflow.com</a>
+            </p>
+          </div>
         </div>
       </div>
     );

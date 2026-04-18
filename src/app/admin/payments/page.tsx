@@ -1,5 +1,5 @@
 import { getAdminSubscriptions, computeRevenue, deriveTransactions } from "@/lib/admin";
-import { PLANS, type PlanId } from "@/lib/subscriptions";
+import { PLANS, GRANT_LABELS, type PlanId, type GrantType } from "@/lib/subscriptions";
 
 const TEXT   = "#0f172a";
 const MUTED  = "#64748b";
@@ -31,9 +31,12 @@ const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }
 };
 
 export default async function PaymentsPage() {
-  const subs  = await getAdminSubscriptions();
-  const rev   = computeRevenue(subs);
-  const txns  = deriveTransactions(subs);
+  const allSubs     = await getAdminSubscriptions();
+  const billableSubs = allSubs.filter(s => !s.granted_by_admin);
+  const grantedSubs  = allSubs.filter(s => s.granted_by_admin);
+  const subs  = billableSubs;
+  const rev   = computeRevenue(allSubs);  // already filters internally
+  const txns  = deriveTransactions(allSubs); // already filters internally
   const currentYear = new Date().getFullYear();
 
   const now        = new Date();
@@ -63,6 +66,17 @@ export default async function PaymentsPage() {
         <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900, color: TEXT }}>Payments & Revenue</h1>
         <p style={{ margin: "6px 0 0", fontSize: 14, color: MUTED }}>{monthName}</p>
       </div>
+
+      {/* Complimentary accounts notice */}
+      {grantedSubs.length > 0 && (
+        <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "rgba(124,58,237,0.05)", border: "1px solid rgba(124,58,237,0.15)", display: "flex", alignItems: "center", gap: 10 }}>
+          <i className="fa-solid fa-gift" style={{ fontSize: 14, color: "#7c3aed", flexShrink: 0 }} />
+          <p style={{ margin: 0, fontSize: 13, color: "#6d28d9" }}>
+            <strong>{grantedSubs.length} complimentary account{grantedSubs.length !== 1 ? "s" : ""}</strong> excluded from all revenue figures below.{" "}
+            <span style={{ opacity: 0.75 }}>These are admin-granted subscriptions and generate $0 in revenue.</span>
+          </p>
+        </div>
+      )}
 
       {/* Revenue hero */}
       <div style={{ background: "linear-gradient(135deg, #0d0f14 0%, #1e1b4b 50%, #0d0f14 100%)", borderRadius: 20, padding: "28px 28px", marginBottom: 20, border: "1px solid #2d2f5e" }}>
@@ -257,6 +271,9 @@ export default async function PaymentsPage() {
         )}
       </div>
 
+      {/* ── Subscriptions table — paid only ── */}
+      {/* (subs already filtered to billable above) */}
+
       {/* ── Transactions ── */}
       <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, overflow: "hidden", marginTop: 20 }}>
         <div style={{ padding: "16px 22px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -356,6 +373,85 @@ export default async function PaymentsPage() {
           </>
         )}
       </div>
+      {/* ── Complimentary Accounts ── */}
+      {grantedSubs.length > 0 && (
+        <div style={{ background: CARD, border: "1px solid rgba(124,58,237,0.2)", borderRadius: 16, overflow: "hidden", marginTop: 20 }}>
+          <div style={{ padding: "16px 22px", borderBottom: "1px solid rgba(124,58,237,0.12)", background: "rgba(124,58,237,0.03)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: TEXT, display: "flex", alignItems: "center", gap: 8 }}>
+                <i className="fa-solid fa-gift" style={{ color: "#7c3aed" }} />
+                Complimentary Accounts
+              </p>
+              <p style={{ margin: "2px 0 0", fontSize: 13, color: MUTED }}>
+                {grantedSubs.length} account{grantedSubs.length !== 1 ? "s" : ""} · admin-granted · excluded from all revenue
+              </p>
+            </div>
+            <div style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", fontSize: 12, fontWeight: 700, color: "#7c3aed" }}>
+              $0 Revenue
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", padding: "10px 22px", background: BG, borderBottom: `1px solid ${BORDER}`, gap: 12 }} className="hidden md:grid">
+            {["Account", "Plan", "Access Type", "Granted By", "Granted"].map(h => (
+              <span key={h} style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: MUTED }}>{h}</span>
+            ))}
+          </div>
+
+          {grantedSubs.map((s, i) => {
+            const plan  = PLANS[s.plan];
+            const gt    = GRANT_LABELS[s.grant_type as GrantType] ?? GRANT_LABELS.lifetime;
+            return (
+              <div key={s.id} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", padding: "13px 22px", borderBottom: i < grantedSubs.length - 1 ? `1px solid ${BG}` : "none", gap: 12, alignItems: "center" }} className="hidden md:grid">
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {s.user_name || s.business_name || s.user_email || "Unknown"}
+                  </p>
+                  <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.user_email}</p>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  {plan && <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 11, color: plan.color }} />}
+                  <span style={{ fontSize: 13, fontWeight: 700, color: plan?.color ?? TEXT }}>{plan?.name ?? s.plan}</span>
+                </div>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 5,
+                  fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
+                  background: `${gt.color}12`, color: gt.color, border: `1px solid ${gt.color}25`,
+                }}>
+                  <i className={gt.icon} style={{ fontSize: 9 }} />{gt.label}
+                </span>
+                <span style={{ fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {s.granted_by ?? "—"}
+                </span>
+                <span style={{ fontSize: 12, color: MUTED }}>
+                  {s.granted_at ? new Date(s.granted_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                </span>
+              </div>
+            );
+          })}
+
+          {/* Mobile */}
+          <div className="md:hidden">
+            {grantedSubs.map(s => {
+              const plan = PLANS[s.plan];
+              const gt   = GRANT_LABELS[s.grant_type as GrantType] ?? GRANT_LABELS.lifetime;
+              return (
+                <div key={`mob-${s.id}`} style={{ padding: "14px 18px", borderBottom: `1px solid ${BG}` }}>
+                  <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: TEXT }}>{s.user_name || s.business_name || "Unknown"}</p>
+                  <p style={{ margin: "0 0 8px", fontSize: 12, color: MUTED }}>{s.user_email}</p>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: plan ? `${plan.color}18` : BG, color: plan?.color ?? MUTED }}>
+                      {plan?.name}
+                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: `${gt.color}12`, color: gt.color }}>
+                      <i className={gt.icon} style={{ marginRight: 4 }} />{gt.label}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

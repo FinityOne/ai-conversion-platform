@@ -3,6 +3,8 @@ import { createSupabaseServiceClient } from "./supabase-service";
 export type PlanId = "starter" | "growth" | "pro";
 export type BillingCycle = "annual" | "monthly";
 
+export type GrantType = "lifetime" | "beta_tester" | "internal";
+
 export interface Subscription {
   id: string;
   user_id: string;
@@ -17,7 +19,37 @@ export interface Subscription {
   current_period_end: string | null;
   created_at: string;
   updated_at: string;
+  // Admin-granted fields
+  granted_by_admin: boolean;
+  grant_type: GrantType | null;
+  grant_note: string | null;
+  granted_at: string | null;
+  granted_by: string | null;
 }
+
+export const GRANT_LABELS: Record<GrantType, { label: string; icon: string; color: string; headline: string; subline: string }> = {
+  lifetime: {
+    label:    "Lifetime Free Access",
+    icon:     "fa-solid fa-gift",
+    color:    "#7c3aed",
+    headline: "Lifetime Free Access",
+    subline:  "You've been gifted permanent, complimentary access to ClozeFlow — no payment ever required.",
+  },
+  beta_tester: {
+    label:    "Beta Tester Access",
+    icon:     "fa-solid fa-flask",
+    color:    "#0ea5e9",
+    headline: "Beta Tester Access",
+    subline:  "You're an early access beta tester. Help shape ClozeFlow with your feedback — full access, on us.",
+  },
+  internal: {
+    label:    "Internal Account",
+    icon:     "fa-solid fa-shield-halved",
+    color:    "#64748b",
+    headline: "Internal Test Account",
+    subline:  "This is an internal ClozeFlow account with full access for testing and development.",
+  },
+};
 
 export const PLANS = {
   starter: {
