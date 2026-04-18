@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { AdminUser } from "@/lib/admin";
 import type { AdminSubscription } from "@/lib/admin";
 import type { GrantType } from "@/lib/subscriptions";
@@ -14,7 +14,7 @@ const CARD   = "#ffffff";
 const BG     = "#f8f9fb";
 const INDIGO = "#6366f1";
 
-type SubMap = Record<string, AdminSubscription>; // user_id → sub
+type SubMap = Record<string, AdminSubscription>;
 
 function initials(u: AdminUser): string {
   return ((u.first_name?.[0] ?? "") + (u.last_name?.[0] ?? "")).toUpperCase() || (u.email[0] ?? "?").toUpperCase();
@@ -32,12 +32,53 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
+function healthColor(score: number): string {
+  if (score >= 75) return "#22c55e";
+  if (score >= 50) return "#f59e0b";
+  if (score >= 25) return "#f97316";
+  return "#ef4444";
+}
+function healthLabel(score: number): string {
+  if (score >= 75) return "Great";
+  if (score >= 50) return "Good";
+  if (score >= 25) return "Fair";
+  return "Low";
+}
+
+function HealthBadge({ score }: { score: number }) {
+  const color = healthColor(score);
+  const R = 11;
+  const C = 2 * Math.PI * R;
+  const filled = (score / 100) * C;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ position: "relative", width: 28, height: 28, flexShrink: 0 }}>
+        <svg width="28" height="28" style={{ transform: "rotate(-90deg)" }}>
+          <circle cx="14" cy="14" r={R} fill="none" stroke="#f1f5f9" strokeWidth="2.5" />
+          <circle
+            cx="14" cy="14" r={R} fill="none"
+            stroke={color} strokeWidth="2.5"
+            strokeDasharray={`${filled} ${C - filled}`}
+            strokeLinecap="round"
+          />
+        </svg>
+        <span style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 8, fontWeight: 900, color,
+        }}>{score}</span>
+      </div>
+      <span style={{ fontSize: 12, fontWeight: 700, color }}>{healthLabel(score)}</span>
+    </div>
+  );
+}
+
 function LeadBar({ count }: { count: number }) {
   const pct   = Math.min(100, Math.round((count / 50) * 100));
   const color = count === 0 ? "#e9ecef" : count < 10 ? "#6366f1" : count < 30 ? "#8b5cf6" : "#22c55e";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <div style={{ flex: 1, height: 6, borderRadius: 3, background: "#f1f5f9", overflow: "hidden" }}>
+      <div style={{ flex: 1, height: 5, borderRadius: 3, background: "#f1f5f9", overflow: "hidden" }}>
         <div style={{ height: "100%", borderRadius: 3, width: `${pct}%`, background: color }} />
       </div>
       <span style={{ fontSize: 13, fontWeight: 700, color: TEXT, minWidth: 20, textAlign: "right" }}>{count}</span>
@@ -78,7 +119,9 @@ function SubBadge({ sub }: { sub: AdminSubscription | undefined }) {
     }}>
       {plan && <i className={`fa-solid ${plan.icon}`} style={{ fontSize: 9 }} />}
       {plan?.name ?? sub.plan}
-      <span style={{ opacity: 0.7, fontWeight: 500, textTransform: "capitalize" }}>· {sub.billing_cycle === "annual" ? "Annual" : "Monthly"}</span>
+      <span style={{ opacity: 0.7, fontWeight: 500, textTransform: "capitalize" }}>
+        · {sub.billing_cycle === "annual" ? "Annual" : "Monthly"}
+      </span>
     </span>
   );
 }
@@ -88,11 +131,13 @@ export default function UsersClient({
   users,
   initialSubMap,
 }: {
-  users:          AdminUser[];
-  initialSubMap:  SubMap;
+  users:         AdminUser[];
+  initialSubMap: SubMap;
 }) {
-  const subMap = initialSubMap;
+  const router   = useRouter();
+  const subMap   = initialSubMap;
   const [search, setSearch] = useState("");
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const totalLeads   = users.reduce((s, u) => s + u.lead_count, 0);
   const adminCount   = users.filter(u => u.role === "admin").length;
@@ -106,22 +151,26 @@ export default function UsersClient({
     return name.includes(q) || u.email.toLowerCase().includes(q) || (u.business_name ?? "").toLowerCase().includes(q);
   });
 
+  function goToUser(id: string) {
+    router.push(`/admin/users/${id}`);
+  }
+
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
         <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: INDIGO }}>Admin Console</p>
         <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900, color: TEXT }}>All Users</h1>
-        <p style={{ margin: "6px 0 0", fontSize: 14, color: MUTED }}>{users.length} accounts · sorted by lead count</p>
+        <p style={{ margin: "6px 0 0", fontSize: 14, color: MUTED }}>{users.length} accounts · sorted by lead count · click any row to view profile</p>
       </div>
 
-      {/* Summary */}
+      {/* Summary stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          { label: "Total Accounts",  value: users.length,    color: INDIGO,    icon: "fa-solid fa-users"           },
-          { label: "Paid Subs",       value: paidCount,       color: "#16a34a", icon: "fa-solid fa-credit-card"     },
-          { label: "Complimentary",   value: grantedCount,    color: "#7c3aed", icon: "fa-solid fa-gift"            },
-          { label: "Total Leads",     value: totalLeads,      color: "#f59e0b", icon: "fa-solid fa-layer-group"     },
-          { label: "Admins",          value: adminCount,      color: "#8b5cf6", icon: "fa-solid fa-shield-halved"   },
+          { label: "Total Accounts", value: users.length,    color: INDIGO,    icon: "fa-solid fa-users"         },
+          { label: "Paid Subs",      value: paidCount,       color: "#16a34a", icon: "fa-solid fa-credit-card"   },
+          { label: "Complimentary",  value: grantedCount,    color: "#7c3aed", icon: "fa-solid fa-gift"          },
+          { label: "Total Leads",    value: totalLeads,      color: "#f59e0b", icon: "fa-solid fa-layer-group"   },
+          { label: "Admins",         value: adminCount,      color: "#8b5cf6", icon: "fa-solid fa-shield-halved" },
         ].map(s => (
           <div key={s.label} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -149,10 +198,14 @@ export default function UsersClient({
         )}
       </div>
 
-      {/* Table */}
+      {/* Desktop table */}
       <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1.8fr 1.5fr 0.9fr 0.8fr 1.1fr 90px", padding: "12px 20px", background: BG, borderBottom: `1px solid ${BORDER}`, gap: 12 }} className="hidden lg:grid">
-          {["User", "Business / Phone", "Email", "Joined", "Leads", "Subscription", ""].map(h => (
+        {/* Header */}
+        <div
+          style={{ display: "grid", gridTemplateColumns: "2.2fr 1.6fr 1.4fr 0.9fr 0.85fr 1.2fr 1fr", padding: "11px 20px", background: BG, borderBottom: `1px solid ${BORDER}`, gap: 12 }}
+          className="hidden lg:grid"
+        >
+          {["User", "Business / Phone", "Email", "Joined", "Leads", "Subscription", "Health"].map(h => (
             <span key={h} style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: MUTED }}>{h}</span>
           ))}
         </div>
@@ -169,23 +222,36 @@ export default function UsersClient({
             const name      = [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
             const sub       = subMap[u.id];
             const isGranted = sub?.granted_by_admin;
+            const isHovered = hoveredId === u.id;
             return (
               <div
                 key={u.id}
-                style={{
-                  padding: "13px 20px", borderBottom: i < filtered.length - 1 ? "1px solid #f8f9fb" : "none",
-                  display: "grid", gridTemplateColumns: "2fr 1.8fr 1.5fr 0.9fr 0.8fr 1.1fr 90px",
-                  alignItems: "center", gap: 12,
-                  background: isGranted ? "rgba(124,58,237,0.015)" : undefined,
-                }}
+                onClick={() => goToUser(u.id)}
+                onMouseEnter={() => setHoveredId(u.id)}
+                onMouseLeave={() => setHoveredId(null)}
                 className="hidden lg:grid"
+                style={{
+                  padding: "13px 20px",
+                  borderBottom: i < filtered.length - 1 ? `1px solid ${BG}` : "none",
+                  display: "grid",
+                  gridTemplateColumns: "2.2fr 1.6fr 1.4fr 0.9fr 0.85fr 1.2fr 1fr",
+                  alignItems: "center",
+                  gap: 12,
+                  cursor: "pointer",
+                  background: isHovered
+                    ? isGranted ? "rgba(124,58,237,0.04)" : "rgba(99,102,241,0.03)"
+                    : isGranted ? "rgba(124,58,237,0.015)" : CARD,
+                  transition: "background 0.12s",
+                  borderLeft: isHovered ? `3px solid ${isGranted ? "#7c3aed" : INDIGO}` : "3px solid transparent",
+                }}
               >
+                {/* User */}
                 <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
                   <div style={{ width: 36, height: 36, borderRadius: "50%", flexShrink: 0, background: `${color}18`, border: `1.5px solid ${color}40`, display: "flex", alignItems: "center", justifyContent: "center", color, fontSize: 13, fontWeight: 800 }}>
                     {inits}
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: isHovered ? INDIGO : TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", transition: "color 0.12s" }}>{name}</p>
                     <div style={{ display: "flex", gap: 4, marginTop: 2 }}>
                       {u.role === "admin" && (
                         <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 10, background: "rgba(99,102,241,0.1)", color: INDIGO }}>Admin</span>
@@ -193,38 +259,38 @@ export default function UsersClient({
                     </div>
                   </div>
                 </div>
+
+                {/* Business / Phone */}
                 <div style={{ minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.business_name ?? <span style={{ color: "#94a3b8" }}>—</span>}</p>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {u.business_name ?? <span style={{ color: "#94a3b8" }}>—</span>}
+                  </p>
                   {u.phone && <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED }}>{u.phone}</p>}
                 </div>
+
+                {/* Email */}
                 <div style={{ minWidth: 0 }}>
                   <p style={{ margin: 0, fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.email}</p>
                 </div>
+
+                {/* Joined */}
                 <div>
                   <p style={{ margin: 0, fontSize: 12, color: MUTED }}>{timeAgo(u.created_at)}</p>
                 </div>
+
+                {/* Leads */}
                 <div>
                   <LeadBar count={u.lead_count} />
                 </div>
+
+                {/* Subscription */}
                 <div>
                   <SubBadge sub={sub} />
                 </div>
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <Link
-                    href={`/admin/users/${u.id}`}
-                    style={{
-                      padding: "6px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                      border: `1px solid ${BORDER}`,
-                      background: "#fff",
-                      color: INDIGO,
-                      display: "flex", alignItems: "center", gap: 5,
-                      textDecoration: "none",
-                    }}
-                    title="View user profile"
-                  >
-                    <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: 10 }} />
-                    View
-                  </Link>
+
+                {/* Health */}
+                <div>
+                  <HealthBadge score={u.health_score} />
                 </div>
               </div>
             );
@@ -233,24 +299,34 @@ export default function UsersClient({
 
         {/* Mobile cards */}
         {filtered.map((u, i) => {
-          const color = avatarColor(u.id);
-          const inits = initials(u);
-          const name  = [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
-          const sub   = subMap[u.id];
+          const color     = avatarColor(u.id);
+          const inits     = initials(u);
+          const name      = [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
+          const sub       = subMap[u.id];
+          const hcolor    = healthColor(u.health_score);
           return (
-            <div key={`mob-${u.id}`} className="lg:hidden" style={{ padding: "14px 16px", borderBottom: i < filtered.length - 1 ? "1px solid #f8f9fb" : "none" }}>
+            <div
+              key={`mob-${u.id}`}
+              className="lg:hidden"
+              onClick={() => goToUser(u.id)}
+              style={{
+                padding: "14px 16px",
+                borderBottom: i < filtered.length - 1 ? `1px solid ${BG}` : "none",
+                cursor: "pointer",
+                background: CARD,
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <div style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, background: `${color}18`, border: `1.5px solid ${color}40`, display: "flex", alignItems: "center", justifyContent: "center", color, fontSize: 13, fontWeight: 800 }}>{inits}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT }}>{name}</p>
                   <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED }}>{u.email}</p>
                 </div>
-                <Link
-                  href={`/admin/users/${u.id}`}
-                  style={{ padding: "6px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: `1px solid ${BORDER}`, background: "#fff", color: INDIGO, textDecoration: "none" }}
-                >
-                  <i className="fa-solid fa-arrow-up-right-from-square" />
-                </Link>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: hcolor }}>{u.health_score}</span>
+                  <i className="fa-solid fa-chevron-right" style={{ fontSize: 11, color: MUTED }} />
+                </div>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <SubBadge sub={sub} />

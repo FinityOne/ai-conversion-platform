@@ -13,6 +13,7 @@ export interface AdminUser {
   role:          string;
   created_at:    string;
   lead_count:    number;
+  health_score:  number;
 }
 
 export interface AdminSubscription {
@@ -101,10 +102,17 @@ export async function getActivityFeed(limit = 60): Promise<ActivityEvent[]> {
 
 export async function getAdminUsers(): Promise<AdminUser[]> {
   const sb = createSupabaseServiceClient();
-  const { data } = await sb.rpc("admin_get_users_with_lead_counts");
-  return (data ?? []).map((r: AdminUser) => ({
+  const [{ data: users }, { data: scores }] = await Promise.all([
+    sb.rpc("admin_get_users_with_lead_counts"),
+    sb.rpc("admin_get_users_health_scores"),
+  ]);
+  const scoreMap = new Map(
+    ((scores ?? []) as { user_id: string; health_score: number }[]).map(r => [r.user_id, Number(r.health_score)])
+  );
+  return (users ?? []).map((r: AdminUser) => ({
     ...r,
-    lead_count: Number(r.lead_count),
+    lead_count:   Number(r.lead_count),
+    health_score: scoreMap.get(r.id) ?? 0,
   }));
 }
 
