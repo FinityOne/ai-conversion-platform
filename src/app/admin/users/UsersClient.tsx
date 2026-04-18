@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { AdminUser } from "@/lib/admin";
 import type { AdminSubscription } from "@/lib/admin";
-import type { PlanId, GrantType } from "@/lib/subscriptions";
+import type { GrantType } from "@/lib/subscriptions";
 import { PLANS, GRANT_LABELS } from "@/lib/subscriptions";
 
 const TEXT   = "#0f172a";
@@ -82,243 +83,6 @@ function SubBadge({ sub }: { sub: AdminSubscription | undefined }) {
   );
 }
 
-// ── Grant Drawer ──────────────────────────────────────────────────────────────
-function GrantDrawer({
-  user,
-  currentSub,
-  onClose,
-  onChanged,
-}: {
-  user:       AdminUser;
-  currentSub: AdminSubscription | undefined;
-  onClose:    () => void;
-  onChanged:  (userId: string, sub: AdminSubscription | null) => void;
-}) {
-  const [selectedPlan, setSelectedPlan]       = useState<PlanId>(currentSub?.plan ?? "growth");
-  const [selectedType, setSelectedType]       = useState<GrantType>((currentSub?.grant_type as GrantType) ?? "lifetime");
-  const [note, setNote]                       = useState(currentSub?.grant_note ?? "");
-  const [loading, setLoading]                 = useState(false);
-  const [revoking, setRevoking]               = useState(false);
-  const [error, setError]                     = useState("");
-  const [success, setSuccess]                 = useState("");
-
-  const name = [user.first_name, user.last_name].filter(Boolean).join(" ") || user.email;
-  const color = avatarColor(user.id);
-  const inits = initials(user);
-
-  const grantOptions: { type: GrantType; label: string; desc: string; icon: string; color: string }[] = [
-    { type: "lifetime",    label: "Lifetime Free",   desc: "Permanent access, forever",           icon: "fa-solid fa-gift",          color: "#7c3aed" },
-    { type: "beta_tester", label: "Beta Tester",     desc: "Early access for testers & partners", icon: "fa-solid fa-flask",         color: "#0ea5e9" },
-    { type: "internal",    label: "Internal / Test", desc: "Internal accounts & QA testing",      icon: "fa-solid fa-shield-halved", color: "#64748b" },
-  ];
-
-  async function handleGrant() {
-    setLoading(true); setError(""); setSuccess("");
-    const res = await fetch("/api/admin/subscriptions/grant", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: user.id, plan: selectedPlan, grant_type: selectedType, note }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error ?? "Failed to grant access."); return; }
-    setSuccess("Access granted successfully!");
-    onChanged(user.id, data.subscription);
-  }
-
-  async function handleRevoke() {
-    if (!confirm(`Revoke complimentary access for ${name}? They will lose access immediately.`)) return;
-    setRevoking(true); setError("");
-    const res = await fetch(`/api/admin/subscriptions/grant?user_id=${user.id}`, { method: "DELETE" });
-    const data = await res.json();
-    setRevoking(false);
-    if (!res.ok) { setError(data.error ?? "Failed to revoke."); return; }
-    onChanged(user.id, null);
-    onClose();
-  }
-
-  const alreadyGranted = currentSub?.granted_by_admin;
-
-  return (
-    <>
-      <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 150, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(1px)" }} />
-      <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 160, width: "min(520px, 100vw)", background: "#fff", boxShadow: "-20px 0 60px rgba(0,0,0,0.15)", display: "flex", flexDirection: "column" }}>
-
-        {/* Header */}
-        <div style={{ padding: "20px 24px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", flexShrink: 0, background: `${color}18`, border: `2px solid ${color}40`, display: "flex", alignItems: "center", justifyContent: "center", color, fontSize: 15, fontWeight: 800 }}>{inits}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 900, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</h2>
-            <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.email}</p>
-          </div>
-          <button onClick={onClose} style={{ padding: "8px 10px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 14, cursor: "pointer", flexShrink: 0 }}><i className="fa-solid fa-xmark" /></button>
-        </div>
-
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
-
-          {/* Current subscription status */}
-          <div style={{ marginBottom: 20, padding: "14px 16px", borderRadius: 12, background: BG, border: `1px solid ${BORDER}` }}>
-            <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1.2px" }}>Current Subscription</p>
-            {!currentSub ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <i className="fa-solid fa-circle-xmark" style={{ color: "#94a3b8", fontSize: 14 }} />
-                <span style={{ fontSize: 13, color: MUTED }}>No active subscription</span>
-              </div>
-            ) : alreadyGranted ? (
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                  <i className={GRANT_LABELS[currentSub.grant_type as GrantType]?.icon ?? "fa-solid fa-gift"} style={{ color: GRANT_LABELS[currentSub.grant_type as GrantType]?.color ?? "#7c3aed", fontSize: 14 }} />
-                  <span style={{ fontSize: 14, fontWeight: 800, color: TEXT }}>{GRANT_LABELS[currentSub.grant_type as GrantType]?.label ?? "Granted Access"}</span>
-                </div>
-                <p style={{ margin: "0 0 2px", fontSize: 12, color: MUTED }}>Plan: <strong style={{ color: TEXT }}>{PLANS[currentSub.plan]?.name ?? currentSub.plan}</strong></p>
-                {currentSub.granted_at && <p style={{ margin: "0 0 2px", fontSize: 12, color: MUTED }}>Granted: <strong style={{ color: TEXT }}>{timeAgo(currentSub.granted_at)}</strong> by {currentSub.granted_by}</p>}
-                {currentSub.grant_note && <p style={{ margin: "4px 0 0", fontSize: 12, color: MUTED, fontStyle: "italic" }}>"{currentSub.grant_note}"</p>}
-              </div>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <i className="fa-solid fa-credit-card" style={{ color: "#16a34a", fontSize: 14 }} />
-                <span style={{ fontSize: 13, color: TEXT, fontWeight: 600 }}>
-                  Paid — {PLANS[currentSub.plan]?.name ?? currentSub.plan} ({currentSub.billing_cycle})
-                </span>
-                <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 700, padding: "2px 7px", borderRadius: 10, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
-                  {currentSub.status}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Grant section */}
-          <div>
-            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 800, color: TEXT }}>
-              <i className="fa-solid fa-gift" style={{ color: "#7c3aed", marginRight: 8 }} />
-              {alreadyGranted ? "Update Complimentary Access" : "Grant Complimentary Access"}
-            </p>
-            <p style={{ margin: "0 0 16px", fontSize: 13, color: MUTED }}>
-              {alreadyGranted ? "Change the plan or type, or revoke access entirely." : "Give this user free access to any plan. This will not appear in revenue reports."}
-            </p>
-
-            {/* Plan selector */}
-            <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1.2px" }}>Plan</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 16 }}>
-              {(["starter", "growth", "pro"] as PlanId[]).map(planId => {
-                const p = PLANS[planId];
-                const sel = selectedPlan === planId;
-                return (
-                  <button
-                    key={planId}
-                    onClick={() => setSelectedPlan(planId)}
-                    style={{
-                      padding: "10px 8px", borderRadius: 10, cursor: "pointer",
-                      border: sel ? `2px solid ${p.color}` : `1px solid ${BORDER}`,
-                      background: sel ? `${p.color}10` : "#fff",
-                      display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
-                      transition: "all 0.12s",
-                    }}
-                  >
-                    <i className={`fa-solid ${p.icon}`} style={{ fontSize: 16, color: sel ? p.color : MUTED }} />
-                    <span style={{ fontSize: 12, fontWeight: sel ? 800 : 600, color: sel ? p.color : TEXT }}>{p.name}</span>
-                    <span style={{ fontSize: 10, color: MUTED }}>${p.annualMonthly}/mo</span>
-                    {sel && <i className="fa-solid fa-circle-check" style={{ fontSize: 12, color: p.color, marginTop: 2 }} />}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Grant type selector */}
-            <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1.2px" }}>Access Type</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-              {grantOptions.map(opt => {
-                const sel = selectedType === opt.type;
-                return (
-                  <button
-                    key={opt.type}
-                    onClick={() => setSelectedType(opt.type)}
-                    style={{
-                      padding: "12px 14px", borderRadius: 10, cursor: "pointer", textAlign: "left",
-                      border: sel ? `2px solid ${opt.color}` : `1px solid ${BORDER}`,
-                      background: sel ? `${opt.color}08` : "#fff",
-                      display: "flex", alignItems: "center", gap: 12, transition: "all 0.12s",
-                    }}
-                  >
-                    <div style={{ width: 34, height: 34, borderRadius: 9, background: `${opt.color}15`, border: `1px solid ${opt.color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <i className={opt.icon} style={{ fontSize: 14, color: opt.color }} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ margin: 0, fontSize: 13, fontWeight: sel ? 800 : 600, color: sel ? opt.color : TEXT }}>{opt.label}</p>
-                      <p style={{ margin: 0, fontSize: 11, color: MUTED }}>{opt.desc}</p>
-                    </div>
-                    {sel && <i className="fa-solid fa-circle-check" style={{ fontSize: 16, color: opt.color, flexShrink: 0 }} />}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Internal note */}
-            <p style={{ margin: "0 0 6px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1.2px" }}>Internal Note <span style={{ fontSize: 10, fontWeight: 500, textTransform: "none", letterSpacing: 0 }}>(optional)</span></p>
-            <textarea
-              value={note}
-              onChange={e => setNote(e.target.value)}
-              placeholder="e.g. Gave access for podcast collaboration, early adopter reward…"
-              style={{ width: "100%", minHeight: 70, padding: "10px 13px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#fff", fontSize: 13, color: TEXT, outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit" }}
-            />
-
-            {/* What they'll see */}
-            <div style={{ marginTop: 12, padding: "12px 14px", borderRadius: 10, background: "rgba(124,58,237,0.05)", border: "1px solid rgba(124,58,237,0.12)" }}>
-              <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#7c3aed" }}>
-                <i className="fa-solid fa-eye" style={{ marginRight: 5 }} />What the user will see
-              </p>
-              <p style={{ margin: 0, fontSize: 12, color: "#6d28d9" }}>
-                Their billing page will show a special "{GRANT_LABELS[selectedType]?.label}" card — no pricing, no payment info. Just a premium "you've been gifted access" experience.
-              </p>
-            </div>
-
-            {error && <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 8, background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)", color: "#dc2626", fontSize: 13 }}>{error}</div>}
-            {success && <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 8, background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.2)", color: "#16a34a", fontSize: 13, fontWeight: 600 }}><i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />{success}</div>}
-          </div>
-        </div>
-
-        {/* Footer actions */}
-        <div style={{ padding: "16px 24px", borderTop: `1px solid ${BORDER}`, display: "flex", gap: 10, flexShrink: 0 }}>
-          {alreadyGranted && (
-            <button
-              onClick={handleRevoke}
-              disabled={revoking}
-              style={{ padding: "10px 16px", borderRadius: 9, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.05)", color: "#dc2626", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: revoking ? 0.7 : 1, flexShrink: 0 }}
-            >
-              <i className="fa-solid fa-ban" style={{ marginRight: 6 }} />
-              {revoking ? "Revoking…" : "Revoke Access"}
-            </button>
-          )}
-          <button
-            onClick={onClose}
-            style={{ padding: "10px 16px", borderRadius: 9, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer" }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleGrant}
-            disabled={loading}
-            style={{
-              flex: 1, padding: "11px 16px", borderRadius: 9, border: "none",
-              background: success ? "linear-gradient(135deg,#16a34a,#22c55e)" : "linear-gradient(135deg,#7c3aed,#8b5cf6)",
-              color: "#fff", fontSize: 14, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.75 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            }}
-          >
-            {loading ? (
-              <><i className="fa-solid fa-circle-notch fa-spin" /> Granting…</>
-            ) : success ? (
-              <><i className="fa-solid fa-circle-check" /> Access Granted</>
-            ) : (
-              <><i className="fa-solid fa-gift" /> {alreadyGranted ? "Update Access" : "Grant Access"}</>
-            )}
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
-
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function UsersClient({
   users,
@@ -327,12 +91,11 @@ export default function UsersClient({
   users:          AdminUser[];
   initialSubMap:  SubMap;
 }) {
-  const [subMap, setSubMap]     = useState<SubMap>(initialSubMap);
-  const [search, setSearch]     = useState("");
-  const [drawer, setDrawer]     = useState<AdminUser | null>(null);
+  const subMap = initialSubMap;
+  const [search, setSearch] = useState("");
 
-  const totalLeads  = users.reduce((s, u) => s + u.lead_count, 0);
-  const adminCount  = users.filter(u => u.role === "admin").length;
+  const totalLeads   = users.reduce((s, u) => s + u.lead_count, 0);
+  const adminCount   = users.filter(u => u.role === "admin").length;
   const grantedCount = Object.values(subMap).filter(s => s.granted_by_admin).length;
   const paidCount    = Object.values(subMap).filter(s => !s.granted_by_admin).length;
 
@@ -342,16 +105,6 @@ export default function UsersClient({
     const name = [u.first_name, u.last_name].filter(Boolean).join(" ").toLowerCase();
     return name.includes(q) || u.email.toLowerCase().includes(q) || (u.business_name ?? "").toLowerCase().includes(q);
   });
-
-  function handleSubChanged(userId: string, sub: AdminSubscription | null) {
-    setSubMap(prev => {
-      const next = { ...prev };
-      if (sub) next[userId] = sub;
-      else delete next[userId];
-      return next;
-    });
-    if (sub) setDrawer(null);
-  }
 
   return (
     <div>
@@ -411,10 +164,10 @@ export default function UsersClient({
           </div>
         ) : (
           filtered.map((u, i) => {
-            const color = avatarColor(u.id);
-            const inits = initials(u);
-            const name  = [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
-            const sub   = subMap[u.id];
+            const color     = avatarColor(u.id);
+            const inits     = initials(u);
+            const name      = [u.first_name, u.last_name].filter(Boolean).join(" ") || "—";
+            const sub       = subMap[u.id];
             const isGranted = sub?.granted_by_admin;
             return (
               <div
@@ -457,20 +210,21 @@ export default function UsersClient({
                   <SubBadge sub={sub} />
                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <button
-                    onClick={() => setDrawer(u)}
+                  <Link
+                    href={`/admin/users/${u.id}`}
                     style={{
                       padding: "6px 11px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                      border: isGranted ? "1px solid rgba(124,58,237,0.3)" : `1px solid ${BORDER}`,
-                      background: isGranted ? "rgba(124,58,237,0.07)" : "#fff",
-                      color: isGranted ? "#7c3aed" : MUTED,
+                      border: `1px solid ${BORDER}`,
+                      background: "#fff",
+                      color: INDIGO,
                       display: "flex", alignItems: "center", gap: 5,
+                      textDecoration: "none",
                     }}
-                    title="Manage subscription access"
+                    title="View user profile"
                   >
-                    <i className={isGranted ? "fa-solid fa-gift" : "fa-solid fa-key"} style={{ fontSize: 10 }} />
-                    Access
-                  </button>
+                    <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: 10 }} />
+                    View
+                  </Link>
                 </div>
               </div>
             );
@@ -491,9 +245,12 @@ export default function UsersClient({
                   <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT }}>{name}</p>
                   <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED }}>{u.email}</p>
                 </div>
-                <button onClick={() => setDrawer(u)} style={{ padding: "6px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: `1px solid ${BORDER}`, background: "#fff", color: MUTED }}>
-                  <i className="fa-solid fa-key" />
-                </button>
+                <Link
+                  href={`/admin/users/${u.id}`}
+                  style={{ padding: "6px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", border: `1px solid ${BORDER}`, background: "#fff", color: INDIGO, textDecoration: "none" }}
+                >
+                  <i className="fa-solid fa-arrow-up-right-from-square" />
+                </Link>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                 <SubBadge sub={sub} />
@@ -503,16 +260,6 @@ export default function UsersClient({
           );
         })}
       </div>
-
-      {/* Drawer */}
-      {drawer && (
-        <GrantDrawer
-          user={drawer}
-          currentSub={subMap[drawer.id]}
-          onClose={() => setDrawer(null)}
-          onChanged={handleSubChanged}
-        />
-      )}
     </div>
   );
 }
