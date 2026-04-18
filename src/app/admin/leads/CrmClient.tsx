@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useTransition } from "react";
+import { useState, useCallback, useRef, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type {
   InternalLead, CrmStats, LeadFilter,
@@ -514,7 +514,7 @@ function OverviewTab({
 function LeadsListTab({
   leads, total, perPage, filter, stats,
   statusConfig, priorityConfig, sourceLabels,
-  onFilter, onRefresh,
+  onFilter, onRefresh, isPending,
 }: {
   leads:         InternalLead[];
   total:         number;
@@ -526,13 +526,25 @@ function LeadsListTab({
   sourceLabels:  Record<string, string>;
   onFilter:      (params: Record<string, string>) => void;
   onRefresh:     () => void;
+  isPending:     boolean;
 }) {
   const [localLeads, setLocalLeads] = useState(leads);
-  const [search, setSearch]         = useState(filter.search ?? "");
+  const [searchInput, setSearchInput] = useState(filter.search ?? "");
   const [viewLead, setViewLead]     = useState<InternalLead | null>(null);
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sync when server data changes
-  useState(() => { setLocalLeads(leads); });
+  // Sync when server data changes (after navigation)
+  useEffect(() => { setLocalLeads(leads); }, [leads]);
+  // Sync search input when URL filter changes (e.g. status pill clears search)
+  useEffect(() => { setSearchInput(filter.search ?? ""); }, [filter.search]);
+
+  function handleSearchChange(value: string) {
+    setSearchInput(value);
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      onFilter({ search: value, page: "1" });
+    }, 400);
+  }
 
   async function changeStatus(id: string, status: LeadStatus) {
     setLocalLeads(prev => prev.map(l => l.id === id ? { ...l, status } : l));
@@ -567,9 +579,30 @@ function LeadsListTab({
     <>
       {/* Filters + Add buttons */}
       <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
-        <div style={{ flex: "1 1 200px", position: "relative" }}>
-          <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: MUTED, fontSize: 13, pointerEvents: "none" }} />
-          <input style={{ ...INP, paddingLeft: 34 }} placeholder="Search name, email, company…" value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => { if (e.key === "Enter") onFilter({ search, page: "1" }); }} />
+        <div style={{ flex: "1 1 260px", position: "relative" }}>
+          <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: searchInput ? INDIGO : MUTED, fontSize: 13, pointerEvents: "none" }} />
+          <input
+            style={{ ...INP, paddingLeft: 36, paddingRight: searchInput ? 32 : 13, borderColor: searchInput ? `${INDIGO}60` : BORDER }}
+            placeholder="Search name, email, company…"
+            value={searchInput}
+            onChange={e => handleSearchChange(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter") {
+                if (searchTimer.current) clearTimeout(searchTimer.current);
+                onFilter({ search: searchInput, page: "1" });
+              } else if (e.key === "Escape") {
+                handleSearchChange("");
+              }
+            }}
+          />
+          {searchInput && (
+            <button
+              onClick={() => handleSearchChange("")}
+              style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: MUTED, fontSize: 13, padding: "2px 4px", display: "flex", alignItems: "center" }}
+            >
+              <i className="fa-solid fa-xmark" />
+            </button>
+          )}
         </div>
         <select style={{ ...SEL, flex: "0 0 auto", width: 130 }} value={filter.status ?? ""} onChange={e => onFilter({ status: e.target.value, page: "1" })}>
           <option value="">All Statuses</option>
@@ -579,7 +612,7 @@ function LeadsListTab({
           <option value="">All Priorities</option>
           {["low","medium","high","urgent"].map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
         </select>
-        <select style={{ ...SEL, flex: "0 0 auto", width: 150 }} value={`${filter.sort ?? "created_at"}_${filter.dir ?? "desc"}`} onChange={e => { const [s, d] = e.target.value.split("_"); onFilter({ sort: s, dir: d, page: "1" }); }}>
+        <select style={{ ...SEL, flex: "0 0 auto", width: 150 }} value={`${filter.sort ?? "created_at"}_${filter.dir ?? "desc"}`} onChange={e => { const val = e.target.value; const idx = val.lastIndexOf("_"); const s = val.slice(0, idx); const d = val.slice(idx + 1); onFilter({ sort: s, dir: d, page: "1" }); }}>
           <option value="created_at_desc">Newest First</option>
           <option value="created_at_asc">Oldest First</option>
           <option value="updated_at_desc">Recently Updated</option>
@@ -587,7 +620,7 @@ function LeadsListTab({
           <option value="priority_desc">Highest Priority</option>
         </select>
         {(filter.status || filter.priority || filter.search) && (
-          <button onClick={() => onFilter({ status: "", priority: "", search: "", page: "1" })} style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+          <button onClick={() => { setSearchInput(""); onFilter({ status: "", priority: "", search: "", page: "1" }); }} style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
             <i className="fa-solid fa-xmark" style={{ marginRight: 4 }} />Clear
           </button>
         )}
@@ -609,7 +642,15 @@ function LeadsListTab({
       </div>
 
       {/* Table */}
-      <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, overflow: "hidden" }}>
+      <div style={{ background: CARD, border: `1px solid ${isPending ? `${INDIGO}50` : BORDER}`, borderRadius: 16, overflow: "hidden", position: "relative", transition: "border-color 0.15s" }}>
+        {isPending && (
+          <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.65)", zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(1px)", borderRadius: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#fff", borderRadius: 10, padding: "10px 18px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", border: `1px solid ${BORDER}` }}>
+              <i className="fa-solid fa-circle-notch fa-spin" style={{ color: INDIGO, fontSize: 14 }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>Loading…</span>
+            </div>
+          </div>
+        )}
         {/* Header row */}
         <div style={{ display: "grid", gridTemplateColumns: "2.5fr 1.8fr 1.2fr 1fr 1.2fr 90px", gap: 10, padding: "11px 20px", background: BG, borderBottom: `1px solid ${BORDER}` }} className="hidden lg:grid">
           {["Lead", "Company / Trade", "Status", "Priority", "Follow-up", ""].map(h => (
@@ -944,11 +985,12 @@ interface Props {
 }
 
 export default function CrmClient({ tab, initialLeads, total, perPage, stats, filter, statusConfig, priorityConfig, sourceLabels }: Props) {
-  const router              = useRouter();
-  const [, startTransition] = useTransition();
+  const router                          = useRouter();
+  const [isPending, startNavTransition] = useTransition();
+  const [, startRefreshTransition]      = useTransition();
 
   const refresh = useCallback(() => {
-    startTransition(() => router.refresh());
+    startRefreshTransition(() => router.refresh());
   }, [router]);
 
   function applyFilter(params: Record<string, string>) {
@@ -961,7 +1003,7 @@ export default function CrmClient({ tab, initialLeads, total, perPage, stats, fi
     if (filter.page && filter.page > 1) current.page = String(filter.page);
     const merged = { ...current, ...params };
     Object.keys(merged).forEach(k => { if (!merged[k]) delete merged[k]; });
-    router.push(`/admin/leads?${new URLSearchParams(merged).toString()}`);
+    startNavTransition(() => router.push(`/admin/leads?${new URLSearchParams(merged).toString()}`));
   }
 
   function goToList(status?: string) {
@@ -1027,6 +1069,7 @@ export default function CrmClient({ tab, initialLeads, total, perPage, stats, fi
           sourceLabels={sourceLabels}
           onFilter={applyFilter}
           onRefresh={refresh}
+          isPending={isPending}
         />
       )}
     </div>
