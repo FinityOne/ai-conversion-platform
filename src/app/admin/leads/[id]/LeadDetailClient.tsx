@@ -6,7 +6,8 @@ import {
   InternalLead, LeadActivity, LeadStatus, LeadPriority, ActivityType,
   STATUS_CONFIG, PRIORITY_CONFIG, SOURCE_LABELS, TRADE_OPTIONS, EMPLOYEE_COUNT_OPTIONS,
 } from "@/lib/internal-leads";
-import { ScheduledMeeting, MEETING_TYPE_CONFIG, MeetingType, US_TIMEZONES, formatMeetingDate, formatMeetingTime, formatMeetingTimeWithTZ } from "@/lib/meetings";
+import { ScheduledMeeting, MEETING_TYPE_CONFIG, MeetingType, US_TIMEZONES, formatMeetingDate, formatMeetingTimeWithTZ } from "@/lib/meetings";
+import { MarketingTemplate, MARKETING_TEMPLATES } from "@/lib/emails/marketing";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -105,7 +106,7 @@ function PipelineBar({ status, onStatusChange }: { status: LeadStatus; onStatusC
   return (
     <div style={{
       background: CARD, border: `1px solid ${BORDER}`,
-      borderRadius: 14, padding: "20px 28px", marginBottom: 24,
+      borderRadius: 12, padding: "12px 20px", marginBottom: 16,
     }}>
       {/* Main pipeline */}
       <div style={{ display: "flex", alignItems: "center", gap: 0, position: "relative" }}>
@@ -204,32 +205,28 @@ function PipelineBar({ status, onStatusChange }: { status: LeadStatus; onStatusC
 function InfoRow({ icon, label, value, href }: { icon: string; label: string; value: string | null; href?: string }) {
   if (!value) return null;
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "8px 0", borderBottom: `1px solid ${BORDER}` }}>
-      <div style={{ width: 28, flexShrink: 0, display: "flex", justifyContent: "center", paddingTop: 1 }}>
-        <i className={icon} style={{ fontSize: 13, color: MUTED }} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 11, color: MUTED, marginBottom: 1 }}>{label}</div>
-        {href
-          ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: INDIGO, fontWeight: 500, textDecoration: "none", wordBreak: "break-all" }}>{value}</a>
-          : <div style={{ fontSize: 14, color: TEXT, fontWeight: 500, wordBreak: "break-all" }}>{value}</div>
-        }
-      </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: `1px solid ${BORDER}` }}>
+      <i className={icon} style={{ fontSize: 11, color: MUTED, width: 14, flexShrink: 0, textAlign: "center" }} />
+      <span style={{ fontSize: 11, color: MUTED, width: 88, flexShrink: 0 }}>{label}</span>
+      {href
+        ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: INDIGO, fontWeight: 500, textDecoration: "none", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</a>
+        : <span style={{ fontSize: 13, color: TEXT, fontWeight: 500, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</span>
+      }
     </div>
   );
 }
 
 function Card({ title, icon, children, action }: { title: string; icon: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, marginBottom: 20, overflow: "hidden" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <i className={icon} style={{ fontSize: 14, color: INDIGO }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: TEXT, letterSpacing: 0.2 }}>{title}</span>
+    <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, marginBottom: 16, overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <i className={icon} style={{ fontSize: 12, color: INDIGO }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: TEXT, letterSpacing: 0.2 }}>{title}</span>
         </div>
         {action}
       </div>
-      <div style={{ padding: "16px 20px" }}>{children}</div>
+      <div style={{ padding: "10px 16px" }}>{children}</div>
     </div>
   );
 }
@@ -464,91 +461,91 @@ function QuickEditCard({ lead, onUpdated }: { lead: InternalLead; onUpdated: (l:
 
   return (
     <Card title="Pipeline & Assignment" icon="fa-solid fa-sliders">
-      {/* Status */}
-      <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 11, fontWeight: 600, color: MUTED, display: "block", marginBottom: 6 }}>STATUS</label>
-        <div style={{ position: "relative" }}>
-          <select
-            value={status}
-            onChange={e => setStatus(e.target.value as LeadStatus)}
-            style={{
-              width: "100%", padding: "8px 32px 8px 12px", borderRadius: 8,
-              border: `1.5px solid ${sCfg.border}`, background: sCfg.bg,
-              color: sCfg.color, fontSize: 13, fontWeight: 700,
-              appearance: "none", cursor: "pointer", outline: "none",
-            }}
-          >
-            {(Object.keys(STATUS_CONFIG) as LeadStatus[]).map(s => (
-              <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
-            ))}
-          </select>
-          <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: sCfg.color, pointerEvents: "none" }} />
+      {/* Status + Priority inline */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+        <div>
+          <label style={{ fontSize: 10, fontWeight: 600, color: MUTED, display: "block", marginBottom: 4 }}>STATUS</label>
+          <div style={{ position: "relative" }}>
+            <select
+              value={status}
+              onChange={e => setStatus(e.target.value as LeadStatus)}
+              style={{
+                width: "100%", padding: "6px 24px 6px 8px", borderRadius: 7,
+                border: `1.5px solid ${sCfg.border}`, background: sCfg.bg,
+                color: sCfg.color, fontSize: 12, fontWeight: 700,
+                appearance: "none", cursor: "pointer", outline: "none",
+              }}
+            >
+              {(Object.keys(STATUS_CONFIG) as LeadStatus[]).map(s => (
+                <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
+              ))}
+            </select>
+            <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: sCfg.color, pointerEvents: "none" }} />
+          </div>
         </div>
-      </div>
-
-      {/* Priority */}
-      <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 11, fontWeight: 600, color: MUTED, display: "block", marginBottom: 6 }}>PRIORITY</label>
-        <div style={{ position: "relative" }}>
-          <select
-            value={priority}
-            onChange={e => setPriority(e.target.value as LeadPriority)}
-            style={{
-              width: "100%", padding: "8px 32px 8px 12px", borderRadius: 8,
-              border: `1.5px solid ${BORDER}`, background: CARD,
-              color: pCfg.color, fontSize: 13, fontWeight: 700,
-              appearance: "none", cursor: "pointer", outline: "none",
-            }}
-          >
-            {(Object.keys(PRIORITY_CONFIG) as LeadPriority[]).map(p => (
-              <option key={p} value={p}>{PRIORITY_CONFIG[p].label}</option>
-            ))}
-          </select>
-          <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: MUTED, pointerEvents: "none" }} />
+        <div>
+          <label style={{ fontSize: 10, fontWeight: 600, color: MUTED, display: "block", marginBottom: 4 }}>PRIORITY</label>
+          <div style={{ position: "relative" }}>
+            <select
+              value={priority}
+              onChange={e => setPriority(e.target.value as LeadPriority)}
+              style={{
+                width: "100%", padding: "6px 24px 6px 8px", borderRadius: 7,
+                border: `1.5px solid ${BORDER}`, background: CARD,
+                color: pCfg.color, fontSize: 12, fontWeight: 700,
+                appearance: "none", cursor: "pointer", outline: "none",
+              }}
+            >
+              {(Object.keys(PRIORITY_CONFIG) as LeadPriority[]).map(p => (
+                <option key={p} value={p}>{PRIORITY_CONFIG[p].label}</option>
+              ))}
+            </select>
+            <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: MUTED, pointerEvents: "none" }} />
+          </div>
         </div>
       </div>
 
       {/* Assigned to */}
-      <div style={{ marginBottom: 14 }}>
-        <label style={{ fontSize: 11, fontWeight: 600, color: MUTED, display: "block", marginBottom: 6 }}>ASSIGNED TO</label>
+      <div style={{ marginBottom: 10 }}>
+        <label style={{ fontSize: 10, fontWeight: 600, color: MUTED, display: "block", marginBottom: 4 }}>ASSIGNED TO</label>
         <input
           value={assignedTo}
           onChange={e => setAssignedTo(e.target.value)}
           placeholder="e.g. heran@finityone.com"
           style={{
-            width: "100%", padding: "8px 12px", borderRadius: 8,
+            width: "100%", padding: "6px 10px", borderRadius: 7,
             border: `1.5px solid ${BORDER}`, background: CARD,
-            color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box",
+            color: TEXT, fontSize: 12, outline: "none", boxSizing: "border-box",
           }}
         />
       </div>
 
       {/* Next follow-up */}
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 11, fontWeight: 600, color: MUTED, display: "block", marginBottom: 6 }}>NEXT FOLLOW-UP</label>
+      <div style={{ marginBottom: 10 }}>
+        <label style={{ fontSize: 10, fontWeight: 600, color: MUTED, display: "block", marginBottom: 4 }}>NEXT FOLLOW-UP</label>
         <input
           type="datetime-local" value={followUp}
           onChange={e => setFollowUp(e.target.value)}
           style={{
-            width: "100%", padding: "8px 12px", borderRadius: 8,
+            width: "100%", padding: "6px 10px", borderRadius: 7,
             border: `1.5px solid ${BORDER}`, background: CARD,
-            color: TEXT, fontSize: 13, outline: "none", boxSizing: "border-box",
+            color: TEXT, fontSize: 12, outline: "none", boxSizing: "border-box",
           }}
         />
       </div>
 
       {/* Internal notes */}
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ fontSize: 11, fontWeight: 600, color: MUTED, display: "block", marginBottom: 6 }}>INTERNAL NOTES</label>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 10, fontWeight: 600, color: MUTED, display: "block", marginBottom: 4 }}>INTERNAL NOTES</label>
         <textarea
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          rows={3}
+          rows={2}
           placeholder="Private notes about this lead…"
           style={{
-            width: "100%", padding: "8px 12px", borderRadius: 8,
+            width: "100%", padding: "6px 10px", borderRadius: 7,
             border: `1.5px solid ${BORDER}`, background: CARD,
-            color: TEXT, fontSize: 13, outline: "none", resize: "vertical",
+            color: TEXT, fontSize: 12, outline: "none", resize: "vertical",
             fontFamily: "inherit", boxSizing: "border-box",
           }}
         />
@@ -558,11 +555,11 @@ function QuickEditCard({ lead, onUpdated }: { lead: InternalLead; onUpdated: (l:
         onClick={handleSave}
         disabled={saving}
         style={{
-          width: "100%", padding: "10px", borderRadius: 8, border: "none",
+          width: "100%", padding: "8px", borderRadius: 7, border: "none",
           background: saved ? "#22c55e" : INDIGO, color: "#fff",
-          fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer",
+          fontSize: 12, fontWeight: 700, cursor: saving ? "wait" : "pointer",
           opacity: saving ? 0.7 : 1, transition: "background 0.2s",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
         }}
       >
         {saved
@@ -1121,6 +1118,210 @@ function MeetingsCard({
   );
 }
 
+// ── Send Marketing Email Modal ────────────────────────────────────────────────
+
+const TEMPLATE_ORDER: MarketingTemplate[] = [
+  "general", "medical_wellness", "home_services", "project_trades", "outdoor_recurring", "small_business", "enterprise",
+];
+
+function SendMarketingEmailModal({
+  lead,
+  onClose,
+  onSent,
+}: {
+  lead: InternalLead;
+  onClose: () => void;
+  onSent: () => void;
+}) {
+  const [selected, setSelected] = useState<MarketingTemplate>("general");
+  const [sending,  setSending]  = useState(false);
+  const [error,    setError]    = useState<string | null>(null);
+
+  const meta = MARKETING_TEMPLATES[selected];
+
+  async function handleSend() {
+    setSending(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/leads/${lead.id}/outreach`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ template: selected }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error ?? "Failed to send");
+      }
+      onSent();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 1000,
+      background: "rgba(15,23,42,0.5)", display: "flex",
+      alignItems: "center", justifyContent: "center", padding: 16,
+    }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{
+        width: "min(560px, 100%)", background: CARD, borderRadius: 16,
+        boxShadow: "0 24px 60px rgba(0,0,0,0.2)", overflow: "hidden",
+        display: "flex", flexDirection: "column", maxHeight: "90vh",
+      }}>
+        {/* Header */}
+        <div style={{
+          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+          padding: "20px 24px", flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{
+              width: 38, height: 38, background: "rgba(255,255,255,0.2)",
+              borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <i className="fa-solid fa-paper-plane" style={{ fontSize: 16, color: "#fff" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Send Marketing Email</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}>
+                To: {lead.first_name} {lead.last_name ?? ""}{lead.email ? ` · ${lead.email}` : ""}
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 6 }}>
+            <i className="fa-solid fa-xmark" style={{ fontSize: 18, color: "rgba(255,255,255,0.8)" }} />
+          </button>
+        </div>
+
+        <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1 }}>
+          {/* Section label */}
+          <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 700, color: MUTED, letterSpacing: 1 }}>
+            SELECT EMAIL TEMPLATE
+          </p>
+
+          {/* Template cards */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 20 }}>
+            {TEMPLATE_ORDER.map(key => {
+              const t   = MARKETING_TEMPLATES[key];
+              const sel = key === selected;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSelected(key)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 14,
+                    padding: "12px 16px", borderRadius: 12, cursor: "pointer",
+                    background: sel ? t.color + "0f" : CARD,
+                    border: `2px solid ${sel ? t.color : BORDER}`,
+                    textAlign: "left", transition: "all 0.15s",
+                    boxShadow: sel ? `0 0 0 1px ${t.color}30` : "none",
+                  }}
+                >
+                  {/* Icon */}
+                  <div style={{
+                    width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+                    background: sel ? t.grad : "#f1f5f9",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all 0.15s",
+                  }}>
+                    <i className={t.icon} style={{ fontSize: 14, color: sel ? "#fff" : "#94a3b8" }} />
+                  </div>
+                  {/* Text */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: sel ? t.color : TEXT }}>{t.label}</span>
+                      <span style={{
+                        fontSize: 10, fontWeight: 600, padding: "1px 7px", borderRadius: 20,
+                        background: sel ? t.color + "18" : "#f1f5f9",
+                        color: sel ? t.color : MUTED,
+                      }}>{t.group}</span>
+                    </div>
+                    <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED, lineHeight: 1.4 }}>{t.description}</p>
+                  </div>
+                  {/* Checkmark */}
+                  {sel && (
+                    <div style={{
+                      width: 20, height: 20, borderRadius: "50%", background: t.color,
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                    }}>
+                      <i className="fa-solid fa-check" style={{ fontSize: 9, color: "#fff" }} />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Subject preview */}
+          <div style={{
+            background: "#f8faff", border: `1.5px solid ${INDIGO}20`,
+            borderRadius: 10, padding: "12px 16px", marginBottom: 20,
+          }}>
+            <p style={{ margin: "0 0 4px", fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: 1 }}>EMAIL SUBJECT PREVIEW</p>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: TEXT, fontStyle: "italic" }}>
+              &ldquo;{meta.subject(lead.first_name)}&rdquo;
+            </p>
+          </div>
+
+          {/* Info note */}
+          <div style={{
+            background: "#fffbeb", border: "1px solid #fde68a",
+            borderRadius: 10, padding: "10px 14px", marginBottom: 20,
+            fontSize: 12, color: "#92400e", display: "flex", gap: 8, alignItems: "flex-start",
+          }}>
+            <i className="fa-solid fa-circle-info" style={{ fontSize: 13, color: "#f59e0b", marginTop: 1, flexShrink: 0 }} />
+            <span>
+              This email will be sent to <strong>{lead.first_name}</strong>{lead.email ? ` at ${lead.email}` : ""} and logged in the activity timeline.
+            </span>
+          </div>
+
+          {error && (
+            <div style={{
+              padding: "10px 14px", borderRadius: 8, marginBottom: 16,
+              background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+              fontSize: 13, color: "#dc2626",
+            }}>
+              <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 8 }} />
+              {error}
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <button type="button" onClick={onClose} style={{
+              flex: 1, padding: "11px", borderRadius: 8,
+              border: `1.5px solid ${BORDER}`, background: CARD,
+              color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer",
+            }}>Cancel</button>
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={sending || !lead.email}
+              title={!lead.email ? "No email address on file" : undefined}
+              style={{
+                flex: 2, padding: "11px", borderRadius: 8, border: "none",
+                background: meta.grad, color: "#fff", fontSize: 13, fontWeight: 700,
+                cursor: (sending || !lead.email) ? "not-allowed" : "pointer",
+                opacity: !lead.email ? 0.5 : 1,
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}
+            >
+              {sending
+                ? "Sending…"
+                : <><i className="fa-solid fa-paper-plane" style={{ fontSize: 12 }} /> Send Email</>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function LeadDetailClient({
@@ -1135,12 +1336,11 @@ export default function LeadDetailClient({
   const [lead,         setLead]         = useState<InternalLead>(initialLead);
   const [activities,   setActivities]   = useState(initialActivities);
   const [meetings,     setMeetings]     = useState<ScheduledMeeting[]>(initialMeetings);
-  const [showLog,      setShowLog]      = useState(false);
-  const [logDefault,   setLogDefault]   = useState<ActivityType>("note");
-  const [showEdit,     setShowEdit]     = useState(false);
-  const [showDemoModal, setShowDemoModal] = useState(false);
-  const [sendingEmail, setSendingEmail] = useState(false);
-  const [emailSent,    setEmailSent]    = useState(false);
+  const [showLog,        setShowLog]        = useState(false);
+  const [logDefault,     setLogDefault]     = useState<ActivityType>("note");
+  const [showEdit,       setShowEdit]       = useState(false);
+  const [showDemoModal,  setShowDemoModal]  = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   const sCfg = STATUS_CONFIG[lead.status];
   const pCfg = PRIORITY_CONFIG[lead.priority];
@@ -1166,22 +1366,6 @@ export default function LeadDetailClient({
     // Refresh activities to show status_change entry
     const aRes = await fetch(`/api/admin/leads/${lead.id}/activities`);
     if (aRes.ok) setActivities(await aRes.json());
-  }
-
-  async function handleSendEmail() {
-    if (!lead.email) return;
-    setSendingEmail(true);
-    try {
-      const res = await fetch(`/api/admin/leads/${lead.id}/outreach`, { method: "POST" });
-      if (res.ok) {
-        setEmailSent(true);
-        const aRes = await fetch(`/api/admin/leads/${lead.id}/activities`);
-        if (aRes.ok) setActivities(await aRes.json());
-        setTimeout(() => setEmailSent(false), 3000);
-      }
-    } finally {
-      setSendingEmail(false);
-    }
   }
 
   function handleActivitySaved(a: LeadActivity) {
@@ -1239,93 +1423,87 @@ export default function LeadDetailClient({
         </div>
       </div>
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 32px" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px 28px" }}>
 
         {/* ── Pipeline Bar ── */}
         <PipelineBar status={lead.status} onStatusChange={handleStatusChange} />
 
         {/* ── Two-column layout ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 24, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, alignItems: "start" }}>
 
           {/* ── LEFT COLUMN ── */}
           <div>
 
             {/* Lead Header Card */}
             <div style={{
-              background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14,
-              padding: "24px 24px", marginBottom: 20,
-              display: "flex", alignItems: "flex-start", gap: 20,
+              background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12,
+              padding: "16px 20px", marginBottom: 16,
+              display: "flex", alignItems: "center", gap: 14,
             }}>
               {/* Avatar */}
               <div style={{
-                width: 64, height: 64, borderRadius: 16, flexShrink: 0,
+                width: 48, height: 48, borderRadius: 12, flexShrink: 0,
                 background: `linear-gradient(135deg, ${INDIGO}, #8b5cf6)`,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 22, fontWeight: 800, color: "#fff", letterSpacing: -1,
+                fontSize: 17, fontWeight: 800, color: "#fff", letterSpacing: -0.5,
               }}>
                 {initials(lead)}
               </div>
 
               {/* Name + meta */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
-                  <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: TEXT }}>{fullName}</h1>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 2 }}>
+                  <h1 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: TEXT }}>{fullName}</h1>
                   <span style={{
-                    display: "inline-flex", alignItems: "center", gap: 5,
-                    padding: "3px 10px", borderRadius: 20,
+                    display: "inline-flex", alignItems: "center", gap: 4,
+                    padding: "2px 8px", borderRadius: 20,
                     background: sCfg.bg, border: `1px solid ${sCfg.border}`,
-                    fontSize: 11, fontWeight: 700, color: sCfg.color,
+                    fontSize: 10, fontWeight: 700, color: sCfg.color,
                   }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: sCfg.dot, display: "inline-block" }} />
+                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: sCfg.dot, display: "inline-block" }} />
                     {sCfg.label}
                   </span>
                 </div>
 
-                {/* Title + company */}
-                <div style={{ fontSize: 14, color: MUTED, marginBottom: 10 }}>
-                  {[lead.job_title, lead.company].filter(Boolean).join(" — ")}
-                </div>
-
-                {/* Location + last contact */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+                {/* Title + company + location + meta — all in one compact row */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+                  {[lead.job_title, lead.company].filter(Boolean).length > 0 && (
+                    <span style={{ fontSize: 12, color: MUTED }}>
+                      {[lead.job_title, lead.company].filter(Boolean).join(" · ")}
+                    </span>
+                  )}
                   {(lead.city || lead.state) && (
-                    <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: MUTED }}>
-                      <i className="fa-solid fa-location-dot" style={{ fontSize: 11 }} />
+                    <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: MUTED }}>
+                      <i className="fa-solid fa-location-dot" style={{ fontSize: 10 }} />
                       {[lead.city, lead.state].filter(Boolean).join(", ")}
                     </span>
                   )}
-                  <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: MUTED }}>
-                    <i className="fa-solid fa-clock-rotate-left" style={{ fontSize: 11 }} />
-                    Last contact: {relativeTime(lead.last_contacted_at)}
+                  <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: MUTED }}>
+                    <i className="fa-solid fa-clock-rotate-left" style={{ fontSize: 10 }} />
+                    {relativeTime(lead.last_contacted_at)}
                   </span>
                   {lead.next_follow_up && new Date(lead.next_follow_up) > new Date() && (
-                    <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#f59e0b" }}>
-                      <i className="fa-solid fa-bell" style={{ fontSize: 11 }} />
-                      Follow-up: {formatDate(lead.next_follow_up, { month: "short", day: "numeric" })}
+                    <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#f59e0b" }}>
+                      <i className="fa-solid fa-bell" style={{ fontSize: 10 }} />
+                      {formatDate(lead.next_follow_up, { month: "short", day: "numeric" })}
                     </span>
                   )}
                   {lead.next_follow_up && new Date(lead.next_follow_up) <= new Date() && (
-                    <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "#ef4444" }}>
-                      <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 11 }} />
-                      Follow-up overdue!
+                    <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#ef4444" }}>
+                      <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 10 }} />
+                      Follow-up overdue
                     </span>
                   )}
+                  {lead.tags?.map(tag => (
+                    <span key={tag} style={{
+                      padding: "1px 8px", borderRadius: 20,
+                      background: "#f1f5f9", border: `1px solid ${BORDER}`,
+                      fontSize: 10, fontWeight: 600, color: MUTED,
+                    }}>
+                      {tag}
+                    </span>
+                  ))}
                 </div>
-
-                {/* Tags */}
-                {lead.tags?.length > 0 && (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
-                    {lead.tags.map(tag => (
-                      <span key={tag} style={{
-                        padding: "2px 10px", borderRadius: 20,
-                        background: "#f1f5f9", border: `1px solid ${BORDER}`,
-                        fontSize: 11, fontWeight: 600, color: MUTED,
-                      }}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
 
@@ -1521,33 +1699,36 @@ export default function LeadDetailClient({
 
             {/* Quick Actions */}
             <Card title="Actions" icon="fa-solid fa-bolt">
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {/* Send Outreach Email */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {/* Send Marketing Email — opens template picker */}
                 <button
-                  onClick={handleSendEmail}
-                  disabled={sendingEmail || !lead.email}
-                  title={!lead.email ? "No email address on file" : undefined}
+                  onClick={() => setShowEmailModal(true)}
+                  disabled={!lead.email}
+                  title={!lead.email ? "No email address on file" : "Pick a template and send a personalized email"}
                   style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: "11px 16px", borderRadius: 10,
-                    background: emailSent ? "#22c55e" : INDIGO,
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "10px 14px", borderRadius: 10,
+                    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                     border: "none", color: "#fff",
-                    fontSize: 13, fontWeight: 700, cursor: sendingEmail || !lead.email ? "not-allowed" : "pointer",
-                    opacity: !lead.email ? 0.5 : 1, transition: "background 0.2s",
-                    textAlign: "left",
+                    fontSize: 13, fontWeight: 700,
+                    cursor: !lead.email ? "not-allowed" : "pointer",
+                    opacity: !lead.email ? 0.5 : 1,
+                    textAlign: "left", boxShadow: "0 2px 8px rgba(99,102,241,0.3)",
                   }}
                 >
-                  <i className={emailSent ? "fa-solid fa-check" : "fa-solid fa-paper-plane"} style={{ fontSize: 13, width: 16 }} />
-                  {emailSent ? "Email Sent!" : sendingEmail ? "Sending…" : "Send Outreach Email"}
+                  <i className="fa-solid fa-envelope-open-text" style={{ fontSize: 13, width: 16 }} />
+                  <span style={{ flex: 1 }}>Send Marketing Email</span>
+                  <i className="fa-solid fa-chevron-right" style={{ fontSize: 10, opacity: 0.7 }} />
                 </button>
 
-                {/* Log Call */}
-                <ActionBtn icon="fa-solid fa-phone"     label="Log a Call"         color="#0ea5e9" onClick={() => openLog("call")} />
-                <ActionBtn icon="fa-solid fa-video"     label="Log a Meeting"      color="#8b5cf6" onClick={() => openLog("meeting")} />
-                <ActionBtn icon="fa-solid fa-handshake" label="Log In-Person"      color="#f97316" onClick={() => openLog("in_person")} />
+                <div style={{ height: 1, background: BORDER, margin: "2px 0" }} />
+
+                <ActionBtn icon="fa-solid fa-phone"          label="Log a Call"         color="#0ea5e9" onClick={() => openLog("call")} />
+                <ActionBtn icon="fa-solid fa-video"          label="Log a Meeting"      color="#8b5cf6" onClick={() => openLog("meeting")} />
+                <ActionBtn icon="fa-solid fa-handshake"      label="Log In-Person"      color="#f97316" onClick={() => openLog("in_person")} />
                 <ActionBtn icon="fa-solid fa-calendar-check" label="Schedule Demo Call" color="#f59e0b" onClick={() => setShowDemoModal(true)} />
-                <ActionBtn icon="fa-solid fa-note-sticky" label="Add a Note"       color="#64748b" onClick={() => openLog("note")} />
-                <ActionBtn icon="fa-solid fa-clock"     label="Schedule Follow-up" color="#22c55e" onClick={() => openLog("follow_up")} />
+                <ActionBtn icon="fa-solid fa-note-sticky"    label="Add a Note"         color="#64748b" onClick={() => openLog("note")} />
+                <ActionBtn icon="fa-solid fa-clock"          label="Schedule Follow-up" color="#22c55e" onClick={() => openLog("follow_up")} />
               </div>
             </Card>
 
@@ -1595,7 +1776,20 @@ export default function LeadDetailClient({
           onClose={() => setShowDemoModal(false)}
           onScheduled={(m) => {
             setMeetings(prev => [m, ...prev]);
-            // Also refresh activities to show the logged demo entry
+            fetch(`/api/admin/leads/${lead.id}/activities`)
+              .then(r => r.json())
+              .then(setActivities)
+              .catch(() => {});
+          }}
+        />
+      )}
+
+      {/* Send Marketing Email Modal */}
+      {showEmailModal && (
+        <SendMarketingEmailModal
+          lead={lead}
+          onClose={() => setShowEmailModal(false)}
+          onSent={() => {
             fetch(`/api/admin/leads/${lead.id}/activities`)
               .then(r => r.json())
               .then(setActivities)
@@ -1614,14 +1808,14 @@ function ActionBtn({ icon, label, color, onClick }: { icon: string; label: strin
     <button
       onClick={onClick}
       style={{
-        display: "flex", alignItems: "center", gap: 10,
-        padding: "10px 16px", borderRadius: 10,
+        display: "flex", alignItems: "center", gap: 8,
+        padding: "8px 12px", borderRadius: 8,
         background: color + "0f", border: `1.5px solid ${color}25`,
-        color: TEXT, fontSize: 13, fontWeight: 600, cursor: "pointer",
+        color: TEXT, fontSize: 12, fontWeight: 600, cursor: "pointer",
         textAlign: "left", transition: "all 0.15s",
       }}
     >
-      <i className={icon} style={{ fontSize: 13, color, width: 16, textAlign: "center" }} />
+      <i className={icon} style={{ fontSize: 12, color, width: 14, textAlign: "center" }} />
       {label}
     </button>
   );
@@ -1631,13 +1825,13 @@ function IntelRow({ icon, label, value }: { icon: string; label: string; value: 
   return (
     <div style={{
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "9px 0", borderBottom: `1px solid ${BORDER}`,
+      padding: "5px 0", borderBottom: `1px solid ${BORDER}`,
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <i className={icon} style={{ fontSize: 11, color: MUTED, width: 14, textAlign: "center" }} />
-        <span style={{ fontSize: 12, color: MUTED }}>{label}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <i className={icon} style={{ fontSize: 10, color: MUTED, width: 12, textAlign: "center" }} />
+        <span style={{ fontSize: 11, color: MUTED }}>{label}</span>
       </div>
-      <span style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{value}</span>
+      <span style={{ fontSize: 12, fontWeight: 600, color: TEXT }}>{value}</span>
     </div>
   );
 }
