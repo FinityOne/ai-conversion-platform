@@ -1,7 +1,7 @@
 import {
-  getCrmStats, listInternalLeads,
+  getCrmStats, listInternalLeads, getAdminReps,
   STATUS_CONFIG, PRIORITY_CONFIG, SOURCE_LABELS,
-  type LeadStatus, type LeadFilter,
+  type LeadStatus, type LeadFilter, type CrmAdmin,
 } from "@/lib/internal-leads";
 import CrmClient from "./CrmClient";
 
@@ -15,7 +15,7 @@ export default async function AdminLeadsPage({
   searchParams: Promise<Record<string, string>>;
 }) {
   const sp  = await searchParams;
-  const tab = (sp.tab ?? "overview") as "overview" | "list";
+  const tab = (sp.tab ?? "overview") as "overview" | "list" | "leaderboard";
 
   const filter: LeadFilter = {
     status:   (sp.status   as LeadStatus) || undefined,
@@ -30,11 +30,12 @@ export default async function AdminLeadsPage({
 
   // Always fetch stats (needed for both tabs).
   // Only fetch the lead list when on the list tab.
-  const [stats, listResult] = await Promise.all([
+  const [stats, listResult, admins] = await Promise.all([
     getCrmStats(),
     tab === "list"
       ? listInternalLeads(filter)
       : Promise.resolve({ leads: [], total: 0 }),
+    getAdminReps(),
   ]);
 
   return (
@@ -45,6 +46,7 @@ export default async function AdminLeadsPage({
       perPage={PER_PAGE}
       stats={stats}
       filter={filter}
+      admins={admins}
       statusConfig={STATUS_CONFIG}
       priorityConfig={PRIORITY_CONFIG}
       sourceLabels={SOURCE_LABELS}

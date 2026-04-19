@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type {
   InternalLead, CrmStats, LeadFilter,
-  LeadStatus, LeadPriority, LeadSource,
+  LeadStatus, LeadPriority, LeadSource, CrmAdmin,
 } from "@/lib/internal-leads";
 import { TRADE_OPTIONS, EMPLOYEE_COUNT_OPTIONS } from "@/lib/internal-leads";
 
@@ -15,6 +15,9 @@ const BORDER = "#e9ecef";
 const CARD   = "#ffffff";
 const BG     = "#f8f9fb";
 const INDIGO = "#6366f1";
+const GOLD   = "#f59e0b";
+const SILVER = "#94a3b8";
+const BRONZE = "#d97706";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function timeAgo(iso: string): string {
@@ -96,9 +99,11 @@ function PriorityPip({
 function AddLeadModal({
   onCreated,
   statusConfig,
+  admins,
 }: {
   onCreated: () => void;
   statusConfig: Record<string, any>;
+  admins: CrmAdmin[];
 }) {
   const [open, setOpen]       = useState(false);
   const [loading, setLoading] = useState(false);
@@ -181,7 +186,12 @@ function AddLeadModal({
                 <Field label="Status"><select style={SEL} value={form.status} onChange={e => set("status", e.target.value as LeadStatus)}>{Object.entries(statusConfig).map(([v, c]: any) => <option key={v} value={v}>{c.label}</option>)}</select></Field>
                 <Field label="Priority"><select style={SEL} value={form.priority} onChange={e => set("priority", e.target.value as LeadPriority)}>{["low","medium","high","urgent"].map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}</select></Field>
                 <Field label="Source"><select style={SEL} value={form.source} onChange={e => set("source", e.target.value as LeadSource)}>{[["referral","Referral"],["google_ad","Google Ad"],["organic","Organic"],["linkedin","LinkedIn"],["cold_outreach","Cold Outreach"],["trade_event","Trade Event"],["partner","Partner"],["other","Other"]].map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></Field>
-                <Field label="Assigned To"><input style={INP} value={form.assigned_to} onChange={e => set("assigned_to", e.target.value)} placeholder="admin@clozeflow.com" /></Field>
+                <Field label="Assigned To">
+                  <select style={SEL} value={form.assigned_to} onChange={e => set("assigned_to", e.target.value)}>
+                    <option value="">— Unassigned —</option>
+                    {admins.map(a => <option key={a.id} value={a.email}>{a.name} ({a.email})</option>)}
+                  </select>
+                </Field>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
                 <Field label="Next Follow-Up Date"><input style={INP} type="date" value={form.next_follow_up} onChange={e => set("next_follow_up", e.target.value)} /></Field>
@@ -361,6 +371,409 @@ function QuickStatus({ lead, statusConfig, onChange }: { lead: InternalLead; sta
   );
 }
 
+// ── Quick Assign dropdown ─────────────────────────────────────────────────────
+function QuickAssign({
+  lead, admins, onChange,
+}: {
+  lead: InternalLead;
+  admins: CrmAdmin[];
+  onChange: (id: string, email: string | null) => void;
+}) {
+  const [open, setOpen]       = useState(false);
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0 });
+  const btnRef                = useRef<HTMLButtonElement>(null);
+
+  const current      = lead.assigned_to;
+  const currentAdmin = admins.find(a => a.email === current);
+  const displayName  = currentAdmin?.name ?? (current ? current.split("@")[0] : null);
+  const hasOrphaned  = current && !currentAdmin;
+  const displayLabel = displayName ?? current;
+
+  function handleOpen(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setDropPos({ top: rect.bottom + 6, left: rect.left });
+    }
+    setOpen(o => !o);
+  }
+
+  return (
+    <div>
+      <button
+        ref={btnRef}
+        onClick={handleOpen}
+        title={current ? `Assigned to ${displayLabel}` : "Unassigned — click to assign"}
+        style={{
+          display: "inline-flex", alignItems: "center", gap: 5,
+          padding: "3px 8px", borderRadius: 20,
+          border: `1px solid ${current ? BORDER : "rgba(239,68,68,0.3)"}`,
+          background: current ? BG : "rgba(239,68,68,0.05)",
+          color: current ? TEXT : "#ef4444", fontSize: 11, fontWeight: 600,
+          cursor: "pointer", whiteSpace: "nowrap", maxWidth: 120,
+        }}
+      >
+        {current
+          ? <>
+              <span style={{ width: 16, height: 16, borderRadius: "50%", background: avatarColor(current) + "30", color: avatarColor(current), fontSize: 8, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{(displayLabel ?? "?")[0].toUpperCase()}</span>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: 80 }}>{displayLabel}</span>
+            </>
+          : <><i className="fa-solid fa-user-plus" style={{ fontSize: 9 }} /> Assign</>
+        }
+      </button>
+
+      {open && (
+        <>
+          {/* Full-screen backdrop to close */}
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 9998 }} />
+          {/* Dropdown rendered at fixed viewport coords — escapes any overflow:hidden ancestor */}
+          <div
+            style={{
+              position: "fixed", top: dropPos.top, left: dropPos.left,
+              zIndex: 9999, background: "#fff", borderRadius: 10,
+              border: `1px solid ${BORDER}`, boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
+              overflow: "hidden", minWidth: 210,
+            }}
+          >
+            <div style={{ padding: "6px 14px 4px", borderBottom: `1px solid ${BORDER}` }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px" }}>Assign to</span>
+            </div>
+            <button
+              onClick={e => { e.stopPropagation(); onChange(lead.id, null); setOpen(false); }}
+              style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "9px 14px", border: "none", background: !current ? BG : "transparent", cursor: "pointer", fontSize: 12, color: MUTED, fontWeight: 500 }}
+            >
+              <i className="fa-solid fa-user-slash" style={{ fontSize: 10, color: "#ef4444" }} /> Unassigned
+            </button>
+            {admins.map(admin => (
+              <button
+                key={admin.id}
+                onClick={e => { e.stopPropagation(); onChange(lead.id, admin.email); setOpen(false); }}
+                style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "9px 14px", border: "none", background: current === admin.email ? "rgba(99,102,241,0.06)" : "transparent", cursor: "pointer", fontSize: 12, fontWeight: current === admin.email ? 700 : 500, color: TEXT }}
+              >
+                <span style={{ width: 20, height: 20, borderRadius: "50%", background: avatarColor(admin.email) + "25", color: avatarColor(admin.email), fontSize: 9, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{admin.name[0].toUpperCase()}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{admin.name}</div>
+                  <div style={{ fontSize: 10, color: MUTED, overflow: "hidden", textOverflow: "ellipsis" }}>{admin.email}</div>
+                </div>
+                {current === admin.email && <i className="fa-solid fa-check" style={{ fontSize: 9, color: INDIGO, flexShrink: 0 }} />}
+              </button>
+            ))}
+            {hasOrphaned && (
+              <div style={{ padding: "7px 14px", borderTop: `1px solid ${BORDER}`, fontSize: 11, color: MUTED }}>
+                <i className="fa-solid fa-triangle-exclamation" style={{ color: "#f59e0b", marginRight: 5 }} />
+                Previously: {current}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Sales Leaderboard ─────────────────────────────────────────────────────────
+interface RepScore {
+  email: string; display_name: string;
+  leads_assigned: number; by_status: Record<string, number>;
+  conversions_this_month: number; conversions_this_week: number;
+  demos_this_week: number; follow_ups_overdue: number;
+  activities_30d: number; activity_breakdown: Record<string, number>;
+  last_activity_at: string | null; score: number; streak: number;
+}
+interface RecentWin { lead_name: string; rep: string; converted_at: string; revenue: number | null; }
+
+const RANK_BADGES = ["🏆", "⚡", "🎯"];
+const RANK_COLORS = [GOLD, SILVER, BRONZE];
+const RANK_LABELS = ["Closer", "Hunter", "Grinder"];
+
+function repDisplayName(email: string) {
+  return email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function ScorePill({ label, pts, color }: { label: string; pts: number; color: string }) {
+  if (!pts) return null;
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 0", fontSize: 12 }}>
+      <span style={{ color: MUTED }}>{label}</span>
+      <span style={{ fontWeight: 700, color }}>{pts > 0 ? `+${pts}` : pts}</span>
+    </div>
+  );
+}
+
+function SalesLeaderboard() {
+  const [data, setData]         = useState<{ reps: RepScore[]; recent_wins: RecentWin[]; updated_at: string } | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [loading, setLoading]   = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("/api/admin/leads/leaderboard")
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false); });
+  }, []);
+
+  if (loading) return (
+    <div style={{ textAlign: "center", padding: "80px 24px" }}>
+      <i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: 28, color: INDIGO, marginBottom: 12, display: "block" }} />
+      <p style={{ margin: 0, fontSize: 14, color: MUTED }}>Calculating scores…</p>
+    </div>
+  );
+
+  if (!data || data.reps.length === 0) return (
+    <div style={{ textAlign: "center", padding: "80px 24px" }}>
+      <p style={{ margin: "0 0 6px", fontSize: 18, fontWeight: 800, color: TEXT }}>No reps yet</p>
+      <p style={{ margin: 0, fontSize: 13, color: MUTED }}>Assign leads to team members to start scoring.</p>
+    </div>
+  );
+
+  const { reps, recent_wins, updated_at } = data;
+  const [first, second, ...rest] = reps;
+
+  const minsAgo = Math.floor((Date.now() - new Date(updated_at).getTime()) / 60_000);
+  const updatedLabel = minsAgo < 1 ? "just now" : minsAgo < 60 ? `${minsAgo}m ago` : `${Math.floor(minsAgo / 60)}h ago`;
+
+  // Battle gap data
+  const gap = second ? first.score - second.score : 0;
+  const battlePct = second ? (second.score / first.score) * 100 : 100;
+
+  const SCORE_WEIGHTS = {
+    converted: 100, demo_scheduled: 40, trialing: 25, contacted: 15, nurture: 8, new: 5,
+    demo: 15, in_person: 12, meeting: 10, call: 8, follow_up: 8, email: 6, note: 3,
+  };
+
+  function calcBreakdown(rep: RepScore) {
+    return [
+      { label: `Conversions (×${SCORE_WEIGHTS.converted})`, pts: (rep.by_status.converted ?? 0) * SCORE_WEIGHTS.converted },
+      { label: `Demos booked (×${SCORE_WEIGHTS.demo_scheduled})`, pts: (rep.by_status.demo_scheduled ?? 0) * SCORE_WEIGHTS.demo_scheduled },
+      { label: `Trialing (×${SCORE_WEIGHTS.trialing})`, pts: (rep.by_status.trialing ?? 0) * SCORE_WEIGHTS.trialing },
+      { label: `Contacted (×${SCORE_WEIGHTS.contacted})`, pts: (rep.by_status.contacted ?? 0) * SCORE_WEIGHTS.contacted },
+      { label: `Activities (30d)`, pts: Object.entries(rep.activity_breakdown).reduce((s,[t,c]) => s + c * ((SCORE_WEIGHTS as any)[t] ?? 0), 0) },
+      { label: `Overdue follow-ups (−8 each)`, pts: -rep.follow_ups_overdue * 8 },
+    ].filter(r => r.pts !== 0);
+  }
+
+  function RepCard({ rep, rank }: { rep: RepScore; rank: number }) {
+    const isTop3   = rank < 3;
+    const isGhost  = !rep.last_activity_at || (Date.now() - new Date(rep.last_activity_at).getTime()) > 48 * 3_600_000;
+    const isOnFire = rep.streak >= 2;
+    const rankColor = isTop3 ? RANK_COLORS[rank] : MUTED;
+    const expanded_ = expanded === rep.email;
+    const breakdown = calcBreakdown(rep);
+    const hidden    = rank >= 3 && !revealed;
+
+    return (
+      <div
+        onClick={() => setExpanded(expanded_ ? null : rep.email)}
+        style={{
+          background: isTop3 ? `linear-gradient(135deg, ${rankColor}08, #fff)` : CARD,
+          border: `1.5px solid ${isTop3 ? rankColor + "40" : BORDER}`,
+          borderRadius: 16, padding: "16px 18px", cursor: "pointer",
+          boxShadow: isTop3 ? `0 4px 20px ${rankColor}18` : "0 1px 4px rgba(0,0,0,0.04)",
+          transition: "box-shadow 0.15s",
+          position: "relative", overflow: "hidden",
+        }}
+      >
+        {/* Rank stripe */}
+        {isTop3 && <div style={{ position: "absolute", top: 0, left: 0, width: 4, height: "100%", background: rankColor, borderRadius: "16px 0 0 16px" }} />}
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: expanded_ ? 14 : 0 }}>
+          {/* Rank badge */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 40, flexShrink: 0 }}>
+            <span style={{ fontSize: isTop3 ? 20 : 14 }}>{isTop3 ? RANK_BADGES[rank] : `#${rank + 1}`}</span>
+            {isTop3 && <span style={{ fontSize: 9, fontWeight: 700, color: rankColor, textTransform: "uppercase", letterSpacing: "0.8px" }}>{RANK_LABELS[rank]}</span>}
+          </div>
+
+          {/* Avatar */}
+          <div style={{ width: isTop3 ? 42 : 34, height: isTop3 ? 42 : 34, borderRadius: "50%", flexShrink: 0, background: avatarColor(rep.email) + "20", border: `2px solid ${avatarColor(rep.email)}40`, display: "flex", alignItems: "center", justifyContent: "center", color: avatarColor(rep.email), fontSize: isTop3 ? 15 : 12, fontWeight: 800, position: "relative" }}>
+            {rep.display_name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+            {isOnFire && <span style={{ position: "absolute", bottom: -4, right: -4, fontSize: 12 }}>🔥</span>}
+            {isGhost && !isOnFire && <span style={{ position: "absolute", bottom: -4, right: -4, fontSize: 11 }}>👻</span>}
+          </div>
+
+          {/* Name + mini stats */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+              <span style={{ fontSize: isTop3 ? 15 : 13, fontWeight: 800, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rep.display_name}</span>
+              {rep.streak === 3 && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 10, background: "rgba(245,158,11,0.15)", color: "#d97706" }}>STREAK ×1.35</span>}
+              {rep.streak === 2 && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 10, background: "rgba(99,102,241,0.1)", color: INDIGO }}>STREAK ×1.2</span>}
+              {isGhost && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 10, background: "rgba(100,116,139,0.12)", color: MUTED }}>COLD</span>}
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, color: MUTED }}><strong style={{ color: TEXT }}>{rep.leads_assigned}</strong> leads</span>
+              <span style={{ fontSize: 11, color: MUTED }}><strong style={{ color: "#22c55e" }}>{rep.by_status.converted ?? 0}</strong> won</span>
+              <span style={{ fontSize: 11, color: MUTED }}><strong style={{ color: "#f59e0b" }}>{rep.by_status.demo_scheduled ?? 0}</strong> demos</span>
+              <span style={{ fontSize: 11, color: MUTED }}><strong style={{ color: INDIGO }}>{rep.activities_30d}</strong> activities</span>
+              {rep.follow_ups_overdue > 0 && <span style={{ fontSize: 11, color: "#ef4444" }}>⚠️ {rep.follow_ups_overdue} overdue</span>}
+            </div>
+          </div>
+
+          {/* Score */}
+          <div style={{ textAlign: "right", flexShrink: 0 }}>
+            {hidden ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
+                <div style={{ width: 52, height: 22, borderRadius: 6, background: "#e2e8f0", filter: "blur(4px)" }} />
+                <span style={{ fontSize: 9, color: MUTED, fontWeight: 600 }}>Hidden</span>
+              </div>
+            ) : (
+              <>
+                <p style={{ margin: 0, fontSize: isTop3 ? 24 : 18, fontWeight: 900, color: isTop3 ? rankColor : TEXT, lineHeight: 1 }}>{rep.score.toLocaleString()}</p>
+                <p style={{ margin: "2px 0 0", fontSize: 9, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px" }}>pts</p>
+              </>
+            )}
+          </div>
+          <i className={`fa-solid fa-chevron-${expanded_ ? "up" : "down"}`} style={{ fontSize: 10, color: MUTED, flexShrink: 0 }} />
+        </div>
+
+        {/* Score breakdown */}
+        {expanded_ && (
+          <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 12, marginTop: 4 }}>
+            <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1px" }}>Score Breakdown</p>
+            {breakdown.map(b => (
+              <ScorePill key={b.label} label={b.label} pts={b.pts} color={b.pts > 0 ? "#22c55e" : "#ef4444"} />
+            ))}
+            {rep.streak > 0 && (
+              <div style={{ marginTop: 6, padding: "6px 10px", borderRadius: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", fontSize: 12, color: "#d97706", fontWeight: 600 }}>
+                🔥 Hot streak multiplier applied — keep closing!
+              </div>
+            )}
+            <div style={{ marginTop: 10, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <div style={{ background: BG, borderRadius: 8, padding: "8px 10px" }}>
+                <p style={{ margin: "0 0 2px", fontSize: 10, color: MUTED, fontWeight: 600 }}>This week</p>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: TEXT }}>{rep.conversions_this_week} closed · {rep.demos_this_week} demos</p>
+              </div>
+              <div style={{ background: BG, borderRadius: 8, padding: "8px 10px" }}>
+                <p style={{ margin: "0 0 2px", fontSize: 10, color: MUTED, fontWeight: 600 }}>Last activity</p>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: TEXT }}>{rep.last_activity_at ? timeAgo(rep.last_activity_at) : "Never"}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: TEXT }}>Sales Leaderboard</h2>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 8px", borderRadius: 20, background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", fontSize: 10, fontWeight: 700, color: "#16a34a" }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", animation: "pulse 2s infinite" }} />
+              LIVE
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: 13, color: MUTED }}>Updated {updatedLabel} · Click any card to reveal score breakdown</p>
+        </div>
+        <button
+          onClick={() => setRevealed(r => !r)}
+          style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 9, border: `1px solid ${BORDER}`, background: revealed ? "rgba(99,102,241,0.08)" : "#fff", color: revealed ? INDIGO : TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+        >
+          <i className={`fa-solid fa-${revealed ? "eye-slash" : "eye"}`} />
+          {revealed ? "Hide Scores" : "Reveal All Scores"}
+        </button>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: second ? "1fr 340px" : "1fr", gap: 20 }}>
+        <div>
+          {/* Battle bar — #1 vs #2 */}
+          {second && (
+            <div style={{ background: `linear-gradient(135deg, ${GOLD}08, ${SILVER}08)`, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "16px 20px", marginBottom: 16 }}>
+              <p style={{ margin: "0 0 10px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1.2px" }}>⚔️ The Race — #1 vs #2</p>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>{first.display_name}</span>
+                <span style={{ fontSize: 11, color: MUTED, fontWeight: 600 }}>Gap: <strong style={{ color: gap > 200 ? "#22c55e" : "#f59e0b" }}>{gap.toLocaleString()} pts</strong></span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>{second.display_name}</span>
+              </div>
+              <div style={{ position: "relative", height: 12, borderRadius: 6, background: SILVER + "30", overflow: "hidden" }}>
+                <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${100 - battlePct}%`, background: `linear-gradient(90deg, ${GOLD}, ${GOLD}90)`, borderRadius: 6, transition: "width 0.8s ease" }} />
+                <div style={{ position: "absolute", right: 0, top: 0, height: "100%", width: `${battlePct}%`, background: `linear-gradient(90deg, ${SILVER}80, ${SILVER})`, borderRadius: 6, transition: "width 0.8s ease" }} />
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 5 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: GOLD }}>{first.score.toLocaleString()} pts</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: SILVER }}>{second.score.toLocaleString()} pts</span>
+              </div>
+              {!revealed && gap > 0 && (
+                <p style={{ margin: "8px 0 0", fontSize: 11, color: MUTED, textAlign: "center" }}>
+                  {second.display_name} needs <strong style={{ color: TEXT }}>{gap} more pts</strong> to take the crown.
+                  {gap <= 50 ? " 🔥 It's anybody's game!" : gap <= 150 ? " Keep pushing!" : ""}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Podium (top 3) */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+            {reps.slice(0, 3).map((rep, i) => <RepCard key={rep.email} rep={rep} rank={i} />)}
+          </div>
+
+          {/* Rest of reps */}
+          {rest.length > 0 && (
+            <>
+              <p style={{ margin: "16px 0 10px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1.2px" }}>
+                Chasing the podium
+                {!revealed && <span style={{ marginLeft: 8, padding: "2px 7px", borderRadius: 10, background: "rgba(99,102,241,0.08)", color: INDIGO, fontSize: 10 }}>Scores hidden — click Reveal to see</span>}
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {rest.map((rep, i) => <RepCard key={rep.email} rep={rep} rank={i + 3} />)}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Right column — Recent wins + scoring guide */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Recent wins feed */}
+          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "16px 18px" }}>
+            <p style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 800, color: TEXT }}>🏆 Recent Wins</p>
+            {recent_wins.length === 0 ? (
+              <p style={{ margin: 0, fontSize: 12, color: MUTED, textAlign: "center", padding: "12px 0" }}>No conversions this week</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {recent_wins.map((w, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", paddingBottom: 8, borderBottom: i < recent_wins.length - 1 ? `1px solid ${BORDER}` : "none" }}>
+                    <span style={{ width: 26, height: 26, borderRadius: "50%", background: avatarColor(w.rep) + "20", color: avatarColor(w.rep), fontSize: 10, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{w.rep[0].toUpperCase()}</span>
+                    <div>
+                      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: TEXT }}>{w.lead_name}</p>
+                      <p style={{ margin: "2px 0 0", fontSize: 11, color: MUTED }}>{repDisplayName(w.rep)} · {timeAgo(w.converted_at)}{w.revenue ? ` · $${Number(w.revenue).toLocaleString()}` : ""}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Scoring guide */}
+          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: "16px 18px" }}>
+            <p style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 800, color: TEXT }}>📊 How Scores Work</p>
+            {[
+              { label: "Conversion",    pts: "+100", color: "#22c55e" },
+              { label: "Demo booked",   pts: "+40",  color: "#f59e0b" },
+              { label: "Trialing lead", pts: "+25",  color: "#8b5cf6" },
+              { label: "Demo activity", pts: "+15",  color: "#8b5cf6" },
+              { label: "Meeting logged",pts: "+10",  color: "#0ea5e9" },
+              { label: "Call logged",   pts: "+8",   color: "#0ea5e9" },
+              { label: "Email logged",  pts: "+6",   color: INDIGO    },
+              { label: "Note added",    pts: "+3",   color: MUTED     },
+              { label: "Overdue follow-up", pts: "−8", color: "#ef4444" },
+            ].map(r => (
+              <div key={r.label} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: `1px solid ${BORDER}`, fontSize: 12 }}>
+                <span style={{ color: MUTED }}>{r.label}</span>
+                <span style={{ fontWeight: 800, color: r.color }}>{r.pts}</span>
+              </div>
+            ))}
+            <p style={{ margin: "10px 0 0", fontSize: 11, color: MUTED, lineHeight: 1.5 }}>
+              🔥 Hot streak bonus: ×1.2 (3+ wins/mo) or ×1.35 (5+ wins/mo)
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Outreach Button ───────────────────────────────────────────────────────────
 function OutreachButton({ leadId, email, firstName, onSent }: { leadId: string; email: string; firstName: string; onSent: (updated: InternalLead) => void }) {
   const [sending, setSending] = useState(false);
@@ -513,7 +926,7 @@ function OverviewTab({
 // ── Leads List Tab ────────────────────────────────────────────────────────────
 function LeadsListTab({
   leads, total, perPage, filter, stats,
-  statusConfig, priorityConfig, sourceLabels,
+  statusConfig, priorityConfig, sourceLabels, admins,
   onFilter, onRefresh, isPending,
 }: {
   leads:         InternalLead[];
@@ -524,6 +937,7 @@ function LeadsListTab({
   statusConfig:  Record<string, any>;
   priorityConfig: Record<string, any>;
   sourceLabels:  Record<string, string>;
+  admins:        CrmAdmin[];
   onFilter:      (params: Record<string, string>) => void;
   onRefresh:     () => void;
   isPending:     boolean;
@@ -549,6 +963,12 @@ function LeadsListTab({
   async function changeStatus(id: string, status: LeadStatus) {
     setLocalLeads(prev => prev.map(l => l.id === id ? { ...l, status } : l));
     await fetch(`/api/admin/leads/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+    onRefresh();
+  }
+
+  async function changeAssignee(id: string, email: string | null) {
+    setLocalLeads(prev => prev.map(l => l.id === id ? { ...l, assigned_to: email } : l));
+    await fetch(`/api/admin/leads/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ assigned_to: email }) });
     onRefresh();
   }
 
@@ -612,6 +1032,10 @@ function LeadsListTab({
           <option value="">All Priorities</option>
           {["low","medium","high","urgent"].map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
         </select>
+        <select style={{ ...SEL, flex: "0 0 auto", width: 150 }} value={filter.assigned_to ?? ""} onChange={e => onFilter({ assigned_to: e.target.value, page: "1" })}>
+          <option value="">All Reps</option>
+          {admins.map(a => <option key={a.id} value={a.email}>{a.name}</option>)}
+        </select>
         <select style={{ ...SEL, flex: "0 0 auto", width: 150 }} value={`${filter.sort ?? "created_at"}_${filter.dir ?? "desc"}`} onChange={e => { const val = e.target.value; const idx = val.lastIndexOf("_"); const s = val.slice(0, idx); const d = val.slice(idx + 1); onFilter({ sort: s, dir: d, page: "1" }); }}>
           <option value="created_at_desc">Newest First</option>
           <option value="created_at_asc">Oldest First</option>
@@ -619,14 +1043,14 @@ function LeadsListTab({
           <option value="next_follow_up_asc">Follow-up Soon</option>
           <option value="priority_desc">Highest Priority</option>
         </select>
-        {(filter.status || filter.priority || filter.search) && (
-          <button onClick={() => { setSearchInput(""); onFilter({ status: "", priority: "", search: "", page: "1" }); }} style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+        {(filter.status || filter.priority || filter.search || filter.assigned_to) && (
+          <button onClick={() => { setSearchInput(""); onFilter({ status: "", priority: "", search: "", assigned_to: "", page: "1" }); }} style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
             <i className="fa-solid fa-xmark" style={{ marginRight: 4 }} />Clear
           </button>
         )}
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
           <ImportModal onImported={onRefresh} />
-          <AddLeadModal onCreated={onRefresh} statusConfig={statusConfig} />
+          <AddLeadModal onCreated={onRefresh} statusConfig={statusConfig} admins={admins} />
         </div>
       </div>
 
@@ -652,8 +1076,8 @@ function LeadsListTab({
           </div>
         )}
         {/* Header row */}
-        <div style={{ display: "grid", gridTemplateColumns: "2.5fr 1.8fr 1.2fr 1fr 1.2fr 90px", gap: 10, padding: "11px 20px", background: BG, borderBottom: `1px solid ${BORDER}` }} className="hidden lg:grid">
-          {["Lead", "Company / Trade", "Status", "Priority", "Follow-up", ""].map(h => (
+        <div style={{ display: "grid", gridTemplateColumns: "2.2fr 1.6fr 1.1fr 0.9fr 1.1fr 1.1fr 90px", gap: 10, padding: "11px 20px", background: BG, borderBottom: `1px solid ${BORDER}` }} className="hidden lg:grid">
+          {["Lead", "Company / Trade", "Status", "Priority", "Follow-up", "Assigned", ""].map(h => (
             <span key={h} style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: MUTED }}>{h}</span>
           ))}
         </div>
@@ -672,7 +1096,7 @@ function LeadsListTab({
             <div key={lead.id}>
               {/* Desktop row */}
               <div
-                style={{ display: "grid", gridTemplateColumns: "2.5fr 1.8fr 1.2fr 1fr 1.2fr 90px", gap: 10, padding: "13px 20px", alignItems: "center", borderBottom: i < localLeads.length - 1 ? `1px solid ${BORDER}` : "none", cursor: "pointer" }}
+                style={{ display: "grid", gridTemplateColumns: "2.2fr 1.6fr 1.1fr 0.9fr 1.1fr 1.1fr 90px", gap: 10, padding: "13px 20px", alignItems: "center", borderBottom: i < localLeads.length - 1 ? `1px solid ${BORDER}` : "none", cursor: "pointer" }}
                 className="hidden lg:grid hover:bg-[#f8f9fb]"
                 onClick={() => window.open(`/admin/leads/${lead.id}`, "_blank")}
               >
@@ -695,6 +1119,9 @@ function LeadsListTab({
                   {lead.next_follow_up
                     ? <span style={{ fontSize: 12, fontWeight: 600, color: overdue ? "#dc2626" : MUTED }}>{overdue && <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 4, fontSize: 10 }} />}{fmtDate(lead.next_follow_up)}</span>
                     : <span style={{ fontSize: 12, color: "#d1d5db" }}>—</span>}
+                </div>
+                <div onClick={e => e.stopPropagation()}>
+                  <QuickAssign lead={lead} admins={admins} onChange={changeAssignee} />
                 </div>
                 <div style={{ display: "flex", gap: 5, justifyContent: "flex-end" }} onClick={e => e.stopPropagation()}>
                   {lead.email && (
@@ -772,6 +1199,7 @@ function LeadsListTab({
           statusConfig={statusConfig}
           priorityConfig={priorityConfig}
           sourceLabels={sourceLabels}
+          admins={admins}
           onClose={() => setViewLead(null)}
           onUpdate={(updated) => { setLocalLeads(prev => prev.map(l => l.id === updated.id ? updated : l)); setViewLead(updated); onRefresh(); }}
           onDelete={(id) => { setLocalLeads(prev => prev.filter(l => l.id !== id)); setViewLead(null); onRefresh(); }}
@@ -782,9 +1210,9 @@ function LeadsListTab({
 }
 
 // ── Lead Detail Drawer ────────────────────────────────────────────────────────
-function LeadDrawer({ lead, statusConfig, priorityConfig, sourceLabels, onClose, onUpdate, onDelete }: {
+function LeadDrawer({ lead, statusConfig, priorityConfig, sourceLabels, admins, onClose, onUpdate, onDelete }: {
   lead: InternalLead; statusConfig: Record<string, any>; priorityConfig: Record<string, any>;
-  sourceLabels: Record<string, string>; onClose: () => void; onUpdate: (l: InternalLead) => void; onDelete: (id: string) => void;
+  sourceLabels: Record<string, string>; admins: CrmAdmin[]; onClose: () => void; onUpdate: (l: InternalLead) => void; onDelete: (id: string) => void;
 }) {
   const [editing,  setEditing]  = useState(false);
   const [saving,   setSaving]   = useState(false);
@@ -952,7 +1380,18 @@ function LeadDrawer({ lead, statusConfig, priorityConfig, sourceLabels, onClose,
                 <Field label="Status"><select style={SEL} value={form.status} onChange={e => setF("status", e.target.value)}>{Object.entries(statusConfig).map(([v, c]: any) => <option key={v} value={v}>{c.label}</option>)}</select></Field>
                 <Field label="Priority"><select style={SEL} value={form.priority} onChange={e => setF("priority", e.target.value)}>{["low","medium","high","urgent"].map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}</select></Field>
                 <Field label="Source"><select style={SEL} value={form.source} onChange={e => setF("source", e.target.value)}>{Object.entries(sourceLabels).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></Field>
-                <Field label="Assigned To"><input style={INP} value={form.assigned_to ?? ""} onChange={e => setF("assigned_to", e.target.value)} /></Field>
+                <Field label="Assigned To">
+                  <select style={SEL} value={form.assigned_to ?? ""} onChange={e => setF("assigned_to", e.target.value || null)}>
+                    <option value="">— Unassigned —</option>
+                    {admins.map(a => (
+                      <option key={a.id} value={a.email}>{a.name} ({a.email})</option>
+                    ))}
+                    {/* Show legacy value if not in current admin list */}
+                    {form.assigned_to && !admins.find(a => a.email === form.assigned_to) && (
+                      <option value={form.assigned_to}>{form.assigned_to} (legacy)</option>
+                    )}
+                  </select>
+                </Field>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
                 <Field label="Next Follow-up"><input style={INP} type="date" value={form.next_follow_up ?? ""} onChange={e => setF("next_follow_up", e.target.value || null)} /></Field>
@@ -973,18 +1412,19 @@ function LeadDrawer({ lead, statusConfig, priorityConfig, sourceLabels, onClose,
 
 // ── Root CrmClient ────────────────────────────────────────────────────────────
 interface Props {
-  tab:           "overview" | "list";
+  tab:           "overview" | "list" | "leaderboard";
   initialLeads:  InternalLead[];
   total:         number;
   perPage:       number;
   stats:         CrmStats;
   filter:        LeadFilter;
+  admins:        CrmAdmin[];
   statusConfig:  Record<string, { label: string; color: string; bg: string; border: string; dot: string }>;
   priorityConfig: Record<string, { label: string; color: string; icon: string }>;
   sourceLabels:  Record<string, string>;
 }
 
-export default function CrmClient({ tab, initialLeads, total, perPage, stats, filter, statusConfig, priorityConfig, sourceLabels }: Props) {
+export default function CrmClient({ tab, initialLeads, total, perPage, stats, filter, admins, statusConfig, priorityConfig, sourceLabels }: Props) {
   const router                          = useRouter();
   const [isPending, startNavTransition] = useTransition();
   const [, startRefreshTransition]      = useTransition();
@@ -1026,12 +1466,13 @@ export default function CrmClient({ tab, initialLeads, total, perPage, stats, fi
       {/* Tab bar */}
       <div style={{ display: "flex", gap: 2, marginBottom: 24, background: "#f1f5f9", borderRadius: 12, padding: 4, width: "fit-content" }}>
         {[
-          { key: "overview", label: "Overview",  icon: "fa-solid fa-chart-pie"    },
-          { key: "list",     label: "All Leads", icon: "fa-solid fa-list"          },
+          { key: "overview",     label: "Overview",     icon: "fa-solid fa-chart-pie"   },
+          { key: "list",         label: "All Leads",    icon: "fa-solid fa-list"          },
+          { key: "leaderboard",  label: "Leaderboard",  icon: "fa-solid fa-ranking-star"  },
         ].map(t => (
           <button
             key={t.key}
-            onClick={() => router.push(t.key === "overview" ? "/admin/leads" : "/admin/leads?tab=list")}
+            onClick={() => router.push(t.key === "overview" ? "/admin/leads" : `/admin/leads?tab=${t.key}`)}
             style={{
               display: "flex", alignItems: "center", gap: 7,
               padding: "9px 18px", borderRadius: 9, border: "none",
@@ -1041,10 +1482,14 @@ export default function CrmClient({ tab, initialLeads, total, perPage, stats, fi
               cursor: "pointer",
               boxShadow: activeTab === t.key ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
               transition: "all 0.15s",
+              position: "relative",
             }}
           >
-            <i className={t.icon} style={{ fontSize: 12, color: activeTab === t.key ? INDIGO : MUTED }} />
+            <i className={t.icon} style={{ fontSize: 12, color: activeTab === t.key ? (t.key === "leaderboard" ? GOLD : INDIGO) : MUTED }} />
             {t.label}
+            {t.key === "leaderboard" && (
+              <span style={{ position: "absolute", top: 4, right: 6, width: 6, height: 6, borderRadius: "50%", background: "#22c55e", border: "1px solid #fff" }} />
+            )}
           </button>
         ))}
       </div>
@@ -1057,6 +1502,8 @@ export default function CrmClient({ tab, initialLeads, total, perPage, stats, fi
           sourceLabels={sourceLabels}
           onGoToList={goToList}
         />
+      ) : activeTab === "leaderboard" ? (
+        <SalesLeaderboard />
       ) : (
         <LeadsListTab
           leads={initialLeads}
@@ -1067,6 +1514,7 @@ export default function CrmClient({ tab, initialLeads, total, perPage, stats, fi
           statusConfig={statusConfig}
           priorityConfig={priorityConfig}
           sourceLabels={sourceLabels}
+          admins={admins}
           onFilter={applyFilter}
           onRefresh={refresh}
           isPending={isPending}

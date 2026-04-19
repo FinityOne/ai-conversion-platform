@@ -19,6 +19,7 @@ const NAV = [
   { href: "/admin/payments",    label: "Payments",    fa: "fa-solid fa-credit-card",       desc: "Revenue & billing"   },
   { href: "/admin/chat-leads",  label: "Chat Leads",  fa: "fa-solid fa-message",           desc: "Widget submissions"  },
   { href: "/admin/emails",      label: "Messages",    fa: "fa-solid fa-paper-plane",       desc: "Email & SMS catalogue" },
+  { href: "/profile",            label: "My Profile",  fa: "fa-solid fa-user-circle",       desc: "Account & branding"  },
 ];
 
 // Dark sidebar palette

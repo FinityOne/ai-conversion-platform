@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   InternalLead, LeadActivity, LeadStatus, LeadPriority, ActivityType,
   STATUS_CONFIG, PRIORITY_CONFIG, SOURCE_LABELS, TRADE_OPTIONS, EMPLOYEE_COUNT_OPTIONS,
+  type CrmAdmin,
 } from "@/lib/internal-leads";
 import { ScheduledMeeting, MEETING_TYPE_CONFIG, MeetingType, US_TIMEZONES, formatMeetingDate, formatMeetingTimeWithTZ } from "@/lib/meetings";
 import { MarketingTemplate, MARKETING_TEMPLATES } from "@/lib/emails/marketing";
@@ -424,7 +425,7 @@ function LogForm({ leadId, onSaved, onCancel, defaultType = "note" }: LogFormPro
 
 // ── Quick Edit Card ───────────────────────────────────────────────────────────
 
-function QuickEditCard({ lead, onUpdated }: { lead: InternalLead; onUpdated: (l: InternalLead) => void }) {
+function QuickEditCard({ lead, admins, onUpdated }: { lead: InternalLead; admins: CrmAdmin[]; onUpdated: (l: InternalLead) => void }) {
   const [status,     setStatus]     = useState<LeadStatus>(lead.status);
   const [priority,   setPriority]   = useState<LeadPriority>(lead.priority);
   const [assignedTo, setAssignedTo] = useState(lead.assigned_to ?? "");
@@ -508,16 +509,38 @@ function QuickEditCard({ lead, onUpdated }: { lead: InternalLead; onUpdated: (l:
       {/* Assigned to */}
       <div style={{ marginBottom: 10 }}>
         <label style={{ fontSize: 10, fontWeight: 600, color: MUTED, display: "block", marginBottom: 4 }}>ASSIGNED TO</label>
-        <input
-          value={assignedTo}
-          onChange={e => setAssignedTo(e.target.value)}
-          placeholder="e.g. heran@finityone.com"
-          style={{
-            width: "100%", padding: "6px 10px", borderRadius: 7,
-            border: `1.5px solid ${BORDER}`, background: CARD,
-            color: TEXT, fontSize: 12, outline: "none", boxSizing: "border-box",
-          }}
-        />
+        <div style={{ position: "relative" }}>
+          <select
+            value={assignedTo}
+            onChange={e => setAssignedTo(e.target.value)}
+            style={{
+              width: "100%", padding: "6px 28px 6px 10px", borderRadius: 7,
+              border: `1.5px solid ${assignedTo ? INDIGO + "60" : BORDER}`,
+              background: assignedTo ? "rgba(99,102,241,0.04)" : CARD,
+              color: TEXT, fontSize: 12, outline: "none",
+              boxSizing: "border-box", appearance: "none", cursor: "pointer",
+            }}
+          >
+            <option value="">— Unassigned —</option>
+            {admins.map(a => (
+              <option key={a.id} value={a.email}>{a.name} ({a.email})</option>
+            ))}
+            {/* Keep legacy value if not in current admin list */}
+            {assignedTo && !admins.find(a => a.email === assignedTo) && (
+              <option value={assignedTo}>{assignedTo} (legacy)</option>
+            )}
+          </select>
+          <i className="fa-solid fa-chevron-down" style={{
+            position: "absolute", right: 9, top: "50%", transform: "translateY(-50%)",
+            fontSize: 10, color: MUTED, pointerEvents: "none",
+          }} />
+        </div>
+        {assignedTo && (
+          <p style={{ margin: "4px 0 0", fontSize: 10, color: MUTED }}>
+            <i className="fa-solid fa-user-check" style={{ marginRight: 4, color: INDIGO }} />
+            {admins.find(a => a.email === assignedTo)?.name ?? assignedTo}
+          </p>
+        )}
       </div>
 
       {/* Next follow-up */}
@@ -1328,10 +1351,12 @@ export default function LeadDetailClient({
   lead: initialLead,
   initialActivities,
   initialMeetings = [],
+  admins = [],
 }: {
   lead: InternalLead;
   initialActivities: LeadActivity[];
   initialMeetings?: ScheduledMeeting[];
+  admins?: CrmAdmin[];
 }) {
   const [lead,         setLead]         = useState<InternalLead>(initialLead);
   const [activities,   setActivities]   = useState(initialActivities);
@@ -1733,7 +1758,7 @@ export default function LeadDetailClient({
             </Card>
 
             {/* Quick Edit */}
-            <QuickEditCard lead={lead} onUpdated={setLead} />
+            <QuickEditCard lead={lead} admins={admins} onUpdated={setLead} />
 
             {/* Lead Intel */}
             <Card title="Lead Intel" icon="fa-solid fa-chart-line">

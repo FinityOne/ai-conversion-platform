@@ -233,6 +233,26 @@ export interface CrmStats {
   follow_ups_due: number;
 }
 
+export interface CrmAdmin {
+  id:    string;
+  email: string;
+  name:  string;
+}
+
+export async function getAdminReps(): Promise<CrmAdmin[]> {
+  const sb = createSupabaseServiceClient();
+  const { data } = await sb
+    .from("profiles")
+    .select("id, email, first_name, last_name")
+    .eq("role", "admin")
+    .order("first_name", { ascending: true });
+  return (data ?? []).map(r => ({
+    id:    r.id,
+    email: r.email,
+    name:  [r.first_name, r.last_name].filter(Boolean).join(" ") || r.email,
+  }));
+}
+
 export async function getCrmStats(): Promise<CrmStats> {
   const sb = createSupabaseServiceClient();
   const now = new Date();

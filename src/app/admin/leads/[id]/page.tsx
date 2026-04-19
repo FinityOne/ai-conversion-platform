@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getInternalLead, getLeadActivities } from "@/lib/internal-leads";
+import { getInternalLead, getLeadActivities, getAdminReps } from "@/lib/internal-leads";
 import { getScheduledMeetingsForLead } from "@/lib/meetings";
 import LeadDetailClient from "./LeadDetailClient";
 
@@ -11,13 +11,14 @@ export default async function LeadDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [lead, activities, meetings] = await Promise.all([
+  const [lead, activities, meetings, admins] = await Promise.all([
     getInternalLead(id),
     getLeadActivities(id),
     getScheduledMeetingsForLead(id),
+    getAdminReps(),
   ]);
 
   if (!lead) notFound();
 
-  return <LeadDetailClient lead={lead} initialActivities={activities} initialMeetings={meetings} />;
+  return <LeadDetailClient lead={lead} initialActivities={activities} initialMeetings={meetings} admins={admins} />;
 }
