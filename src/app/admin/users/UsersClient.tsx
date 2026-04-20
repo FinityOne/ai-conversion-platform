@@ -7,12 +7,251 @@ import type { AdminSubscription } from "@/lib/admin";
 import type { GrantType } from "@/lib/subscriptions";
 import { PLANS, GRANT_LABELS } from "@/lib/subscriptions";
 
+// ── Add User Modal ────────────────────────────────────────────────────────────
 const TEXT   = "#0f172a";
 const MUTED  = "#64748b";
 const BORDER = "#e9ecef";
-const CARD   = "#ffffff";
-const BG     = "#f8f9fb";
 const INDIGO = "#6366f1";
+const BG     = "#f8f9fb";
+
+type AddUserStep = "form" | "success";
+interface CreatedUser { id: string; email: string; password: string; }
+
+function AddUserModal({ onClose, onCreated }: { onClose: () => void; onCreated: (u: AdminUser) => void }) {
+  const [step,      setStep]      = useState<AddUserStep>("form");
+  const [firstName, setFirstName] = useState("");
+  const [lastName,  setLastName]  = useState("");
+  const [email,     setEmail]     = useState("");
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState("");
+  const [created,   setCreated]   = useState<CreatedUser | null>(null);
+  const [copied,    setCopied]    = useState<string | null>(null);
+  const router = useRouter();
+
+  const intakeUrl = created ? `https://clozeflow.com/intake/${created.id}` : "";
+
+  const emailDraft = created ? [
+    `To: ${created.email}`,
+    `Subject: Your ClozeFlow Account is Ready`,
+    ``,
+    `Hi ${firstName || "there"},`,
+    ``,
+    `Your ClozeFlow account has been set up! Here are your login credentials:`,
+    ``,
+    `  Login page:  https://clozeflow.com/login`,
+    `  Email:       ${created.email}`,
+    `  Password:    ${created.password}`,
+    ``,
+    `Your intake website (share with customers to generate leads):`,
+    `  ${intakeUrl}`,
+    ``,
+    `Next steps:`,
+    `  1. Log in and complete your business profile`,
+    `  2. Share your intake website to start capturing leads`,
+    ``,
+    `Let us know if you have any questions!`,
+    ``,
+    `— The ClozeFlow Team`,
+  ].join("\n") : "";
+
+  function copyText(text: string, key: string) {
+    navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 2000);
+  }
+
+  async function handleCreate(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) { setError("Email is required."); return; }
+    setLoading(true); setError("");
+
+    const res = await fetch("/api/admin/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ first_name: firstName, last_name: lastName, email }),
+    });
+    const d = await res.json();
+    setLoading(false);
+    if (!res.ok) { setError(d.error ?? "Failed to create user."); return; }
+
+    setCreated(d);
+    setStep("success");
+    onCreated({
+      id: d.id, email: d.email,
+      first_name: firstName || null, last_name: lastName || null,
+      phone: null, business_name: null, role: "user",
+      created_at: new Date().toISOString(), lead_count: 0, health_score: 0,
+    });
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "10px 13px", borderRadius: 9,
+    border: `1.5px solid ${BORDER}`, background: "#fff",
+    fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box",
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(15,23,42,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#fff", borderRadius: 22, width: "100%", maxWidth: 540, maxHeight: "92vh", overflowY: "auto", boxShadow: "0 32px 80px rgba(0,0,0,0.2)" }}
+      >
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 26px 18px", borderBottom: `1px solid ${BORDER}` }}>
+          <div>
+            <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.2px", color: INDIGO }}>
+              {step === "form" ? "New Account" : "Account Created"}
+            </p>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: TEXT }}>
+              {step === "form" ? "Add User" : "Share Credentials"}
+            </h2>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: MUTED, fontSize: 16 }}>
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+
+        <div style={{ padding: "24px 26px" }}>
+          {step === "form" ? (
+            <form onSubmit={handleCreate} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {error && (
+                <div style={{ padding: "10px 14px", borderRadius: 9, background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)", color: "#dc2626", fontSize: 13, fontWeight: 600 }}>
+                  <i className="fa-solid fa-circle-exclamation" style={{ marginRight: 7 }} />{error}
+                </div>
+              )}
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 6 }}>First Name</label>
+                  <input style={inputStyle} placeholder="Jane" value={firstName} onChange={e => setFirstName(e.target.value)} autoFocus />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 6 }}>Last Name</label>
+                  <input style={inputStyle} placeholder="Smith" value={lastName} onChange={e => setLastName(e.target.value)} />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 6 }}>Email Address *</label>
+                <input style={inputStyle} type="email" placeholder="jane@company.com" value={email} onChange={e => setEmail(e.target.value)} />
+              </div>
+
+              <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(99,102,241,0.05)", border: `1px solid rgba(99,102,241,0.15)`, display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <i className="fa-solid fa-key" style={{ color: INDIGO, marginTop: 2, flexShrink: 0 }} />
+                <p style={{ margin: 0, fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
+                  A secure random password will be generated. You&apos;ll see it after creation to share manually — we won&apos;t send it automatically.
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                style={{ padding: "13px", borderRadius: 11, border: "none", background: `linear-gradient(135deg, ${INDIGO}, #8b5cf6)`, color: "#fff", fontSize: 15, fontWeight: 800, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.75 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+              >
+                {loading ? <><i className="fa-solid fa-circle-notch fa-spin" /> Creating Account…</> : <><i className="fa-solid fa-user-plus" /> Create Account</>}
+              </button>
+            </form>
+          ) : created && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+              {/* Success banner */}
+              <div style={{ textAlign: "center", padding: "16px 0 8px" }}>
+                <div style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(34,197,94,0.1)", border: "2px solid rgba(34,197,94,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontSize: 24 }}>
+                  ✓
+                </div>
+                <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: TEXT }}>Account Created!</p>
+                <p style={{ margin: "4px 0 0", fontSize: 13, color: MUTED }}>Share these credentials with the user manually.</p>
+              </div>
+
+              {/* Credentials card */}
+              <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: "hidden" }}>
+                <div style={{ padding: "12px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: MUTED }}>Login Credentials</span>
+                  <button onClick={() => copyText(`Email: ${created.email}\nPassword: ${created.password}`, "both")} style={{ padding: "4px 10px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "#fff", fontSize: 11, fontWeight: 700, color: copied === "both" ? "#16a34a" : INDIGO, cursor: "pointer" }}>
+                    {copied === "both" ? "✓ Copied!" : "Copy Both"}
+                  </button>
+                </div>
+                {[
+                  { label: "Email",    value: created.email,    key: "email",    icon: "fa-solid fa-envelope" },
+                  { label: "Password", value: created.password, key: "password", icon: "fa-solid fa-key" },
+                ].map(row => (
+                  <div key={row.key} style={{ padding: "13px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 12 }}>
+                    <i className={row.icon} style={{ color: INDIGO, fontSize: 13, width: 16, textAlign: "center", flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: "0 0 1px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px" }}>{row.label}</p>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT, fontFamily: "monospace" }}>{row.value}</p>
+                    </div>
+                    <button onClick={() => copyText(row.value, row.key)} style={{ padding: "5px 10px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "#fff", fontSize: 11, fontWeight: 700, color: copied === row.key ? "#16a34a" : MUTED, cursor: "pointer", flexShrink: 0 }}>
+                      {copied === row.key ? "✓" : "Copy"}
+                    </button>
+                  </div>
+                ))}
+                {/* Intake URL */}
+                <div style={{ padding: "13px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+                  <i className="fa-solid fa-link" style={{ color: "#22c55e", fontSize: 13, width: 16, textAlign: "center", flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: "0 0 1px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px" }}>Intake Website URL</p>
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: "#16a34a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{intakeUrl}</p>
+                  </div>
+                  <button onClick={() => copyText(intakeUrl, "intake")} style={{ padding: "5px 10px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "#fff", fontSize: 11, fontWeight: 700, color: copied === "intake" ? "#16a34a" : MUTED, cursor: "pointer", flexShrink: 0 }}>
+                    {copied === "intake" ? "✓" : "Copy"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Email draft */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: TEXT }}>Email Draft</p>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => copyText(emailDraft, "draft")} style={{ padding: "5px 12px", borderRadius: 7, border: `1px solid ${BORDER}`, background: "#fff", fontSize: 12, fontWeight: 700, color: copied === "draft" ? "#16a34a" : MUTED, cursor: "pointer" }}>
+                      {copied === "draft" ? "✓ Copied!" : "Copy Draft"}
+                    </button>
+                    <a
+                      href={`mailto:${created.email}?subject=Your%20ClozeFlow%20Account%20is%20Ready&body=${encodeURIComponent(emailDraft)}`}
+                      style={{ padding: "5px 12px", borderRadius: 7, border: `1px solid rgba(99,102,241,0.3)`, background: "rgba(99,102,241,0.06)", fontSize: 12, fontWeight: 700, color: INDIGO, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5 }}
+                    >
+                      <i className="fa-solid fa-envelope" style={{ fontSize: 11 }} /> Open in Email
+                    </a>
+                  </div>
+                </div>
+                <textarea
+                  readOnly
+                  value={emailDraft}
+                  style={{ width: "100%", minHeight: 200, padding: "12px 14px", borderRadius: 10, border: `1px solid ${BORDER}`, background: BG, fontSize: 12, color: TEXT, fontFamily: "monospace", lineHeight: 1.6, resize: "vertical", boxSizing: "border-box", outline: "none" }}
+                />
+                <p style={{ margin: "6px 0 0", fontSize: 11, color: MUTED }}>
+                  <i className="fa-solid fa-circle-info" style={{ marginRight: 5 }} />
+                  This email is <strong>not sent automatically</strong>. Copy the draft or use &quot;Open in Email&quot; to send it yourself.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={() => { router.push(`/admin/users/${created.id}`); onClose(); }}
+                  style={{ flex: 1, padding: "11px", borderRadius: 10, border: "none", background: `linear-gradient(135deg, ${INDIGO}, #8b5cf6)`, color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}
+                >
+                  <i className="fa-solid fa-arrow-right" /> View User Profile
+                </button>
+                <button
+                  onClick={() => { setStep("form"); setFirstName(""); setLastName(""); setEmail(""); setCreated(null); setError(""); }}
+                  style={{ padding: "11px 18px", borderRadius: 10, border: `1px solid ${BORDER}`, background: "#fff", color: MUTED, fontSize: 14, fontWeight: 700, cursor: "pointer" }}
+                >
+                  Add Another
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const CARD   = "#ffffff";
 
 type SubMap = Record<string, AdminSubscription>;
 
@@ -128,7 +367,7 @@ function SubBadge({ sub }: { sub: AdminSubscription | undefined }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function UsersClient({
-  users,
+  users: initialUsers,
   initialSubMap,
 }: {
   users:         AdminUser[];
@@ -136,8 +375,10 @@ export default function UsersClient({
 }) {
   const router   = useRouter();
   const subMap   = initialSubMap;
-  const [search, setSearch] = useState("");
+  const [users, setUsers]         = useState(initialUsers);
+  const [search, setSearch]       = useState("");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [showAddUser, setShowAddUser] = useState(false);
 
   const totalLeads   = users.reduce((s, u) => s + u.lead_count, 0);
   const adminCount   = users.filter(u => u.role === "admin").length;
@@ -157,10 +398,26 @@ export default function UsersClient({
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: INDIGO }}>Admin Console</p>
-        <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900, color: TEXT }}>All Users</h1>
-        <p style={{ margin: "6px 0 0", fontSize: 14, color: MUTED }}>{users.length} accounts · sorted by lead count · click any row to view profile</p>
+      {showAddUser && (
+        <AddUserModal
+          onClose={() => setShowAddUser(false)}
+          onCreated={u => setUsers(prev => [u, ...prev])}
+        />
+      )}
+
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
+        <div>
+          <p style={{ margin: "0 0 4px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: INDIGO }}>Admin Console</p>
+          <h1 style={{ margin: 0, fontSize: 30, fontWeight: 900, color: TEXT }}>All Users</h1>
+          <p style={{ margin: "6px 0 0", fontSize: 14, color: MUTED }}>{users.length} accounts · sorted by lead count · click any row to view profile</p>
+        </div>
+        <button
+          onClick={() => setShowAddUser(true)}
+          style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 20px", borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${INDIGO}, #8b5cf6)`, color: "#fff", fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(99,102,241,0.35)", flexShrink: 0 }}
+        >
+          <i className="fa-solid fa-user-plus" />
+          Add User
+        </button>
       </div>
 
       {/* Summary stats */}

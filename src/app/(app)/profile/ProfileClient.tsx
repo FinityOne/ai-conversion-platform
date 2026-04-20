@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
+import { INDUSTRY_GROUPS } from "@/lib/industry-config";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -33,6 +34,7 @@ interface UserProfile {
   years_in_business: number | null;
   service_area: string | null;
   timezone: string | null;
+  business_industry: string | null;
 }
 
 // ── Palette ───────────────────────────────────────────────────────────────────
@@ -300,12 +302,16 @@ function PersonalSection({ profile, onChange }: { profile: UserProfile; onChange
 // ── Section: Business Identity ────────────────────────────────────────────────
 
 function BusinessIdentitySection({ profile, onChange }: { profile: UserProfile; onChange: (p: Partial<UserProfile>) => void }) {
-  const [logo,        setLogo]     = useState(profile.business_logo_url);
-  const [bizName,     setBizName]  = useState(profile.business_name ?? "");
-  const [tagline,     setTagline]  = useState(profile.business_tagline ?? "");
-  const [description, setDesc]     = useState(profile.business_description ?? "");
-  const [nameWarning, setNameWarn] = useState(false);
-  const [saveState,   setSave]     = useState<SaveState>("idle");
+  const [logo,        setLogo]      = useState(profile.business_logo_url);
+  const [bizName,     setBizName]   = useState(profile.business_name ?? "");
+  const [tagline,     setTagline]   = useState(profile.business_tagline ?? "");
+  const [description, setDesc]      = useState(profile.business_description ?? "");
+  const [industry,    setIndustry]  = useState(profile.business_industry ?? "");
+  const [nameWarning, setNameWarn]  = useState(false);
+  const [saveState,   setSave]      = useState<SaveState>("idle");
+
+  // Derive the selected group label for the hint badge
+  const selectedGroup = INDUSTRY_GROUPS.find(g => g.items.includes(industry));
 
   async function save() {
     setSave("saving");
@@ -314,10 +320,11 @@ function BusinessIdentitySection({ profile, onChange }: { profile: UserProfile; 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          business_name: bizName || null,
-          business_tagline: tagline || null,
+          business_name:        bizName     || null,
+          business_tagline:     tagline     || null,
           business_description: description || null,
-          business_logo_url: logo,
+          business_logo_url:    logo,
+          business_industry:    industry    || null,
         }),
       });
       if (!res.ok) throw new Error();
@@ -376,15 +383,44 @@ function BusinessIdentitySection({ profile, onChange }: { profile: UserProfile; 
         </div>
       </div>
 
-      <Field label="Business Description" hint="2–4 sentences shown on your landing page and email footer">
-        <textarea
-          value={description}
-          onChange={e => setDesc(e.target.value)}
-          rows={3}
-          placeholder="Tell potential customers what makes your business stand out…"
-          style={{ ...INP, resize: "vertical", fontFamily: "inherit", lineHeight: 1.6 } as React.CSSProperties}
-        />
+      {/* Industry selector */}
+      <Field label="Business Industry" hint="Personalizes your intake website — services, headline, images, and CTAs all adapt to your industry">
+        <div style={{ position: "relative" }}>
+          <select
+            value={industry}
+            onChange={e => setIndustry(e.target.value)}
+            style={{ ...INP, appearance: "none", paddingRight: 32, cursor: "pointer" }}
+          >
+            <option value="">Select your industry…</option>
+            {INDUSTRY_GROUPS.map(g => (
+              <optgroup key={g.group} label={g.group}>
+                {g.items.map(item => (
+                  <option key={item} value={item}>{item}</option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <i className="fa-solid fa-chevron-down" style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: MUTED, pointerEvents: "none" }} />
+        </div>
+        {selectedGroup && (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 8, padding: "4px 10px", borderRadius: 20, background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.2)" }}>
+            <i className={`fa-solid ${selectedGroup.icon}`} style={{ fontSize: 11, color: ORANGE }} />
+            <span style={{ fontSize: 11, fontWeight: 700, color: ORANGE }}>{selectedGroup.group}</span>
+          </div>
+        )}
       </Field>
+
+      <div style={{ marginTop: 20 }}>
+        <Field label="Business Description" hint="2–4 sentences shown on your landing page and email footer">
+          <textarea
+            value={description}
+            onChange={e => setDesc(e.target.value)}
+            rows={3}
+            placeholder="Tell potential customers what makes your business stand out…"
+            style={{ ...INP, resize: "vertical", fontFamily: "inherit", lineHeight: 1.6 } as React.CSSProperties}
+          />
+        </Field>
+      </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
         <SaveBtn state={saveState} onClick={save} />

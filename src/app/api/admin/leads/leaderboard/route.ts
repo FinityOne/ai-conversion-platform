@@ -56,7 +56,7 @@ export async function GET() {
   const startOfMonth  = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const nowIso        = now.toISOString();
 
-  const [{ data: leads }, { data: activities }, { data: recentConverts }] = await Promise.all([
+  const [{ data: leads }, { data: activities }, { data: recentConverts }, { data: profiles }] = await Promise.all([
     sb.from("internal_leads")
       .select("id, assigned_to, status, next_follow_up, converted_at, updated_at, first_name, last_name, revenue_estimate")
       .not("assigned_to", "is", null),
@@ -71,13 +71,22 @@ export async function GET() {
       .gte("converted_at", sevenDaysAgo)
       .order("converted_at", { ascending: false })
       .limit(10),
+    sb.from("profiles")
+      .select("email, first_name, last_name"),
   ]);
+
+  const profileMap: Record<string, string> = {};
+  for (const p of (profiles ?? [])) {
+    if (!p.email) continue;
+    const name = [p.first_name, p.last_name].filter(Boolean).join(" ").trim();
+    if (name) profileMap[p.email] = name;
+  }
 
   const reps: Record<string, RepScore> = {};
 
   function ensureRep(email: string) {
     if (!reps[email]) {
-      const display_name = email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const display_name = profileMap[email] || email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
       reps[email] = {
         email, display_name,
         leads_assigned: 0, by_status: {},

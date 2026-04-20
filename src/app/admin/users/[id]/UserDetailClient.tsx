@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { UserDetail, UserLead, UserEmailLog } from "@/lib/admin";
 import type { PlanId, GrantType } from "@/lib/subscriptions";
 import { PLANS, GRANT_LABELS } from "@/lib/subscriptions";
+import { INDUSTRY_GROUPS } from "@/lib/industry-config";
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 const TEXT   = "#0f172a";
@@ -651,11 +652,263 @@ function AccessTab({ user, onUserUpdated }: { user: UserDetail; onUserUpdated: (
   );
 }
 
+// ── Business Profile Tab ──────────────────────────────────────────────────────
+function BusinessProfileTab({ user, onUserUpdated }: { user: UserDetail; onUserUpdated: (u: Partial<UserDetail>) => void }) {
+  const intakeUrl = user.intake_slug
+    ? `https://clozeflow.com/intake/${user.intake_slug}`
+    : `https://clozeflow.com/intake/${user.id}`;
+
+  const [copied, setCopied] = useState(false);
+
+  function copyUrl() {
+    navigator.clipboard.writeText(intakeUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  // ── Personal section ──
+  const [pFirst,   setPFirst]   = useState(user.first_name   ?? "");
+  const [pLast,    setPLast]    = useState(user.last_name    ?? "");
+  const [pPhone,   setPPhone]   = useState(user.phone        ?? "");
+  const [pState,   setPState]   = useState<"idle"|"saving"|"ok"|"err">("idle");
+  const [pMsg,     setPMsg]     = useState("");
+
+  // ── Business Identity section ──
+  const [bName,   setBName]   = useState(user.business_name     ?? "");
+  const [bInd,    setBInd]    = useState(user.business_industry ?? "");
+  const [bTag,    setBTag]    = useState(user.business_tagline  ?? "");
+  const [bEmail,  setBEmail]  = useState(user.business_email    ?? "");
+  const [bPhone,  setBPhone]  = useState(user.business_phone    ?? "");
+  const [bSlug,   setBSlug]   = useState(user.intake_slug       ?? "");
+  const [biState, setBiState] = useState<"idle"|"saving"|"ok"|"err">("idle");
+  const [biMsg,   setBiMsg]   = useState("");
+
+  // ── Business Operations section ──
+  const [oAddr,  setOAddr]  = useState(user.business_address  ?? "");
+  const [oCity,  setOCity]  = useState(user.business_city     ?? "");
+  const [oState, setOState] = useState(user.business_state    ?? "");
+  const [oZip,   setOZip]   = useState(user.business_zip      ?? "");
+  const [oArea,  setOArea]  = useState(user.service_area      ?? "");
+  const [oYears, setOYears] = useState(user.years_in_business?.toString() ?? "");
+  const [oLic,   setOLic]   = useState(user.business_license  ?? "");
+  const [oDesc,  setODesc]  = useState(user.business_description ?? "");
+  const [ooState, setOoState] = useState<"idle"|"saving"|"ok"|"err">("idle");
+  const [ooMsg,   setOoMsg]   = useState("");
+
+  // ── Online Presence section ──
+  const [nWeb,   setNWeb]   = useState(user.business_website        ?? "");
+  const [nInsta, setNInsta] = useState(user.business_instagram      ?? "");
+  const [nFb,    setNFb]    = useState(user.business_facebook       ?? "");
+  const [nGoog,  setNGoog]  = useState(user.business_google_profile ?? "");
+  const [npState, setNpState] = useState<"idle"|"saving"|"ok"|"err">("idle");
+  const [npMsg,   setNpMsg]   = useState("");
+
+  async function save(
+    fields: Record<string, unknown>,
+    setState: (s: "idle"|"saving"|"ok"|"err") => void,
+    setMsg: (m: string) => void,
+    optimistic: Partial<UserDetail>,
+  ) {
+    setState("saving");
+    const res = await fetch(`/api/admin/users/${user.id}/profile`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fields),
+    });
+    const d = await res.json();
+    if (!res.ok) { setState("err"); setMsg(d.error ?? "Failed."); return; }
+    setState("ok"); setMsg("Saved!");
+    onUserUpdated(optimistic);
+    setTimeout(() => setState("idle"), 3000);
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "10px 13px", borderRadius: 9,
+    border: `1.5px solid ${BORDER}`, background: "#fff",
+    fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box",
+    fontFamily: "inherit",
+  };
+  const labelStyle: React.CSSProperties = {
+    display: "block", fontSize: 11, fontWeight: 700, color: MUTED,
+    textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 5,
+  };
+
+  function SectionSaveBtn({ state, msg, onClick }: { state: "idle"|"saving"|"ok"|"err"; msg: string; onClick: () => void }) {
+    const btnColor = state === "ok" ? "#16a34a" : state === "err" ? "#dc2626" : INDIGO;
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
+        {msg && state !== "idle" && (
+          <span style={{ fontSize: 13, fontWeight: 600, color: btnColor }}>
+            <i className={`fa-solid ${state === "ok" ? "fa-circle-check" : state === "saving" ? "fa-circle-notch fa-spin" : "fa-circle-exclamation"}`} style={{ marginRight: 5 }} />
+            {msg}
+          </span>
+        )}
+        <button
+          onClick={onClick}
+          disabled={state === "saving"}
+          style={{ padding: "9px 20px", borderRadius: 10, border: "none", background: state === "ok" ? "rgba(22,163,74,0.1)" : `linear-gradient(135deg, ${INDIGO}, #8b5cf6)`, color: state === "ok" ? "#16a34a" : "#fff", fontSize: 13, fontWeight: 700, cursor: state === "saving" ? "not-allowed" : "pointer", opacity: state === "saving" ? 0.75 : 1 }}
+        >
+          {state === "saving" ? "Saving…" : state === "ok" ? "✓ Saved" : "Save Changes"}
+        </button>
+      </div>
+    );
+  }
+
+  const sectionStyle: React.CSSProperties = { background: CARD, border: `1px solid ${BORDER}`, borderRadius: 18, padding: "22px 24px", marginBottom: 16 };
+  const sectionTitle: React.CSSProperties = { margin: "0 0 4px", fontSize: 15, fontWeight: 900, color: TEXT };
+  const sectionSub: React.CSSProperties   = { margin: "0 0 18px", fontSize: 13, color: MUTED };
+  const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 };
+
+  return (
+    <div>
+      {/* ── Intake Site Card ── */}
+      <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", borderRadius: 18, padding: "22px 24px", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(99,102,241,0.25)", border: "1px solid rgba(99,102,241,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <i className="fa-solid fa-globe" style={{ color: "#a5b4fc", fontSize: 15 }} />
+          </div>
+          <div>
+            <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "rgba(165,180,252,0.7)", textTransform: "uppercase", letterSpacing: "1px" }}>White-Label Intake Website</p>
+            <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#fff" }}>Live at this URL</p>
+          </div>
+        </div>
+
+        <div style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: "12px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: "#a5b4fc", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontFamily: "monospace" }}>{intakeUrl}</span>
+          <button onClick={copyUrl} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(165,180,252,0.3)", background: "rgba(165,180,252,0.1)", color: copied ? "#6ee7b7" : "#a5b4fc", fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>
+            {copied ? "✓ Copied!" : "Copy Link"}
+          </button>
+          <a href={intakeUrl} target="_blank" rel="noopener noreferrer" style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(165,180,252,0.3)", background: "rgba(165,180,252,0.1)", color: "#a5b4fc", fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0, textDecoration: "none", whiteSpace: "nowrap" }}>
+            <i className="fa-solid fa-arrow-up-right-from-square" style={{ marginRight: 5, fontSize: 10 }} />Preview
+          </a>
+        </div>
+
+        <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
+          This page is live immediately. Complete the business profile below to populate it with the correct branding and content.
+        </p>
+      </div>
+
+      {/* ── Personal Info ── */}
+      <div style={sectionStyle}>
+        <p style={sectionTitle}><i className="fa-solid fa-user" style={{ color: INDIGO, marginRight: 8 }} />Personal Info</p>
+        <p style={sectionSub}>Name and contact details for this account holder.</p>
+        <div style={grid2}>
+          <div><label style={labelStyle}>First Name</label><input style={inputStyle} value={pFirst} onChange={e => setPFirst(e.target.value)} placeholder="Jane" /></div>
+          <div><label style={labelStyle}>Last Name</label><input style={inputStyle} value={pLast} onChange={e => setPLast(e.target.value)} placeholder="Smith" /></div>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={labelStyle}>Phone</label>
+          <input style={inputStyle} value={pPhone} onChange={e => setPPhone(e.target.value)} placeholder="+1 (555) 000-0000" />
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={labelStyle}>Email (read-only)</label>
+          <input style={{ ...inputStyle, background: BG, color: MUTED }} value={user.email} readOnly />
+        </div>
+        <SectionSaveBtn state={pState} msg={pMsg} onClick={() => save(
+          { first_name: pFirst, last_name: pLast, phone: pPhone },
+          setPState, setPMsg,
+          { first_name: pFirst || null, last_name: pLast || null, phone: pPhone || null },
+        )} />
+      </div>
+
+      {/* ── Business Identity ── */}
+      <div style={sectionStyle}>
+        <p style={sectionTitle}><i className="fa-solid fa-building" style={{ color: "#f59e0b", marginRight: 8 }} />Business Identity</p>
+        <p style={sectionSub}>Core branding details displayed on the intake website.</p>
+        <div style={grid2}>
+          <div><label style={labelStyle}>Business Name</label><input style={inputStyle} value={bName} onChange={e => setBName(e.target.value)} placeholder="Smith Roofing Co." /></div>
+          <div>
+            <label style={labelStyle}>Industry</label>
+            <select style={{ ...inputStyle, appearance: "none", cursor: "pointer" }} value={bInd} onChange={e => setBInd(e.target.value)}>
+              <option value="">Select industry…</option>
+              {INDUSTRY_GROUPS.map(g => (
+                <optgroup key={g.group} label={g.group}>
+                  {g.items.map(item => <option key={item} value={item}>{item}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={labelStyle}>Tagline</label>
+          <input style={inputStyle} value={bTag} onChange={e => setBTag(e.target.value)} placeholder="Austin's most trusted roofer since 2010" />
+        </div>
+        <div style={{ ...grid2, marginTop: 12 }}>
+          <div><label style={labelStyle}>Business Email</label><input style={inputStyle} type="email" value={bEmail} onChange={e => setBEmail(e.target.value)} placeholder="contact@smithroofing.com" /></div>
+          <div><label style={labelStyle}>Business Phone</label><input style={inputStyle} value={bPhone} onChange={e => setBPhone(e.target.value)} placeholder="(512) 555-0123" /></div>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={labelStyle}>Custom Intake Slug <span style={{ fontSize: 10, fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(optional — e.g. <code>smith-roofing</code> → clozeflow.com/intake/smith-roofing)</span></label>
+          <input style={inputStyle} value={bSlug} onChange={e => setBSlug(e.target.value)} placeholder="smith-roofing" />
+        </div>
+        <SectionSaveBtn state={biState} msg={biMsg} onClick={() => save(
+          { business_name: bName, business_industry: bInd, business_tagline: bTag, business_email: bEmail, business_phone: bPhone, intake_slug: bSlug || null },
+          setBiState, setBiMsg,
+          { business_name: bName || null, business_industry: bInd || null, business_tagline: bTag || null, business_email: bEmail || null, business_phone: bPhone || null, intake_slug: bSlug || null },
+        )} />
+      </div>
+
+      {/* ── Business Operations ── */}
+      <div style={sectionStyle}>
+        <p style={sectionTitle}><i className="fa-solid fa-map-location-dot" style={{ color: "#22c55e", marginRight: 8 }} />Business Operations</p>
+        <p style={sectionSub}>Location, service area, and licensing details.</p>
+        <div style={{ marginBottom: 12 }}>
+          <label style={labelStyle}>Street Address</label>
+          <input style={inputStyle} value={oAddr} onChange={e => setOAddr(e.target.value)} placeholder="123 Main St" />
+        </div>
+        <div style={{ ...grid2 }}>
+          <div><label style={labelStyle}>City</label><input style={inputStyle} value={oCity} onChange={e => setOCity(e.target.value)} placeholder="Austin" /></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div><label style={labelStyle}>State</label><input style={inputStyle} value={oState} onChange={e => setOState(e.target.value)} placeholder="TX" /></div>
+            <div><label style={labelStyle}>ZIP</label><input style={inputStyle} value={oZip} onChange={e => setOZip(e.target.value)} placeholder="78701" /></div>
+          </div>
+        </div>
+        <div style={{ ...grid2, marginTop: 12 }}>
+          <div><label style={labelStyle}>Service Area</label><input style={inputStyle} value={oArea} onChange={e => setOArea(e.target.value)} placeholder="Greater Austin Metro" /></div>
+          <div><label style={labelStyle}>Years in Business</label><input style={inputStyle} type="number" min={0} value={oYears} onChange={e => setOYears(e.target.value)} placeholder="12" /></div>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={labelStyle}>License Number</label>
+          <input style={inputStyle} value={oLic} onChange={e => setOLic(e.target.value)} placeholder="TX-RLC-123456" />
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <label style={labelStyle}>Business Description</label>
+          <textarea style={{ ...inputStyle, resize: "vertical", minHeight: 80 } as React.CSSProperties} value={oDesc} onChange={e => setODesc(e.target.value)} placeholder="Describe the business, specialties, and what sets them apart…" />
+        </div>
+        <SectionSaveBtn state={ooState} msg={ooMsg} onClick={() => save(
+          { business_address: oAddr, business_city: oCity, business_state: oState, business_zip: oZip, service_area: oArea, years_in_business: oYears ? Number(oYears) : null, business_license: oLic, business_description: oDesc },
+          setOoState, setOoMsg,
+          { business_address: oAddr || null, business_city: oCity || null, business_state: oState || null, business_zip: oZip || null, service_area: oArea || null, years_in_business: oYears ? Number(oYears) : null, business_license: oLic || null, business_description: oDesc || null },
+        )} />
+      </div>
+
+      {/* ── Online Presence ── */}
+      <div style={sectionStyle}>
+        <p style={sectionTitle}><i className="fa-solid fa-share-nodes" style={{ color: "#ec4899", marginRight: 8 }} />Online Presence</p>
+        <p style={sectionSub}>Website and social links displayed on the intake page.</p>
+        <div style={grid2}>
+          <div><label style={labelStyle}>Website</label><input style={inputStyle} value={nWeb} onChange={e => setNWeb(e.target.value)} placeholder="https://smithroofing.com" /></div>
+          <div><label style={labelStyle}>Google Business Profile URL</label><input style={inputStyle} value={nGoog} onChange={e => setNGoog(e.target.value)} placeholder="https://g.page/..." /></div>
+        </div>
+        <div style={{ ...grid2, marginTop: 12 }}>
+          <div><label style={labelStyle}>Instagram Handle</label><input style={inputStyle} value={nInsta} onChange={e => setNInsta(e.target.value)} placeholder="smithroofing" /></div>
+          <div><label style={labelStyle}>Facebook Page URL</label><input style={inputStyle} value={nFb} onChange={e => setNFb(e.target.value)} placeholder="https://facebook.com/smithroofing" /></div>
+        </div>
+        <SectionSaveBtn state={npState} msg={npMsg} onClick={() => save(
+          { business_website: nWeb, business_instagram: nInsta, business_facebook: nFb, business_google_profile: nGoog },
+          setNpState, setNpMsg,
+          { business_website: nWeb || null, business_instagram: nInsta || null, business_facebook: nFb || null, business_google_profile: nGoog || null },
+        )} />
+      </div>
+    </div>
+  );
+}
+
 // ── Root Component ────────────────────────────────────────────────────────────
 export default function UserDetailClient({ user: initialUser }: { user: UserDetail }) {
   const router = useRouter();
   const [user, setUser] = useState(initialUser);
-  const [tab,  setTab]  = useState<"overview" | "leads" | "emails" | "access">("overview");
+  const [tab,  setTab]  = useState<"overview" | "profile" | "leads" | "emails" | "access">("overview");
 
   const color = avatarColor(user.id);
   const inits = initials(user);
@@ -668,10 +921,11 @@ export default function UserDetailClient({ user: initialUser }: { user: UserDeta
   }
 
   const tabs = [
-    { id: "overview", label: "Overview",    icon: "fa-solid fa-chart-pie"        },
+    { id: "overview", label: "Overview",       icon: "fa-solid fa-chart-pie"     },
+    { id: "profile",  label: "Business Profile", icon: "fa-solid fa-building"    },
     { id: "leads",    label: `Leads (${user.total_leads})`, icon: "fa-solid fa-layer-group" },
-    { id: "emails",   label: `Emails (${user.total_emails})`, icon: "fa-solid fa-envelope"  },
-    { id: "access",   label: "Access & Permissions", icon: "fa-solid fa-key"               },
+    { id: "emails",   label: `Emails (${user.total_emails})`, icon: "fa-solid fa-envelope" },
+    { id: "access",   label: "Access",         icon: "fa-solid fa-key"           },
   ] as const;
 
   return (
@@ -711,10 +965,15 @@ export default function UserDetailClient({ user: initialUser }: { user: UserDeta
             <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: hc }}>{healthLabel(user.health_score)}</p>
           </div>
         </div>
-        {/* Quick action */}
-        <button onClick={() => setTab("access")} style={{ padding: "10px 16px", borderRadius: 10, border: `1px solid ${BORDER}`, background: "#fff", color: TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7, flexShrink: 0 }}>
-          <i className="fa-solid fa-key" style={{ color: INDIGO, fontSize: 12 }} />Manage Access
-        </button>
+        {/* Quick actions */}
+        <div style={{ display: "flex", gap: 8, flexShrink: 0, flexWrap: "wrap" }}>
+          <button onClick={() => setTab("profile")} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${BORDER}`, background: "#fff", color: TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <i className="fa-solid fa-globe" style={{ color: "#22c55e", fontSize: 12 }} />Intake Site
+          </button>
+          <button onClick={() => setTab("access")} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${BORDER}`, background: "#fff", color: TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <i className="fa-solid fa-key" style={{ color: INDIGO, fontSize: 12 }} />Manage Access
+          </button>
+        </div>
       </div>
 
       {/* Tab bar */}
@@ -729,6 +988,7 @@ export default function UserDetailClient({ user: initialUser }: { user: UserDeta
 
       {/* Tab content */}
       {tab === "overview" && <OverviewTab user={user} />}
+      {tab === "profile"  && <BusinessProfileTab user={user} onUserUpdated={handleUserUpdated} />}
       {tab === "leads"    && <LeadsTab leads={user.leads} leadsByStatus={user.leads_by_status} />}
       {tab === "emails"   && <EmailsTab emails={user.email_log} totalEmails={user.total_emails} emailsOpened={user.emails_opened} emailsClicked={user.emails_clicked} />}
       {tab === "access"   && <AccessTab user={user} onUserUpdated={handleUserUpdated} />}

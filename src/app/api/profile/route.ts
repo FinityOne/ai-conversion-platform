@@ -15,7 +15,7 @@ export async function PATCH(req: NextRequest) {
     "business_address", "business_city", "business_state", "business_zip",
     "business_tagline", "business_description", "business_license",
     "business_instagram", "business_facebook", "business_google_profile",
-    "years_in_business", "service_area", "timezone",
+    "years_in_business", "service_area", "timezone", "business_industry",
   ] as const;
 
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };

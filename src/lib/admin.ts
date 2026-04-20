@@ -408,6 +408,24 @@ export interface UserDetail {
   intake_slug:         string | null;
   wants_setup_call:    boolean;
   profile_created_at:  string;
+  // Business profile
+  business_tagline:        string | null;
+  business_description:    string | null;
+  business_email:          string | null;
+  business_phone:          string | null;
+  business_address:        string | null;
+  business_city:           string | null;
+  business_state:          string | null;
+  business_zip:            string | null;
+  business_website:        string | null;
+  business_instagram:      string | null;
+  business_facebook:       string | null;
+  business_google_profile: string | null;
+  years_in_business:       number | null;
+  service_area:            string | null;
+  business_license:        string | null;
+  business_logo_url:       string | null;
+  business_industry:       string | null;
   // Auth state
   last_sign_in_at:     string | null;
   email_confirmed_at:  string | null;
@@ -573,6 +591,24 @@ export async function getAdminUserDetail(userId: string): Promise<UserDetail | n
     role: profile.role, intake_slug: profile.intake_slug,
     wants_setup_call: profile.wants_setup_call,
     profile_created_at: profile.created_at,
+    // Business profile fields
+    business_tagline:        profile.business_tagline        ?? null,
+    business_description:    profile.business_description    ?? null,
+    business_email:          profile.business_email          ?? null,
+    business_phone:          profile.business_phone          ?? null,
+    business_address:        profile.business_address        ?? null,
+    business_city:           profile.business_city           ?? null,
+    business_state:          profile.business_state          ?? null,
+    business_zip:            profile.business_zip            ?? null,
+    business_website:        profile.business_website        ?? null,
+    business_instagram:      profile.business_instagram      ?? null,
+    business_facebook:       profile.business_facebook       ?? null,
+    business_google_profile: profile.business_google_profile ?? null,
+    years_in_business:       profile.years_in_business       ?? null,
+    service_area:            profile.service_area            ?? null,
+    business_license:        profile.business_license        ?? null,
+    business_logo_url:       profile.business_logo_url       ?? null,
+    business_industry:       profile.business_industry       ?? null,
     last_sign_in_at:    stats?.last_sign_in_at    ?? null,
     email_confirmed_at: stats?.email_confirmed_at ?? null,
     banned_until:       stats?.banned_until       ?? null,

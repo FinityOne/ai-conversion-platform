@@ -3,6 +3,7 @@ import Nav from "@/components/Nav";
 import MarketingFooter from "@/components/MarketingFooter";
 import ChatWidget from "@/components/ChatWidget";
 import TopBanner from "@/components/TopBanner";
+import MarketingSocialProof from "@/components/MarketingSocialProof";
 
 export const metadata: Metadata = {
   // Title template applies to every child page in this route group.
@@ -37,6 +38,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <main style={{ paddingTop: "calc(64px + var(--banner-h, 36px))" }}>{children}</main>
       <MarketingFooter />
       <ChatWidget />
+      <MarketingSocialProof />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import PhoneInput from "@/components/PhoneInput";
 import { formatPhoneE164 } from "@/lib/phone";
 
-const JOB_TYPES = [
+const DEFAULT_JOB_TYPES = [
   "Roofing",
   "Siding & Gutters",
   "Windows & Doors",
@@ -21,7 +21,9 @@ const JOB_TYPES = [
 interface Props {
   slug: string;
   businessName: string;
-  accent: string; // hex color, determined server-side from slug
+  accent: string;
+  jobTypes?: string[];
+  ctaLabel?: string;
 }
 
 const inputStyle = (accent: string, focused: boolean): React.CSSProperties => ({
@@ -54,7 +56,8 @@ function Field({
   );
 }
 
-export default function IntakeForm({ slug, businessName, accent }: Props) {
+export default function IntakeForm({ slug, businessName, accent, jobTypes, ctaLabel }: Props) {
+  const JOB_TYPES = jobTypes ?? DEFAULT_JOB_TYPES;
   const [name,        setName]        = useState("");
   const [phone,       setPhone]       = useState("");
   const [email,       setEmail]       = useState("");
@@ -238,7 +241,7 @@ export default function IntakeForm({ slug, businessName, accent }: Props) {
           letterSpacing: "0.2px",
         }}
       >
-        {loading ? "Sending…" : "Get My Free Estimate →"}
+        {loading ? "Sending…" : (ctaLabel ?? "Get My Free Estimate") + " →"}
       </button>
 
       <p style={{ margin: 0, textAlign: "center", fontSize: 13, color: "#a8a29e" }}>

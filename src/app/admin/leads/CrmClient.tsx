@@ -593,12 +593,13 @@ function SalesLeaderboard() {
 
           {/* Name + mini stats */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 1 }}>
               <span style={{ fontSize: isTop3 ? 15 : 13, fontWeight: 800, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rep.display_name}</span>
               {rep.streak === 3 && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 10, background: "rgba(245,158,11,0.15)", color: "#d97706" }}>STREAK ×1.35</span>}
               {rep.streak === 2 && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 10, background: "rgba(99,102,241,0.1)", color: INDIGO }}>STREAK ×1.2</span>}
               {isGhost && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 10, background: "rgba(100,116,139,0.12)", color: MUTED }}>COLD</span>}
             </div>
+            <div style={{ fontSize: 10, color: MUTED, marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rep.email}</div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <span style={{ fontSize: 11, color: MUTED }}><strong style={{ color: TEXT }}>{rep.leads_assigned}</strong> leads</span>
               <span style={{ fontSize: 11, color: MUTED }}><strong style={{ color: "#22c55e" }}>{rep.by_status.converted ?? 0}</strong> won</span>
