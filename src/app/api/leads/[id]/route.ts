@@ -31,6 +31,11 @@ export async function PATCH(
     }
   }
 
+  // custom_fields — merge patch: only touch provided keys
+  if (body.custom_fields && typeof body.custom_fields === "object" && !Array.isArray(body.custom_fields)) {
+    updates.custom_fields = body.custom_fields;
+  }
+
   if (!updates.name && "name" in updates) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }

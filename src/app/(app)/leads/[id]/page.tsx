@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getLeadById, type EmailLogEntry, type ProjectDetails } from "@/lib/leads";
+import { getLeadById, type EmailLogEntry, type ProjectDetails, type CustomFieldDef } from "@/lib/leads";
 import { getStageConfig, scoreColor, scoreBgColor, scoreBorderColor, type LeadStatus } from "@/lib/scoring";
 import { formatPhoneDisplay } from "@/lib/phone";
 import SendFollowUpButton from "@/components/SendFollowUpButton";
 import SendBookingButton from "@/components/SendBookingButton";
 import EditLeadModal from "@/components/EditLeadModal";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseServiceClient } from "@/lib/supabase-service";
 import { formatDateFull, formatTime12 } from "@/lib/bookings";
 
@@ -343,6 +344,90 @@ function ProjectDetailsMini({ pd, siteUrl }: { pd: ProjectDetails; siteUrl: stri
   );
 }
 
+// ─── Custom Fields Section ───────────────────────────────────────────────────
+
+const TYPE_ICON: Record<string, string> = {
+  text:     "fa-font",
+  dropdown: "fa-list",
+  boolean:  "fa-toggle-on",
+};
+const TYPE_LABEL: Record<string, string> = {
+  text:     "Text",
+  dropdown: "Dropdown",
+  boolean:  "Yes / No",
+};
+
+function CustomFieldsSection({
+  defs,
+  values,
+}: {
+  defs: CustomFieldDef[];
+  values: Record<string, string | boolean | null>;
+}) {
+  if (defs.length === 0) return null;
+
+  return (
+    <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden", marginBottom: 20 }}>
+      {/* Header */}
+      <div style={{ padding: "12px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 8 }}>
+        <i className="fa-solid fa-table-columns" style={{ fontSize: 12, color: "#D35400" }} />
+        <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>Custom Fields</span>
+        <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "#f9f7f4", color: MUTED, border: `1px solid ${BORDER}` }}>
+          {defs.length} field{defs.length !== 1 ? "s" : ""}
+        </span>
+      </div>
+
+      {/* Field rows */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+        {defs.map((def, i) => {
+          const raw   = values[def.key];
+          const isEmpty = raw === undefined || raw === null || raw === "";
+          let display: string;
+          if (isEmpty) {
+            display = "—";
+          } else if (def.type === "boolean") {
+            display = raw === true || raw === "true" ? "Yes" : "No";
+          } else {
+            display = String(raw);
+          }
+
+          const isLast = i >= defs.length - (defs.length % 2 === 0 ? 2 : 1);
+          const isOdd  = i % 2 === 0;
+
+          return (
+            <div
+              key={def.key}
+              style={{
+                padding: "12px 16px",
+                borderBottom: isLast ? "none" : `1px solid ${BORDER}`,
+                borderRight: isOdd && i < defs.length - 1 ? `1px solid ${BORDER}` : "none",
+              }}
+            >
+              {/* Label row */}
+              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+                <i
+                  className={`fa-solid ${TYPE_ICON[def.type] ?? "fa-font"}`}
+                  style={{ fontSize: 10, color: "#D35400" }}
+                />
+                <span style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  {def.label}
+                </span>
+                <span style={{ marginLeft: 4, fontSize: 10, fontWeight: 600, padding: "1px 6px", borderRadius: 10, background: "#f0ede8", color: "#a8a29e" }}>
+                  {TYPE_LABEL[def.type] ?? def.type}
+                </span>
+              </div>
+              {/* Value */}
+              <p style={{ margin: 0, fontSize: 14, fontWeight: isEmpty ? 400 : 600, color: isEmpty ? "#c4bfb8" : TEXT }}>
+                {display}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Step action card shell ──────────────────────────────────────────────────
 
 function StepCard({
@@ -397,6 +482,15 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   if (!lead) notFound();
+
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("custom_field_defs")
+    .eq("id", user!.id)
+    .single();
+  const customDefs: CustomFieldDef[] = (profileData?.custom_field_defs as CustomFieldDef[]) ?? [];
 
   const sb = createSupabaseServiceClient();
   const { data: confirmedBooking } = await sb
@@ -519,6 +613,12 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
           <p style={{ margin: "8px 0 0", fontSize: 13, color: MUTED, lineHeight: 1.5 }}>{lead.description}</p>
         )}
       </div>
+
+      {/* ── Custom Fields ── */}
+      <CustomFieldsSection
+        defs={customDefs}
+        values={(lead.custom_fields ?? {}) as Record<string, string | boolean | null>}
+      />
 
       {/* ── Next Steps section label ── */}
       {!isTerminal && (

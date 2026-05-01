@@ -43,4 +43,4 @@ npm run lint   # ESLint
 ```
 
 ## Additional Notes
-We are using the subabase mcp with the project called clozeflow.
+We are using the subabase mcp with the project called CloseFlow.

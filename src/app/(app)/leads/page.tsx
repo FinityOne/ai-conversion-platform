@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-import { getLeads, getLeadStats, buildSummaryBlurb, type Lead } from "@/lib/leads";
+import { getLeads, getLeadStats, buildSummaryBlurb, type Lead, type CustomFieldDef } from "@/lib/leads";
 import { getStageConfig, scoreColor, scoreBgColor, scoreBorderColor, type LeadStatus } from "@/lib/scoring";
 import { getSubscription, getLeadCountThisMonth, PLANS, type PlanId } from "@/lib/subscriptions";
 import AddLeadModal from "@/components/AddLeadModal";
@@ -65,7 +65,11 @@ function ScoreBadge({ score }: { score: number }) {
   );
 }
 
-function LeadCard({ lead }: { lead: Lead }) {
+function LeadCard({ lead, customDefs }: { lead: Lead; customDefs: CustomFieldDef[] }) {
+  const cfEntries = customDefs
+    .filter(d => lead.custom_fields?.[d.key] != null && lead.custom_fields[d.key] !== "")
+    .slice(0, 2); // show max 2 on card to keep it compact
+
   return (
     <Link href={`/leads/${lead.id}`} style={{ textDecoration: "none", display: "block" }}>
       <div style={{
@@ -76,7 +80,7 @@ function LeadCard({ lead }: { lead: Lead }) {
         {/* Score circle */}
         <ScoreBadge score={lead.score} />
 
-        {/* Name + job type + last activity */}
+        {/* Name + job type + last activity + custom chips */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800, color: TEXT, lineHeight: 1.2 }}>
             {lead.name}
@@ -88,6 +92,27 @@ function LeadCard({ lead }: { lead: Lead }) {
             <i className="fa-regular fa-clock" style={{ marginRight: 4 }} />
             {timeAgo(lead.last_activity_at ?? lead.created_at)}
           </p>
+          {cfEntries.length > 0 && (
+            <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap", gap: 5 }}>
+              {cfEntries.map(d => {
+                const val = lead.custom_fields![d.key];
+                const display = d.type === "boolean"
+                  ? (val === true || val === "true" ? "✓ " + d.label : null)
+                  : String(val);
+                if (!display) return null;
+                return (
+                  <span key={d.key} style={{
+                    fontSize: 11, fontWeight: 600, padding: "2px 8px",
+                    borderRadius: 20, background: "#f5f3f0",
+                    color: MUTED, border: `1px solid ${BORDER}`,
+                    maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                  }}>
+                    {d.label}: {display}
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Status + chevron */}
@@ -123,11 +148,13 @@ export default async function LeadsPage() {
   const { data: profile } = await supabase
     .from("profiles").select("first_name").eq("id", user!.id).single();
 
-  const [leads, stats, subscription, leadCount] = await Promise.all([
+  const [leads, stats, subscription, leadCount, cfDefsRes] = await Promise.all([
     getLeads(), getLeadStats(),
     getSubscription(user!.id),
     getLeadCountThisMonth(user!.id),
+    supabase.from("profiles").select("custom_field_defs").eq("id", user!.id).single(),
   ]);
+  const customDefs: CustomFieldDef[] = (cfDefsRes.data?.custom_field_defs as CustomFieldDef[]) ?? [];
   const blurb = buildSummaryBlurb(stats, profile?.first_name);
 
   const plan       = (subscription?.plan ?? null) as PlanId | null;
@@ -152,7 +179,7 @@ export default async function LeadsPage() {
           </div>
           <PipelineInfoModal />
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <ImportLeadsModal />
           <AddLeadModal />
         </div>
@@ -253,7 +280,7 @@ export default async function LeadsPage() {
       ) : (
         <>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {activeLeads.map(lead => <LeadCard key={lead.id} lead={lead} />)}
+            {activeLeads.map(lead => <LeadCard key={lead.id} lead={lead} customDefs={customDefs} />)}
           </div>
 
           {/* Closed leads section */}
@@ -263,7 +290,7 @@ export default async function LeadsPage() {
                 Closed
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, opacity: 0.7 }}>
-                {closedLeads.map(lead => <LeadCard key={lead.id} lead={lead} />)}
+                {closedLeads.map(lead => <LeadCard key={lead.id} lead={lead} customDefs={customDefs} />)}
               </div>
             </div>
           )}

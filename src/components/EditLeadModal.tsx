@@ -3,17 +3,19 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { LeadStatus } from "@/lib/scoring";
+import type { CustomFieldDef } from "@/lib/leads";
 import PhoneInput from "@/components/PhoneInput";
 import { formatPhoneE164, formatPhoneDisplay } from "@/lib/phone";
 
 interface LeadFields {
-  id:          string;
-  name:        string;
-  phone:       string | null;
-  email:       string | null;
-  job_type:    string | null;
-  description: string | null;
-  status:      LeadStatus;
+  id:            string;
+  name:          string;
+  phone:         string | null;
+  email:         string | null;
+  job_type:      string | null;
+  description:   string | null;
+  status:        LeadStatus;
+  custom_fields?: Record<string, string | boolean | null>;
 }
 
 interface Props {
@@ -35,6 +37,7 @@ const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
 const ORANGE = "#D35400";
+const BG     = "#F9F7F2";
 
 export default function EditLeadModal({ lead }: Props) {
   const router = useRouter();
@@ -49,7 +52,22 @@ export default function EditLeadModal({ lead }: Props) {
   const [description, setDescription] = useState(lead.description ?? "");
   const [status,      setStatus]      = useState<LeadStatus>(lead.status);
 
-  // Sync fields if lead prop changes (after router.refresh)
+  const [customDefs,   setCustomDefs]   = useState<CustomFieldDef[]>([]);
+  const [customValues, setCustomValues] = useState<Record<string, string | boolean>>(
+    Object.fromEntries(
+      Object.entries(lead.custom_fields ?? {}).map(([k, v]) => [k, v ?? ""])
+    )
+  );
+
+  // Load custom field definitions when modal opens
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/leads/custom-field-defs")
+      .then(r => r.ok ? r.json() : { defs: [] })
+      .then(b => setCustomDefs(b.defs ?? []));
+  }, [open]);
+
+  // Sync fields if lead prop changes
   useEffect(() => {
     setName(lead.name);
     setPhone(formatPhoneDisplay(lead.phone));
@@ -57,9 +75,11 @@ export default function EditLeadModal({ lead }: Props) {
     setJobType(lead.job_type ?? "");
     setDescription(lead.description ?? "");
     setStatus(lead.status);
+    setCustomValues(Object.fromEntries(
+      Object.entries(lead.custom_fields ?? {}).map(([k, v]) => [k, v ?? ""])
+    ));
   }, [lead]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -69,21 +89,37 @@ export default function EditLeadModal({ lead }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  function setCustomValue(key: string, val: string | boolean) {
+    setCustomValues(prev => ({ ...prev, [key]: val }));
+  }
+
   async function handleSave() {
     if (!name.trim()) { setError("Name is required."); return; }
     setSaving(true);
     setError("");
 
+    // Build custom_fields payload — only include defined fields
+    const custom_fields: Record<string, string | boolean | null> = {};
+    for (const def of customDefs) {
+      const val = customValues[def.key];
+      if (def.type === "boolean") {
+        custom_fields[def.key] = val === true || val === "true";
+      } else {
+        custom_fields[def.key] = (typeof val === "string" ? val.trim() : "") || null;
+      }
+    }
+
     const res = await fetch(`/api/leads/${lead.id}`, {
       method:  "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name:        name.trim(),
-        phone:       formatPhoneE164(phone) ?? (phone.trim() || null),
-        email:       email.trim()       || null,
-        job_type:    jobType.trim()     || null,
-        description: description.trim() || null,
+        name:          name.trim(),
+        phone:         formatPhoneE164(phone) ?? (phone.trim() || null),
+        email:         email.trim()       || null,
+        job_type:      jobType.trim()     || null,
+        description:   description.trim() || null,
         status,
+        ...(customDefs.length > 0 ? { custom_fields } : {}),
       }),
     });
 
@@ -101,7 +137,6 @@ export default function EditLeadModal({ lead }: Props) {
 
   return (
     <>
-      {/* Trigger button */}
       <button
         onClick={() => setOpen(true)}
         style={{
@@ -117,7 +152,6 @@ export default function EditLeadModal({ lead }: Props) {
         Edit Lead
       </button>
 
-      {/* Overlay + modal */}
       {open && (
         <div
           onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
@@ -134,7 +168,6 @@ export default function EditLeadModal({ lead }: Props) {
             maxHeight: "90vh", overflowY: "auto",
             boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
           }}>
-            {/* Header */}
             <div style={{
               padding: "20px 24px 16px",
               borderBottom: `1px solid ${BORDER}`,
@@ -157,75 +190,41 @@ export default function EditLeadModal({ lead }: Props) {
               </button>
             </div>
 
-            {/* Form */}
             <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
               {error && (
                 <p style={{ margin: 0, fontSize: 13, color: "#dc2626", fontWeight: 600 }}>{error}</p>
               )}
 
-              {/* Name */}
               <div>
-                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 6 }}>
-                  Name <span style={{ color: ORANGE }}>*</span>
-                </label>
-                <input
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Full name"
-                  style={inputStyle}
-                />
+                <label style={labelStyle}>Name <span style={{ color: ORANGE }}>*</span></label>
+                <input value={name} onChange={e => setName(e.target.value)} placeholder="Full name" style={inputStyle} />
               </div>
 
-              {/* Phone + Email — side by side */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={labelStyle}>🇺🇸 Phone</label>
-                  <PhoneInput
-                    value={phone}
-                    onChange={setPhone}
-                    inputStyle={inputStyle}
-                  />
+                  <PhoneInput value={phone} onChange={setPhone} inputStyle={inputStyle} />
                 </div>
                 <div>
                   <label style={labelStyle}>Email</label>
-                  <input
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="name@email.com"
-                    type="email"
-                    style={inputStyle}
-                  />
+                  <input value={email} onChange={e => setEmail(e.target.value)} placeholder="name@email.com" type="email" style={inputStyle} />
                 </div>
               </div>
 
-              {/* Job Type */}
               <div>
                 <label style={labelStyle}>Job Type</label>
-                <input
-                  value={jobType}
-                  onChange={e => setJobType(e.target.value)}
-                  placeholder="e.g. Roof replacement, HVAC install"
-                  style={inputStyle}
-                />
+                <input value={jobType} onChange={e => setJobType(e.target.value)} placeholder="e.g. Roof replacement, HVAC install" style={inputStyle} />
               </div>
 
-              {/* Status */}
               <div>
                 <label style={labelStyle}>Pipeline Status</label>
-                <select
-                  value={status}
-                  onChange={e => setStatus(e.target.value as LeadStatus)}
-                  style={{ ...inputStyle, cursor: "pointer" }}
-                >
+                <select value={status} onChange={e => setStatus(e.target.value as LeadStatus)} style={{ ...inputStyle, cursor: "pointer" }}>
                   {STATUSES.map(s => (
-                    <option key={s.value} value={s.value}>
-                      {s.emoji} {s.label}
-                    </option>
+                    <option key={s.value} value={s.value}>{s.emoji} {s.label}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Description */}
               <div>
                 <label style={labelStyle}>Notes / Description</label>
                 <textarea
@@ -236,9 +235,27 @@ export default function EditLeadModal({ lead }: Props) {
                   style={{ ...inputStyle, resize: "vertical", minHeight: 80 }}
                 />
               </div>
+
+              {/* Custom fields */}
+              {customDefs.length > 0 && (
+                <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 16 }}>
+                  <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 800, color: ORANGE, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                    Custom Fields
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {customDefs.map(def => (
+                      <CustomFieldInput
+                        key={def.key}
+                        def={def}
+                        value={customValues[def.key]}
+                        onChange={val => setCustomValue(def.key, val)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Footer */}
             <div style={{
               padding: "16px 24px 20px",
               borderTop: `1px solid ${BORDER}`,
@@ -279,11 +296,75 @@ export default function EditLeadModal({ lead }: Props) {
   );
 }
 
+// ─── Custom field input renderer ─────────────────────────────────────────────
+
+function CustomFieldInput({
+  def, value, onChange,
+}: {
+  def: CustomFieldDef;
+  value: string | boolean | undefined;
+  onChange: (val: string | boolean) => void;
+}) {
+  const strVal = value === true ? "true" : value === false ? "false" : (value as string) ?? "";
+  const boolVal = value === true || value === "true";
+
+  return (
+    <div>
+      <label style={labelStyle}>{def.label}</label>
+      {def.type === "text" && (
+        <input
+          value={strVal}
+          onChange={e => onChange(e.target.value)}
+          placeholder={`Enter ${def.label.toLowerCase()}…`}
+          style={inputStyle}
+        />
+      )}
+      {def.type === "dropdown" && (
+        <select
+          value={strVal}
+          onChange={e => onChange(e.target.value)}
+          style={{ ...inputStyle, cursor: "pointer" }}
+        >
+          <option value="">— Select —</option>
+          {(def.options ?? []).map(o => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+      )}
+      {def.type === "boolean" && (
+        <div style={{ display: "flex", gap: 8 }}>
+          {[
+            { val: true,  label: "Yes" },
+            { val: false, label: "No"  },
+          ].map(opt => (
+            <button
+              key={String(opt.val)}
+              type="button"
+              onClick={() => onChange(opt.val)}
+              style={{
+                flex: 1, padding: "10px", borderRadius: 10,
+                border: `1.5px solid ${boolVal === opt.val ? "#D35400" : BORDER}`,
+                background: boolVal === opt.val ? "#fff8f5" : "#fff",
+                color: boolVal === opt.val ? "#D35400" : MUTED,
+                fontSize: 14, fontWeight: boolVal === opt.val ? 700 : 500,
+                cursor: "pointer",
+                transition: "all 0.12s",
+              }}
+            >
+              {opt.val ? "✓ Yes" : "✗ No"}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "11px 13px",
   borderRadius: 10, border: "1.5px solid #e6e2db",
   fontSize: 14, color: "#2C3E50",
-  background: "#F9F7F2",
+  background: BG,
   outline: "none", boxSizing: "border-box",
   fontFamily: "inherit",
 };

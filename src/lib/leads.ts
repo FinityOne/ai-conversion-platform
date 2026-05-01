@@ -106,6 +106,15 @@ async function syncBookedToClosedWon(
 
 export type { LeadStatus };
 
+export type CustomFieldKey = "cf_1" | "cf_2" | "cf_3";
+
+export interface CustomFieldDef {
+  key: CustomFieldKey;
+  label: string;
+  type: "text" | "dropdown" | "boolean";
+  options?: string[];
+}
+
 export interface Lead {
   id: string;
   user_id: string;
@@ -120,6 +129,7 @@ export interface Lead {
   last_activity_at: string | null;
   created_at: string;
   updated_at: string;
+  custom_fields?: Record<string, string | boolean | null>;
 }
 
 export interface EmailLogEntry {

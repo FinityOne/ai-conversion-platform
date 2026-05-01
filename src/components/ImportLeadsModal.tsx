@@ -1,35 +1,34 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
+import type { CustomFieldDef, CustomFieldKey } from "@/lib/leads";
 
 // ─── Design tokens (matches AddLeadModal) ────────────────────────────────────
 const BORDER = "#e6e2db";
 const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BG     = "#F9F7F2";
+const ORANGE = "#D35400";
 
 // ─── Target fields we want to capture ────────────────────────────────────────
-export type TargetField = "name" | "email" | "phone" | "job_type" | "description" | "__skip__";
+export type TargetField = "name" | "email" | "phone" | "job_type" | "description" | "cf_1" | "cf_2" | "cf_3" | "__skip__";
 
 interface FieldMeta {
   label: string;
   required: boolean;
-  hint: string;
 }
-const TARGET_FIELDS: Record<Exclude<TargetField, "__skip__">, FieldMeta> = {
-  name:        { label: "Full Name",    required: true,  hint: "Lead's full name" },
-  email:       { label: "Email",        required: false, hint: "Contact email" },
-  phone:       { label: "Phone",        required: false, hint: "Contact phone number" },
-  job_type:    { label: "Job Type",     required: false, hint: "Type of service needed" },
-  description: { label: "Notes",        required: false, hint: "Project details, notes, etc." },
+const CORE_FIELDS: Record<Exclude<TargetField, "__skip__" | CustomFieldKey>, FieldMeta> = {
+  name:        { label: "Full Name",          required: true  },
+  email:       { label: "Email",              required: false },
+  phone:       { label: "Phone",              required: false },
+  job_type:    { label: "Job Type",           required: false },
+  description: { label: "Notes / Description",required: false },
 };
 
 // ─── Auto-detection alias map ─────────────────────────────────────────────────
-// Keys are lowercase, trimmed versions of common CSV headers from:
-// Meta Ads, Google Ads, Typeform, JotForm, Gravity Forms, etc.
-const FIELD_ALIASES: Record<Exclude<TargetField, "__skip__">, string[]> = {
+const FIELD_ALIASES: Record<Exclude<TargetField, "__skip__" | CustomFieldKey>, string[]> = {
   name: [
     "name", "full name", "fullname", "full_name",
     "contact name", "contact_name", "lead name", "lead_name",
@@ -61,14 +60,12 @@ const FIELD_ALIASES: Record<Exclude<TargetField, "__skip__">, string[]> = {
   ],
 };
 
-/** Return best-match target field for a CSV column header */
 function detectField(header: string): TargetField {
   const normalized = header.toLowerCase().trim();
-  for (const [field, aliases] of Object.entries(FIELD_ALIASES) as [Exclude<TargetField, "__skip__">, string[]][]) {
+  for (const [field, aliases] of Object.entries(FIELD_ALIASES) as [Exclude<TargetField, "__skip__" | CustomFieldKey>, string[]][]) {
     if (aliases.includes(normalized)) return field;
   }
-  // Partial match fallback
-  for (const [field, aliases] of Object.entries(FIELD_ALIASES) as [Exclude<TargetField, "__skip__">, string[]][]) {
+  for (const [field, aliases] of Object.entries(FIELD_ALIASES) as [Exclude<TargetField, "__skip__" | CustomFieldKey>, string[]][]) {
     if (aliases.some(a => normalized.includes(a) || a.includes(normalized))) return field;
   }
   return "__skip__";
@@ -94,13 +91,24 @@ const inputStyle: React.CSSProperties = {
   appearance: "none",
 };
 
-function buildLead(row: Record<string, string>, mapping: ColumnMapping, firstNameCol?: string, lastNameCol?: string) {
+function buildLead(
+  row: Record<string, string>,
+  mapping: ColumnMapping,
+  customDefs: CustomFieldDef[],
+  firstNameCol?: string,
+  lastNameCol?: string,
+) {
   const result: Record<string, string> = {};
+  const customFields: Record<string, string> = {};
+
   for (const [col, field] of Object.entries(mapping)) {
     if (field === "__skip__") continue;
     const val = row[col]?.trim();
-    if (val) {
-      // If multiple columns map to the same field, concatenate (e.g. notes from two cols)
+    if (!val) continue;
+
+    if (field === "cf_1" || field === "cf_2" || field === "cf_3") {
+      customFields[field] = val;
+    } else {
       if (result[field]) {
         result[field] = result[field] + " " + val;
       } else {
@@ -108,13 +116,27 @@ function buildLead(row: Record<string, string>, mapping: ColumnMapping, firstNam
       }
     }
   }
-  // Combine first + last name if we have them but no name
+
   if (!result["name"] && firstNameCol && lastNameCol) {
     const first = row[firstNameCol]?.trim() ?? "";
     const last  = row[lastNameCol]?.trim() ?? "";
     const combined = [first, last].filter(Boolean).join(" ");
     if (combined) result["name"] = combined;
   }
+
+  // Coerce boolean custom fields
+  for (const [k, v] of Object.entries(customFields)) {
+    const def = customDefs.find(d => d.key === k);
+    if (def?.type === "boolean") {
+      const lower = v.toLowerCase();
+      customFields[k] = ["yes", "true", "1", "y"].includes(lower) ? "true" : "false";
+    }
+  }
+
+  if (Object.keys(customFields).length > 0) {
+    result["__custom_fields__"] = JSON.stringify(customFields);
+  }
+
   return result;
 }
 
@@ -123,18 +145,27 @@ export default function ImportLeadsModal() {
   const router  = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [open,    setOpen]    = useState(false);
-  const [step,    setStep]    = useState<Step>("upload");
+  const [open,     setOpen]     = useState(false);
+  const [step,     setStep]     = useState<Step>("upload");
   const [dragging, setDragging] = useState(false);
 
-  const [parsed,   setParsed]   = useState<ParsedCSV | null>(null);
-  const [mapping,  setMapping]  = useState<ColumnMapping>({});
+  const [parsed,       setParsed]       = useState<ParsedCSV | null>(null);
+  const [mapping,      setMapping]      = useState<ColumnMapping>({});
   const [firstNameCol, setFirstNameCol] = useState<string | undefined>();
   const [lastNameCol,  setLastNameCol]  = useState<string | undefined>();
+  const [customDefs,   setCustomDefs]   = useState<CustomFieldDef[]>([]);
 
-  const [loading,  setLoading]  = useState(false);
-  const [result,   setResult]   = useState<{ imported: number; skipped: number; errorDetails: string[] } | null>(null);
+  const [loading,    setLoading]    = useState(false);
+  const [result,     setResult]     = useState<{ imported: number; skipped: number; errorDetails: string[] } | null>(null);
   const [parseError, setParseError] = useState("");
+
+  // Load custom field defs when modal opens
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/leads/custom-field-defs")
+      .then(r => r.ok ? r.json() : { defs: [] })
+      .then(b => setCustomDefs(b.defs ?? []));
+  }, [open]);
 
   function resetAndClose() {
     setOpen(false);
@@ -169,17 +200,15 @@ export default function ImportLeadsModal() {
         const rows = results.data as Record<string, string>[];
         setParsed({ headers, rows });
 
-        // Auto-detect mapping
         const autoMapping: ColumnMapping = {};
         let fnCol: string | undefined;
         let lnCol: string | undefined;
 
         for (const h of headers) {
           const norm = h.toLowerCase().trim();
-          // Special handling for split first/last name columns
           if (["first name", "first_name", "firstname", "fname"].includes(norm)) {
             fnCol = h;
-            autoMapping[h] = "__skip__"; // will combine below
+            autoMapping[h] = "__skip__";
             continue;
           }
           if (["last name", "last_name", "lastname", "surname", "lname"].includes(norm)) {
@@ -190,7 +219,6 @@ export default function ImportLeadsModal() {
           autoMapping[h] = detectField(h);
         }
 
-        // If split name cols exist and no "name" col already mapped, activate combination
         const hasNameMapped = Object.values(autoMapping).includes("name");
         if (fnCol && lnCol && !hasNameMapped) {
           setFirstNameCol(fnCol);
@@ -221,20 +249,36 @@ export default function ImportLeadsModal() {
 
   // ── Derived preview rows ────────────────────────────────────────────────────
   const previewRows = (parsed?.rows ?? []).slice(0, 5).map(row =>
-    buildLead(row, mapping, firstNameCol, lastNameCol)
+    buildLead(row, mapping, customDefs, firstNameCol, lastNameCol)
   );
   const totalRows = parsed?.rows.length ?? 0;
   const validCount = (parsed?.rows ?? []).filter(row => {
-    const lead = buildLead(row, mapping, firstNameCol, lastNameCol);
+    const lead = buildLead(row, mapping, customDefs, firstNameCol, lastNameCol);
     return !!lead["name"];
   }).length;
+
+  // Columns that are still unmapped (not assigned to a core field or CF) — used to suggest CF slots
+  const unmappedHeaders = (parsed?.headers ?? []).filter(h => mapping[h] === "__skip__" && h !== firstNameCol && h !== lastNameCol);
 
   // ── Import ──────────────────────────────────────────────────────────────────
   async function handleImport() {
     if (!parsed) return;
     setLoading(true);
 
-    const rows = parsed.rows.map(row => buildLead(row, mapping, firstNameCol, lastNameCol));
+    const rows = parsed.rows.map(row => {
+      const built = buildLead(row, mapping, customDefs, firstNameCol, lastNameCol);
+      const customFields = built["__custom_fields__"]
+        ? JSON.parse(built["__custom_fields__"])
+        : null;
+      return {
+        name:          built["name"],
+        phone:         built["phone"],
+        email:         built["email"],
+        job_type:      built["job_type"],
+        description:   built["description"],
+        custom_fields: customFields,
+      };
+    });
 
     const res = await fetch("/api/leads/import", {
       method: "POST",
@@ -252,7 +296,6 @@ export default function ImportLeadsModal() {
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Trigger button */}
       <button
         onClick={() => setOpen(true)}
         style={{
@@ -263,11 +306,10 @@ export default function ImportLeadsModal() {
           border: `1.5px solid ${BORDER}`, cursor: "pointer",
         }}
       >
-        <i className="fa-solid fa-file-arrow-up" style={{ color: "#D35400" }} />
+        <i className="fa-solid fa-file-arrow-up" style={{ color: ORANGE }} />
         Import CSV
       </button>
 
-      {/* Overlay */}
       {open && (
         <div
           onClick={resetAndClose}
@@ -312,10 +354,8 @@ export default function ImportLeadsModal() {
               </button>
             </div>
 
-            {/* Step indicator */}
             <StepBar step={step} />
 
-            {/* ── Step: Upload ── */}
             {step === "upload" && (
               <UploadStep
                 dragging={dragging}
@@ -328,32 +368,33 @@ export default function ImportLeadsModal() {
               />
             )}
 
-            {/* ── Step: Mapping ── */}
             {step === "mapping" && parsed && (
               <MappingStep
                 headers={parsed.headers}
                 mapping={mapping}
                 firstNameCol={firstNameCol}
                 lastNameCol={lastNameCol}
+                customDefs={customDefs}
+                unmappedHeaders={unmappedHeaders}
                 onChange={(col, field) => setMapping(prev => ({ ...prev, [col]: field }))}
                 onContinue={() => setStep("preview")}
                 onBack={() => setStep("upload")}
               />
             )}
 
-            {/* ── Step: Preview ── */}
             {step === "preview" && parsed && (
               <PreviewStep
                 previewRows={previewRows}
                 validCount={validCount}
                 totalRows={totalRows}
                 loading={loading}
+                customDefs={customDefs}
+                mapping={mapping}
                 onImport={handleImport}
                 onBack={() => setStep("mapping")}
               />
             )}
 
-            {/* ── Step: Done ── */}
             {step === "done" && result && (
               <DoneStep result={result} onClose={resetAndClose} />
             )}
@@ -391,7 +432,7 @@ function StepBar({ step }: { step: Step }) {
             {s.label}
           </span>
           {i < steps.length - 1 && (
-            <div style={{ flex: 1, height: 2, background: i < idx ? "#D35400" : "#e6e2db", borderRadius: 2, marginRight: 6 }} />
+            <div style={{ flex: 1, height: 2, background: i < idx ? ORANGE : BORDER, borderRadius: 2, marginRight: 6 }} />
           )}
         </div>
       ))}
@@ -413,20 +454,19 @@ function UploadStep({
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {/* Drop zone */}
       <div
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         onClick={() => fileRef.current?.click()}
         style={{
-          border: `2px dashed ${dragging ? "#D35400" : BORDER}`,
+          border: `2px dashed ${dragging ? ORANGE : BORDER}`,
           borderRadius: 14, padding: "40px 24px", textAlign: "center",
           cursor: "pointer", transition: "border-color 0.15s",
           background: dragging ? "#fff7ed" : "#fafaf9",
         }}
       >
-        <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 36, color: "#D35400", marginBottom: 12, display: "block" }} />
+        <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 36, color: ORANGE, marginBottom: 12, display: "block" }} />
         <p style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700, color: TEXT }}>
           Drop your CSV here, or click to browse
         </p>
@@ -440,13 +480,10 @@ function UploadStep({
         </div>
       )}
 
-      {/* Format guide */}
       <div style={{ background: BG, borderRadius: 12, padding: "16px 18px" }}>
-        <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 700, color: TEXT }}>
-          Expected format
-        </p>
+        <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 700, color: TEXT }}>Expected format</p>
         <p style={{ margin: "0 0 8px", fontSize: 12, color: MUTED, lineHeight: 1.5 }}>
-          Your CSV should have column headers in the first row. We'll auto-detect common column names and let you fix any mismatches.
+          Your CSV should have column headers in the first row. We'll auto-detect common column names and let you fix any mismatches. Extra columns can be saved as custom fields.
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 380 }}>
@@ -470,25 +507,31 @@ function UploadStep({
             </tbody>
           </table>
         </div>
-        <p style={{ margin: "10px 0 0", fontSize: 12, color: MUTED }}>
-          Works with exports from <strong>Meta Ads</strong>, <strong>Google Ads</strong>, <strong>Typeform</strong>, <strong>JotForm</strong>, and most form builders. Column order doesn't matter.
-        </p>
       </div>
     </div>
   );
 }
 
 function MappingStep({
-  headers, mapping, firstNameCol, lastNameCol, onChange, onContinue, onBack,
+  headers, mapping, firstNameCol, lastNameCol, customDefs, unmappedHeaders,
+  onChange, onContinue, onBack,
 }: {
   headers: string[];
   mapping: ColumnMapping;
   firstNameCol?: string;
   lastNameCol?: string;
+  customDefs: CustomFieldDef[];
+  unmappedHeaders: string[];
   onChange: (col: string, field: TargetField) => void;
   onContinue: () => void;
   onBack: () => void;
 }) {
+  const hasDirect = Object.values(mapping).includes("name");
+  const hasCombo  = !!(firstNameCol && lastNameCol &&
+    mapping[firstNameCol] === "__skip__" && mapping[lastNameCol] === "__skip__");
+  const nameOk = hasDirect || hasCombo;
+
+  // Build the dropdown options: core fields + defined custom fields + skip
   const fieldOptions: { value: TargetField; label: string }[] = [
     { value: "__skip__",    label: "— Skip this column —" },
     { value: "name",        label: "Full Name *" },
@@ -496,22 +539,22 @@ function MappingStep({
     { value: "phone",       label: "Phone" },
     { value: "job_type",    label: "Job Type" },
     { value: "description", label: "Notes / Description" },
+    ...customDefs.map(d => ({
+      value: d.key as TargetField,
+      label: `Custom: ${d.label}`,
+    })),
   ];
 
-  // Check if name is covered (mapped directly or via first+last combo)
-  const hasDirect = Object.values(mapping).includes("name");
-  const hasCombo   = !!(firstNameCol && lastNameCol &&
-    mapping[firstNameCol] === "__skip__" && mapping[lastNameCol] === "__skip__");
-  const nameOk = hasDirect || hasCombo;
+  const customFieldsInUse = Object.values(mapping).filter(f => f === "cf_1" || f === "cf_2" || f === "cf_3");
+  const hasCustomMapped = customFieldsInUse.length > 0;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      {/* First+Last notice */}
       {firstNameCol && lastNameCol && (
         <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#15803d", display: "flex", gap: 8, alignItems: "flex-start" }}>
           <i className="fa-solid fa-circle-check" style={{ marginTop: 1, flexShrink: 0 }} />
           <span>
-            Detected split name columns (<strong>{firstNameCol}</strong> + <strong>{lastNameCol}</strong>). They'll be combined into a full name automatically.
+            Detected split name columns (<strong>{firstNameCol}</strong> + <strong>{lastNameCol}</strong>). They'll be combined automatically.
           </span>
         </div>
       )}
@@ -519,39 +562,74 @@ function MappingStep({
       {!nameOk && (
         <div style={{ background: "#fef2f2", border: "1px solid #fee2e2", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#dc2626" }}>
           <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }} />
-          Map at least one column to <strong>Full Name</strong> before continuing — it's required for each lead.
+          Map at least one column to <strong>Full Name</strong> — it's required.
+        </div>
+      )}
+
+      {/* Hint when there are unmapped columns and custom field defs exist */}
+      {unmappedHeaders.length > 0 && customDefs.length > 0 && !hasCustomMapped && (
+        <div style={{ background: "#fff8f5", border: `1px solid ${ORANGE}44`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: ORANGE, display: "flex", gap: 8, alignItems: "flex-start" }}>
+          <i className="fa-solid fa-lightbulb" style={{ marginTop: 1, flexShrink: 0 }} />
+          <span>
+            <strong>{unmappedHeaders.length} column{unmappedHeaders.length > 1 ? "s are" : " is"} unmatched.</strong>{" "}
+            You have custom fields defined — map them below to capture extra data.
+          </span>
+        </div>
+      )}
+
+      {unmappedHeaders.length > 0 && customDefs.length === 0 && (
+        <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: MUTED }}>
+          <i className="fa-solid fa-circle-info" style={{ marginRight: 6 }} />
+          <strong>{unmappedHeaders.length} column{unmappedHeaders.length > 1 ? "s" : ""}</strong> couldn't be matched.
+          {" "}Set up <strong>Custom Fields</strong> in your leads list to capture them.
         </div>
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 320, overflowY: "auto" }}>
         {headers.map(col => {
           const isFnLn = (col === firstNameCol || col === lastNameCol) && hasCombo;
+          const isCF = (mapping[col] === "cf_1" || mapping[col] === "cf_2" || mapping[col] === "cf_3");
+          const cfDef = isCF ? customDefs.find(d => d.key === mapping[col]) : null;
+
           return (
             <div key={col} style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 10 }}>
-              {/* CSV column */}
               <div style={{
-                padding: "9px 12px", borderRadius: 8, background: BG,
+                padding: "9px 12px", borderRadius: 8,
+                background: isCF ? "#fff8f5" : BG,
+                border: isCF ? `1px solid ${ORANGE}33` : "1px solid transparent",
                 fontSize: 13, fontWeight: 600, color: TEXT,
                 overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
               }}>
                 {col}
               </div>
               <i className="fa-solid fa-arrow-right" style={{ fontSize: 12, color: "#c4bfb8" }} />
-              {/* Target field selector */}
               {isFnLn ? (
                 <div style={{ padding: "9px 12px", borderRadius: 8, background: "#f0fdf4", border: "1px solid #bbf7d0", fontSize: 13, color: "#15803d", fontWeight: 600 }}>
                   Combined → Full Name
                 </div>
               ) : (
-                <select
-                  value={mapping[col] ?? "__skip__"}
-                  onChange={e => onChange(col, e.target.value as TargetField)}
-                  style={inputStyle}
-                >
-                  {fieldOptions.map(o => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
+                <div style={{ position: "relative" }}>
+                  <select
+                    value={mapping[col] ?? "__skip__"}
+                    onChange={e => onChange(col, e.target.value as TargetField)}
+                    style={{
+                      ...inputStyle,
+                      borderColor: isCF ? ORANGE + "88" : BORDER,
+                      background: isCF ? "#fff8f5" : "#fff",
+                      color: isCF ? ORANGE : TEXT,
+                      fontWeight: isCF ? 700 : 400,
+                    }}
+                  >
+                    {fieldOptions.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                  {cfDef && (
+                    <span style={{ position: "absolute", right: 28, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: ORANGE, fontWeight: 800, pointerEvents: "none" }}>
+                      {cfDef.type === "text" ? "TXT" : cfDef.type === "dropdown" ? "▾" : "Y/N"}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           );
@@ -559,10 +637,7 @@ function MappingStep({
       </div>
 
       <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-        <button
-          onClick={onBack}
-          style={{ flex: 1, padding: "14px", borderRadius: 12, border: `1.5px solid ${BORDER}`, background: "#fff", fontSize: 15, fontWeight: 700, color: TEXT, cursor: "pointer" }}
-        >
+        <button onClick={onBack} style={{ flex: 1, padding: "14px", borderRadius: 12, border: `1.5px solid ${BORDER}`, background: "#fff", fontSize: 15, fontWeight: 700, color: TEXT, cursor: "pointer" }}>
           Back
         </button>
         <button
@@ -583,19 +658,25 @@ function MappingStep({
 }
 
 function PreviewStep({
-  previewRows, validCount, totalRows, loading, onImport, onBack,
+  previewRows, validCount, totalRows, loading, customDefs, mapping, onImport, onBack,
 }: {
   previewRows: Record<string, string>[];
   validCount: number;
   totalRows: number;
   loading: boolean;
+  customDefs: CustomFieldDef[];
+  mapping: ColumnMapping;
   onImport: () => void;
   onBack: () => void;
 }) {
   const skippedCount = totalRows - validCount;
+  const activeCFs = customDefs.filter(d => Object.values(mapping).includes(d.key as TargetField));
+
+  const coreHeaders = ["Name", "Email", "Phone", "Job Type", "Notes"];
+  const coreFields  = ["name", "email", "phone", "job_type", "description"];
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {/* Summary */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
           <p style={{ margin: "0 0 2px", fontSize: 26, fontWeight: 900, color: "#27AE60" }}>{validCount}</p>
@@ -607,7 +688,14 @@ function PreviewStep({
         </div>
       </div>
 
-      {/* Preview table */}
+      {activeCFs.length > 0 && (
+        <div style={{ background: "#fff8f5", border: `1px solid ${ORANGE}33`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: ORANGE }}>
+          <i className="fa-solid fa-table-columns" style={{ marginRight: 6 }} />
+          <strong>{activeCFs.length} custom field{activeCFs.length > 1 ? "s" : ""}</strong> will be imported:{" "}
+          {activeCFs.map(d => d.label).join(", ")}
+        </div>
+      )}
+
       <div>
         <p style={{ margin: "0 0 8px", fontSize: 13, fontWeight: 700, color: MUTED }}>
           Preview (first {Math.min(5, previewRows.length)} rows)
@@ -616,7 +704,7 @@ function PreviewStep({
           <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 420 }}>
             <thead>
               <tr>
-                {["Name", "Email", "Phone", "Job Type", "Notes"].map(h => (
+                {[...coreHeaders, ...activeCFs.map(d => d.label)].map(h => (
                   <th key={h} style={{ padding: "8px 10px", background: BG, border: `1px solid ${BORDER}`, fontWeight: 700, color: TEXT, textAlign: "left", whiteSpace: "nowrap" }}>
                     {h}
                   </th>
@@ -624,31 +712,35 @@ function PreviewStep({
               </tr>
             </thead>
             <tbody>
-              {previewRows.map((row, i) => (
-                <tr key={i} style={{ background: row["name"] ? "#fff" : "#fef2f2" }}>
-                  {["name", "email", "phone", "job_type", "description"].map(f => (
-                    <td key={f} style={{ padding: "7px 10px", border: `1px solid ${BORDER}`, color: row[f] ? TEXT : "#c4bfb8", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {row[f] || <em>—</em>}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {previewRows.map((row, i) => {
+                const cfData: Record<string, string> = row["__custom_fields__"]
+                  ? JSON.parse(row["__custom_fields__"])
+                  : {};
+                return (
+                  <tr key={i} style={{ background: row["name"] ? "#fff" : "#fef2f2" }}>
+                    {coreFields.map(f => (
+                      <td key={f} style={{ padding: "7px 10px", border: `1px solid ${BORDER}`, color: row[f] ? TEXT : "#c4bfb8", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {row[f] || <em>—</em>}
+                      </td>
+                    ))}
+                    {activeCFs.map(d => (
+                      <td key={d.key} style={{ padding: "7px 10px", border: `1px solid ${BORDER}`, color: cfData[d.key] ? ORANGE : "#c4bfb8", maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {cfData[d.key] ? (d.type === "boolean" ? (cfData[d.key] === "true" ? "✓ Yes" : "✗ No") : cfData[d.key]) : <em>—</em>}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
         {totalRows > 5 && (
-          <p style={{ margin: "6px 0 0", fontSize: 12, color: MUTED }}>
-            + {totalRows - 5} more rows not shown
-          </p>
+          <p style={{ margin: "6px 0 0", fontSize: 12, color: MUTED }}>+ {totalRows - 5} more rows not shown</p>
         )}
       </div>
 
       <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-        <button
-          onClick={onBack}
-          disabled={loading}
-          style={{ flex: 1, padding: "14px", borderRadius: 12, border: `1.5px solid ${BORDER}`, background: "#fff", fontSize: 15, fontWeight: 700, color: TEXT, cursor: "pointer" }}
-        >
+        <button onClick={onBack} disabled={loading} style={{ flex: 1, padding: "14px", borderRadius: 12, border: `1.5px solid ${BORDER}`, background: "#fff", fontSize: 15, fontWeight: 700, color: TEXT, cursor: "pointer" }}>
           Back
         </button>
         <button
@@ -684,19 +776,14 @@ function DoneStep({
         display: "flex", alignItems: "center", justifyContent: "center",
         boxShadow: result.imported > 0 ? "0 8px 24px rgba(211,84,0,0.3)" : "none",
       }}>
-        <i
-          className={`fa-solid ${result.imported > 0 ? "fa-check" : "fa-xmark"}`}
-          style={{ fontSize: 30, color: "#fff" }}
-        />
+        <i className={`fa-solid ${result.imported > 0 ? "fa-check" : "fa-xmark"}`} style={{ fontSize: 30, color: "#fff" }} />
       </div>
       <div style={{ textAlign: "center" }}>
         <p style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 900, color: TEXT }}>
           {result.imported} {result.imported === 1 ? "lead" : "leads"} imported
         </p>
         {result.skipped > 0 && (
-          <p style={{ margin: 0, fontSize: 14, color: MUTED }}>
-            {result.skipped} rows skipped (missing name)
-          </p>
+          <p style={{ margin: 0, fontSize: 14, color: MUTED }}>{result.skipped} rows skipped (missing name)</p>
         )}
       </div>
       {result.errorDetails.length > 0 && (

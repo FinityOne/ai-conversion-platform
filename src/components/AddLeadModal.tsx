@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import PhoneInput from "@/components/PhoneInput";
 import { formatPhoneE164 } from "@/lib/phone";
 import { useAnalytics } from "@/lib/analytics";
+import type { CustomFieldDef } from "@/lib/leads";
 
 const JOB_TYPES = [
   "Roofing",
@@ -25,6 +26,7 @@ const BORDER = "#e6e2db";
 const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BG     = "#F9F7F2";
+const ORANGE = "#D35400";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "14px 16px", borderRadius: 10,
@@ -38,6 +40,63 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <label style={{ fontSize: 14, fontWeight: 600, color: MUTED }}>{label}</label>
       {children}
     </div>
+  );
+}
+
+function CustomFieldInput({
+  def, value, onChange,
+}: {
+  def: CustomFieldDef;
+  value: string | boolean;
+  onChange: (val: string | boolean) => void;
+}) {
+  const boolVal = value === true || value === "true";
+  const strVal  = value === true ? "true" : value === false ? "false" : (value as string) ?? "";
+
+  return (
+    <Field label={def.label}>
+      {def.type === "text" && (
+        <input
+          value={strVal}
+          onChange={e => onChange(e.target.value)}
+          placeholder={`Enter ${def.label.toLowerCase()}…`}
+          style={inputStyle}
+        />
+      )}
+      {def.type === "dropdown" && (
+        <select
+          value={strVal}
+          onChange={e => onChange(e.target.value)}
+          style={{ ...inputStyle, appearance: "none" as const, cursor: "pointer" }}
+        >
+          <option value="">— Select —</option>
+          {(def.options ?? []).map(o => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+      )}
+      {def.type === "boolean" && (
+        <div style={{ display: "flex", gap: 8 }}>
+          {([true, false] as const).map(opt => (
+            <button
+              key={String(opt)}
+              type="button"
+              onClick={() => onChange(opt)}
+              style={{
+                flex: 1, padding: "13px", borderRadius: 10,
+                border: `1.5px solid ${boolVal === opt ? ORANGE : BORDER}`,
+                background: boolVal === opt ? "#fff8f5" : "#fff",
+                color: boolVal === opt ? ORANGE : MUTED,
+                fontSize: 15, fontWeight: boolVal === opt ? 700 : 500,
+                cursor: "pointer", transition: "all 0.12s",
+              }}
+            >
+              {opt ? "✓ Yes" : "✗ No"}
+            </button>
+          ))}
+        </div>
+      )}
+    </Field>
   );
 }
 
@@ -55,10 +114,31 @@ export default function AddLeadModal() {
   const [jobType,     setJobType]     = useState("");
   const [description, setDescription] = useState("");
 
+  const [customDefs,   setCustomDefs]   = useState<CustomFieldDef[]>([]);
+  const [customValues, setCustomValues] = useState<Record<string, string | boolean>>({});
+
+  // Load custom field defs when modal opens
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/leads/custom-field-defs")
+      .then(r => r.ok ? r.json() : { defs: [] })
+      .then(b => {
+        const defs: CustomFieldDef[] = b.defs ?? [];
+        setCustomDefs(defs);
+        // Init booleans to false
+        const init: Record<string, string | boolean> = {};
+        for (const d of defs) {
+          if (d.type === "boolean") init[d.key] = false;
+        }
+        setCustomValues(init);
+      });
+  }, [open]);
+
   function resetAndClose() {
     setName(""); setPhone(""); setEmail("");
     setJobType(""); setDescription("");
     setError(""); setEmailNote(""); setOpen(false);
+    setCustomValues({});
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -70,15 +150,27 @@ export default function AddLeadModal() {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) { setError("Not signed in."); setLoading(false); return; }
 
+    // Build custom_fields payload
+    const custom_fields: Record<string, string | boolean | null> = {};
+    for (const def of customDefs) {
+      const val = customValues[def.key];
+      if (def.type === "boolean") {
+        custom_fields[def.key] = val === true || val === "true";
+      } else {
+        custom_fields[def.key] = (typeof val === "string" ? val.trim() : "") || null;
+      }
+    }
+
     const { data: lead, error: insertError } = await sb.from("leads").insert({
-      user_id:     user.id,
-      name:        name.trim(),
-      phone:       formatPhoneE164(phone) ?? (phone.trim() || null),
-      email:       email.trim()       || null,
-      job_type:    jobType            || null,
-      description: description.trim() || null,
-      status:      "new",
-      score:       5,
+      user_id:       user.id,
+      name:          name.trim(),
+      phone:         formatPhoneE164(phone) ?? (phone.trim() || null),
+      email:         email.trim()       || null,
+      job_type:      jobType            || null,
+      description:   description.trim() || null,
+      custom_fields: customDefs.length > 0 ? custom_fields : null,
+      status:        "new",
+      score:         5,
     }).select().single();
 
     if (insertError || !lead) {
@@ -86,8 +178,7 @@ export default function AddLeadModal() {
       setLoading(false); return;
     }
 
-    // Send confirmation email to lead if they have an email and status is 'new'
-    if (email.trim() && status === "new") {
+    if (email.trim()) {
       try {
         const res = await fetch("/api/email/lead-confirmation", {
           method: "POST",
@@ -104,7 +195,7 @@ export default function AddLeadModal() {
           setEmailNote(`✓ Confirmation email sent to ${email.trim()}`);
         }
       } catch {
-        // fire-and-forget — don't block on email failure
+        // fire-and-forget
       }
     }
 
@@ -116,7 +207,6 @@ export default function AddLeadModal() {
 
   return (
     <>
-      {/* Trigger */}
       <button
         onClick={() => setOpen(true)}
         style={{
@@ -132,7 +222,6 @@ export default function AddLeadModal() {
         Add Lead
       </button>
 
-      {/* Overlay */}
       {open && (
         <div
           onClick={resetAndClose}
@@ -153,7 +242,6 @@ export default function AddLeadModal() {
             }}
             className="md:rounded-[20px] md:p-8"
           >
-            {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
               <div>
                 <h2 style={{ fontSize: 22, fontWeight: 900, color: TEXT, margin: 0 }}>Add New Lead</h2>
@@ -187,11 +275,7 @@ export default function AddLeadModal() {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <Field label="🇺🇸 Phone">
-                  <PhoneInput
-                    value={phone}
-                    onChange={setPhone}
-                    inputStyle={inputStyle}
-                  />
+                  <PhoneInput value={phone} onChange={setPhone} inputStyle={inputStyle} />
                 </Field>
                 <Field label="Email">
                   <input style={inputStyle} type="email" inputMode="email" placeholder="jake@email.com" value={email} onChange={e => setEmail(e.target.value)} />
@@ -220,6 +304,25 @@ export default function AddLeadModal() {
                   onChange={e => setDescription(e.target.value)}
                 />
               </Field>
+
+              {/* Custom fields */}
+              {customDefs.length > 0 && (
+                <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 16 }}>
+                  <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 800, color: ORANGE, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                    Custom Fields
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    {customDefs.map(def => (
+                      <CustomFieldInput
+                        key={def.key}
+                        def={def}
+                        value={customValues[def.key] ?? (def.type === "boolean" ? false : "")}
+                        onChange={val => setCustomValues(prev => ({ ...prev, [def.key]: val }))}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <button
                 type="submit"
