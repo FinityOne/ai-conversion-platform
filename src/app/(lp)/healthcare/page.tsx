@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const ORANGE = "#D35400";
@@ -11,8 +12,14 @@ const BORDER = "#e6e2db";
 
 // ── Responsive CSS injected once ──────────────────────────────────────────────
 const CSS = `
-  .hc-hero        { padding: 40px 20px 48px; }
-  .hc-hero-grid   { display: flex; flex-direction: column; gap: 32px; }
+  .hc-hero        { padding: 56px 20px 60px; position: relative; overflow: hidden; }
+  .hc-hero-img    { position: absolute; inset: 0; z-index: 0; }
+  .hc-hero-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(135deg, rgba(10,6,2,0.91) 0%, rgba(10,6,2,0.82) 45%, rgba(10,6,2,0.62) 100%);
+  }
+  .hc-hero-content { position: relative; z-index: 2; }
+  .hc-hero-grid   { display: flex; flex-direction: column; gap: 28px; }
   .hc-section     { padding: 56px 20px; }
   .hc-wrap        { max-width: 1100px; margin: 0 auto; }
   .hc-grid-2      { display: grid; grid-template-columns: 1fr; gap: 24px; }
@@ -44,7 +51,10 @@ const CSS = `
   .hc-stat-divider { display: none; }
 
   @media (min-width: 640px) {
-    .hc-hero      { padding: 64px 24px 72px; }
+    .hc-hero      { padding: 80px 24px 88px; }
+    .hc-hero-overlay {
+      background: linear-gradient(100deg, rgba(10,6,2,0.93) 0%, rgba(10,6,2,0.82) 42%, rgba(10,6,2,0.42) 100%);
+    }
     .hc-section   { padding: 80px 24px; }
     .hc-grid-3    { grid-template-columns: repeat(3, 1fr); gap: 24px; }
     .hc-stats-grid { grid-template-columns: repeat(3, 1fr); }
@@ -509,43 +519,74 @@ export default function HealthcarePage() {
       <style>{CSS}</style>
 
       {/* ── Hero ── */}
-      <section id="demo-form" className="hc-hero" style={{ background: BG }}>
-        <div className="hc-wrap">
+      <section id="demo-form" className="hc-hero">
+        {/* Background photo */}
+        <div className="hc-hero-img">
+          <Image
+            src="https://images.pexels.com/photos/4506208/pexels-photo-4506208.jpeg"
+            alt=""
+            fill
+            style={{ objectFit: "cover", objectPosition: "center 30%" }}
+            priority
+            sizes="100vw"
+          />
+        </div>
+        {/* Gradient overlay */}
+        <div className="hc-hero-overlay" />
+
+        <div className="hc-wrap hc-hero-content">
           <div className="hc-hero-grid">
 
-            {/* Copy */}
+            {/* Copy — white text on dark photo */}
             <div className="hc-hero-copy">
-              <Pill>Built for chiropractic &amp; medical practices</Pill>
-              <h1 style={{ margin: "0 0 16px", fontSize: "clamp(30px, 5vw, 52px)", fontWeight: 900, lineHeight: 1.08, color: TEXT, letterSpacing: -1 }}>
-                Your front desk can&apos;t follow up<br />
-                with every patient inquiry.{" "}
-                <span style={{ color: ORANGE }}>We can.</span>
+              {/* Badge adapted for dark bg */}
+              <span style={{
+                display: "inline-block",
+                background: `${ORANGE}cc`,
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: 11,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                padding: "5px 13px",
+                borderRadius: 100,
+                marginBottom: 18,
+              }}>
+                Built for chiropractic &amp; medical practices
+              </span>
+
+              <h1 style={{ margin: "0 0 18px", fontSize: "clamp(30px, 5vw, 54px)", fontWeight: 900, lineHeight: 1.08, color: "#fff", letterSpacing: -1, textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
+                Your front desk can&apos;t follow up with every patient inquiry.{" "}
+                <span style={{ color: "#f97316" }}>We can.</span>
               </h1>
-              <p style={{ margin: "0 0 24px", fontSize: "clamp(15px, 2.2vw, 18px)", color: MUTED, lineHeight: 1.7, maxWidth: 500 }}>
+
+              <p style={{ margin: "0 0 26px", fontSize: "clamp(15px, 2vw, 17px)", color: "rgba(255,255,255,0.82)", lineHeight: 1.75, maxWidth: 480 }}>
                 ClozeFlow responds to new patient inquiries in under 60 seconds — day or night — books the appointment automatically, and keeps your front desk in full control. Not replaced. Empowered.
               </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 28 }}>
+
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 30 }}>
                 {["⚡ 15-min demo", "✅ No commitment", "📅 Live in 1 day", "🔒 HIPAA-considerate"].map(c => (
-                  <span key={c} style={{ padding: "7px 13px", borderRadius: 100, background: "#fff", border: `1px solid ${BORDER}`, fontSize: 12, color: TEXT, fontWeight: 600 }}>{c}</span>
+                  <span key={c} style={{ padding: "7px 14px", borderRadius: 100, background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.25)", backdropFilter: "blur(6px)", fontSize: 12, color: "rgba(255,255,255,0.92)", fontWeight: 600 }}>{c}</span>
                 ))}
               </div>
 
-              {/* Trust row — hidden on mobile, shown desktop */}
+              {/* Trust avatars — desktop only */}
               <div className="hc-hide-mobile" style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ display: "flex" }}>
                   {["#D35400","#ea580c","#f97316","#fb923c","#fdba74"].map((c, i) => (
-                    <div key={i} style={{ width: 30, height: 30, borderRadius: "50%", background: c, border: "2px solid #fff", marginLeft: i ? -8 : 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 800 }}>
+                    <div key={i} style={{ width: 32, height: 32, borderRadius: "50%", background: c, border: "2px solid rgba(255,255,255,0.4)", marginLeft: i ? -9 : 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 800 }}>
                       {["S","J","M","D","R"][i]}
                     </div>
                   ))}
                 </div>
-                <p style={{ margin: 0, fontSize: 13, color: MUTED }}>
-                  Chiro &amp; medical practices are <strong style={{ color: TEXT }}>booking more patients</strong> with ClozeFlow
+                <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.75)" }}>
+                  Chiro &amp; medical practices are{" "}
+                  <strong style={{ color: "#fff" }}>booking more patients</strong> with ClozeFlow
                 </p>
               </div>
             </div>
 
-            {/* Form */}
+            {/* Form card — stays white */}
             <div className="hc-hero-form" ref={formRef}>
               <DemoForm />
             </div>

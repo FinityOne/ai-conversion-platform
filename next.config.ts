@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "images.pexels.com" },
+    ],
+  },
   // Proxy PostHog through our own domain so events work on localhost + Vercel
   // and aren't blocked by ad blockers.
   async rewrites() {
