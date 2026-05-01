@@ -265,10 +265,12 @@ function buildEntries(count = 24): Entry[] {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function MarketingSocialProof() {
-  const [entries]              = useState<Entry[]>(buildEntries);
+  const [entries, setEntries]  = useState<Entry[] | null>(null);
   const [idx, setIdx]          = useState(0);
   const [visible, setVisible]  = useState(false);
   const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => { setEntries(buildEntries()); }, []);
 
   // First show after 5 s
   useEffect(() => {
@@ -285,18 +287,20 @@ export default function MarketingSocialProof() {
 
   // Next entry 11 s after hiding
   useEffect(() => {
-    if (visible || dismissed) return;
+    if (visible || dismissed || !entries) return;
     const t = setTimeout(() => {
       setIdx(i => (i + 1) % entries.length);
       setVisible(true);
     }, 11000);
     return () => clearTimeout(t);
-  }, [visible, dismissed, entries.length]);
+  }, [visible, dismissed, entries]);
 
   const dismiss = useCallback(() => {
     setVisible(false);
     setDismissed(true);
   }, []);
+
+  if (!entries) return null;
 
   const e = entries[idx];
 

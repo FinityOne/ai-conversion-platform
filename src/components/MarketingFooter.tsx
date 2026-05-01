@@ -55,6 +55,7 @@ export default function MarketingFooter() {
                 { href: "/how-it-works", label: "How It Works" },
                 { href: "/pricing", label: "Pricing" },
                 { href: "/calculator", label: "Calculator" },
+                { href: "/healthcare", label: "For Healthcare" },
               ].map(({ href, label }) => (
                 <Link
                   key={href}

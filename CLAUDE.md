@@ -4,7 +4,6 @@
 
 A Next.js 16 app that turns every lead into an instant response — so you book more jobs automatically.
 
-
 ## Stack
 
 - **Framework**: Next.js 16.2 (App Router) — see `AGENTS.md` for version caveats
@@ -42,3 +41,6 @@ npm run dev    # Start dev server
 npm run build  # Production build
 npm run lint   # ESLint
 ```
+
+## Additional Notes
+We are using the subabase mcp with the project called clozeflow.
