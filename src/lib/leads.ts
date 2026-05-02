@@ -120,7 +120,9 @@ export interface Lead {
   id: string;
   user_id: string;
   location_id: string | null;
-  name: string;
+  name: string;           // kept for compat; kept in sync with first_name + last_name
+  first_name: string;
+  last_name: string | null;
   phone: string | null;
   email: string | null;
   job_type: string | null;
@@ -128,10 +130,16 @@ export interface Lead {
   status: LeadStatus;
   score: number;
   source: "manual" | "intake_form";
+  import_id: string | null;
   last_activity_at: string | null;
   created_at: string;
   updated_at: string;
   custom_fields?: Record<string, string | boolean | null>;
+}
+
+export function leadFullName(lead: { first_name?: string | null; last_name?: string | null; name?: string }): string {
+  if (lead.first_name?.trim()) return [lead.first_name.trim(), lead.last_name?.trim()].filter(Boolean).join(" ");
+  return lead.name ?? "";
 }
 
 export interface EmailLogEntry {

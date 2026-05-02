@@ -7,6 +7,7 @@ import type { UserDetail, UserLead, UserEmailLog, UserLocation } from "@/lib/adm
 import type { PlanId, GrantType } from "@/lib/subscriptions";
 import { PLANS, GRANT_LABELS } from "@/lib/subscriptions";
 import { INDUSTRY_GROUPS } from "@/lib/industry-config";
+import DiagnosticButton from "@/app/admin/leads/[id]/DiagnosticButton";
 
 // ── Palette ───────────────────────────────────────────────────────────────────
 const TEXT   = "#0f172a";
@@ -1229,6 +1230,13 @@ export default function UserDetailClient({ user: initialUser }: { user: UserDeta
           <button onClick={() => setTab("access")} style={{ padding: "10px 14px", borderRadius: 10, border: `1px solid ${BORDER}`, background: "#fff", color: TEXT, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
             <i className="fa-solid fa-key" style={{ color: INDIGO, fontSize: 12 }} />Manage Access
           </button>
+          <DiagnosticButton
+            leadId={user.id}
+            businessName={user.business_name}
+            websiteUrl={user.business_website}
+            city={user.business_city}
+            state={user.business_state}
+          />
         </div>
       </div>
 

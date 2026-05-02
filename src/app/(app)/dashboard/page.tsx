@@ -10,6 +10,7 @@ import Link from "next/link";
 import ShareLinkButton from "@/components/ShareLinkButton";
 import DailyEmailChart from "@/components/DailyEmailChart";
 import PlanGate from "@/components/PlanGate";
+import WeeklyReportButton from "@/components/WeeklyReportButton";
 
 const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
@@ -155,8 +156,9 @@ export default async function DashboardPage(
             </div>
           )}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
           <span style={{ fontSize: 12, color: MUTED, fontWeight: 500 }}>{dateLabel}</span>
+          <WeeklyReportButton />
           {isMultiLocation && (
             <span style={{ fontSize: 11, color: MUTED }}>
               <i className="fa-solid fa-location-dot" style={{ marginRight: 4, color: ORANGE, fontSize: 10 }} />

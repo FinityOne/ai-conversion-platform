@@ -88,6 +88,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       leadLimit={leadLimit}
       isAdmin={!orgCtx && profile?.role === "admin"}
       administratorTabsEnabled={administratorTabsEnabled}
+      hasActiveMemberships={memberOrgs.length > 0}
       locations={locationCtx.locations}
       currentLocationId={locationCtx.currentLocationId}
       orgContext={orgCtx}

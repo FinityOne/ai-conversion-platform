@@ -49,9 +49,10 @@ const ORANGE = "#D35400";
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard":      "Dashboard",
-  "/leads":          "Leads",
+  "/leads":          "Pipeline",
+  "/imports":        "Imports",
   "/share":          "Landing Page",
-  "/segments":       "Segmentation",
+  "/segments":       "Segments",
   "/pulse":          "Pulse",
   "/calendar":       "Calendar",
   "/profile":        "Profile",
@@ -290,27 +291,34 @@ export default function AppShell({
 
             <NavDivider />
 
-            <GroupLabel icon="⚡">Lead Management</GroupLabel>
-            <NavItem href="/leads"    label="Leads"        fa="fa-solid fa-bolt-lightning" active={is("/leads") && !is("/leads/")} />
-            <NavItem href="/segments" label="Segmentation" fa="fa-solid fa-layer-group"    active={is("/segments")} />
-            <NavItem href="/pulse"    label="Pulse"        fa="fa-solid fa-heart-pulse"    active={is("/pulse")} />
+            <GroupLabel icon="⚡">Leads</GroupLabel>
+            <NavItem href="/leads"    label="Pipeline"   fa="fa-solid fa-bolt-lightning" active={is("/leads") && !is("/leads/")} />
+            <NavItem href="/imports"  label="Imports"    fa="fa-solid fa-file-arrow-up"  active={is("/imports")} />
+            <NavItem href="/segments" label="Segments"   fa="fa-solid fa-layer-group"    active={is("/segments")} />
+            <NavItem href="/pulse"    label="Pulse"      fa="fa-solid fa-heart-pulse"    active={is("/pulse")} />
             <div style={{ marginTop: 2 }}>
-              <ComingSoonItem label="AI Voice Calls" fa="fa-solid fa-phone-volume" />
+              <ComingSoonItem label="AI Voice" fa="fa-solid fa-phone-volume" />
             </div>
 
             {/* Administrator — hidden for member role and when disabled by admin */}
             {!isMember && administratorTabsEnabled && (
               <>
                 <NavDivider />
-                <GroupLabel icon="⚙️">Administrator</GroupLabel>
-                <SubNavItem href="/profile"        label="Profile"          fa="fa-solid fa-user"          active={is("/profile")} />
-                <SubNavItem href="/business-setup" label="Business Setup"   fa="fa-solid fa-building"      active={is("/business-setup")} />
-                <SubNavItem href="/team"           label="Team"             fa="fa-solid fa-users"         active={is("/team")} />
-                <SubNavItem href="/lead-fields"    label="Lead Fields"      fa="fa-solid fa-table-columns" active={is("/lead-fields")} />
-                <SubNavItem href="/lead-score"     label="Lead Score"       fa="fa-solid fa-chart-line"    active={is("/lead-score")} />
-                <SubNavItem href="/follow-up"      label="Follow-Up Engine" fa="fa-solid fa-bolt"          active={is("/follow-up")} />
-                <SubNavItem href="/calendar"       label="Calendar"         fa="fa-solid fa-calendar"      active={is("/calendar")} />
-                <SubNavItem href="/integrations"   label="Integrations"     fa="fa-solid fa-plug"          active={is("/integrations")} />
+                <GroupLabel icon="⚙️">Account</GroupLabel>
+                <SubNavItem href="/profile"        label="Profile"      fa="fa-solid fa-user"          active={is("/profile")} />
+                <SubNavItem href="/business-setup" label="Business"     fa="fa-solid fa-building"      active={is("/business-setup")} />
+                <SubNavItem href="/team"           label="Team"         fa="fa-solid fa-users"         active={is("/team")} />
+
+                <NavDivider />
+                <GroupLabel icon="🔧">Pipeline Config</GroupLabel>
+                <SubNavItem href="/lead-fields"    label="Lead Fields"  fa="fa-solid fa-table-columns" active={is("/lead-fields")} />
+                <SubNavItem href="/lead-score"     label="Scoring"      fa="fa-solid fa-chart-line"    active={is("/lead-score")} />
+                <SubNavItem href="/follow-up"      label="Follow-Up"    fa="fa-solid fa-bolt"          active={is("/follow-up")} />
+
+                <NavDivider />
+                <GroupLabel icon="🔌">Tools</GroupLabel>
+                <SubNavItem href="/calendar"       label="Calendar"     fa="fa-solid fa-calendar"      active={is("/calendar")} />
+                <SubNavItem href="/integrations"   label="Integrations" fa="fa-solid fa-plug"          active={is("/integrations")} />
               </>
             )}
           </div>
@@ -346,7 +354,7 @@ export default function AppShell({
                 </div>
               </Link>
             );
-          })() : !orgContext ? (
+          })() : !orgContext && !hasActiveMemberships ? (
             <Link href="/onboarding" style={{ textDecoration: "none", display: "block" }}>
               <div style={{ padding: "9px 11px", borderRadius: 9, background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.18)", display: "flex", alignItems: "center", gap: 8 }}>
                 <i className="fa-solid fa-rocket" style={{ fontSize: 11, color: ORANGE }} />

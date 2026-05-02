@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-import { getLeads, getLeadStats, buildSummaryBlurb, type Lead, type CustomFieldDef } from "@/lib/leads";
+import { createSupabaseServiceClient } from "@/lib/supabase-service";
+import { getLeads, getLeadStats, buildSummaryBlurb, leadFullName, type Lead, type CustomFieldDef } from "@/lib/leads";
 import { getStageConfig, scoreColor, scoreBgColor, scoreBorderColor, type LeadStatus } from "@/lib/scoring";
 import { getSubscription, getLeadCountThisMonth, PLANS, type PlanId } from "@/lib/subscriptions";
 import { getLocationContext } from "@/lib/location-utils";
@@ -84,7 +86,7 @@ function LeadCard({ lead, customDefs }: { lead: Lead; customDefs: CustomFieldDef
         {/* Name + job type + last activity + custom chips */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800, color: TEXT, lineHeight: 1.2 }}>
-            {lead.name}
+            {leadFullName(lead)}
           </h3>
           <span style={{ fontSize: 13, fontWeight: 600, color: "#D35400" }}>
             {lead.job_type ?? "No job type"}
@@ -146,16 +148,29 @@ export default async function LeadsPage() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Respect org context cookie so team members see the org's leads
+  const cookieStore = await cookies();
+  const cfOrg       = cookieStore.get("cf_org")?.value ?? null;
+  let activeUserId   = user!.id;
+  if (cfOrg) {
+    const sb = createSupabaseServiceClient();
+    const { data: m } = await sb
+      .from("team_memberships").select("id")
+      .eq("owner_id", cfOrg).eq("member_user_id", user!.id).eq("status", "active")
+      .maybeSingle();
+    if (m) activeUserId = cfOrg;
+  }
+
   const { data: profile } = await supabase
     .from("profiles").select("first_name").eq("id", user!.id).single();
 
-  const locationCtx = await getLocationContext(user!.id);
+  const locationCtx = await getLocationContext(activeUserId);
 
   const [leads, stats, subscription, leadCount, cfDefsRes] = await Promise.all([
     getLeads(locationCtx.filter), getLeadStats(locationCtx.filter),
-    getSubscription(user!.id),
-    getLeadCountThisMonth(user!.id),
-    supabase.from("profiles").select("custom_field_defs").eq("id", user!.id).single(),
+    getSubscription(activeUserId),
+    getLeadCountThisMonth(activeUserId),
+    supabase.from("profiles").select("custom_field_defs").eq("id", activeUserId).single(),
   ]);
   const customDefs: CustomFieldDef[] = (cfDefsRes.data?.custom_field_defs as CustomFieldDef[]) ?? [];
   const blurb = buildSummaryBlurb(stats, profile?.first_name);

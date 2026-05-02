@@ -9,6 +9,7 @@ import {
 } from "@/lib/internal-leads";
 import { ScheduledMeeting, MEETING_TYPE_CONFIG, MeetingType, US_TIMEZONES, formatMeetingDate, formatMeetingTimeWithTZ } from "@/lib/meetings";
 import { MarketingTemplate, MARKETING_TEMPLATES } from "@/lib/emails/marketing";
+import DiagnosticButton from "./DiagnosticButton";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -1433,6 +1434,13 @@ export default function LeadDetailClient({
             <i className={pCfg.icon} style={{ fontSize: 10 }} />
             {pCfg.label}
           </span>
+          <DiagnosticButton
+            leadId={lead.id}
+            businessName={lead.company || fullName}
+            websiteUrl={lead.website}
+            city={lead.city}
+            state={lead.state}
+          />
           <button
             onClick={() => setShowEdit(true)}
             style={{

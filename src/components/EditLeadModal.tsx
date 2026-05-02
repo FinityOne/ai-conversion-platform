@@ -10,6 +10,8 @@ import { formatPhoneE164, formatPhoneDisplay } from "@/lib/phone";
 interface LeadFields {
   id:            string;
   name:          string;
+  first_name:    string;
+  last_name:     string | null;
   phone:         string | null;
   email:         string | null;
   job_type:      string | null;
@@ -45,7 +47,8 @@ export default function EditLeadModal({ lead }: Props) {
   const [saving,  setSaving]  = useState(false);
   const [error,   setError]   = useState("");
 
-  const [name,        setName]        = useState(lead.name);
+  const [firstName,   setFirstName]   = useState(lead.first_name || lead.name.split(" ")[0] || "");
+  const [lastName,    setLastName]    = useState(lead.last_name ?? (lead.name.split(" ").slice(1).join(" ") || ""));
   const [phone,       setPhone]       = useState(formatPhoneDisplay(lead.phone));
   const [email,       setEmail]       = useState(lead.email ?? "");
   const [jobType,     setJobType]     = useState(lead.job_type ?? "");
@@ -69,7 +72,8 @@ export default function EditLeadModal({ lead }: Props) {
 
   // Sync fields if lead prop changes
   useEffect(() => {
-    setName(lead.name);
+    setFirstName(lead.first_name || lead.name.split(" ")[0] || "");
+    setLastName(lead.last_name ?? (lead.name.split(" ").slice(1).join(" ") || ""));
     setPhone(formatPhoneDisplay(lead.phone));
     setEmail(lead.email ?? "");
     setJobType(lead.job_type ?? "");
@@ -94,7 +98,7 @@ export default function EditLeadModal({ lead }: Props) {
   }
 
   async function handleSave() {
-    if (!name.trim()) { setError("Name is required."); return; }
+    if (!firstName.trim()) { setError("First name is required."); return; }
     setSaving(true);
     setError("");
 
@@ -113,7 +117,8 @@ export default function EditLeadModal({ lead }: Props) {
       method:  "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name:          name.trim(),
+        first_name:    firstName.trim(),
+        last_name:     lastName.trim() || null,
         phone:         formatPhoneE164(phone) ?? (phone.trim() || null),
         email:         email.trim()       || null,
         job_type:      jobType.trim()     || null,
@@ -175,7 +180,7 @@ export default function EditLeadModal({ lead }: Props) {
             }}>
               <div>
                 <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: TEXT }}>Edit Lead</h2>
-                <p style={{ margin: "2px 0 0", fontSize: 13, color: MUTED }}>{lead.name}</p>
+                <p style={{ margin: "2px 0 0", fontSize: 13, color: MUTED }}>{[lead.first_name, lead.last_name].filter(Boolean).join(" ") || lead.name}</p>
               </div>
               <button
                 onClick={() => setOpen(false)}
@@ -195,9 +200,15 @@ export default function EditLeadModal({ lead }: Props) {
                 <p style={{ margin: 0, fontSize: 13, color: "#dc2626", fontWeight: 600 }}>{error}</p>
               )}
 
-              <div>
-                <label style={labelStyle}>Name <span style={{ color: ORANGE }}>*</span></label>
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="Full name" style={inputStyle} />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={labelStyle}>First Name <span style={{ color: ORANGE }}>*</span></label>
+                  <input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Jake" style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Last Name</label>
+                  <input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Rivera" style={inputStyle} />
+                </div>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

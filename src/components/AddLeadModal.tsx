@@ -108,7 +108,8 @@ export default function AddLeadModal() {
   const [emailNote, setEmailNote] = useState("");
   const { track } = useAnalytics();
 
-  const [name,        setName]        = useState("");
+  const [firstName,   setFirstName]   = useState("");
+  const [lastName,    setLastName]    = useState("");
   const [phone,       setPhone]       = useState("");
   const [email,       setEmail]       = useState("");
   const [jobType,     setJobType]     = useState("");
@@ -135,7 +136,7 @@ export default function AddLeadModal() {
   }, [open]);
 
   function resetAndClose() {
-    setName(""); setPhone(""); setEmail("");
+    setFirstName(""); setLastName(""); setPhone(""); setEmail("");
     setJobType(""); setDescription("");
     setError(""); setEmailNote(""); setOpen(false);
     setCustomValues({});
@@ -143,12 +144,14 @@ export default function AddLeadModal() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) { setError("Name is required."); return; }
+    if (!firstName.trim()) { setError("First name is required."); return; }
     setLoading(true); setError(""); setEmailNote("");
 
     const sb = createSupabaseBrowserClient();
     const { data: { user } } = await sb.auth.getUser();
     if (!user) { setError("Not signed in."); setLoading(false); return; }
+
+    const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(" ");
 
     // Build custom_fields payload
     const custom_fields: Record<string, string | boolean | null> = {};
@@ -163,7 +166,9 @@ export default function AddLeadModal() {
 
     const { data: lead, error: insertError } = await sb.from("leads").insert({
       user_id:       user.id,
-      name:          name.trim(),
+      first_name:    firstName.trim(),
+      last_name:     lastName.trim() || null,
+      name:          fullName,
       phone:         formatPhoneE164(phone) ?? (phone.trim() || null),
       email:         email.trim()       || null,
       job_type:      jobType            || null,
@@ -186,7 +191,7 @@ export default function AddLeadModal() {
           body: JSON.stringify({
             leadId:      lead.id,
             toEmail:     email.trim(),
-            toName:      name.trim(),
+            toName:      fullName,
             jobType:     jobType || null,
             description: description.trim() || null,
           }),
@@ -269,9 +274,14 @@ export default function AddLeadModal() {
             )}
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <Field label="Full Name *">
-                <input style={inputStyle} placeholder="Jake Rivera" value={name} onChange={e => setName(e.target.value)} autoFocus />
-              </Field>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <Field label="First Name *">
+                  <input style={inputStyle} placeholder="Jake" value={firstName} onChange={e => setFirstName(e.target.value)} autoFocus />
+                </Field>
+                <Field label="Last Name">
+                  <input style={inputStyle} placeholder="Rivera" value={lastName} onChange={e => setLastName(e.target.value)} />
+                </Field>
+              </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <Field label="🇺🇸 Phone">

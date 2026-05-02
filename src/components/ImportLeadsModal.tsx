@@ -13,14 +13,15 @@ const BG     = "#F9F7F2";
 const ORANGE = "#D35400";
 
 // ─── Target fields we want to capture ────────────────────────────────────────
-export type TargetField = "name" | "email" | "phone" | "job_type" | "description" | "cf_1" | "cf_2" | "cf_3" | "__skip__";
+export type TargetField = "first_name" | "last_name" | "email" | "phone" | "job_type" | "description" | "cf_1" | "cf_2" | "cf_3" | "__skip__";
 
 interface FieldMeta {
   label: string;
   required: boolean;
 }
 const CORE_FIELDS: Record<Exclude<TargetField, "__skip__" | CustomFieldKey>, FieldMeta> = {
-  name:        { label: "Full Name",          required: true  },
+  first_name:  { label: "First Name",         required: true  },
+  last_name:   { label: "Last Name",          required: false },
   email:       { label: "Email",              required: false },
   phone:       { label: "Phone",              required: false },
   job_type:    { label: "Job Type",           required: false },
@@ -29,11 +30,15 @@ const CORE_FIELDS: Record<Exclude<TargetField, "__skip__" | CustomFieldKey>, Fie
 
 // ─── Auto-detection alias map ─────────────────────────────────────────────────
 const FIELD_ALIASES: Record<Exclude<TargetField, "__skip__" | CustomFieldKey>, string[]> = {
-  name: [
+  first_name: [
+    "first name", "first_name", "firstname", "fname",
     "name", "full name", "fullname", "full_name",
     "contact name", "contact_name", "lead name", "lead_name",
     "customer name", "customer_name", "client name", "client_name",
     "your name", "respondent", "submitter",
+  ],
+  last_name: [
+    "last name", "last_name", "lastname", "surname", "lname",
   ],
   email: [
     "email", "email address", "email_address", "e-mail", "e_mail",
@@ -95,8 +100,6 @@ function buildLead(
   row: Record<string, string>,
   mapping: ColumnMapping,
   customDefs: CustomFieldDef[],
-  firstNameCol?: string,
-  lastNameCol?: string,
 ) {
   const result: Record<string, string> = {};
   const customFields: Record<string, string> = {};
@@ -109,19 +112,8 @@ function buildLead(
     if (field === "cf_1" || field === "cf_2" || field === "cf_3") {
       customFields[field] = val;
     } else {
-      if (result[field]) {
-        result[field] = result[field] + " " + val;
-      } else {
-        result[field] = val;
-      }
+      result[field] = val;
     }
-  }
-
-  if (!result["name"] && firstNameCol && lastNameCol) {
-    const first = row[firstNameCol]?.trim() ?? "";
-    const last  = row[lastNameCol]?.trim() ?? "";
-    const combined = [first, last].filter(Boolean).join(" ");
-    if (combined) result["name"] = combined;
   }
 
   // Coerce boolean custom fields
@@ -151,12 +143,11 @@ export default function ImportLeadsModal() {
 
   const [parsed,       setParsed]       = useState<ParsedCSV | null>(null);
   const [mapping,      setMapping]      = useState<ColumnMapping>({});
-  const [firstNameCol, setFirstNameCol] = useState<string | undefined>();
-  const [lastNameCol,  setLastNameCol]  = useState<string | undefined>();
   const [customDefs,   setCustomDefs]   = useState<CustomFieldDef[]>([]);
 
+  const [fileName,   setFileName]   = useState("import.csv");
   const [loading,    setLoading]    = useState(false);
-  const [result,     setResult]     = useState<{ imported: number; skipped: number; errorDetails: string[] } | null>(null);
+  const [result,     setResult]     = useState<{ imported: number; skipped: number; importId?: string; errorDetails: string[] } | null>(null);
   const [parseError, setParseError] = useState("");
 
   // Load custom field defs when modal opens
@@ -172,8 +163,7 @@ export default function ImportLeadsModal() {
     setStep("upload");
     setParsed(null);
     setMapping({});
-    setFirstNameCol(undefined);
-    setLastNameCol(undefined);
+    setFileName("import.csv");
     setLoading(false);
     setResult(null);
     setParseError("");
@@ -182,6 +172,7 @@ export default function ImportLeadsModal() {
   // ── Parse CSV file ──────────────────────────────────────────────────────────
   const parseFile = useCallback((file: File) => {
     setParseError("");
+    setFileName(file.name);
     Papa.parse<Record<string, string>>(file, {
       header: true,
       skipEmptyLines: true,
@@ -201,28 +192,8 @@ export default function ImportLeadsModal() {
         setParsed({ headers, rows });
 
         const autoMapping: ColumnMapping = {};
-        let fnCol: string | undefined;
-        let lnCol: string | undefined;
-
         for (const h of headers) {
-          const norm = h.toLowerCase().trim();
-          if (["first name", "first_name", "firstname", "fname"].includes(norm)) {
-            fnCol = h;
-            autoMapping[h] = "__skip__";
-            continue;
-          }
-          if (["last name", "last_name", "lastname", "surname", "lname"].includes(norm)) {
-            lnCol = h;
-            autoMapping[h] = "__skip__";
-            continue;
-          }
           autoMapping[h] = detectField(h);
-        }
-
-        const hasNameMapped = Object.values(autoMapping).includes("name");
-        if (fnCol && lnCol && !hasNameMapped) {
-          setFirstNameCol(fnCol);
-          setLastNameCol(lnCol);
         }
 
         setMapping(autoMapping);
@@ -249,16 +220,16 @@ export default function ImportLeadsModal() {
 
   // ── Derived preview rows ────────────────────────────────────────────────────
   const previewRows = (parsed?.rows ?? []).slice(0, 5).map(row =>
-    buildLead(row, mapping, customDefs, firstNameCol, lastNameCol)
+    buildLead(row, mapping, customDefs)
   );
   const totalRows = parsed?.rows.length ?? 0;
   const validCount = (parsed?.rows ?? []).filter(row => {
-    const lead = buildLead(row, mapping, customDefs, firstNameCol, lastNameCol);
-    return !!lead["name"];
+    const lead = buildLead(row, mapping, customDefs);
+    return !!lead["first_name"];
   }).length;
 
   // Columns that are still unmapped (not assigned to a core field or CF) — used to suggest CF slots
-  const unmappedHeaders = (parsed?.headers ?? []).filter(h => mapping[h] === "__skip__" && h !== firstNameCol && h !== lastNameCol);
+  const unmappedHeaders = (parsed?.headers ?? []).filter(h => mapping[h] === "__skip__");
 
   // ── Import ──────────────────────────────────────────────────────────────────
   async function handleImport() {
@@ -266,16 +237,17 @@ export default function ImportLeadsModal() {
     setLoading(true);
 
     const rows = parsed.rows.map(row => {
-      const built = buildLead(row, mapping, customDefs, firstNameCol, lastNameCol);
+      const built = buildLead(row, mapping, customDefs);
       const customFields = built["__custom_fields__"]
         ? JSON.parse(built["__custom_fields__"])
         : null;
       return {
-        name:          built["name"],
-        phone:         built["phone"],
-        email:         built["email"],
-        job_type:      built["job_type"],
-        description:   built["description"],
+        first_name:    built["first_name"],
+        last_name:     built["last_name"] || null,
+        phone:         built["phone"] || null,
+        email:         built["email"] || null,
+        job_type:      built["job_type"] || null,
+        description:   built["description"] || null,
         custom_fields: customFields,
       };
     });
@@ -283,7 +255,7 @@ export default function ImportLeadsModal() {
     const res = await fetch("/api/leads/import", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rows }),
+      body: JSON.stringify({ rows, file_name: fileName }),
     });
 
     const data = await res.json();
@@ -372,8 +344,6 @@ export default function ImportLeadsModal() {
               <MappingStep
                 headers={parsed.headers}
                 mapping={mapping}
-                firstNameCol={firstNameCol}
-                lastNameCol={lastNameCol}
                 customDefs={customDefs}
                 unmappedHeaders={unmappedHeaders}
                 onChange={(col, field) => setMapping(prev => ({ ...prev, [col]: field }))}
@@ -396,7 +366,7 @@ export default function ImportLeadsModal() {
             )}
 
             {step === "done" && result && (
-              <DoneStep result={result} onClose={resetAndClose} />
+              <DoneStep result={result} onClose={resetAndClose} router={router} />
             )}
           </div>
         </div>
@@ -513,28 +483,24 @@ function UploadStep({
 }
 
 function MappingStep({
-  headers, mapping, firstNameCol, lastNameCol, customDefs, unmappedHeaders,
+  headers, mapping, customDefs, unmappedHeaders,
   onChange, onContinue, onBack,
 }: {
   headers: string[];
   mapping: ColumnMapping;
-  firstNameCol?: string;
-  lastNameCol?: string;
   customDefs: CustomFieldDef[];
   unmappedHeaders: string[];
   onChange: (col: string, field: TargetField) => void;
   onContinue: () => void;
   onBack: () => void;
 }) {
-  const hasDirect = Object.values(mapping).includes("name");
-  const hasCombo  = !!(firstNameCol && lastNameCol &&
-    mapping[firstNameCol] === "__skip__" && mapping[lastNameCol] === "__skip__");
-  const nameOk = hasDirect || hasCombo;
+  const nameOk = Object.values(mapping).includes("first_name");
 
   // Build the dropdown options: core fields + defined custom fields + skip
   const fieldOptions: { value: TargetField; label: string }[] = [
     { value: "__skip__",    label: "— Skip this column —" },
-    { value: "name",        label: "Full Name *" },
+    { value: "first_name",  label: "First Name *" },
+    { value: "last_name",   label: "Last Name" },
     { value: "email",       label: "Email" },
     { value: "phone",       label: "Phone" },
     { value: "job_type",    label: "Job Type" },
@@ -550,19 +516,10 @@ function MappingStep({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      {firstNameCol && lastNameCol && (
-        <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#15803d", display: "flex", gap: 8, alignItems: "flex-start" }}>
-          <i className="fa-solid fa-circle-check" style={{ marginTop: 1, flexShrink: 0 }} />
-          <span>
-            Detected split name columns (<strong>{firstNameCol}</strong> + <strong>{lastNameCol}</strong>). They'll be combined automatically.
-          </span>
-        </div>
-      )}
-
       {!nameOk && (
         <div style={{ background: "#fef2f2", border: "1px solid #fee2e2", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#dc2626" }}>
           <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }} />
-          Map at least one column to <strong>Full Name</strong> — it's required.
+          Map at least one column to <strong>First Name</strong> — it's required.
         </div>
       )}
 
@@ -587,7 +544,6 @@ function MappingStep({
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 320, overflowY: "auto" }}>
         {headers.map(col => {
-          const isFnLn = (col === firstNameCol || col === lastNameCol) && hasCombo;
           const isCF = (mapping[col] === "cf_1" || mapping[col] === "cf_2" || mapping[col] === "cf_3");
           const cfDef = isCF ? customDefs.find(d => d.key === mapping[col]) : null;
 
@@ -603,34 +559,28 @@ function MappingStep({
                 {col}
               </div>
               <i className="fa-solid fa-arrow-right" style={{ fontSize: 12, color: "#c4bfb8" }} />
-              {isFnLn ? (
-                <div style={{ padding: "9px 12px", borderRadius: 8, background: "#f0fdf4", border: "1px solid #bbf7d0", fontSize: 13, color: "#15803d", fontWeight: 600 }}>
-                  Combined → Full Name
-                </div>
-              ) : (
-                <div style={{ position: "relative" }}>
-                  <select
-                    value={mapping[col] ?? "__skip__"}
-                    onChange={e => onChange(col, e.target.value as TargetField)}
-                    style={{
-                      ...inputStyle,
-                      borderColor: isCF ? ORANGE + "88" : BORDER,
-                      background: isCF ? "#fff8f5" : "#fff",
-                      color: isCF ? ORANGE : TEXT,
-                      fontWeight: isCF ? 700 : 400,
-                    }}
-                  >
-                    {fieldOptions.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                  {cfDef && (
-                    <span style={{ position: "absolute", right: 28, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: ORANGE, fontWeight: 800, pointerEvents: "none" }}>
-                      {cfDef.type === "text" ? "TXT" : cfDef.type === "dropdown" ? "▾" : "Y/N"}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div style={{ position: "relative" }}>
+                <select
+                  value={mapping[col] ?? "__skip__"}
+                  onChange={e => onChange(col, e.target.value as TargetField)}
+                  style={{
+                    ...inputStyle,
+                    borderColor: isCF ? ORANGE + "88" : BORDER,
+                    background: isCF ? "#fff8f5" : "#fff",
+                    color: isCF ? ORANGE : TEXT,
+                    fontWeight: isCF ? 700 : 400,
+                  }}
+                >
+                  {fieldOptions.map(o => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                {cfDef && (
+                  <span style={{ position: "absolute", right: 28, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: ORANGE, fontWeight: 800, pointerEvents: "none" }}>
+                    {cfDef.type === "text" ? "TXT" : cfDef.type === "dropdown" ? "▾" : "Y/N"}
+                  </span>
+                )}
+              </div>
             </div>
           );
         })}
@@ -672,8 +622,8 @@ function PreviewStep({
   const skippedCount = totalRows - validCount;
   const activeCFs = customDefs.filter(d => Object.values(mapping).includes(d.key as TargetField));
 
-  const coreHeaders = ["Name", "Email", "Phone", "Job Type", "Notes"];
-  const coreFields  = ["name", "email", "phone", "job_type", "description"];
+  const coreHeaders = ["First Name", "Last Name", "Email", "Phone", "Job Type", "Notes"];
+  const coreFields  = ["first_name", "last_name", "email", "phone", "job_type", "description"];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -684,7 +634,7 @@ function PreviewStep({
         </div>
         <div style={{ background: skippedCount > 0 ? "#fef2f2" : BG, border: `1px solid ${skippedCount > 0 ? "#fee2e2" : BORDER}`, borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
           <p style={{ margin: "0 0 2px", fontSize: 26, fontWeight: 900, color: skippedCount > 0 ? "#dc2626" : MUTED }}>{skippedCount}</p>
-          <p style={{ margin: 0, fontSize: 12, color: skippedCount > 0 ? "#b91c1c" : MUTED, fontWeight: 600 }}>Rows skipped (no name)</p>
+          <p style={{ margin: 0, fontSize: 12, color: skippedCount > 0 ? "#b91c1c" : MUTED, fontWeight: 600 }}>Rows skipped (no first name)</p>
         </div>
       </div>
 
@@ -719,7 +669,7 @@ function PreviewStep({
                 return (
                   <tr key={i} style={{ background: row["name"] ? "#fff" : "#fef2f2" }}>
                     {coreFields.map(f => (
-                      <td key={f} style={{ padding: "7px 10px", border: `1px solid ${BORDER}`, color: row[f] ? TEXT : "#c4bfb8", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <td key={f} style={{ padding: "7px 10px", border: `1px solid ${BORDER}`, color: row[f] ? (f === "first_name" && !row[f] ? "#dc2626" : TEXT) : "#c4bfb8", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {row[f] || <em>—</em>}
                       </td>
                     ))}
@@ -763,10 +713,11 @@ function PreviewStep({
 }
 
 function DoneStep({
-  result, onClose,
+  result, onClose, router,
 }: {
-  result: { imported: number; skipped: number; errorDetails: string[] };
+  result: { imported: number; skipped: number; importId?: string; errorDetails: string[] };
   onClose: () => void;
+  router: ReturnType<typeof import("next/navigation").useRouter>;
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: "20px 0" }}>
@@ -783,7 +734,7 @@ function DoneStep({
           {result.imported} {result.imported === 1 ? "lead" : "leads"} imported
         </p>
         {result.skipped > 0 && (
-          <p style={{ margin: 0, fontSize: 14, color: MUTED }}>{result.skipped} rows skipped (missing name)</p>
+          <p style={{ margin: 0, fontSize: 14, color: MUTED }}>{result.skipped} rows skipped (missing first name)</p>
         )}
       </div>
       {result.errorDetails.length > 0 && (
@@ -791,17 +742,32 @@ function DoneStep({
           {result.errorDetails.map((e, i) => <p key={i} style={{ margin: i === 0 ? 0 : "4px 0 0" }}>{e}</p>)}
         </div>
       )}
-      <button
-        onClick={onClose}
-        style={{
-          padding: "14px 40px", borderRadius: 12, border: "none",
-          background: "linear-gradient(135deg,#D35400,#e8641c)",
-          color: "#fff", fontSize: 15, fontWeight: 700,
-          cursor: "pointer", boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
-        }}
-      >
-        View My Leads
-      </button>
+      <div style={{ display: "flex", gap: 10, width: "100%" }}>
+        <button
+          onClick={onClose}
+          style={{
+            flex: 1, padding: "14px", borderRadius: 12, border: "none",
+            background: "linear-gradient(135deg,#D35400,#e8641c)",
+            color: "#fff", fontSize: 15, fontWeight: 700,
+            cursor: "pointer", boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
+          }}
+        >
+          View Leads
+        </button>
+        {result.importId && (
+          <button
+            onClick={() => { onClose(); router.push(`/imports/${result.importId}`); }}
+            style={{
+              flex: 1, padding: "14px", borderRadius: 12,
+              border: "1.5px solid #e6e2db",
+              background: "#fff", color: TEXT, fontSize: 15, fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            View Import
+          </button>
+        )}
+      </div>
     </div>
   );
 }

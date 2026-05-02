@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Lead, EmailLogEntry, CustomFieldDef } from "@/lib/leads";
+import { leadFullName } from "@/lib/leads";
 import type { LeadStatus } from "@/lib/scoring";
 import { getStageConfig, scoreColor, scoreBgColor, scoreBorderColor } from "@/lib/scoring";
 import { formatPhoneDisplay } from "@/lib/phone";
@@ -384,7 +385,7 @@ export default function LeadDetailClient({
         {/* Name + meta */}
         <div style={{ flex: 1, minWidth: 240 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 6 }}>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: TEXT }}>{lead.name}</h1>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 900, color: TEXT }}>{leadFullName(lead)}</h1>
             {/* Score pill */}
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 10, background: sBg, border: `1.5px solid ${sBorder}` }}>
               <span style={{ fontSize: 18, fontWeight: 900, color: sColor, lineHeight: 1 }}>{lead.score}</span>
@@ -496,7 +497,7 @@ export default function LeadDetailClient({
           <div style={{ padding: "12px 16px", background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.18)", borderRadius: 12, display: "flex", gap: 9, alignItems: "flex-start" }}>
             <i className="fa-solid fa-bullseye" style={{ color: ORANGE, fontSize: 13, marginTop: 1, flexShrink: 0 }} />
             <p style={{ margin: 0, fontSize: 12, color: TEXT, lineHeight: 1.6 }}>
-              <strong>Goal:</strong> Get {lead.name?.split(" ")[0] || "this lead"} to book a first appointment.
+              <strong>Goal:</strong> Get {lead.first_name || lead.name?.split(" ")[0] || "this lead"} to book a first appointment.
               Send emails in sequence or pick the most relevant one.
             </p>
           </div>

@@ -20,15 +20,22 @@ export async function PATCH(
   }
 
   // Only allow these fields to be updated
-  const allowed = ["name", "phone", "email", "job_type", "description", "status"] as const;
+  const allowed = ["name", "first_name", "last_name", "phone", "email", "job_type", "description", "status"] as const;
   const updates: Record<string, unknown> = {};
 
   for (const key of allowed) {
     if (key in body) {
       const val = body[key];
-      // Coerce empty strings to null for optional fields
-      updates[key] = (key !== "name" && key !== "status" && val === "") ? null : val;
+      const required = key === "name" || key === "first_name" || key === "status";
+      updates[key] = (!required && val === "") ? null : val;
     }
+  }
+
+  // Keep name in sync when first_name/last_name are provided
+  if ("first_name" in updates || "last_name" in updates) {
+    const fn = (updates.first_name ?? body.first_name ?? "") as string;
+    const ln = (updates.last_name  ?? body.last_name  ?? "") as string;
+    updates.name = [fn, ln].filter(Boolean).join(" ") || fn;
   }
 
   // custom_fields — merge patch: only touch provided keys
@@ -36,8 +43,11 @@ export async function PATCH(
     updates.custom_fields = body.custom_fields;
   }
 
-  if (!updates.name && "name" in updates) {
+  if ("name" in updates && !updates.name) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
+  }
+  if ("first_name" in updates && !updates.first_name) {
+    return NextResponse.json({ error: "First name is required" }, { status: 400 });
   }
 
   // Verify ownership before updating
