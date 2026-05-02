@@ -1,6 +1,7 @@
 import { createSupabaseServerClient } from "./supabase-server";
 import { createSupabaseServiceClient } from "./supabase-service";
 import { type LeadStatus, computeScore } from "./scoring";
+import { type LocationFilter, applyLocationFilter } from "./location-utils";
 
 // Statuses that sit strictly before project_submitted in the pipeline.
 // A lead in any of these states will be auto-advanced when submitted project
@@ -118,6 +119,7 @@ export interface CustomFieldDef {
 export interface Lead {
   id: string;
   user_id: string;
+  location_id: string | null;
   name: string;
   phone: string | null;
   email: string | null;
@@ -174,15 +176,14 @@ export interface LeadStats {
   closedLost: number;
 }
 
-export async function getLeads(): Promise<Lead[]> {
+export async function getLeads(locationFilter?: LocationFilter): Promise<Lead[]> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const { data: leads, error } = await supabase
-    .from("leads")
-    .select("*")
-    .eq("user_id", user.id);
+  let q = supabase.from("leads").select("*").eq("user_id", user.id);
+  if (locationFilter) q = applyLocationFilter(q, locationFilter);
+  const { data: leads, error } = await q;
 
   if (error || !leads) return [];
 
@@ -266,15 +267,14 @@ export async function getLeadById(id: string): Promise<{
   };
 }
 
-export async function getLeadStats(): Promise<LeadStats> {
+export async function getLeadStats(locationFilter?: LocationFilter): Promise<LeadStats> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { total: 0, today: 0, thisWeek: 0, new: 0, contacted: 0, followUpSent: 0, replied: 0, projectSubmitted: 0, booked: 0, closedWon: 0, closedLost: 0 };
 
-  const { data } = await supabase
-    .from("leads")
-    .select("status, created_at")
-    .eq("user_id", user.id);
+  let q = supabase.from("leads").select("status, created_at").eq("user_id", user.id);
+  if (locationFilter) q = applyLocationFilter(q, locationFilter);
+  const { data } = await q;
 
   if (!data) return { total: 0, today: 0, thisWeek: 0, new: 0, contacted: 0, followUpSent: 0, replied: 0, projectSubmitted: 0, booked: 0, closedWon: 0, closedLost: 0 };
 

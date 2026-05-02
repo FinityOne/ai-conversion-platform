@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { UserDetail, UserLead, UserEmailLog } from "@/lib/admin";
+import type { UserDetail, UserLead, UserEmailLog, UserLocation } from "@/lib/admin";
 import type { PlanId, GrantType } from "@/lib/subscriptions";
 import { PLANS, GRANT_LABELS } from "@/lib/subscriptions";
 import { INDUSTRY_GROUPS } from "@/lib/industry-config";
@@ -424,6 +424,11 @@ function AccessTab({ user, onUserUpdated }: { user: UserDetail; onUserUpdated: (
   const [banLoading,  setBanLoading]  = useState(false);
   const [banMsg,      setBanMsg]      = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
+  // Administrator tabs state
+  const [adminTabsEnabled,  setAdminTabsEnabled]  = useState(user.administrator_tabs_enabled);
+  const [adminTabsLoading,  setAdminTabsLoading]  = useState(false);
+  const [adminTabsMsg,      setAdminTabsMsg]       = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
   const isBanned  = user.banned_until ? new Date(user.banned_until) > new Date() : false;
   const isGranted = user.subscription?.granted_by_admin;
 
@@ -496,6 +501,20 @@ function AccessTab({ user, onUserUpdated }: { user: UserDetail; onUserUpdated: (
     if (!res.ok) { setBanMsg({ type: "err", text: d.error ?? "Failed." }); return; }
     setBanMsg({ type: "ok", text: "Account reinstated." });
     onUserUpdated({ banned_until: null });
+  }
+
+  async function handleAdminTabsToggle(enabled: boolean) {
+    setAdminTabsLoading(true); setAdminTabsMsg(null);
+    const res = await fetch(`/api/admin/users/${user.id}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "set_administrator_tabs", enabled }),
+    });
+    const d = await res.json();
+    setAdminTabsLoading(false);
+    if (!res.ok) { setAdminTabsMsg({ type: "err", text: d.error ?? "Failed." }); return; }
+    setAdminTabsEnabled(enabled);
+    setAdminTabsMsg({ type: "ok", text: enabled ? "Administrator tabs enabled." : "Administrator tabs hidden." });
+    onUserUpdated({ administrator_tabs_enabled: enabled });
   }
 
   function Msg({ msg }: { msg: { type: "ok" | "err"; text: string } | null }) {
@@ -647,6 +666,33 @@ function AccessTab({ user, onUserUpdated }: { user: UserDetail; onUserUpdated: (
           </button>
         )}
         <Msg msg={banMsg} />
+      </div>
+
+      {/* ── Administrator Tabs ── */}
+      <div style={sectionStyle}>
+        <p style={sectionTitle}><i className="fa-solid fa-table-columns" style={{ color: "#ea580c", marginRight: 8 }} />Administrator Section</p>
+        <p style={sectionSub}>Control whether this user sees the Administrator nav section (Business Setup, Team, Lead Fields, Follow-Up Engine, etc.).</p>
+
+        <div style={{ padding: "14px 18px", borderRadius: 12, marginBottom: 16, background: adminTabsEnabled ? "rgba(34,197,94,0.05)" : "rgba(245,158,11,0.05)", border: `1px solid ${adminTabsEnabled ? "rgba(34,197,94,0.2)" : "rgba(245,158,11,0.2)"}`, display: "flex", alignItems: "center", gap: 12 }}>
+          <i className={`fa-solid ${adminTabsEnabled ? "fa-eye" : "fa-eye-slash"}`} style={{ fontSize: 18, color: adminTabsEnabled ? "#16a34a" : "#d97706" }} />
+          <div>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: adminTabsEnabled ? "#16a34a" : "#d97706" }}>{adminTabsEnabled ? "Administrator tabs visible" : "Administrator tabs hidden"}</p>
+            <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED }}>{adminTabsEnabled ? "User can see and access all administrator settings." : "User only sees Marketing and Lead Management."}</p>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          {adminTabsEnabled ? (
+            <button onClick={() => handleAdminTabsToggle(false)} disabled={adminTabsLoading} style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid rgba(245,158,11,0.3)", background: "rgba(245,158,11,0.05)", color: "#b45309", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: adminTabsLoading ? 0.75 : 1 }}>
+              <i className="fa-solid fa-eye-slash" style={{ marginRight: 7 }} />{adminTabsLoading ? "Updating…" : "Hide Administrator Tabs"}
+            </button>
+          ) : (
+            <button onClick={() => handleAdminTabsToggle(true)} disabled={adminTabsLoading} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#16a34a,#22c55e)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: adminTabsLoading ? 0.75 : 1 }}>
+              <i className="fa-solid fa-eye" style={{ marginRight: 7 }} />{adminTabsLoading ? "Updating…" : "Enable Administrator Tabs"}
+            </button>
+          )}
+        </div>
+        <Msg msg={adminTabsMsg} />
       </div>
     </div>
   );
@@ -904,11 +950,220 @@ function BusinessProfileTab({ user, onUserUpdated }: { user: UserDetail; onUserU
   );
 }
 
+// ── Locations Tab ─────────────────────────────────────────────────────────────
+function LocationsTab({ userId, initialLocations, user }: { userId: string; initialLocations: UserLocation[]; user: UserDetail }) {
+  const [locations, setLocations] = useState<UserLocation[]>(initialLocations);
+  const [name,      setName]      = useState("");
+  const [location,  setLocation]  = useState("");
+  const [saving,    setSaving]    = useState(false);
+  const [settingPrimary, setSettingPrimary] = useState<string | null>(null);
+  const [deleting,  setDeleting]  = useState<string | null>(null);
+  const [msg,       setMsg]       = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  const hasPrimary  = locations.some(l => l.is_primary);
+  const profileName = user.business_name ?? "";
+  const profileLoc  = [user.business_city, user.business_state].filter(Boolean).join(", ") || user.business_address || "";
+
+  function flash(type: "ok" | "err", text: string) {
+    setMsg({ type, text });
+    setTimeout(() => setMsg(null), 4000);
+  }
+
+  function prefillFromProfile() {
+    setName(profileName);
+    setLocation(profileLoc);
+  }
+
+  async function handleAdd(isPrimary = false) {
+    if (!name.trim() || !location.trim()) {
+      flash("err", "Both name and location are required.");
+      return;
+    }
+    setSaving(true);
+    const res = await fetch(`/api/admin/users/${userId}/locations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name.trim(), location: location.trim(), is_primary: isPrimary || locations.length === 0 }),
+    });
+    const d = await res.json();
+    setSaving(false);
+    if (!res.ok) { flash("err", d.error ?? "Failed to add location."); return; }
+    // If the new loc is primary, update existing ones
+    const newLoc = { ...d.location, is_primary: d.location.is_primary ?? false };
+    setLocations(prev => {
+      const updated = newLoc.is_primary ? prev.map(l => ({ ...l, is_primary: false })) : prev;
+      return [...updated, newLoc];
+    });
+    setName(""); setLocation("");
+    flash("ok", `Location "${newLoc.name}" added${newLoc.is_primary ? " as primary" : ""}.`);
+  }
+
+  async function handleSetPrimary(locId: string) {
+    setSettingPrimary(locId);
+    const res = await fetch(`/api/admin/users/${userId}/locations?location_id=${locId}`, { method: "PATCH" });
+    const d = await res.json();
+    setSettingPrimary(null);
+    if (!res.ok) { flash("err", d.error ?? "Failed."); return; }
+    setLocations(prev => prev.map(l => ({ ...l, is_primary: l.id === locId })));
+    flash("ok", "Primary location updated.");
+  }
+
+  async function handleDelete(locId: string) {
+    if (!confirm("Remove this location? Leads assigned here will become unassigned.")) return;
+    setDeleting(locId);
+    const res = await fetch(`/api/admin/users/${userId}/locations?location_id=${locId}`, { method: "DELETE" });
+    const d = await res.json();
+    setDeleting(null);
+    if (!res.ok) { flash("err", d.error ?? "Failed to delete."); return; }
+    setLocations(prev => prev.filter(l => l.id !== locId));
+    flash("ok", "Location removed.");
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "10px 13px", borderRadius: 9,
+    border: `1.5px solid ${BORDER}`, background: "#fff",
+    fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box",
+    fontFamily: "inherit",
+  };
+  const labelStyle: React.CSSProperties = {
+    display: "block", fontSize: 11, fontWeight: 700, color: MUTED,
+    textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 5,
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+      {/* Explainer banner */}
+      <div style={{ background: "linear-gradient(135deg,rgba(99,102,241,0.04),rgba(139,92,246,0.04))", border: "1px solid rgba(99,102,241,0.15)", borderRadius: 14, padding: "14px 18px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+        <i className="fa-solid fa-circle-info" style={{ color: INDIGO, fontSize: 16, flexShrink: 0, marginTop: 1 }} />
+        <div>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT }}>Multi-Location Management</p>
+          <p style={{ margin: "3px 0 0", fontSize: 12, color: MUTED, lineHeight: 1.5 }}>
+            The <strong>primary location</strong> is shown first in the client's location picker and captures all historical leads (created before multi-location was configured). Each additional location gets its own clean slate of leads, calendar, and landing page.
+          </p>
+        </div>
+      </div>
+
+      {/* Add location form */}
+      <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 18, padding: "22px 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: TEXT }}>
+            <i className="fa-solid fa-location-dot" style={{ color: INDIGO, marginRight: 8 }} />Add Location
+          </p>
+          {(profileName || profileLoc) && (
+            <button
+              onClick={prefillFromProfile}
+              style={{ padding: "5px 12px", borderRadius: 8, border: `1px solid ${BORDER}`, background: "#fff", color: INDIGO, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+            >
+              <i className="fa-solid fa-wand-magic-sparkles" style={{ marginRight: 5 }} />Use Profile Data
+            </button>
+          )}
+        </div>
+        <p style={{ margin: "0 0 18px", fontSize: 13, color: MUTED }}>
+          {locations.length === 0
+            ? "Add the primary location first — this will be auto-populated from the user's profile."
+            : "Add another location. It will start with a clean slate of leads."}
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+          <div>
+            <label style={labelStyle}>Location Name</label>
+            <input style={inputStyle} value={name} onChange={e => setName(e.target.value)}
+              placeholder="e.g. Main Clinic, North Location" onKeyDown={e => { if (e.key === "Enter") handleAdd(); }} />
+          </div>
+          <div>
+            <label style={labelStyle}>Address / City</label>
+            <input style={inputStyle} value={location} onChange={e => setLocation(e.target.value)}
+              placeholder="e.g. 123 Main St, Austin TX" onKeyDown={e => { if (e.key === "Enter") handleAdd(); }} />
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => handleAdd(false)} disabled={saving}
+            style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: `linear-gradient(135deg, ${INDIGO}, #8b5cf6)`, color: "#fff", fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.75 : 1, display: "inline-flex", alignItems: "center", gap: 7 }}>
+            {saving ? <><i className="fa-solid fa-circle-notch fa-spin" /> Adding…</> : <><i className="fa-solid fa-plus" /> Add Location</>}
+          </button>
+          {locations.length === 0 && (
+            <button onClick={() => handleAdd(true)} disabled={saving}
+              style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#16a34a,#22c55e)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.75 : 1, display: "inline-flex", alignItems: "center", gap: 7 }}>
+              <i className="fa-solid fa-star" /> Add as Primary
+            </button>
+          )}
+        </div>
+
+        {msg && (
+          <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600,
+            background: msg.type === "ok" ? "rgba(34,197,94,0.07)" : "rgba(239,68,68,0.07)",
+            border: `1px solid ${msg.type === "ok" ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)"}`,
+            color: msg.type === "ok" ? "#16a34a" : "#dc2626" }}>
+            <i className={`fa-solid ${msg.type === "ok" ? "fa-circle-check" : "fa-circle-exclamation"}`} style={{ marginRight: 7 }} />
+            {msg.text}
+          </div>
+        )}
+      </div>
+
+      {/* Locations list */}
+      <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 18, overflow: "hidden" }}>
+        <div style={{ padding: "14px 22px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: TEXT }}>Locations</p>
+          <span style={{ fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: "rgba(99,102,241,0.08)", color: INDIGO }}>
+            {locations.length} {locations.length === 1 ? "location" : "locations"}
+          </span>
+        </div>
+
+        {locations.length === 0 ? (
+          <div style={{ padding: "48px 24px", textAlign: "center" }}>
+            <i className="fa-solid fa-location-dot" style={{ fontSize: 28, color: "#e2e8f0", display: "block", marginBottom: 10 }} />
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT }}>No locations configured</p>
+            <p style={{ margin: "4px 0 0", fontSize: 13, color: MUTED }}>This user is operating as a solo practitioner. Add a primary location above to enable multi-location mode.</p>
+          </div>
+        ) : locations.map((loc, i) => (
+          <div key={loc.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 22px", borderBottom: i < locations.length - 1 ? `1px solid ${BG}` : "none" }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+              background: loc.is_primary ? "rgba(22,163,74,0.08)" : "rgba(99,102,241,0.08)",
+              border: `1px solid ${loc.is_primary ? "rgba(22,163,74,0.2)" : "rgba(99,102,241,0.15)"}` }}>
+              <i className="fa-solid fa-location-dot" style={{ fontSize: 15, color: loc.is_primary ? "#16a34a" : INDIGO }} />
+            </div>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: TEXT }}>{loc.name}</p>
+                {loc.is_primary && (
+                  <span style={{ fontSize: 9.5, fontWeight: 800, padding: "2px 7px", borderRadius: 10, background: "rgba(22,163,74,0.1)", color: "#16a34a", border: "1px solid rgba(22,163,74,0.2)", letterSpacing: "0.5px" }}>
+                    PRIMARY
+                  </span>
+                )}
+              </div>
+              <p style={{ margin: "2px 0 0", fontSize: 13, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{loc.location}</p>
+              <p style={{ margin: "1px 0 0", fontSize: 11, color: "#94a3b8" }}>Added {fmtDate(loc.created_at)}</p>
+            </div>
+
+            <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+              {!loc.is_primary && (
+                <button onClick={() => handleSetPrimary(loc.id)} disabled={settingPrimary === loc.id}
+                  title="Set as primary location"
+                  style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(22,163,74,0.3)", background: "rgba(22,163,74,0.05)", color: "#16a34a", fontSize: 12, fontWeight: 700, cursor: settingPrimary === loc.id ? "not-allowed" : "pointer" }}>
+                  {settingPrimary === loc.id ? <i className="fa-solid fa-circle-notch fa-spin" /> : <><i className="fa-solid fa-star" style={{ marginRight: 4 }} />Set Primary</>}
+                </button>
+              )}
+              <button onClick={() => handleDelete(loc.id)} disabled={deleting === loc.id}
+                title="Remove location"
+                style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", color: "#dc2626", fontSize: 12, cursor: deleting === loc.id ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {deleting === loc.id ? <i className="fa-solid fa-circle-notch fa-spin" /> : <i className="fa-solid fa-trash" />}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Root Component ────────────────────────────────────────────────────────────
 export default function UserDetailClient({ user: initialUser }: { user: UserDetail }) {
   const router = useRouter();
   const [user, setUser] = useState(initialUser);
-  const [tab,  setTab]  = useState<"overview" | "profile" | "leads" | "emails" | "access">("overview");
+  const [tab,  setTab]  = useState<"overview" | "profile" | "leads" | "emails" | "access" | "locations">("overview");
 
   const color = avatarColor(user.id);
   const inits = initials(user);
@@ -925,7 +1180,8 @@ export default function UserDetailClient({ user: initialUser }: { user: UserDeta
     { id: "profile",  label: "Business Profile", icon: "fa-solid fa-building"    },
     { id: "leads",    label: `Leads (${user.total_leads})`, icon: "fa-solid fa-layer-group" },
     { id: "emails",   label: `Emails (${user.total_emails})`, icon: "fa-solid fa-envelope" },
-    { id: "access",   label: "Access",         icon: "fa-solid fa-key"           },
+    { id: "access",    label: "Access",                               icon: "fa-solid fa-key"            },
+    { id: "locations", label: `Locations (${user.locations.length})`, icon: "fa-solid fa-location-dot"  },
   ] as const;
 
   return (
@@ -991,7 +1247,8 @@ export default function UserDetailClient({ user: initialUser }: { user: UserDeta
       {tab === "profile"  && <BusinessProfileTab user={user} onUserUpdated={handleUserUpdated} />}
       {tab === "leads"    && <LeadsTab leads={user.leads} leadsByStatus={user.leads_by_status} />}
       {tab === "emails"   && <EmailsTab emails={user.email_log} totalEmails={user.total_emails} emailsOpened={user.emails_opened} emailsClicked={user.emails_clicked} />}
-      {tab === "access"   && <AccessTab user={user} onUserUpdated={handleUserUpdated} />}
+      {tab === "access"    && <AccessTab user={user} onUserUpdated={handleUserUpdated} />}
+      {tab === "locations" && <LocationsTab userId={user.id} initialLocations={user.locations} user={user} />}
     </div>
   );
 }

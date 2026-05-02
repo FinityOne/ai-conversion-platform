@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import PhoneInput from "@/components/PhoneInput";
@@ -115,6 +115,8 @@ const STEP_NAMES = ["email", "first_name", "last_name", "phone", "business_name"
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "/onboarding";
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -214,7 +216,7 @@ export default function SignupPage() {
       }
     }
 
-    router.push("/onboarding");
+    router.push(redirectTo);
   }
 
   async function handleGoogleSignIn() {

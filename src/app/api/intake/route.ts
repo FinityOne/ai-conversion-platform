@@ -27,9 +27,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Business not found" }, { status: 404 });
   }
 
+  // Stamp leads with the primary location (if multi-location is configured)
+  const { data: primaryLocation } = await sb
+    .from("user_locations")
+    .select("id")
+    .eq("user_id", profile.id)
+    .eq("is_primary", true)
+    .maybeSingle();
+
   // Create the lead
   const { data: lead, error: insertError } = await sb.from("leads").insert({
     user_id:     profile.id,
+    location_id: primaryLocation?.id ?? null,
     name:        name.trim(),
     phone:       phone?.trim() || null,
     email:       email?.trim() || null,

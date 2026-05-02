@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getSubscription } from "@/lib/subscriptions";
+import { getMemberOrgs } from "@/lib/team";
 import OnboardingWizard from "@/components/OnboardingWizard";
 
 export default async function OnboardingPage() {
@@ -12,6 +13,10 @@ export default async function OnboardingPage() {
   // Already subscribed → skip to dashboard
   const subscription = await getSubscription(user.id);
   if (subscription) redirect("/dashboard");
+
+  // Active team member of another org → skip paywall entirely
+  const memberOrgs = await getMemberOrgs(user.id);
+  if (memberOrgs.length > 0) redirect("/dashboard");
 
   const { data: profile } = await supabase
     .from("profiles")

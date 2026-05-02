@@ -34,6 +34,16 @@ export async function PATCH(
     return NextResponse.json({ success: true, role });
   }
 
+  if (action === "set_administrator_tabs") {
+    const enabled = body.enabled as boolean;
+    if (typeof enabled !== "boolean") {
+      return NextResponse.json({ error: "enabled must be a boolean" }, { status: 400 });
+    }
+    const { error } = await sb.from("profiles").update({ administrator_tabs_enabled: enabled }).eq("id", userId);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true, administrator_tabs_enabled: enabled });
+  }
+
   if (action === "ban") {
     const { error } = await sb.auth.admin.updateUserById(userId, {
       ban_duration: "876000h", // ~100 years = effectively permanent

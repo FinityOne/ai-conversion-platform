@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseServiceClient } from "@/lib/supabase-service";
 import { applySegmentRules, type Segment, type SegmentRule } from "@/lib/segments";
 import type { CustomFieldDef } from "@/lib/leads";
+import { getLocationContext, applyLocationFilter } from "@/lib/location-utils";
 import SegmentDetailClient from "./SegmentDetailClient";
 
 export const metadata = { title: "Segment" };
@@ -12,10 +13,13 @@ export default async function SegmentDetailPage({ params }: { params: Promise<{ 
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  const { filter } = await getLocationContext(user!.id);
+  const sb = createSupabaseServiceClient();
+
   const [segRes, profileRes, allLeadsRes] = await Promise.all([
     supabase.from("segments").select("*").eq("id", id).eq("user_id", user!.id).single(),
     supabase.from("profiles").select("custom_field_defs, business_name").eq("id", user!.id).single(),
-    createSupabaseServiceClient().from("leads").select("*").eq("user_id", user!.id),
+    applyLocationFilter(sb.from("leads").select("*").eq("user_id", user!.id), filter),
   ]);
 
   if (!segRes.data) notFound();

@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "./supabase-server";
+import { type LocationFilter, applyLocationFilter } from "./location-utils";
 
 export interface DailyVolume {
   label: string;   // "Mon", "Tue", etc.
@@ -11,12 +12,12 @@ export interface EmailDashStats {
   sentThisWeek:  number;
   sentThisMonth: number;
   totalSent:     number;
-  openedCount:   number;   // emails with opened_at set
-  dailyVolume:   DailyVolume[]; // last 7 days oldest→newest
-  awaitingCount: number;   // active leads with email not yet fully engaged
+  openedCount:   number;
+  dailyVolume:   DailyVolume[];
+  awaitingCount: number;
 }
 
-export async function getEmailDashStats(): Promise<EmailDashStats> {
+export async function getEmailDashStats(locationFilter?: LocationFilter): Promise<EmailDashStats> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -31,13 +32,28 @@ export async function getEmailDashStats(): Promise<EmailDashStats> {
   const start7     = new Date(now); start7.setDate(now.getDate() - 6); start7.setHours(0,0,0,0);
   const start30    = new Date(now); start30.setDate(now.getDate() - 29); start30.setHours(0,0,0,0);
 
-  // Pull all sent emails for this user
-  const { data: logs } = await supabase
+  // When a location filter is active, scope email_log to leads in that location.
+  // email_log has no location_id column, so we join through lead IDs.
+  let leadIds: string[] | null = null;
+  if (locationFilter && locationFilter.mode !== "all") {
+    let leadsQ = supabase.from("leads").select("id").eq("user_id", user.id);
+    leadsQ = applyLocationFilter(leadsQ, locationFilter);
+    const { data: locationLeads } = await leadsQ;
+    leadIds = (locationLeads ?? []).map((l: { id: string }) => l.id);
+    if (leadIds.length === 0) return empty;
+  }
+
+  let emailQ = supabase
     .from("email_log")
     .select("created_at, opened_at, email_status")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
+  if (leadIds !== null) {
+    emailQ = emailQ.in("lead_id", leadIds);
+  }
+
+  const { data: logs } = await emailQ;
   const all = logs ?? [];
 
   const sentToday     = all.filter(l => new Date(l.created_at) >= startToday).length;
@@ -54,40 +70,31 @@ export async function getEmailDashStats(): Promise<EmailDashStats> {
     const d = new Date(now);
     d.setDate(now.getDate() - i);
     d.setHours(0, 0, 0, 0);
-
     const dEnd = new Date(d);
     dEnd.setHours(23, 59, 59, 999);
-
     const count = all.filter(l => {
       const t = new Date(l.created_at);
       return t >= d && t <= dEnd;
     }).length;
-
-    const dateStr = d.toISOString().slice(0, 10);
     dailyVolume.push({
       label: i === 0 ? "Today" : DAY_LABELS[d.getDay()],
-      date:  dateStr,
+      date:  d.toISOString().slice(0, 10),
       count,
     });
   }
 
   // Awaiting follow-up: active leads with an email that aren't yet booked/closed
-  const { data: awaitingLeads } = await supabase
+  let awaitQ = supabase
     .from("leads")
     .select("id")
     .eq("user_id", user.id)
     .not("email", "is", null)
     .in("status", ["new", "contacted", "replied", "follow_up_sent"]);
 
+  if (locationFilter) awaitQ = applyLocationFilter(awaitQ, locationFilter);
+
+  const { data: awaitingLeads } = await awaitQ;
   const awaitingCount = awaitingLeads?.length ?? 0;
 
-  return {
-    sentToday,
-    sentThisWeek,
-    sentThisMonth,
-    totalSent,
-    openedCount,
-    dailyVolume,
-    awaitingCount,
-  };
+  return { sentToday, sentThisWeek, sentThisMonth, totalSent, openedCount, dailyVolume, awaitingCount };
 }

@@ -742,12 +742,41 @@ export default function ProfileClient({ initialProfile }: { initialProfile: User
         )}
       </div>
 
+      {/* ── Business Setup link card ── */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: 14,
+        padding: "16px 20px", borderRadius: 14, marginBottom: 20,
+        background: "rgba(211,84,0,0.05)",
+        border: "1.5px solid rgba(211,84,0,0.2)",
+      }}>
+        <div style={{
+          width: 40, height: 40, borderRadius: 11,
+          background: "rgba(211,84,0,0.1)", border: "1px solid rgba(211,84,0,0.2)",
+          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+        }}>
+          <i className="fa-solid fa-building" style={{ fontSize: 17, color: ORANGE }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ margin: "0 0 2px", fontSize: 14, fontWeight: 800, color: TEXT }}>Business Setup</p>
+          <p style={{ margin: 0, fontSize: 12, color: MUTED }}>
+            Manage your logo, contact details, address, social links, and brand preview — used across all your emails and landing pages.
+          </p>
+        </div>
+        <Link
+          href="/business-setup"
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "8px 16px", borderRadius: 9,
+            background: ORANGE, color: "#fff",
+            fontSize: 13, fontWeight: 700, textDecoration: "none", flexShrink: 0,
+          }}
+        >
+          Open <i className="fa-solid fa-arrow-right" style={{ fontSize: 11 }} />
+        </Link>
+      </div>
+
       {/* ── Edit sections ── */}
-      <PersonalSection          profile={profile} onChange={handleChange} />
-      <BusinessIdentitySection  profile={profile} onChange={handleChange} />
-      <BusinessOperationsSection profile={profile} onChange={handleChange} />
-      <OnlinePresenceSection    profile={profile} onChange={handleChange} />
-      <WhiteLabelPreview        profile={profile} />
+      <PersonalSection profile={profile} onChange={handleChange} />
 
       {/* ── Security ── */}
       <ChangePasswordForm />

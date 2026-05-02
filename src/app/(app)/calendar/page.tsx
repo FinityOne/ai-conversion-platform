@@ -3,6 +3,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase-service";
 import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import Link from "next/link";
 import { formatDateFull, formatTime12 } from "@/lib/bookings";
+import { getLocationContext, applyLocationFilter } from "@/lib/location-utils";
 
 const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
@@ -14,6 +15,7 @@ export default async function CalendarPage() {
 
   const sb    = createSupabaseServiceClient();
   const today = new Date().toISOString().slice(0, 10);
+  const { filter } = await getLocationContext(user!.id);
 
   // Fetch existing availability
   const end7 = new Date(); end7.setDate(end7.getDate() + 6);
@@ -28,18 +30,17 @@ export default async function CalendarPage() {
     r => `${r.slot_date}|${String(r.slot_time).slice(0, 5)}`
   );
 
-  // Fetch upcoming confirmed bookings
-  const { data: bookings } = await sb
-    .from("bookings")
-    .select("id, lead_id, booking_date, start_time, end_time, status")
-    .eq("user_id", user!.id)
-    .eq("status", "confirmed")
-    .gte("booking_date", today)
-    .order("booking_date")
-    .order("start_time");
+  // Fetch upcoming confirmed bookings (filtered by location)
+  const bookingsQ = applyLocationFilter(
+    sb.from("bookings").select("id, lead_id, booking_date, start_time, end_time, status")
+      .eq("user_id", user!.id).eq("status", "confirmed").gte("booking_date", today)
+      .order("booking_date").order("start_time"),
+    filter,
+  );
+  const { data: bookings } = await bookingsQ;
 
   // Fetch lead names for those bookings
-  const leadIds = [...new Set((bookings ?? []).map(b => b.lead_id))];
+  const leadIds = [...new Set((bookings ?? []).map((b: { lead_id: string }) => b.lead_id))];
   const { data: leads } = leadIds.length
     ? await sb.from("leads").select("id, name, job_type").in("id", leadIds)
     : { data: [] };
@@ -95,7 +96,7 @@ export default async function CalendarPage() {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {bookings.map(b => {
+            {bookings.map((b: { id: string; lead_id: string; booking_date: string | null; start_time: string | null; end_time: string | null; status: string }) => {
               const lead = leadMap[b.lead_id];
               return (
                 <Link

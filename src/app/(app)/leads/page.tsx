@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getLeads, getLeadStats, buildSummaryBlurb, type Lead, type CustomFieldDef } from "@/lib/leads";
 import { getStageConfig, scoreColor, scoreBgColor, scoreBorderColor, type LeadStatus } from "@/lib/scoring";
 import { getSubscription, getLeadCountThisMonth, PLANS, type PlanId } from "@/lib/subscriptions";
+import { getLocationContext } from "@/lib/location-utils";
 import AddLeadModal from "@/components/AddLeadModal";
 import ImportLeadsModal from "@/components/ImportLeadsModal";
 import PipelineInfoModal from "@/components/PipelineInfoModal";
@@ -148,8 +149,10 @@ export default async function LeadsPage() {
   const { data: profile } = await supabase
     .from("profiles").select("first_name").eq("id", user!.id).single();
 
+  const locationCtx = await getLocationContext(user!.id);
+
   const [leads, stats, subscription, leadCount, cfDefsRes] = await Promise.all([
-    getLeads(), getLeadStats(),
+    getLeads(locationCtx.filter), getLeadStats(locationCtx.filter),
     getSubscription(user!.id),
     getLeadCountThisMonth(user!.id),
     supabase.from("profiles").select("custom_field_defs").eq("id", user!.id).single(),

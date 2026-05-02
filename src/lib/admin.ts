@@ -380,6 +380,15 @@ export interface UserBooking {
   created_at:   string;
 }
 
+export interface UserLocation {
+  id:         string;
+  user_id:    string;
+  name:       string;
+  location:   string;
+  is_primary: boolean;
+  created_at: string;
+}
+
 export interface HealthDimension {
   score:  number;
   max:    number;
@@ -447,6 +456,9 @@ export interface UserDetail {
   leads:     UserLead[];
   email_log: UserEmailLog[];
   bookings:  UserBooking[];
+  locations: UserLocation[];
+  // Feature flags
+  administrator_tabs_enabled: boolean;
   // Computed
   health_score:     number;
   health_breakdown: HealthBreakdown;
@@ -526,7 +538,7 @@ export async function getAdminUserDetail(userId: string): Promise<UserDetail | n
   const sb = createSupabaseServiceClient();
 
   const [
-    profileRes, statsRes, subRes, leadsRes, emailsRes, bookingsRes,
+    profileRes, statsRes, subRes, leadsRes, emailsRes, bookingsRes, locationsRes,
   ] = await Promise.all([
     sb.from("profiles").select("*").eq("id", userId).maybeSingle(),
     sb.rpc("admin_get_user_detail", { p_user_id: userId }).single(),
@@ -542,6 +554,9 @@ export async function getAdminUserDetail(userId: string): Promise<UserDetail | n
     sb.from("bookings")
       .select("id, lead_id, booking_date, start_time, status, created_at")
       .eq("user_id", userId).order("created_at", { ascending: false }),
+    sb.from("user_locations")
+      .select("id, user_id, name, location, is_primary, created_at")
+      .eq("user_id", userId).order("is_primary", { ascending: false }).order("created_at", { ascending: true }),
   ]);
 
   const profile = profileRes.data;
@@ -567,9 +582,10 @@ export async function getAdminUserDetail(userId: string): Promise<UserDetail | n
     };
   }
 
-  const leads     = (leadsRes.data  ?? []) as UserLead[];
-  const email_log = (emailsRes.data ?? []) as UserEmailLog[];
-  const bookings  = (bookingsRes.data ?? []) as UserBooking[];
+  const leads     = (leadsRes.data     ?? []) as UserLead[];
+  const email_log = (emailsRes.data   ?? []) as UserEmailLog[];
+  const bookings  = (bookingsRes.data  ?? []) as UserBooking[];
+  const locations = (locationsRes.data ?? []) as UserLocation[];
 
   const leadStats    = stats?.lead_stats  ?? { total: 0, this_month: 0, by_status: {} };
   const emailStats   = stats?.email_stats ?? { total: 0, opened: 0, clicked: 0 };
@@ -612,11 +628,12 @@ export async function getAdminUserDetail(userId: string): Promise<UserDetail | n
     last_sign_in_at:    stats?.last_sign_in_at    ?? null,
     email_confirmed_at: stats?.email_confirmed_at ?? null,
     banned_until:       stats?.banned_until       ?? null,
+    administrator_tabs_enabled: profile.administrator_tabs_enabled ?? true,
     subscription,
     total_leads, leads_this_month, leads_by_status,
     total_emails, emails_opened, emails_clicked,
     total_bookings, total_sms, has_webhook, webhook_last_triggered,
-    leads, email_log, bookings,
+    leads, email_log, bookings, locations,
   };
 
   const { score, breakdown } = computeUserHealthScore(baseData);
