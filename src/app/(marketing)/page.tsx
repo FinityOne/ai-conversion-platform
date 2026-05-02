@@ -3,12 +3,17 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  MIDNIGHT_NAVY, DEEP_NAVY, SAPPHIRE, SAPPHIRE_PALE,
+  LAVENDER, LAVENDER_PALE, SLATE, STEEL, CLOUD, FROST, WHITE,
+  GRAD_PRIMARY, GRAD_HERO_BG, GRAD_DARK,
+  FONT_DISPLAY, FONT_SANS,
+} from "@/lib/brand";
 
-const BG     = "#F9F7F2";
-const ORANGE = "#D35400";
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BORDER = "#e6e2db";
+const BG     = FROST;
+const TEXT   = MIDNIGHT_NAVY;
+const MUTED  = SLATE;
+const BORDER = CLOUD;
 const GREEN  = "#27AE60";
 
 const TESTIMONIALS = [
@@ -85,9 +90,9 @@ const TRADE_GROUPS: { label: string; icon: string; color: string; bg: string; bo
   {
     label: "Core Home Trades",
     icon: "fa-solid fa-house-chimney-crack",
-    color: "#D35400",
-    bg: "rgba(211,84,0,0.06)",
-    border: "rgba(211,84,0,0.15)",
+    color: SAPPHIRE,
+    bg: "rgba(40,96,176,0.06)",
+    border: "rgba(40,96,176,0.15)",
     services: [
       { icon: "fa-solid fa-wind",           label: "HVAC & Cooling"   },
       { icon: "fa-solid fa-faucet-drip",    label: "Plumbing"         },
@@ -179,7 +184,7 @@ function ScrollCalculator() {
       <div style={{
         position: "sticky", top: 0,
         height: "100dvh",
-        background: TEXT,
+        background: DEEP_NAVY,
         display: "flex", flexDirection: "column",
         overflow: "hidden",
       }}>
@@ -188,7 +193,7 @@ function ScrollCalculator() {
         <div style={{ height: 3, background: "rgba(255,255,255,0.06)", flexShrink: 0 }}>
           <div style={{
             height: "100%", width: `${progress * 100}%`,
-            background: "linear-gradient(90deg,#D35400,#e8641c)",
+            background: GRAD_PRIMARY,
             transition: "width 0.05s linear",
           }} />
         </div>
@@ -305,12 +310,12 @@ function ScrollCalculator() {
               <p style={{ fontSize: 10, color: "rgba(249,247,242,0.2)" }}>jobs / mo</p>
             </div>
             <p style={{ textAlign: "center", fontSize: 12, color: "rgba(249,247,242,0.18)", fontWeight: 700 }}>vs</p>
-            <div style={{ textAlign: "center", background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.18)", borderRadius: 12, padding: "12px 8px" }}>
-              <p style={{ fontSize: 9, fontWeight: 700, color: "#e8641c", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>With ClozeFlow</p>
-              <p style={{ fontSize: 28, fontWeight: 900, color: "#e8641c", fontVariantNumeric: "tabular-nums", transition: "all 0.08s linear" }}>
+            <div style={{ textAlign: "center", background: "rgba(40,96,176,0.08)", border: "1px solid rgba(40,96,176,0.18)", borderRadius: 12, padding: "12px 8px" }}>
+              <p style={{ fontSize: 9, fontWeight: 700, color: SAPPHIRE, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>With ClozeFlow</p>
+              <p style={{ fontSize: 28, fontWeight: 900, color: SAPPHIRE, fontVariantNumeric: "tabular-nums", transition: "all 0.08s linear" }}>
                 {Math.round(cfJobs)}
               </p>
-              <p style={{ fontSize: 10, color: "rgba(211,84,0,0.4)" }}>jobs / mo</p>
+              <p style={{ fontSize: 10, color: "rgba(40,96,176,0.4)" }}>jobs / mo</p>
             </div>
           </div>
 
@@ -320,11 +325,11 @@ function ScrollCalculator() {
             pointerEvents: ctaOpacity > 0.3 ? "auto" : "none",
           }}>
             <Link href="/signup" style={{
-              background: "linear-gradient(135deg,#D35400,#e8641c)",
+              background: GRAD_PRIMARY,
               color: "#fff", fontWeight: 800, fontSize: 15,
               padding: "13px 28px", borderRadius: 10, textDecoration: "none",
               display: "inline-block",
-              boxShadow: "0 4px 24px rgba(211,84,0,0.45)",
+              boxShadow: "0 4px 24px rgba(40,96,176,0.45)",
             }}>
               Stop Losing Jobs — Start Free →
             </Link>
@@ -337,7 +342,7 @@ function ScrollCalculator() {
             <div key={t} style={{
               height: 5, borderRadius: 3,
               width: progress >= t - 0.01 ? 18 : 5,
-              background: progress >= t - 0.01 ? ORANGE : "rgba(255,255,255,0.14)",
+              background: progress >= t - 0.01 ? SAPPHIRE : "rgba(255,255,255,0.14)",
               transition: "all 0.3s",
             }} />
           ))}
@@ -391,9 +396,9 @@ function ConnectScreenContent() {
             </div>
           </div>
         ))}
-        <div style={{ background: "rgba(211,84,0,0.06)", border: "1px solid rgba(211,84,0,0.12)", borderRadius: 10, padding: "9px 12px", textAlign: "center", marginTop: 4 }}>
-          <p style={{ fontSize: 10, fontWeight: 800, color: ORANGE, margin: 0 }}>8 leads captured today</p>
-          <p style={{ fontSize: 8, color: "rgba(211,84,0,0.5)", marginTop: 2 }}>All responded to within 60s</p>
+        <div style={{ background: "rgba(40,96,176,0.06)", border: "1px solid rgba(40,96,176,0.12)", borderRadius: 10, padding: "9px 12px", textAlign: "center", marginTop: 4 }}>
+          <p style={{ fontSize: 10, fontWeight: 800, color: SAPPHIRE, margin: 0 }}>8 leads captured today</p>
+          <p style={{ fontSize: 8, color: "rgba(40,96,176,0.5)", marginTop: 2 }}>All responded to within 60s</p>
         </div>
       </div>
     </div>
@@ -417,33 +422,33 @@ function ChatScreenContent() {
       </div>
       <div style={{ padding: "10px 10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          <div style={{ background: "#2C3E50", borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
+          <div style={{ background: DEEP_NAVY, borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
             <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;Need a roof quote. Saw your Angi ad.&rdquo;</p>
           </div>
           <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:14 PM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <span style={{ fontSize: 7, fontWeight: 700, color: ORANGE, marginBottom: 2 }}>ClozeFlow · 47s</span>
+          <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow · 47s</span>
           <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "7px 10px", maxWidth: "85%", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
             <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Hi Sarah! What&apos;s your address and best day for an estimate?&rdquo;</p>
           </div>
           <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:14 PM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          <div style={{ background: "#2C3E50", borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
+          <div style={{ background: DEEP_NAVY, borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
             <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;123 Oak St. Any day this week.&rdquo;</p>
           </div>
           <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:16 PM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <span style={{ fontSize: 7, fontWeight: 700, color: ORANGE, marginBottom: 2 }}>ClozeFlow · 12s</span>
+          <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow · 12s</span>
           <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "7px 10px", maxWidth: "85%", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
             <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Perfect — Thursday 2–4 PM for a free estimate?&rdquo;</p>
           </div>
           <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:16 PM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <span style={{ fontSize: 7, fontWeight: 700, color: ORANGE, marginBottom: 2 }}>ClozeFlow</span>
+          <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow</span>
           <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "9px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.08)", display: "flex", gap: 4, alignItems: "center" }}>
             <div className="hiw-td hiw-td-0" style={{ width: 5, height: 5, borderRadius: "50%", background: "#d1d5db" }} />
             <div className="hiw-td hiw-td-1" style={{ width: 5, height: 5, borderRadius: "50%", background: "#d1d5db" }} />
@@ -471,7 +476,7 @@ function CalendarScreenContent() {
           {weekDates.map(d => (
             <div key={d} style={{
               height: 22, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6,
-              background: d === 17 ? "linear-gradient(135deg,#D35400,#e8641c)" : "transparent",
+              background: d === 17 ? GRAD_PRIMARY : "transparent",
             }}>
               <p style={{ fontSize: 9, fontWeight: d === 17 ? 800 : 400, color: d === 17 ? "#fff" : TEXT, margin: 0 }}>{d}</p>
             </div>
@@ -480,10 +485,10 @@ function CalendarScreenContent() {
       </div>
       <div style={{ padding: "10px 10px" }}>
         <p style={{ fontSize: 9, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Thursday, Apr 17</p>
-        <div style={{ background: "#fff", borderRadius: 12, padding: "12px 12px", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", borderLeft: `3px solid ${ORANGE}` }}>
+        <div style={{ background: "#fff", borderRadius: 12, padding: "12px 12px", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", borderLeft: "3px solid " + SAPPHIRE }}>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: ORANGE, flexShrink: 0 }} />
-            <p style={{ fontSize: 10, fontWeight: 800, color: ORANGE, margin: 0 }}>2:00 PM</p>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: SAPPHIRE, flexShrink: 0 }} />
+            <p style={{ fontSize: 10, fontWeight: 800, color: SAPPHIRE, margin: 0 }}>2:00 PM</p>
           </div>
           <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, marginBottom: 1 }}>Sarah M.</p>
           <p style={{ fontSize: 9, color: MUTED, marginBottom: 1 }}>Roof Inspection</p>
@@ -502,7 +507,7 @@ function StepPhone({ step }: { step: number }) {
     <div style={{ position: "relative" }}>
       <div style={{
         position: "absolute", width: 260, height: 260, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(211,84,0,0.12) 0%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(40,96,176,0.12) 0%, transparent 70%)",
         bottom: -40, left: "50%", transform: "translateX(-50%)",
         pointerEvents: "none",
       }} />
@@ -587,10 +592,10 @@ function HowItWorks() {
     <section style={{ background: BG, borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 72 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: SAPPHIRE, marginBottom: 14 }}>
             How It Works
           </p>
-          <h2 style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 900, color: TEXT, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+          <h2 style={{ fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 900, color: TEXT, letterSpacing: "-0.02em", lineHeight: 1.1, fontFamily: FONT_DISPLAY, fontStyle: "italic" }}>
             Set it up once. Let it run forever.
           </h2>
         </div>
@@ -609,7 +614,7 @@ function HowItWorks() {
                   cursor: "pointer",
                   background: active === i ? "#fff" : "transparent",
                   border: `1px solid ${active === i ? BORDER : "transparent"}`,
-                  borderLeft: `3px solid ${active === i ? ORANGE : "transparent"}`,
+                  borderLeft: `3px solid ${active === i ? SAPPHIRE : "transparent"}`,
                   boxShadow: active === i ? "0 4px 16px rgba(0,0,0,0.06)" : "none",
                   transition: "all 0.25s ease",
                 }}
@@ -617,7 +622,7 @@ function HowItWorks() {
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: active === i ? 10 : 0 }}>
                   <span style={{
                     fontSize: 11, fontWeight: 800, letterSpacing: "0.05em", flexShrink: 0,
-                    color: active === i ? ORANGE : "rgba(44,62,80,0.28)",
+                    color: active === i ? SAPPHIRE : "rgba(44,62,80,0.28)",
                     transition: "color 0.25s",
                   }}>
                     {step.n}
@@ -678,7 +683,7 @@ function PhoneMockup() {
         position: "absolute",
         width: 300, height: 300,
         borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(211,84,0,0.18) 0%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(40,96,176,0.18) 0%, transparent 70%)",
         bottom: -60, left: "50%", transform: "translateX(-50%)",
         pointerEvents: "none",
       }} />
@@ -765,14 +770,14 @@ function PhoneMockup() {
           {/* AI notification */}
           <div style={{
             margin: "7px 10px 2px",
-            background: "linear-gradient(135deg,rgba(211,84,0,0.07),rgba(232,100,28,0.04))",
-            border: "1px solid rgba(211,84,0,0.18)",
+            background: "linear-gradient(135deg,rgba(40,96,176,0.07),rgba(139,111,196,0.04))",
+            border: "1px solid rgba(40,96,176,0.18)",
             borderRadius: 9,
             padding: "6px 9px",
             display: "flex", alignItems: "center", gap: 6,
           }}>
             <span style={{ fontSize: 10, flexShrink: 0 }}>⚡</span>
-            <p style={{ margin: 0, fontSize: 8, fontWeight: 600, color: "#D35400", lineHeight: 1.4 }}>
+            <p style={{ margin: 0, fontSize: 8, fontWeight: 600, color: SAPPHIRE, lineHeight: 1.4 }}>
               AI replied to 3 new leads while you were on the job
             </p>
           </div>
@@ -819,10 +824,10 @@ function PhoneMockup() {
 
 export default function Home() {
   return (
-    <div style={{ background: BG, color: TEXT }}>
+    <div style={{ background: BG, color: TEXT, fontFamily: FONT_SANS }}>
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section style={{ padding: "72px 24px 80px" }}>
+      <section style={{ padding: "72px 24px 80px", background: GRAD_HERO_BG }}>
         <div style={{
           maxWidth: 1100, margin: "0 auto",
           display: "grid",
@@ -837,12 +842,12 @@ export default function Home() {
             {/* Badge */}
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 6,
-              background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.2)",
+              background: SAPPHIRE_PALE, border: "1px solid rgba(40,96,176,0.2)",
               borderRadius: 100, padding: "6px 14px",
-              fontSize: 12, fontWeight: 700, color: ORANGE, letterSpacing: "0.04em",
+              fontSize: 12, fontWeight: 700, color: SAPPHIRE, letterSpacing: "0.04em",
               marginBottom: 24,
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: ORANGE }} />
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: SAPPHIRE }} />
               ⚡ 100+ service businesses. Zero missed leads.
             </div>
 
@@ -851,6 +856,7 @@ export default function Home() {
               fontWeight: 900, color: TEXT,
               letterSpacing: "-0.03em", lineHeight: 1.05,
               marginBottom: 20,
+              fontFamily: FONT_DISPLAY, fontStyle: "italic",
             }}>
               Never lose a lead again.
             </h1>
@@ -864,17 +870,17 @@ export default function Home() {
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
               <Link href="/signup" style={{
-                background: "linear-gradient(135deg,#D35400,#e8641c)",
+                background: GRAD_PRIMARY,
                 color: "#fff", fontWeight: 700, fontSize: 16,
                 padding: "14px 28px", borderRadius: 10, textDecoration: "none",
-                boxShadow: "0 4px 20px rgba(211,84,0,0.25)",
+                boxShadow: "0 4px 20px rgba(40,96,176,0.25)",
               }}>
                 Start Free — No Card Needed →
               </Link>
               <Link href="/how-it-works" style={{
-                background: "#fff", color: TEXT, fontWeight: 600, fontSize: 16,
+                background: "#fff", color: SAPPHIRE, fontWeight: 600, fontSize: 16,
                 padding: "14px 28px", borderRadius: 10, textDecoration: "none",
-                border: `1px solid ${BORDER}`,
+                border: "1.5px solid #C5D5EF",
               }}>
                 See How It Works
               </Link>
@@ -919,7 +925,7 @@ export default function Home() {
 
       {/* ── Social proof strip ───────────────────────────── */}
       <section style={{
-        background: "#fff",
+        background: WHITE,
         borderTop: `1px solid ${BORDER}`,
         borderBottom: `1px solid ${BORDER}`,
         padding: "24px 24px",
@@ -938,7 +944,7 @@ export default function Home() {
       {/* ── Who We Serve ─────────────────────────────────── */}
       <section style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 12 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: SAPPHIRE, marginBottom: 12 }}>
             Who We Serve
           </p>
           <h2 style={{
@@ -1017,7 +1023,7 @@ export default function Home() {
 
         <p style={{ marginTop: 28, fontSize: 14, color: MUTED, textAlign: "center" }}>
           Don&apos;t see your category?{" "}
-          <Link href="/signup" style={{ color: ORANGE, fontWeight: 700, textDecoration: "none" }}>
+          <Link href="/signup" style={{ color: SAPPHIRE, fontWeight: 700, textDecoration: "none" }}>
             ClozeFlow works for any service business that depends on fast follow-up →
           </Link>
         </p>
@@ -1032,7 +1038,7 @@ export default function Home() {
 
           {/* Section header */}
           <div style={{ marginBottom: 72 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: SAPPHIRE, marginBottom: 14 }}>
               The Real Problem
             </p>
             <h2 style={{
@@ -1099,7 +1105,7 @@ export default function Home() {
               {/* Divider */}
               <div style={{
                 height: 1,
-                background: `linear-gradient(90deg, ${ORANGE}, transparent)`,
+                background: `linear-gradient(90deg, ${SAPPHIRE}, transparent)`,
                 marginBottom: 20,
                 opacity: 0.35,
               }} />
@@ -1108,7 +1114,7 @@ export default function Home() {
               <p style={{
                 fontSize: 15, color: MUTED, lineHeight: 1.65,
                 paddingLeft: 16,
-                borderLeft: `2px solid ${ORANGE}`,
+                borderLeft: `2px solid ${SAPPHIRE}`,
               }}>
                 {row.fix}
               </p>
@@ -1124,10 +1130,10 @@ export default function Home() {
       <section style={{ background: BG, borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 64 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: SAPPHIRE, marginBottom: 14 }}>
               Real Results
             </p>
-            <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em", fontFamily: FONT_DISPLAY, fontStyle: "italic" }}>
               Service businesses that stopped losing leads.
             </h2>
           </div>
@@ -1191,10 +1197,10 @@ export default function Home() {
       <section style={{ background: "#fff", borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 64 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, marginBottom: 14 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: SAPPHIRE, marginBottom: 14 }}>
               Features
             </p>
-            <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em", fontFamily: FONT_DISPLAY, fontStyle: "italic" }}>
               Everything you need. Nothing you don&apos;t.
             </h2>
           </div>
@@ -1206,9 +1212,9 @@ export default function Home() {
               }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 12, marginBottom: 20,
-                  background: "rgba(211,84,0,0.07)", border: "1px solid rgba(211,84,0,0.14)",
+                  background: "rgba(40,96,176,0.07)", border: "1px solid rgba(40,96,176,0.14)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  color: ORANGE, flexShrink: 0,
+                  color: SAPPHIRE, flexShrink: 0,
                 }}>
                   <FeatureIcon index={i} />
                 </div>
@@ -1220,8 +1226,8 @@ export default function Home() {
 
           <div style={{ textAlign: "center", marginTop: 40 }}>
             <Link href="/features" style={{
-              color: ORANGE, fontWeight: 700, fontSize: 15, textDecoration: "none",
-              border: `1px solid rgba(211,84,0,0.25)`, padding: "11px 28px",
+              color: SAPPHIRE, fontWeight: 700, fontSize: 15, textDecoration: "none",
+              border: "1px solid rgba(40,96,176,0.25)", padding: "11px 28px",
               borderRadius: 8, display: "inline-block",
             }}>
               See all features →
@@ -1233,17 +1239,17 @@ export default function Home() {
       {/* ── Final CTA ────────────────────────────────────── */}
       <section style={{ padding: "96px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
-          <h2 style={{ fontSize: "clamp(28px, 5vw, 44px)", fontWeight: 900, color: TEXT, marginBottom: 16, lineHeight: 1.1 }}>
+          <h2 style={{ fontSize: "clamp(28px, 5vw, 44px)", fontWeight: 900, color: TEXT, marginBottom: 16, lineHeight: 1.1, fontFamily: FONT_DISPLAY, fontStyle: "italic" }}>
             Ready to fill your calendar this week?
           </h2>
           <p style={{ fontSize: 17, color: MUTED, lineHeight: 1.65, marginBottom: 36 }}>
             Join 100+ service businesses that have stopped missing leads and started booking more jobs — without spending another dollar on ads.
           </p>
           <Link href="/signup" style={{
-            background: "linear-gradient(135deg,#D35400,#e8641c)",
+            background: GRAD_PRIMARY,
             color: "#fff", fontWeight: 800, fontSize: 17,
             padding: "16px 36px", borderRadius: 12, textDecoration: "none", display: "inline-block",
-            boxShadow: "0 4px 20px rgba(211,84,0,0.25)", marginBottom: 16,
+            boxShadow: "0 4px 20px rgba(40,96,176,0.25)", marginBottom: 16,
           }}>
             Create Your Free Account → It&apos;s FREE
           </Link>
