@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -18,115 +18,113 @@ const GREEN  = "#27AE60";
 
 const TESTIMONIALS = [
   {
-    quote: "First month with ClozeFlow I got 9 extra estimate appointments — automatically. Closed 6 of them. It paid for itself in week one.",
-    name: "Jake R.",
-    title: "Owner, Ridge Line Remodeling",
-    location: "Phoenix, AZ",
-    initials: "JR",
-    photo: "https://images.pexels.com/photos/30450838/pexels-photo-30450838.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
+    quote: "In our first 30 days with ClozeFlow, we converted 14 more consultations from inquiries we used to miss. That alone covered 6 months of the subscription.",
+    name: "Dr. Lauren M.",
+    title: "Medical Director, Luminary Aesthetics",
+    location: "Scottsdale, AZ",
+    initials: "LM",
+    photo: "https://images.pexels.com/photos/5214413/pexels-photo-5214413.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
   },
   {
-    quote: "We were spending $2,800/mo on Angi and barely converting. ClozeFlow responds in under a minute. Our ROI on those leads literally tripled.",
-    name: "Maria C.",
-    title: "Operations Manager, Summit Renovations",
-    location: "Denver, CO",
-    initials: "MC",
-    photo: "https://images.pexels.com/photos/27086758/pexels-photo-27086758.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
+    quote: "We were losing patients who called after hours or on weekends. ClozeFlow responds instantly and books them for a consult. Our no-show rate also dropped because of the reminders.",
+    name: "Dr. James T.",
+    title: "Owner, Align Chiropractic & Wellness",
+    location: "Austin, TX",
+    initials: "JT",
+    photo: "https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
   },
   {
-    quote: "I used to drive 40 minutes to meet tire-kickers. That doesn't happen anymore. My close rate nearly tripled in one quarter.",
-    name: "Derek M.",
-    title: "Owner, Keystone Builders",
-    location: "Columbus, OH",
-    initials: "DM",
-    photo: "https://images.pexels.com/photos/32064778/pexels-photo-32064778.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
+    quote: "Our front desk was overwhelmed with follow-up calls. ClozeFlow handles all of it — qualification, scheduling, reminders. My staff now focus on the patients in the office.",
+    name: "Dr. Priya S.",
+    title: "Practice Owner, Bright Smile Dental",
+    location: "Chicago, IL",
+    initials: "PS",
+    photo: "https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
   },
 ];
 
 const FEATURES = [
-  { title: "60-Second Response",   desc: "Every lead gets a personal reply the moment they reach out — day or night, 365 days a year. First response wins the job." },
-  { title: "Smart Qualification",  desc: "AI asks the right questions upfront so your time only goes to serious, ready-to-book buyers. No more tire-kickers." },
-  { title: "Automated Follow-Up",  desc: "A structured 5-touch sequence follows up over 5 days. No lead goes cold while you're on the job." },
-  { title: "Calendar Booking",     desc: "Qualified leads pick a time directly from your availability. No back-and-forth calls, no missed connections." },
-  { title: "Pipeline Dashboard",   desc: "Every lead, every status, one clean view. Know exactly where each job stands without digging through texts." },
-  { title: "Campaign Tracking",    desc: "See which flyers, ads, and sources are actually converting — tracked down to the booked job." },
+  { title: "60-Second Response",   desc: "Every patient inquiry gets a personal reply the moment they reach out — evenings, weekends, holidays. First response wins the appointment." },
+  { title: "Smart Qualification",  desc: "AI asks the right intake questions upfront — service interest, insurance, timeline — so your front desk only handles ready-to-book patients." },
+  { title: "Automated Follow-Up",  desc: "A structured follow-up sequence nurtures every inquiry over 5 days. No patient goes cold while you're with someone in the exam room." },
+  { title: "Online Scheduling",    desc: "Qualified patients pick an appointment slot directly from your availability. No phone tag, no missed connections, no double bookings." },
+  { title: "Patient Pipeline",     desc: "Every inquiry, every status, one clean view. Know exactly where each potential patient stands — new, in-follow-up, or booked." },
+  { title: "Source Tracking",      desc: "See which Google ads, Healthgrades profiles, and referral sources are actually converting — tracked all the way to the booked appointment." },
 ];
 
 const HIW_STEPS = [
   {
     n: "01",
-    title: "Connect your lead sources",
-    desc: "Website, Google, Angi, Thumbtack — anywhere customers find you. Our team handles the full setup in one day. No tech skills needed.",
+    title: "Connect your patient inquiry sources",
+    desc: "Website, Google, Healthgrades, Zocdoc — anywhere patients find your practice. Our team handles the full setup in one day. No tech skills needed.",
   },
   {
     n: "02",
     title: "AI responds in under 60 seconds",
-    desc: "Every inquiry gets a personal, intelligent reply the moment it arrives — day or night. The AI qualifies job type, budget, and timeline while you're on the job.",
+    desc: "Every inquiry gets a warm, intelligent reply the moment it arrives — day or night. The AI qualifies the service of interest, insurance, and preferred time while you're with patients.",
   },
   {
     n: "03",
-    title: "Qualified jobs land on your calendar",
-    desc: "Ready-to-book customers schedule themselves. You get a notification, show up, and do the work you love.",
+    title: "Qualified patients land on your schedule",
+    desc: "Ready-to-book patients schedule themselves. You get a notification, the chart is prepped, and you focus entirely on delivering great care.",
   },
 ];
 
-const TRADE_GROUPS: { label: string; icon: string; color: string; bg: string; border: string; services: { icon: string; label: string }[]; footnote?: string }[] = [
+const MEDICAL_SPECIALTIES: { label: string; icon: string; color: string; bg: string; border: string; services: { icon: string; label: string }[] }[] = [
   {
-    label: "Health, Wellness & Med Services",
-    icon: "fa-solid fa-heart-pulse",
+    label: "Aesthetics & Med Spa",
+    icon: "fa-solid fa-spa",
     color: "#be185d",
     bg: "rgba(190,24,93,0.06)",
     border: "rgba(190,24,93,0.15)",
     services: [
-      { icon: "fa-solid fa-spa",                 label: "Med Spa & Aesthetics"  },
-      { icon: "fa-solid fa-tooth",               label: "Dental & Orthodontics" },
-      { icon: "fa-solid fa-person-walking",       label: "Physical Therapy"      },
-      { icon: "fa-solid fa-hand-holding-medical", label: "Chiropractic Care"     },
-      { icon: "fa-solid fa-brain",               label: "Mental Health"         },
-      { icon: "fa-solid fa-stethoscope",         label: "Local Clinics"         },
-      { icon: "fa-solid fa-paw",                 label: "Veterinary"            },
+      { icon: "fa-solid fa-sparkles",            label: "Botox & Fillers"          },
+      { icon: "fa-solid fa-sun",                 label: "Laser & Skin Resurfacing"  },
+      { icon: "fa-solid fa-droplet",             label: "IV Therapy & Hydration"    },
+      { icon: "fa-solid fa-star",                label: "Body Contouring"           },
+      { icon: "fa-solid fa-face-smile",          label: "Facials & Chemical Peels"  },
     ],
   },
   {
-    label: "Core Home Trades",
-    icon: "fa-solid fa-house-chimney-crack",
-    color: SAPPHIRE,
-    bg: "rgba(40,96,176,0.06)",
-    border: "rgba(40,96,176,0.15)",
+    label: "Dental & Orthodontics",
+    icon: "fa-solid fa-tooth",
+    color: "#0284c7",
+    bg: "rgba(2,132,199,0.06)",
+    border: "rgba(2,132,199,0.15)",
     services: [
-      { icon: "fa-solid fa-wind",           label: "HVAC & Cooling"   },
-      { icon: "fa-solid fa-faucet-drip",    label: "Plumbing"         },
-      { icon: "fa-solid fa-bolt",           label: "Electrical"       },
-      { icon: "fa-solid fa-house-chimney",  label: "Roofing"          },
+      { icon: "fa-solid fa-tooth",               label: "General Dentistry"         },
+      { icon: "fa-solid fa-teeth",               label: "Orthodontics & Invisalign" },
+      { icon: "fa-solid fa-teeth-open",          label: "Dental Implants"           },
+      { icon: "fa-solid fa-star",                label: "Cosmetic Dentistry"        },
+      { icon: "fa-solid fa-child",               label: "Pediatric Dentistry"       },
     ],
   },
   {
-    label: "Project-Based Trades",
-    icon: "fa-solid fa-helmet-safety",
+    label: "PT, Chiro & Rehab",
+    icon: "fa-solid fa-person-walking",
+    color: "#059669",
+    bg: "rgba(5,150,105,0.06)",
+    border: "rgba(5,150,105,0.15)",
+    services: [
+      { icon: "fa-solid fa-person-walking",      label: "Physical Therapy"          },
+      { icon: "fa-solid fa-hand-holding-medical", label: "Chiropractic Care"        },
+      { icon: "fa-solid fa-dumbbell",            label: "Sports Medicine"           },
+      { icon: "fa-solid fa-heart-pulse",         label: "Occupational Therapy"      },
+      { icon: "fa-solid fa-brain",               label: "Neurology Rehab"           },
+    ],
+  },
+  {
+    label: "Primary Care & Clinics",
+    icon: "fa-solid fa-stethoscope",
     color: "#6366f1",
     bg: "rgba(99,102,241,0.06)",
     border: "rgba(99,102,241,0.15)",
     services: [
-      { icon: "fa-solid fa-person-digging",  label: "General Contractors" },
-      { icon: "fa-solid fa-layer-group",     label: "Flooring"            },
-      { icon: "fa-solid fa-paint-roller",    label: "Painting"            },
-      { icon: "fa-solid fa-border-all",      label: "Windows & Doors"     },
-      { icon: "fa-solid fa-road",            label: "Concrete & Paving"   },
-    ],
-  },
-  {
-    label: "Outdoor & Recurring Services",
-    icon: "fa-solid fa-seedling",
-    color: "#16a34a",
-    bg: "rgba(22,163,74,0.06)",
-    border: "rgba(22,163,74,0.15)",
-    services: [
-      { icon: "fa-solid fa-leaf",         label: "Landscaping"       },
-      { icon: "fa-solid fa-tree",         label: "Tree Services"     },
-      { icon: "fa-solid fa-bug-slash",    label: "Pest Control"      },
-      { icon: "fa-solid fa-water-ladder", label: "Pool & Spa"        },
-      { icon: "fa-solid fa-spray-can",    label: "Pressure Washing"  },
-      { icon: "fa-solid fa-broom",        label: "Cleaning Services" },
+      { icon: "fa-solid fa-stethoscope",         label: "Primary Care Clinics"      },
+      { icon: "fa-solid fa-brain",               label: "Mental Health & Therapy"   },
+      { icon: "fa-solid fa-eye",                 label: "Optometry & Vision Care"   },
+      { icon: "fa-solid fa-syringe",             label: "Weight Loss & Wellness"    },
+      { icon: "fa-solid fa-paw",                 label: "Veterinary Practices"      },
     ],
   },
 ];
@@ -135,248 +133,596 @@ function fmt$(n: number) {
   return "$" + Math.round(n).toLocaleString("en-US");
 }
 
-function ScrollCalculator() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+// ── Demo modal ────────────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const update = () => {
-      const scrolled   = -el.getBoundingClientRect().top;
-      const scrollable = el.offsetHeight - window.innerHeight;
-      if (scrollable <= 0) return;
-      setProgress(Math.min(1, Math.max(0, scrolled / scrollable)));
+type DemoStep = 1 | 2 | 3 | "done";
+
+function DemoForm() {
+  const [step, setStep]       = useState<DemoStep>(1);
+  const [leadId, setLeadId]   = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
+  const [foc, setFoc]         = useState("");
+
+  const [fn, setFn]         = useState("");
+  const [ln, setLn]         = useState("");
+  const [email, setEmail]   = useState("");
+  const [phone, setPhone]   = useState("");
+
+  const [practice, setPractice] = useState("");
+  const [city, setCity]         = useState("");
+  const [st, setSt]             = useState("");
+  const [locs, setLocs]         = useState("");
+  const [role, setRole]         = useState("");
+
+  const [challenge, setChallenge]     = useState("");
+  const [patientGoal, setPatientGoal] = useState("");
+
+  const fo = (k: string) => ({ onFocus: () => setFoc(k), onBlur: () => setFoc("") });
+
+  const progress = step === "done" ? 100 : step === 1 ? 33 : step === 2 ? 66 : 100;
+
+  function inp(focused: boolean): React.CSSProperties {
+    return {
+      width: "100%", padding: "13px 14px", borderRadius: 10,
+      border: `2px solid ${focused ? SAPPHIRE : CLOUD}`,
+      boxShadow: focused ? `0 0 0 3px rgba(40,96,176,0.12)` : "none",
+      background: "#fff", fontSize: 15, color: MIDNIGHT_NAVY,
+      outline: "none", boxSizing: "border-box" as const,
+      transition: "border-color 0.15s, box-shadow 0.15s",
+      WebkitAppearance: "none" as const, minHeight: 48, display: "block",
     };
-    window.addEventListener("scroll", update, { passive: true });
-    update();
-    return () => window.removeEventListener("scroll", update);
-  }, []);
+  }
 
-  // Scroll-driven values
-  const closeRate = 20 - progress * 15;             // 20% → 5%
-  const leads     = Math.round(50 + progress * 50); // 50  → 100
-  const yourJobs  = leads * (closeRate / 100);
-  const cfJobs    = leads * 0.55;
-  const annualGap = Math.max(0, cfJobs - yourJobs) * 1000 * 12;
+  const step1 = useCallback(async () => {
+    if (!fn.trim() || !email.trim() || !phone.trim()) { setError("Please fill in your name, email, and phone."); return; }
+    setError(""); setLoading(true);
+    try {
+      const r = await fetch("/api/healthcare-demo", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ first_name: fn, last_name: ln, email, phone }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      setLeadId(d.id); setStep(2);
+    } catch { setError("Something went wrong — please try again."); }
+    finally { setLoading(false); }
+  }, [fn, ln, email, phone]);
 
-  // Close-rate danger colours
-  const crColor  = closeRate > 15 ? "#fbbf24" : closeRate > 10 ? "#f97316" : "#ef4444";
-  const crBorder = closeRate > 15 ? "rgba(251,191,36,0.22)" : closeRate > 10 ? "rgba(249,115,22,0.28)" : "rgba(239,68,68,0.35)";
-  const crGlow   = closeRate <= 10 ? "0 0 28px rgba(239,68,68,0.18)" : "none";
+  const step2 = useCallback(async () => {
+    if (!practice.trim()) { setError("Please enter your practice name."); return; }
+    setError(""); setLoading(true);
+    try {
+      const r = await fetch(`/api/healthcare-demo/${leadId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company: practice, city, state: st, employee_count: locs || null, job_title: role || null }) });
+      if (!r.ok) throw new Error("update failed");
+      setStep(3);
+    } catch { setError("Something went wrong — please try again."); }
+    finally { setLoading(false); }
+  }, [leadId, practice, city, st, locs, role]);
 
-  // Reveal opacities
-  const gapOpacity  = Math.min(1, progress * 10);
-  const rowOpacity  = Math.min(1, Math.max(0, (progress - 0.2)  * 5));
-  const ctaOpacity  = Math.min(1, Math.max(0, (progress - 0.75) * 4));
-  const hintOpacity = Math.max(0, 1 - progress * 7);
-  const glowPx      = Math.round(progress * 32);
+  const step3 = useCallback(async () => {
+    setError(""); setLoading(true);
+    const notes = [challenge && `Challenge: ${challenge}`, patientGoal && `Monthly goal: ${patientGoal}`].filter(Boolean).join(" | ");
+    try {
+      const r = await fetch(`/api/healthcare-demo/${leadId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ notes: notes || "No details provided" }) });
+      if (!r.ok) throw new Error("update failed");
+      setStep("done");
+    } catch { setError("Something went wrong — please try again."); }
+    finally { setLoading(false); }
+  }, [leadId, challenge, patientGoal]);
 
-  const phaseLabel =
-    progress < 0.25 ? "Here's your situation right now" :
-    progress < 0.55 ? "Your leads are slipping through the cracks" :
-    progress < 0.80 ? "This is how much you're leaving behind" :
-                      "ClozeFlow closes this gap — starting today";
+  const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
 
-  return (
-    <div ref={containerRef} style={{ height: "350vh", position: "relative" }}>
-      {/* Sticky full-screen card */}
-      <div style={{
-        position: "sticky", top: 0,
-        height: "100dvh",
-        background: DEEP_NAVY,
-        display: "flex", flexDirection: "column",
-        overflow: "hidden",
-      }}>
-
-        {/* Top progress bar */}
-        <div style={{ height: 3, background: "rgba(255,255,255,0.06)", flexShrink: 0 }}>
-          <div style={{
-            height: "100%", width: `${progress * 100}%`,
-            background: GRAD_PRIMARY,
-            transition: "width 0.05s linear",
-          }} />
-        </div>
-
-        {/* Scroll hint — fades out immediately */}
-        <div style={{
-          position: "absolute", top: 18, left: 0, right: 0,
-          display: "flex", justifyContent: "center", alignItems: "center", gap: 6,
-          opacity: hintOpacity, transition: "opacity 0.3s",
-          pointerEvents: "none",
-        }}>
-          <span className="cf-bounce" style={{ fontSize: 13, color: "rgba(249,247,242,0.35)" }}>↓</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(249,247,242,0.3)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-            Scroll to see your revenue gap
-          </span>
-        </div>
-
-        {/* Body */}
-        <div style={{
-          flex: 1, display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          padding: "52px 24px 16px",
-          gap: 12,
-          width: "100%", maxWidth: 480, margin: "0 auto",
-        }}>
-
-          {/* Phase label */}
-          <p style={{
-            fontSize: 13, fontWeight: 600, color: "rgba(249,247,242,0.42)",
-            textAlign: "center", lineHeight: 1.4,
-            minHeight: "2.6em", display: "flex", alignItems: "center",
-            transition: "opacity 0.4s",
-          }}>
-            {phaseLabel}
-          </p>
-
-          {/* Stat boxes: Leads + Close Rate */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%" }}>
-            {/* Leads */}
-            <div style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 16, padding: "18px 12px", textAlign: "center",
-            }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(249,247,242,0.38)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
-                Leads / month
-              </p>
-              <p style={{
-                fontSize: "clamp(42px, 10vw, 60px)", fontWeight: 900, color: "#F9F7F2", lineHeight: 1,
-                fontVariantNumeric: "tabular-nums", transition: "all 0.08s linear",
-              }}>
-                {leads}
-              </p>
-            </div>
-
-            {/* Close rate */}
-            <div style={{
-              background: "rgba(255,255,255,0.05)",
-              border: `1px solid ${crBorder}`,
-              borderRadius: 16, padding: "18px 12px", textAlign: "center",
-              transition: "border-color 0.4s, box-shadow 0.4s",
-              boxShadow: crGlow,
-            }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(249,247,242,0.38)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
-                Your close rate
-              </p>
-              <p style={{
-                fontSize: "clamp(42px, 10vw, 60px)", fontWeight: 900, lineHeight: 1,
-                color: crColor, transition: "color 0.25s",
-                fontVariantNumeric: "tabular-nums",
-              }}>
-                {Math.round(closeRate)}%
-              </p>
-            </div>
-          </div>
-
-          {/* Annual gap — the hero number */}
-          <div style={{
-            width: "100%",
-            background: "rgba(39,174,96,0.07)", border: "1px solid rgba(39,174,96,0.18)",
-            borderRadius: 18, padding: "20px 16px", textAlign: "center",
-            opacity: gapOpacity, transition: "opacity 0.3s",
-          }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(39,174,96,0.6)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
-              You&apos;re leaving on the table every year
-            </p>
-            <p style={{
-              fontSize: "clamp(38px, 10vw, 62px)", fontWeight: 900, lineHeight: 1,
-              background: "linear-gradient(135deg,#27AE60,#2ecc71)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-              fontVariantNumeric: "tabular-nums",
-              filter: `drop-shadow(0 0 ${glowPx}px rgba(39,174,96,0.55))`,
-              transition: "filter 0.2s",
-              marginBottom: 4,
-            }}>
-              {fmt$(annualGap)}
-            </p>
-            <p style={{ fontSize: 11, color: "rgba(39,174,96,0.38)", fontWeight: 500 }}>
-              based on $1,000 avg job · <Link href="/calculator" style={{ color: "rgba(39,174,96,0.6)", textDecoration: "none", fontWeight: 700 }}>use your real numbers →</Link>
-            </p>
-          </div>
-
-          {/* Without vs With row */}
-          <div style={{
-            display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 8,
-            width: "100%", alignItems: "center",
-            opacity: rowOpacity, transition: "opacity 0.3s",
-          }}>
-            <div style={{ textAlign: "center", background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "12px 8px" }}>
-              <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(249,247,242,0.28)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Without ClozeFlow</p>
-              <p style={{ fontSize: 28, fontWeight: 900, color: "rgba(249,247,242,0.4)", fontVariantNumeric: "tabular-nums", transition: "all 0.08s linear" }}>
-                {Math.round(yourJobs)}
-              </p>
-              <p style={{ fontSize: 10, color: "rgba(249,247,242,0.2)" }}>jobs / mo</p>
-            </div>
-            <p style={{ textAlign: "center", fontSize: 12, color: "rgba(249,247,242,0.18)", fontWeight: 700 }}>vs</p>
-            <div style={{ textAlign: "center", background: "rgba(40,96,176,0.08)", border: "1px solid rgba(40,96,176,0.18)", borderRadius: 12, padding: "12px 8px" }}>
-              <p style={{ fontSize: 9, fontWeight: 700, color: SAPPHIRE, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>With ClozeFlow</p>
-              <p style={{ fontSize: 28, fontWeight: 900, color: SAPPHIRE, fontVariantNumeric: "tabular-nums", transition: "all 0.08s linear" }}>
-                {Math.round(cfJobs)}
-              </p>
-              <p style={{ fontSize: 10, color: "rgba(40,96,176,0.4)" }}>jobs / mo</p>
-            </div>
-          </div>
-
-          {/* CTA — fades in near end */}
-          <div style={{
-            opacity: ctaOpacity, transition: "opacity 0.4s",
-            pointerEvents: ctaOpacity > 0.3 ? "auto" : "none",
-          }}>
-            <Link href="/signup" style={{
-              background: GRAD_PRIMARY,
-              color: "#fff", fontWeight: 800, fontSize: 15,
-              padding: "13px 28px", borderRadius: 10, textDecoration: "none",
-              display: "inline-block",
-              boxShadow: "0 4px 24px rgba(40,96,176,0.45)",
-            }}>
-              Stop Losing Jobs — Start Free →
-            </Link>
-          </div>
-        </div>
-
-        {/* Bottom progress dots */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 6, paddingBottom: 14, flexShrink: 0 }}>
-          {[0.25, 0.5, 0.75, 1].map(t => (
-            <div key={t} style={{
-              height: 5, borderRadius: 3,
-              width: progress >= t - 0.01 ? 18 : 5,
-              background: progress >= t - 0.01 ? SAPPHIRE : "rgba(255,255,255,0.14)",
-              transition: "all 0.3s",
-            }} />
-          ))}
+  if (step === "done") {
+    return (
+      <div style={{ padding: "40px 28px", textAlign: "center" }}>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(39,174,96,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 30 }}>✅</div>
+        <h3 style={{ margin: "0 0 12px", fontSize: 22, fontWeight: 900, color: MIDNIGHT_NAVY }}>You&apos;re confirmed!</h3>
+        <p style={{ margin: "0 0 20px", color: SLATE, fontSize: 15, lineHeight: 1.7 }}>
+          Our team will reach out within one business day to lock in your 15-minute demo. No prep needed on your end.
+        </p>
+        <div style={{ background: FROST, borderRadius: 12, padding: "14px 18px", fontSize: 13, color: SLATE, border: `1px solid ${CLOUD}` }}>
+          📅 Expect a call or text — usually same day.
         </div>
       </div>
+    );
+  }
 
-      <style>{`
-        .cf-bounce { display: inline-block; animation: cf-bounce-y 1.6s ease-in-out infinite; }
-        @keyframes cf-bounce-y { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
-      `}</style>
+  return (
+    <div>
+      {/* Progress bar */}
+      <div style={{ height: 4, background: CLOUD }}>
+        <div style={{ height: "100%", width: `${progress}%`, background: GRAD_PRIMARY, transition: "width 0.45s ease" }} />
+      </div>
+
+      <div style={{ padding: "24px 28px 28px" }}>
+        {/* Step dots */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 20 }}>
+          {[1, 2, 3].map(n => (
+            <div key={n} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ width: 22, height: 22, borderRadius: "50%", background: (step as number) >= n ? SAPPHIRE : CLOUD, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: (step as number) >= n ? "#fff" : SLATE, transition: "background 0.3s", flexShrink: 0 }}>{n}</div>
+              {n < 3 && <div style={{ width: 20, height: 2, background: (step as number) > n ? SAPPHIRE : CLOUD, transition: "background 0.3s" }} />}
+            </div>
+          ))}
+          <span style={{ marginLeft: 6, fontSize: 11, color: SLATE, fontWeight: 600 }}>Step {step} of 3</span>
+        </div>
+
+        {/* Step 1 */}
+        {step === 1 && <>
+          <h3 style={{ margin: "0 0 4px", fontSize: 19, fontWeight: 900, color: MIDNIGHT_NAVY }}>Let&apos;s get your demo scheduled</h3>
+          <p style={{ margin: "0 0 18px", fontSize: 13, color: SLATE }}>30 seconds. No credit card. No commitment.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+            <div><label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>First name *</label><input value={fn} onChange={e => setFn(e.target.value)} placeholder="Sarah" style={inp(foc === "fn")} {...fo("fn")} /></div>
+            <div><label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>Last name</label><input value={ln} onChange={e => setLn(e.target.value)} placeholder="Johnson" style={inp(foc === "ln")} {...fo("ln")} /></div>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>Work email *</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="sarah@alignchiro.com" style={inp(foc === "em")} {...fo("em")} />
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>Mobile phone *</label>
+            <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(512) 555-0100" style={inp(foc === "ph")} {...fo("ph")} />
+          </div>
+          {error && <p style={{ color: "#dc2626", fontSize: 13, margin: "0 0 12px", fontWeight: 600 }}>{error}</p>}
+          <button onClick={step1} disabled={loading} style={{ width: "100%", padding: "14px 20px", borderRadius: 10, background: loading ? CLOUD : GRAD_PRIMARY, color: loading ? SLATE : "#fff", fontWeight: 900, fontSize: 16, border: "none", cursor: loading ? "not-allowed" : "pointer", minHeight: 50 }}>
+            {loading ? "Saving…" : "Next — Practice Info →"}
+          </button>
+          <p style={{ textAlign: "center", fontSize: 11, color: STEEL, marginTop: 10, marginBottom: 0 }}>🔒 Your info is private and never shared.</p>
+        </>}
+
+        {/* Step 2 */}
+        {step === 2 && <>
+          <h3 style={{ margin: "0 0 4px", fontSize: 19, fontWeight: 900, color: MIDNIGHT_NAVY }}>Tell us about your practice</h3>
+          <p style={{ margin: "0 0 18px", fontSize: 13, color: SLATE }}>Helps us show you the exact setup for your clinic.</p>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>Practice name *</label>
+            <input value={practice} onChange={e => setPractice(e.target.value)} placeholder="Align Chiropractic" style={inp(foc === "pn")} {...fo("pn")} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 72px", gap: 12, marginBottom: 12 }}>
+            <div><label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>City</label><input value={city} onChange={e => setCity(e.target.value)} placeholder="Austin" style={inp(foc === "cy")} {...fo("cy")} /></div>
+            <div><label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>State</label>
+              <select value={st} onChange={e => setSt(e.target.value)} style={{ ...inp(foc === "st"), color: st ? MIDNIGHT_NAVY : "#9ca3af" }} {...fo("st")}>
+                <option value="">—</option>
+                {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+            <div><label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>Locations</label>
+              <select value={locs} onChange={e => setLocs(e.target.value)} style={{ ...inp(foc === "lo"), color: locs ? MIDNIGHT_NAVY : "#9ca3af" }} {...fo("lo")}>
+                <option value="">Select…</option>
+                <option value="1">1 location</option>
+                <option value="2-3">2–3 locations</option>
+                <option value="4+">4+ locations</option>
+              </select>
+            </div>
+            <div><label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>Your role</label>
+              <select value={role} onChange={e => setRole(e.target.value)} style={{ ...inp(foc === "ro"), color: role ? MIDNIGHT_NAVY : "#9ca3af" }} {...fo("ro")}>
+                <option value="">Select…</option>
+                <option value="Doctor / Owner">Doctor / Owner</option>
+                <option value="Office Manager">Office Manager</option>
+                <option value="Practice Manager">Practice Manager</option>
+                <option value="Marketing Director">Marketing Director</option>
+              </select>
+            </div>
+          </div>
+          {error && <p style={{ color: "#dc2626", fontSize: 13, margin: "0 0 12px", fontWeight: 600 }}>{error}</p>}
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={() => setStep(1)} style={{ padding: "13px 16px", borderRadius: 10, background: "transparent", color: SLATE, fontWeight: 700, fontSize: 14, border: `2px solid ${CLOUD}`, cursor: "pointer", minHeight: 50, whiteSpace: "nowrap" }}>← Back</button>
+            <button onClick={step2} disabled={loading} style={{ flex: 1, padding: "13px 20px", borderRadius: 10, background: loading ? CLOUD : GRAD_PRIMARY, color: loading ? SLATE : "#fff", fontWeight: 900, fontSize: 16, border: "none", cursor: loading ? "not-allowed" : "pointer", minHeight: 50 }}>
+              {loading ? "Saving…" : "Next — Your Goals →"}
+            </button>
+          </div>
+        </>}
+
+        {/* Step 3 */}
+        {step === 3 && <>
+          <h3 style={{ margin: "0 0 4px", fontSize: 19, fontWeight: 900, color: MIDNIGHT_NAVY }}>One last thing</h3>
+          <p style={{ margin: "0 0 18px", fontSize: 13, color: SLATE }}>So we can show you exactly what matters for your practice.</p>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>Biggest challenge right now</label>
+            <select value={challenge} onChange={e => setChallenge(e.target.value)} style={{ ...inp(foc === "ch"), color: challenge ? MIDNIGHT_NAVY : "#9ca3af" }} {...fo("ch")}>
+              <option value="">Select your biggest pain point…</option>
+              <option value="New patient inquiries not getting followed up fast enough">Inquiries not followed up fast enough</option>
+              <option value="New patients ghosting after the first consultation">Patients ghosting after first consult</option>
+              <option value="Lapsed patients not returning">Lapsed patients not returning</option>
+              <option value="Front desk overwhelmed with follow-up calls and texts">Front desk overwhelmed with follow-up</option>
+              <option value="Losing new patients to faster-responding competitors">Losing patients to faster competitors</option>
+            </select>
+          </div>
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: MIDNIGHT_NAVY, display: "block", marginBottom: 5 }}>Monthly new patient goal</label>
+            <select value={patientGoal} onChange={e => setPatientGoal(e.target.value)} style={{ ...inp(foc === "pg"), color: patientGoal ? MIDNIGHT_NAVY : "#9ca3af" }} {...fo("pg")}>
+              <option value="">How many new patients per month?</option>
+              <option value="Under 20">Under 20 / month</option>
+              <option value="20–50">20–50 / month</option>
+              <option value="50–100">50–100 / month</option>
+              <option value="100+">100+ / month</option>
+            </select>
+          </div>
+          {error && <p style={{ color: "#dc2626", fontSize: 13, margin: "0 0 12px", fontWeight: 600 }}>{error}</p>}
+          <div style={{ display: "flex", gap: 10 }}>
+            <button onClick={() => setStep(2)} style={{ padding: "13px 16px", borderRadius: 10, background: "transparent", color: SLATE, fontWeight: 700, fontSize: 14, border: `2px solid ${CLOUD}`, cursor: "pointer", minHeight: 50, whiteSpace: "nowrap" }}>← Back</button>
+            <button onClick={step3} disabled={loading} style={{ flex: 1, padding: "13px 20px", borderRadius: 10, background: loading ? CLOUD : GRAD_PRIMARY, color: loading ? SLATE : "#fff", fontWeight: 900, fontSize: 16, border: "none", cursor: loading ? "not-allowed" : "pointer", minHeight: 50 }}>
+              {loading ? "Booking…" : "Book My Free 15-Min Demo →"}
+            </button>
+          </div>
+          <p style={{ textAlign: "center", fontSize: 11, color: STEEL, marginTop: 10, marginBottom: 0 }}>No commitment · No credit card · We respond within 1 business day</p>
+        </>}
+      </div>
     </div>
   );
 }
 
-const PIPELINE_LEADS = [
-  { initials: "JD", name: "John D.",  job: "Roof Repair",      status: "Booked",     statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",   detail: "Apr 14 · 2:00 PM"  },
-  { initials: "SK", name: "Sarah K.", job: "HVAC Service",     status: "AI Active",  statusColor: "#f59e0b", statusBg: "rgba(245,158,11,0.12)",  detail: "Following up…"     },
-  { initials: "TB", name: "Tom B.",   job: "Kitchen Remodel",  status: "Qualified",  statusColor: "#6366f1", statusBg: "rgba(99,102,241,0.12)",  detail: "Score: 92 / 100"   },
-  { initials: "MR", name: "Mike R.",  job: "Deck Build",       status: "New",        statusColor: "#3b82f6", statusBg: "rgba(59,130,246,0.12)",  detail: "Just arrived"      },
+function DemoModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <>
+      <style>{`
+        @keyframes modal-in {
+          from { opacity: 0; transform: scale(0.96) translateY(8px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .demo-modal-card { animation: modal-in 0.25s cubic-bezier(0.34,1.2,0.64,1) both; }
+      `}</style>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed", inset: 0, zIndex: 10000,
+          background: "rgba(13,20,40,0.62)",
+          backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "16px",
+        }}
+      >
+        {/* Card — stop propagation so clicking inside doesn't close */}
+        <div
+          className="demo-modal-card"
+          onClick={e => e.stopPropagation()}
+          style={{
+            width: "100%", maxWidth: 480,
+            background: WHITE, borderRadius: 20,
+            boxShadow: "0 32px 80px rgba(0,0,0,0.35)",
+            overflow: "hidden",
+            maxHeight: "calc(100dvh - 32px)",
+            overflowY: "auto",
+          }}
+        >
+          {/* Modal header */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "18px 24px 0",
+          }}>
+            <div>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: SAPPHIRE, textTransform: "uppercase", letterSpacing: "0.07em" }}>⚡ 15-min demo</p>
+              <p style={{ margin: "2px 0 0", fontSize: 13, color: SLATE }}>See ClozeFlow live on a practice like yours.</p>
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, color: SLATE, lineHeight: 1, padding: "4px 4px", flexShrink: 0 }}
+            >
+              ×
+            </button>
+          </div>
+          <DemoForm />
+        </div>
+      </div>
+    </>
+  );
+}
+
+const CF_BOOKING_RATE = 55;
+
+const SPECIALTY_PRESETS = [
+  { label: "Med Spa",        icon: "fa-solid fa-spa",                  avg: 350  },
+  { label: "Dental",         icon: "fa-solid fa-tooth",                avg: 450  },
+  { label: "Ortho",          icon: "fa-solid fa-teeth",                avg: 550  },
+  { label: "Physical Therapy", icon: "fa-solid fa-person-walking",     avg: 200  },
+  { label: "Chiropractic",   icon: "fa-solid fa-hand-holding-medical", avg: 175  },
+  { label: "Mental Health",  icon: "fa-solid fa-brain",                avg: 250  },
+  { label: "Primary Care",   icon: "fa-solid fa-stethoscope",          avg: 180  },
+  { label: "Optometry",      icon: "fa-solid fa-eye",                  avg: 220  },
 ];
 
-// ── How It Works phone screens ───────────────────────────────────────────────
+function CalcSlider({
+  label, value, min, max, step = 1, prefix, suffix,
+  onChange,
+}: {
+  label: string; value: number; min: number; max: number;
+  step?: number; prefix?: string; suffix?: string;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{label}</span>
+        <div style={{
+          display: "flex", alignItems: "center",
+          border: `1.5px solid ${BORDER}`, borderRadius: 8,
+          background: WHITE, overflow: "hidden",
+        }}>
+          {prefix && (
+            <span style={{ padding: "0 8px", fontSize: 13, fontWeight: 700, color: MUTED, borderRight: `1px solid ${BORDER}`, lineHeight: "34px" }}>
+              {prefix}
+            </span>
+          )}
+          <input
+            type="number" inputMode="numeric"
+            min={min} max={max} step={step} value={value}
+            onChange={e => { const v = parseFloat(e.target.value); if (!isNaN(v)) onChange(Math.min(max, Math.max(min, v))); }}
+            style={{
+              width: suffix === "%" ? 44 : 68, border: "none", outline: "none",
+              background: "transparent", fontSize: 14, fontWeight: 800, color: TEXT,
+              padding: "0 8px", height: 34, textAlign: "right",
+              WebkitAppearance: "none", MozAppearance: "textfield",
+            } as React.CSSProperties}
+          />
+          {suffix && (
+            <span style={{ padding: "0 8px", fontSize: 13, fontWeight: 700, color: MUTED, borderLeft: `1px solid ${BORDER}`, lineHeight: "34px" }}>
+              {suffix}
+            </span>
+          )}
+        </div>
+      </div>
+      <input
+        type="range" min={min} max={max} step={step} value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        style={{ width: "100%", accentColor: SAPPHIRE, height: 4, cursor: "pointer", display: "block" }}
+      />
+    </div>
+  );
+}
+
+function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
+  const [inquiries,    setInquiries]    = useState(60);
+  const [bookingRate,  setBookingRate]  = useState(20);
+  const [avgValue,     setAvgValue]     = useState(350);
+  const [activePreset, setActivePreset] = useState<number>(0);
+
+  const currentPatients  = Math.round(inquiries * (bookingRate / 100));
+  const currentRevenue   = currentPatients * avgValue;
+  const cfPatients       = Math.round(inquiries * (CF_BOOKING_RATE / 100));
+  const cfRevenue        = cfPatients * avgValue;
+  const extraPatients    = Math.max(0, cfPatients - currentPatients);
+  const monthlyGap       = Math.max(0, cfRevenue - currentRevenue);
+  const annualGap        = monthlyGap * 12;
+  const showGap          = bookingRate < CF_BOOKING_RATE;
+
+  return (
+    <section style={{ background: DEEP_NAVY, padding: "88px 24px" }}>
+      <div style={{ maxWidth: 960, margin: "0 auto" }}>
+
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: SAPPHIRE, marginBottom: 14 }}>
+            Patient Revenue Calculator
+          </p>
+          <h2 style={{
+            fontSize: "clamp(26px, 4vw, 40px)", fontWeight: 900, color: "#F9F7F2",
+            letterSpacing: "-0.02em", lineHeight: 1.1,
+            fontFamily: FONT_DISPLAY, fontStyle: "italic", marginBottom: 12,
+          }}>
+            How many patients are slipping through?
+          </h2>
+          <p style={{ fontSize: 16, color: "rgba(249,247,242,0.55)", maxWidth: 480, margin: "0 auto" }}>
+            Dial in your numbers and see exactly what you&apos;re leaving on the table every month.
+          </p>
+        </div>
+
+        {/* Card */}
+        <div style={{
+          background: "#fff", borderRadius: 20,
+          boxShadow: "0 24px 64px rgba(0,0,0,0.35)",
+          overflow: "hidden",
+          display: "grid", gridTemplateColumns: "1fr 1fr",
+        }}
+          className="calc-grid"
+        >
+          {/* ── Left: inputs ── */}
+          <div style={{ padding: "32px 28px", borderRight: `1px solid ${BORDER}` }} className="calc-inputs">
+
+            {/* Specialty presets */}
+            <p style={{ fontSize: 12, fontWeight: 700, color: TEXT, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              Your specialty
+            </p>
+            <div style={{
+              display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: 24,
+            }}
+              className="preset-grid"
+            >
+              {SPECIALTY_PRESETS.map((p, i) => {
+                const active = activePreset === i;
+                return (
+                  <button
+                    key={p.label}
+                    onClick={() => { setActivePreset(i); setAvgValue(p.avg); }}
+                    style={{
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                      padding: "8px 4px", borderRadius: 10,
+                      border: `1.5px solid ${active ? SAPPHIRE : BORDER}`,
+                      background: active ? SAPPHIRE_PALE : BG,
+                      cursor: "pointer", transition: "all 0.12s",
+                    }}
+                  >
+                    <i className={p.icon} style={{ fontSize: 13, color: active ? SAPPHIRE : MUTED }} />
+                    <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, color: active ? SAPPHIRE : MUTED, lineHeight: 1.2, textAlign: "center" }}>
+                      {p.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ height: 1, background: BORDER, marginBottom: 24 }} />
+
+            <CalcSlider
+              label="Monthly patient inquiries"
+              value={inquiries} min={10} max={500}
+              suffix=" / mo"
+              onChange={setInquiries}
+            />
+            <CalcSlider
+              label="Current booking rate"
+              value={bookingRate} min={1} max={79}
+              suffix="%"
+              onChange={setBookingRate}
+            />
+            <CalcSlider
+              label="Avg patient value"
+              value={avgValue} min={50} max={2000} step={25}
+              prefix="$"
+              onChange={setAvgValue}
+            />
+
+            <p style={{ fontSize: 11, color: MUTED, lineHeight: 1.5, marginTop: 4 }}>
+              ClozeFlow scenario uses 55% booking rate — our medical practice average with automated follow-up.
+            </p>
+          </div>
+
+          {/* ── Right: results ── */}
+          <div style={{ padding: "32px 28px", background: BG, display: "flex", flexDirection: "column", gap: 16 }}>
+
+            {/* Before vs After */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div style={{ background: WHITE, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 14px" }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
+                  Right now
+                </p>
+                <p style={{ fontSize: 28, fontWeight: 900, color: TEXT, lineHeight: 1, marginBottom: 4, fontVariantNumeric: "tabular-nums" }}>
+                  {currentPatients}
+                </p>
+                <p style={{ fontSize: 12, color: MUTED, marginBottom: 10 }}>patients / mo</p>
+                <p style={{ fontSize: 18, fontWeight: 800, color: TEXT, fontVariantNumeric: "tabular-nums" }}>
+                  {fmt$(currentRevenue)}
+                </p>
+                <p style={{ fontSize: 11, color: MUTED }}>revenue / mo</p>
+              </div>
+
+              <div style={{
+                background: SAPPHIRE_PALE,
+                border: `2px solid ${SAPPHIRE}`,
+                borderRadius: 14, padding: "18px 14px",
+                position: "relative",
+              }}>
+                <div style={{
+                  position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
+                  background: SAPPHIRE, color: "#fff", fontSize: 9, fontWeight: 800,
+                  padding: "2px 10px", borderRadius: 100, whiteSpace: "nowrap",
+                  letterSpacing: "0.04em",
+                }}>
+                  w/ ClozeFlow
+                </div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: SAPPHIRE, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8, marginTop: 4 }}>
+                  Potential
+                </p>
+                <p style={{ fontSize: 28, fontWeight: 900, color: SAPPHIRE, lineHeight: 1, marginBottom: 4, fontVariantNumeric: "tabular-nums" }}>
+                  {cfPatients}
+                </p>
+                <p style={{ fontSize: 12, color: SAPPHIRE, opacity: 0.7, marginBottom: 10 }}>patients / mo</p>
+                <p style={{ fontSize: 18, fontWeight: 800, color: SAPPHIRE, fontVariantNumeric: "tabular-nums" }}>
+                  {fmt$(cfRevenue)}
+                </p>
+                <p style={{ fontSize: 11, color: SAPPHIRE, opacity: 0.7 }}>revenue / mo</p>
+              </div>
+            </div>
+
+            {/* Gap banner */}
+            {showGap && annualGap > 0 && (
+              <div style={{
+                background: "linear-gradient(135deg,rgba(39,174,96,0.07),rgba(39,174,96,0.04))",
+                border: "1.5px solid rgba(39,174,96,0.25)",
+                borderRadius: 14, padding: "18px 16px", textAlign: "center",
+              }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>
+                  You&apos;re leaving on the table every year
+                </p>
+                <p style={{
+                  fontSize: "clamp(32px, 7vw, 52px)", fontWeight: 900, lineHeight: 1,
+                  color: GREEN, marginBottom: 6, fontVariantNumeric: "tabular-nums",
+                }}>
+                  {fmt$(annualGap)}
+                </p>
+                <p style={{ fontSize: 12, color: MUTED }}>
+                  {extraPatients} extra patients/mo · {fmt$(monthlyGap)}/mo gap
+                </p>
+              </div>
+            )}
+
+            {!showGap && (
+              <div style={{
+                background: "rgba(40,96,176,0.05)", border: `1px solid rgba(40,96,176,0.15)`,
+                borderRadius: 14, padding: "18px 16px", textAlign: "center",
+              }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: SAPPHIRE, marginBottom: 4 }}>
+                  Your booking rate is already strong!
+                </p>
+                <p style={{ fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
+                  ClozeFlow can help you maintain it effortlessly — freeing up your front desk.
+                </p>
+              </div>
+            )}
+
+            {/* CTA */}
+            <div style={{ marginTop: "auto" }}>
+              <button onClick={onOpenModal} style={{
+                display: "block", width: "100%", background: GRAD_PRIMARY, color: "#fff",
+                fontWeight: 800, fontSize: 15, padding: "14px",
+                borderRadius: 10, border: "none", cursor: "pointer", textAlign: "center",
+                boxShadow: "0 4px 20px rgba(40,96,176,0.3)", marginBottom: 10,
+              }}>
+                Book a Free Demo →
+              </button>
+              <p style={{ fontSize: 11, color: MUTED, textAlign: "center" }}>
+                15 minutes · No commitment · No credit card
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .calc-grid { grid-template-columns: 1fr 1fr; }
+        .preset-grid { grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 700px) {
+          .calc-grid { grid-template-columns: 1fr !important; }
+          .calc-inputs { border-right: none !important; border-bottom: 1px solid ${BORDER}; }
+          .preset-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+        @media (max-width: 420px) {
+          .preset-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+      `}</style>
+    </section>
+  );
+}
+
+const PIPELINE_LEADS = [
+  { initials: "AM", name: "Ashley M.", job: "Botox Consult",        status: "Booked",    statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  detail: "May 8 · 10:00 AM"  },
+  { initials: "RK", name: "Ryan K.",   job: "Invisalign Inquiry",   status: "AI Active", statusColor: "#f59e0b", statusBg: "rgba(245,158,11,0.12)", detail: "Following up…"     },
+  { initials: "NP", name: "Nina P.",   job: "PT Evaluation",        status: "Qualified", statusColor: "#6366f1", statusBg: "rgba(99,102,241,0.12)", detail: "Score: 88 / 100"   },
+  { initials: "DL", name: "David L.",  job: "Chiro Initial Visit",  status: "New",       statusColor: "#3b82f6", statusBg: "rgba(59,130,246,0.12)", detail: "Just arrived"      },
+];
 
 function ConnectScreenContent() {
   const sources = [
-    { name: "Angi",         color: "#16a34a" },
-    { name: "Thumbtack",    color: "#0891b2" },
-    { name: "Google Local", color: "#ea580c" },
-    { name: "Your Website", color: "#7c3aed" },
+    { name: "Google Business",  color: "#ea580c" },
+    { name: "Healthgrades",     color: "#be185d" },
+    { name: "Your Website",     color: "#7c3aed" },
+    { name: "Zocdoc",           color: "#0891b2" },
   ];
   return (
     <div>
       <div style={{ background: "#fff", padding: "12px 14px 10px", borderBottom: "1px solid #f1f5f9" }}>
-        <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, marginBottom: 4 }}>Lead Sources</p>
+        <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, marginBottom: 4 }}>Inquiry Sources</p>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(39,174,96,0.1)", borderRadius: 100, padding: "3px 9px" }}>
           <div style={{ width: 5, height: 5, borderRadius: "50%", background: GREEN }} />
           <span style={{ fontSize: 9, fontWeight: 700, color: GREEN }}>All Active</span>
@@ -397,7 +743,7 @@ function ConnectScreenContent() {
           </div>
         ))}
         <div style={{ background: "rgba(40,96,176,0.06)", border: "1px solid rgba(40,96,176,0.12)", borderRadius: 10, padding: "9px 12px", textAlign: "center", marginTop: 4 }}>
-          <p style={{ fontSize: 10, fontWeight: 800, color: SAPPHIRE, margin: 0 }}>8 leads captured today</p>
+          <p style={{ fontSize: 10, fontWeight: 800, color: SAPPHIRE, margin: 0 }}>11 inquiries captured today</p>
           <p style={{ fontSize: 8, color: "rgba(40,96,176,0.5)", marginTop: 2 }}>All responded to within 60s</p>
         </div>
       </div>
@@ -409,12 +755,12 @@ function ChatScreenContent() {
   return (
     <div>
       <div style={{ background: "#fff", padding: "10px 14px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(99,102,241,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#6366f1", flexShrink: 0 }}>
-          SM
+        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(190,24,93,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: "#be185d", flexShrink: 0 }}>
+          AM
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, margin: 0 }}>Sarah M.</p>
-          <p style={{ fontSize: 8, color: MUTED, margin: 0 }}>Angi · just now</p>
+          <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, margin: 0 }}>Ashley M.</p>
+          <p style={{ fontSize: 8, color: MUTED, margin: 0 }}>Healthgrades · just now</p>
         </div>
         <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 100, padding: "2px 7px" }}>
           <span style={{ fontSize: 8, fontWeight: 700, color: "#f59e0b" }}>AI Active</span>
@@ -423,29 +769,29 @@ function ChatScreenContent() {
       <div style={{ padding: "10px 10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
           <div style={{ background: DEEP_NAVY, borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
-            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;Need a roof quote. Saw your Angi ad.&rdquo;</p>
+            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;Hi, I&apos;m interested in Botox. What are your prices?&rdquo;</p>
           </div>
-          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:14 PM</span>
+          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>10:32 AM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow · 47s</span>
+          <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow · 38s</span>
           <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "7px 10px", maxWidth: "85%", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
-            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Hi Sarah! What&apos;s your address and best day for an estimate?&rdquo;</p>
+            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Hi Ashley! We&apos;d love to help. Are you looking for a full-face consult or a specific area?&rdquo;</p>
           </div>
-          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:14 PM</span>
+          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>10:32 AM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
           <div style={{ background: DEEP_NAVY, borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
-            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;123 Oak St. Any day this week.&rdquo;</p>
+            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;Forehead and crow&apos;s feet. ASAP if possible!&rdquo;</p>
           </div>
-          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:16 PM</span>
+          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>10:34 AM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow · 12s</span>
+          <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow · 15s</span>
           <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "7px 10px", maxWidth: "85%", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
-            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Perfect — Thursday 2–4 PM for a free estimate?&rdquo;</p>
+            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Perfect — we have a consult slot Thursday at 10 AM. Want me to book it for you?&rdquo;</p>
           </div>
-          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>2:16 PM</span>
+          <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>10:34 AM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
           <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow</span>
@@ -461,12 +807,12 @@ function ChatScreenContent() {
 }
 
 function CalendarScreenContent() {
-  const weekDates = [13, 14, 15, 16, 17, 18, 19];
+  const weekDates = [4, 5, 6, 7, 8, 9, 10];
   const days      = ["S", "M", "T", "W", "T", "F", "S"];
   return (
     <div>
       <div style={{ background: "#fff", padding: "12px 14px 10px", borderBottom: "1px solid #f1f5f9" }}>
-        <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, marginBottom: 8 }}>April 2025</p>
+        <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, marginBottom: 8 }}>May 2026</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, marginBottom: 4 }}>
           {days.map((d, i) => (
             <p key={i} style={{ fontSize: 8, fontWeight: 700, color: "#a8a29e", textAlign: "center", margin: 0 }}>{d}</p>
@@ -476,23 +822,23 @@ function CalendarScreenContent() {
           {weekDates.map(d => (
             <div key={d} style={{
               height: 22, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 6,
-              background: d === 17 ? GRAD_PRIMARY : "transparent",
+              background: d === 8 ? GRAD_PRIMARY : "transparent",
             }}>
-              <p style={{ fontSize: 9, fontWeight: d === 17 ? 800 : 400, color: d === 17 ? "#fff" : TEXT, margin: 0 }}>{d}</p>
+              <p style={{ fontSize: 9, fontWeight: d === 8 ? 800 : 400, color: d === 8 ? "#fff" : TEXT, margin: 0 }}>{d}</p>
             </div>
           ))}
         </div>
       </div>
       <div style={{ padding: "10px 10px" }}>
-        <p style={{ fontSize: 9, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Thursday, Apr 17</p>
+        <p style={{ fontSize: 9, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Thursday, May 8</p>
         <div style={{ background: "#fff", borderRadius: 12, padding: "12px 12px", boxShadow: "0 2px 8px rgba(0,0,0,0.07)", borderLeft: "3px solid " + SAPPHIRE }}>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: SAPPHIRE, flexShrink: 0 }} />
-            <p style={{ fontSize: 10, fontWeight: 800, color: SAPPHIRE, margin: 0 }}>2:00 PM</p>
+            <p style={{ fontSize: 10, fontWeight: 800, color: SAPPHIRE, margin: 0 }}>10:00 AM</p>
           </div>
-          <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, marginBottom: 1 }}>Sarah M.</p>
-          <p style={{ fontSize: 9, color: MUTED, marginBottom: 1 }}>Roof Inspection</p>
-          <p style={{ fontSize: 9, color: "#a8a29e" }}>123 Oak St</p>
+          <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, marginBottom: 1 }}>Ashley M.</p>
+          <p style={{ fontSize: 9, color: MUTED, marginBottom: 1 }}>Botox Consultation</p>
+          <p style={{ fontSize: 9, color: "#a8a29e" }}>Forehead & crow&apos;s feet</p>
         </div>
         <div style={{ marginTop: 8, background: "rgba(39,174,96,0.08)", border: "1px solid rgba(39,174,96,0.18)", borderRadius: 8, padding: "7px 10px", textAlign: "center" }}>
           <p style={{ fontSize: 9, fontWeight: 700, color: GREEN, margin: 0 }}>Booked automatically · ClozeFlow</p>
@@ -520,7 +866,6 @@ function StepPhone({ step }: { step: number }) {
         <div style={{ position:"absolute", left:-3, top:124, width:3, height:40, background:"#374151", borderRadius:"2px 0 0 2px" }} />
         <div style={{ position:"absolute", right:-3, top:116, width:3, height:52, background:"#374151", borderRadius:"0 2px 2px 0" }} />
         <div style={{ background: "#f8f9fb", borderRadius: 36, overflow: "hidden" }}>
-          {/* Status bar */}
           <div style={{ height: 38, background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 18px" }}>
             <span style={{ fontSize: 9, fontWeight: 700, color: "#1c1917" }}>9:41</span>
             <div style={{ width: 68, height: 18, background: "#111827", borderRadius: 10 }} />
@@ -533,7 +878,6 @@ function StepPhone({ step }: { step: number }) {
               </div>
             </div>
           </div>
-          {/* Screen content — key forces re-mount + fade animation */}
           <div key={step} className="hiw-screen" style={{ minHeight: 420 }}>
             {step === 0 && <ConnectScreenContent />}
             {step === 1 && <ChatScreenContent />}
@@ -547,17 +891,11 @@ function StepPhone({ step }: { step: number }) {
 
 function FeatureIcon({ index }: { index: number }) {
   const paths: React.ReactNode[] = [
-    // 0 — clock (speed)
     <><circle key="c" cx="12" cy="12" r="9"/><polyline key="p" points="12 7 12 12 15 14"/></>,
-    // 1 — funnel (qualify)
     <path key="p" d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>,
-    // 2 — message (follow-up)
     <path key="p" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>,
-    // 3 — calendar
     <><rect key="r" x="3" y="4" width="18" height="18" rx="2"/><line key="l1" x1="16" y1="2" x2="16" y2="6"/><line key="l2" x1="8" y1="2" x2="8" y2="6"/><line key="l3" x1="3" y1="10" x2="21" y2="10"/></>,
-    // 4 — bar chart (pipeline)
     <><line key="l1" x1="18" y1="20" x2="18" y2="10"/><line key="l2" x1="12" y1="20" x2="12" y2="4"/><line key="l3" x1="6" y1="20" x2="6" y2="14"/><line key="l4" x1="3" y1="20" x2="21" y2="20"/></>,
-    // 5 — target (campaigns)
     <><circle key="c1" cx="12" cy="12" r="10"/><circle key="c2" cx="12" cy="12" r="5"/><circle key="c3" cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></>,
   ];
   return (
@@ -601,7 +939,6 @@ function HowItWorks() {
         </div>
 
         <div className="hiw-grid">
-          {/* Left: clickable steps */}
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {HIW_STEPS.map((step, i) => (
               <div
@@ -645,7 +982,6 @@ function HowItWorks() {
             ))}
           </div>
 
-          {/* Right: live phone demo */}
           <div className="hiw-phone-col" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <StepPhone step={active} />
           </div>
@@ -678,7 +1014,6 @@ function HowItWorks() {
 function PhoneMockup() {
   return (
     <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
-      {/* Ambient glow */}
       <div style={{
         position: "absolute",
         width: 300, height: 300,
@@ -688,7 +1023,6 @@ function PhoneMockup() {
         pointerEvents: "none",
       }} />
 
-      {/* Phone frame */}
       <div style={{
         width: 270,
         background: "#111827",
@@ -697,13 +1031,11 @@ function PhoneMockup() {
         boxShadow: "0 40px 80px rgba(0,0,0,0.28), 0 8px 20px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.06)",
         position: "relative",
       }}>
-        {/* Side buttons */}
         <div style={{ position: "absolute", left: -3, top: 90, width: 3, height: 28, background: "#374151", borderRadius: "2px 0 0 2px" }} />
         <div style={{ position: "absolute", left: -3, top: 128, width: 3, height: 44, background: "#374151", borderRadius: "2px 0 0 2px" }} />
         <div style={{ position: "absolute", left: -3, top: 180, width: 3, height: 44, background: "#374151", borderRadius: "2px 0 0 2px" }} />
         <div style={{ position: "absolute", right: -3, top: 120, width: 3, height: 56, background: "#374151", borderRadius: "0 2px 2px 0" }} />
 
-        {/* Screen */}
         <div style={{
           background: "#f8f9fb",
           borderRadius: 36,
@@ -711,7 +1043,6 @@ function PhoneMockup() {
           display: "flex",
           flexDirection: "column",
         }}>
-          {/* Status bar + Dynamic Island */}
           <div style={{
             height: 40,
             background: "#ffffff",
@@ -728,7 +1059,6 @@ function PhoneMockup() {
             </div>
           </div>
 
-          {/* App header */}
           <div style={{ background: "#ffffff", padding: "10px 14px 8px", borderBottom: "1px solid #f1f5f9" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
               <div>
@@ -740,7 +1070,7 @@ function PhoneMockup() {
                     style={{ objectFit: "cover", objectPosition: "center" }}
                   />
                 </div>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: TEXT, lineHeight: 1.1 }}>Your Pipeline</p>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: TEXT, lineHeight: 1.1 }}>Patient Pipeline</p>
               </div>
               <div style={{ width: 28, height: 28, overflow: "hidden", position: "relative" }}>
                 <Image
@@ -752,12 +1082,11 @@ function PhoneMockup() {
               </div>
             </div>
 
-            {/* Stats strip */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5 }}>
               {[
-                { label: "New",     value: "5", color: "#3b82f6", bg: "rgba(59,130,246,0.08)"  },
-                { label: "Active",  value: "3", color: "#f59e0b", bg: "rgba(245,158,11,0.08)"  },
-                { label: "Booked",  value: "2", color: "#27AE60", bg: "rgba(39,174,96,0.08)"   },
+                { label: "New",     value: "7", color: "#3b82f6", bg: "rgba(59,130,246,0.08)"  },
+                { label: "Active",  value: "4", color: "#f59e0b", bg: "rgba(245,158,11,0.08)"  },
+                { label: "Booked",  value: "3", color: "#27AE60", bg: "rgba(39,174,96,0.08)"   },
               ].map(s => (
                 <div key={s.label} style={{ background: s.bg, borderRadius: 8, padding: "5px 4px", textAlign: "center" }}>
                   <p style={{ margin: 0, fontSize: 15, fontWeight: 900, color: s.color }}>{s.value}</p>
@@ -767,7 +1096,6 @@ function PhoneMockup() {
             </div>
           </div>
 
-          {/* AI notification */}
           <div style={{
             margin: "7px 10px 2px",
             background: "linear-gradient(135deg,rgba(40,96,176,0.07),rgba(139,111,196,0.04))",
@@ -778,11 +1106,10 @@ function PhoneMockup() {
           }}>
             <span style={{ fontSize: 10, flexShrink: 0 }}>⚡</span>
             <p style={{ margin: 0, fontSize: 8, fontWeight: 600, color: SAPPHIRE, lineHeight: 1.4 }}>
-              AI replied to 3 new leads while you were on the job
+              AI replied to 4 new inquiries while you were with patients
             </p>
           </div>
 
-          {/* Lead cards */}
           <div style={{ padding: "4px 10px 14px", display: "flex", flexDirection: "column", gap: 5 }}>
             {PIPELINE_LEADS.map(lead => (
               <div key={lead.initials} style={{
@@ -823,8 +1150,12 @@ function PhoneMockup() {
 }
 
 export default function Home() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const openModal = useCallback(() => setModalOpen(true), []);
+
   return (
     <div style={{ background: BG, color: TEXT, fontFamily: FONT_SANS }}>
+      <DemoModal open={modalOpen} onClose={() => setModalOpen(false)} />
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section style={{ padding: "72px 24px 80px", background: GRAD_HERO_BG }}>
@@ -837,9 +1168,7 @@ export default function Home() {
         }}
           className="hero-grid"
         >
-          {/* Left: copy */}
           <div>
-            {/* Badge */}
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 6,
               background: SAPPHIRE_PALE, border: "1px solid rgba(40,96,176,0.2)",
@@ -848,7 +1177,7 @@ export default function Home() {
               marginBottom: 24,
             }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: SAPPHIRE }} />
-              ⚡ 100+ service businesses. Zero missed leads.
+              ⚡ 100+ medical practices. Zero missed patients.
             </div>
 
             <h1 style={{
@@ -858,25 +1187,25 @@ export default function Home() {
               marginBottom: 20,
               fontFamily: FONT_DISPLAY, fontStyle: "italic",
             }}>
-              Never lose a lead again.
+              Never lose a patient inquiry again.
             </h1>
 
             <p style={{
               fontSize: 18, color: MUTED, lineHeight: 1.65,
               marginBottom: 36, maxWidth: 460,
             }}>
-              ClozeFlow responds to every inquiry in under 60 seconds, qualifies them, and books them straight to your calendar — while you&apos;re on the job.
+              ClozeFlow responds to every inquiry in under 60 seconds, qualifies the patient, and books them straight to your schedule — while you&apos;re with someone in the room.
             </p>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
-              <Link href="/signup" style={{
+              <button onClick={openModal} style={{
                 background: GRAD_PRIMARY,
                 color: "#fff", fontWeight: 700, fontSize: 16,
-                padding: "14px 28px", borderRadius: 10, textDecoration: "none",
+                padding: "14px 28px", borderRadius: 10, border: "none", cursor: "pointer",
                 boxShadow: "0 4px 20px rgba(40,96,176,0.25)",
               }}>
-                Start Free — No Card Needed →
-              </Link>
+                Book a Free Demo →
+              </button>
               <Link href="/how-it-works" style={{
                 background: "#fff", color: SAPPHIRE, fontWeight: 600, fontSize: 16,
                 padding: "14px 28px", borderRadius: 10, textDecoration: "none",
@@ -887,7 +1216,7 @@ export default function Home() {
             </div>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-              {["✓ Free to start", "✓ Setup in one day", "✓ No tech skills needed"].map(chip => (
+              {["✓ 15-min demo", "✓ No commitment", "✓ Live in one day"].map(chip => (
                 <span key={chip} style={{ fontSize: 13, color: MUTED, fontWeight: 500 }}>{chip}</span>
               ))}
               <div style={{
@@ -909,7 +1238,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right: phone mockup */}
           <div style={{ display: "flex", justifyContent: "center" }}>
             <PhoneMockup />
           </div>
@@ -932,10 +1260,10 @@ export default function Home() {
         textAlign: "center",
       }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: MUTED, marginBottom: 16 }}>
-          Trusted by service businesses on
+          Trusted by practices found on
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px 32px" }}>
-          {["Angi", "Thumbtack", "HomeAdvisor", "Google Local", "Yelp"].map(name => (
+          {["Google", "Healthgrades", "Zocdoc", "Yelp", "Your Website"].map(name => (
             <span key={name} style={{ fontSize: 14, fontWeight: 700, color: "#a8a29e" }}>{name}</span>
           ))}
         </div>
@@ -951,20 +1279,19 @@ export default function Home() {
             fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT,
             marginBottom: 12, lineHeight: 1.15,
           }}>
-            Built for service businesses that rely on leads
+            Built for medical practices that run on appointments
           </h2>
           <p style={{ fontSize: 16, color: MUTED, maxWidth: 480, margin: "0 auto" }}>
-            If your phone is how you get paid, ClozeFlow was built for you.
+            If patient inquiries are how you grow, ClozeFlow was built for you.
           </p>
         </div>
 
-        {/* Trade group cards grid */}
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           gap: 16,
         }}>
-          {TRADE_GROUPS.map(group => (
+          {MEDICAL_SPECIALTIES.map(group => (
             <div key={group.label} style={{
               background: "#ffffff",
               border: `1px solid ${BORDER}`,
@@ -972,7 +1299,6 @@ export default function Home() {
               overflow: "hidden",
               boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
             }}>
-              {/* Card header */}
               <div style={{
                 padding: "16px 20px",
                 background: group.bg,
@@ -991,7 +1317,6 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* Service rows */}
               <ul style={{ margin: 0, padding: "10px 0", listStyle: "none" }}>
                 {group.services.map(svc => (
                   <li key={svc.label} style={{
@@ -1009,119 +1334,84 @@ export default function Home() {
                     <span style={{ fontSize: 14, fontWeight: 500, color: TEXT }}>{svc.label}</span>
                   </li>
                 ))}
-                {group.footnote && (
-                  <li style={{ padding: "8px 20px 4px" }}>
-                    <p style={{ margin: 0, fontSize: 11, color: MUTED, lineHeight: 1.5 }}>
-                      {group.footnote}
-                    </p>
-                  </li>
-                )}
               </ul>
             </div>
           ))}
         </div>
 
         <p style={{ marginTop: 28, fontSize: 14, color: MUTED, textAlign: "center" }}>
-          Don&apos;t see your category?{" "}
-          <Link href="/signup" style={{ color: SAPPHIRE, fontWeight: 700, textDecoration: "none" }}>
-            ClozeFlow works for any service business that depends on fast follow-up →
-          </Link>
+          Don&apos;t see your specialty?{" "}
+          <button onClick={openModal} style={{ color: SAPPHIRE, fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: 0 }}>
+            ClozeFlow works for any practice that depends on fast patient follow-up →
+          </button>
         </p>
       </section>
 
-      {/* ── Scroll Revenue Gap Calculator ────────────────── */}
-      <ScrollCalculator />
+      {/* ── Patient Revenue Calculator ───────────────────── */}
+      <InlineCalculator onOpenModal={openModal} />
 
-      {/* ── Pain / Solution ──────────────────────────────── */}
-      <section style={{ background: "#fff", borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
-        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+      {/* ── Front Desk Empowerment ───────────────────────── */}
+      <section style={{ background: BG, borderTop: `1px solid ${BORDER}`, padding: "96px 24px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 72, alignItems: "center" }} className="fd-grid">
 
-          {/* Section header */}
-          <div style={{ marginBottom: 72 }}>
+          {/* Left: copy */}
+          <div>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: SAPPHIRE, marginBottom: 14 }}>
-              The Real Problem
+              For Your Front Desk
             </p>
-            <h2 style={{
-              fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 900, color: TEXT,
-              lineHeight: 1.1, letterSpacing: "-0.02em", maxWidth: 560,
-            }}>
-              You&apos;re not losing jobs because of bad work.
+            <h2 style={{ fontSize: "clamp(26px, 4vw, 40px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: 20 }}>
+              Your receptionist doesn&apos;t get replaced.{" "}
+              <span style={{ color: SAPPHIRE }}>They get superpowers.</span>
             </h2>
-            <p style={{ fontSize: 18, color: MUTED, lineHeight: 1.6, marginTop: 16, maxWidth: 500 }}>
-              You&apos;re losing them in the hour before you call back.
+            <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.75, marginBottom: 28, maxWidth: 460 }}>
+              The biggest concern we hear from practice owners: <em>&ldquo;My front desk will think automation means their job is at risk.&rdquo;</em> ClozeFlow is built to make your staff more valuable — not replaceable. They stay in full control of every patient relationship.
             </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {[
+                "They see every patient conversation in real time",
+                "One tap to take over any thread — seamlessly",
+                "They focus on patients in the room, not the inbox",
+                "They get credit for every appointment booked",
+                "Less burnout, fewer missed callbacks, more job satisfaction",
+              ].map(item => (
+                <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                  <div style={{
+                    width: 20, height: 20, borderRadius: "50%", flexShrink: 0, marginTop: 2,
+                    background: SAPPHIRE_PALE, border: `1px solid rgba(40,96,176,0.2)`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 10, color: SAPPHIRE, fontWeight: 800,
+                  }}>✓</div>
+                  <span style={{ fontSize: 15, color: TEXT, fontWeight: 500, lineHeight: 1.5 }}>{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Three moments */}
-          {[
-            {
-              n: "01",
-              scene: "2:14 PM — A lead texts while you're mid-job",
-              pain: "By the time you see it, they've already booked someone who answered first. The job was yours to lose.",
-              fix: "ClozeFlow responds in under 60 seconds, qualifies their budget and timeline, and holds the conversation until you're free.",
-            },
-            {
-              n: "02",
-              scene: "You spent $600 on Angi leads this month",
-              pain: "You followed up on 11 out of 40 inquiries. The other 29 never heard from you. That's money you already spent — and jobs you'll never see.",
-              fix: "Every single lead gets an immediate reply and a 5-touch follow-up sequence over the next 5 days. Not one goes cold.",
-            },
-            {
-              n: "03",
-              scene: "You sent 14 estimates last week",
-              pain: "Seven haven't responded. You keep meaning to follow up. Two of them booked a competitor yesterday while you were on the job.",
-              fix: "Automated nudges follow up every 24–48 hours on your behalf. You fill the silence before someone else does.",
-            },
-          ].map((row, i) => (
-            <div key={row.n} style={{
-              paddingTop: i === 0 ? 0 : 56,
-              borderTop: i === 0 ? "none" : `1px solid ${BORDER}`,
-              marginTop: i === 0 ? 0 : 56,
-            }}>
-              {/* Scene label */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                <span style={{
-                  fontSize: 11, fontWeight: 800, color: "rgba(44,62,80,0.25)",
-                  letterSpacing: "0.06em",
-                }}>
-                  {row.n}
-                </span>
-                <span style={{
-                  fontSize: 12, fontWeight: 700, color: MUTED,
-                  letterSpacing: "0.04em",
-                }}>
-                  {row.scene}
-                </span>
+          {/* Right: 2×2 feature cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            {[
+              { icon: "👁️", title: "Full visibility",   body: "Every AI-handled conversation is visible to your team in real time. Nothing happens without them knowing." },
+              { icon: "🎙️", title: "Instant takeover",  body: "One tap and your receptionist is live in the conversation. The patient never notices a thing." },
+              { icon: "🧘", title: "Less chaos",         body: "No more sticky notes and callback lists. Every inquiry, follow-up, and reply lives in one clean view." },
+              { icon: "🏆", title: "More wins",          body: "When ClozeFlow books a new patient, your team still owns that relationship — and gets all the credit." },
+            ].map(({ icon, title, body }) => (
+              <div key={title} style={{
+                background: WHITE, borderRadius: 16, padding: "22px 18px",
+                border: `1px solid ${BORDER}`,
+                boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
+              }}>
+                <div style={{ fontSize: 26, marginBottom: 12 }}>{icon}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: TEXT, marginBottom: 8 }}>{title}</div>
+                <p style={{ margin: 0, fontSize: 13, color: MUTED, lineHeight: 1.65 }}>{body}</p>
               </div>
-
-              {/* Pain */}
-              <p style={{
-                fontSize: "clamp(18px, 2.8vw, 22px)", fontWeight: 700, color: TEXT,
-                lineHeight: 1.4, marginBottom: 20,
-              }}>
-                {row.pain}
-              </p>
-
-              {/* Divider */}
-              <div style={{
-                height: 1,
-                background: `linear-gradient(90deg, ${SAPPHIRE}, transparent)`,
-                marginBottom: 20,
-                opacity: 0.35,
-              }} />
-
-              {/* Fix */}
-              <p style={{
-                fontSize: 15, color: MUTED, lineHeight: 1.65,
-                paddingLeft: 16,
-                borderLeft: `2px solid ${SAPPHIRE}`,
-              }}>
-                {row.fix}
-              </p>
-            </div>
-          ))}
-
+            ))}
+          </div>
         </div>
+
+        <style>{`
+          .fd-grid { grid-template-columns: 1fr 1fr; }
+          @media (max-width: 768px) { .fd-grid { grid-template-columns: 1fr !important; gap: 40px !important; } }
+        `}</style>
       </section>
 
       <HowItWorks />
@@ -1134,7 +1424,7 @@ export default function Home() {
               Real Results
             </p>
             <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em", fontFamily: FONT_DISPLAY, fontStyle: "italic" }}>
-              Service businesses that stopped losing leads.
+              Practices that stopped losing patients.
             </h2>
           </div>
 
@@ -1144,7 +1434,6 @@ export default function Home() {
                 background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "32px 28px",
                 display: "flex", flexDirection: "column",
               }}>
-                {/* Stars */}
                 <div style={{ display: "flex", gap: 3, marginBottom: 22 }}>
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b">
@@ -1153,7 +1442,6 @@ export default function Home() {
                   ))}
                 </div>
 
-                {/* Quote */}
                 <blockquote style={{
                   fontSize: 17, color: TEXT, lineHeight: 1.65, fontWeight: 500,
                   fontStyle: "normal", flexGrow: 1, marginBottom: 28,
@@ -1161,7 +1449,6 @@ export default function Home() {
                   &ldquo;{t.quote}&rdquo;
                 </blockquote>
 
-                {/* Person */}
                 <div style={{ display: "flex", alignItems: "center", gap: 14, paddingTop: 20, borderTop: `1px solid ${BORDER}` }}>
                   <div style={{
                     width: 48, height: 48, borderRadius: "50%", overflow: "hidden",
@@ -1201,7 +1488,7 @@ export default function Home() {
               Features
             </p>
             <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 900, color: TEXT, lineHeight: 1.1, letterSpacing: "-0.02em", fontFamily: FONT_DISPLAY, fontStyle: "italic" }}>
-              Everything you need. Nothing you don&apos;t.
+              Everything your practice needs. Nothing it doesn&apos;t.
             </h2>
           </div>
 
@@ -1240,20 +1527,20 @@ export default function Home() {
       <section style={{ padding: "96px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <h2 style={{ fontSize: "clamp(28px, 5vw, 44px)", fontWeight: 900, color: TEXT, marginBottom: 16, lineHeight: 1.1, fontFamily: FONT_DISPLAY, fontStyle: "italic" }}>
-            Ready to fill your calendar this week?
+            See it working for your practice.
           </h2>
           <p style={{ fontSize: 17, color: MUTED, lineHeight: 1.65, marginBottom: 36 }}>
-            Join 100+ service businesses that have stopped missing leads and started booking more jobs — without spending another dollar on ads.
+            No slides. No pitch. A live 15-minute demo of ClozeFlow on a practice exactly like yours — then you decide.
           </p>
-          <Link href="/signup" style={{
+          <button onClick={openModal} style={{
             background: GRAD_PRIMARY,
             color: "#fff", fontWeight: 800, fontSize: 17,
-            padding: "16px 36px", borderRadius: 12, textDecoration: "none", display: "inline-block",
+            padding: "16px 36px", borderRadius: 12, border: "none", cursor: "pointer", display: "inline-block",
             boxShadow: "0 4px 20px rgba(40,96,176,0.25)", marginBottom: 16,
           }}>
-            Create Your Free Account → It&apos;s FREE
-          </Link>
-          <p style={{ fontSize: 13, color: MUTED }}>No credit card needed · Cancel anytime · Setup in one day</p>
+            Book a Free 15-Min Demo →
+          </button>
+          <p style={{ fontSize: 13, color: MUTED }}>No commitment · No credit card · Response within 1 business day</p>
         </div>
       </section>
 

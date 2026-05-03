@@ -77,8 +77,8 @@ export default function MarketingFooter() {
 
           {/* Col 4: Get Started */}
           <div>
-            <h4 style={FOOTER_HEAD}>Get Started</h4>
-            <Link href="/signup" style={{
+            <h4 style={FOOTER_HEAD}>Book a Demo</h4>
+            <Link href="/healthcare" style={{
               display:       "inline-block",
               background:    GRAD_PRIMARY,
               color:         WHITE,
@@ -90,10 +90,10 @@ export default function MarketingFooter() {
               boxShadow:     "0 4px 20px rgba(40,96,176,0.35)",
               marginBottom:  12,
             }}>
-              Create Free Account →
+              Book a Free Demo →
             </Link>
             <p style={{ color: "#4A6274", fontSize: 12, lineHeight: 1.5 }}>
-              No credit card needed.<br />Setup in under a day.
+              15 minutes · No commitment.<br />No credit card needed.
             </p>
           </div>
         </div>

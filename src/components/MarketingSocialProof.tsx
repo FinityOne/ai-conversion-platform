@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-// ── Seed-based RNG (deterministic per session) ────────────────────────────────
+const SAPPHIRE = "#2860B0";
+const SAPPHIRE_PALE = "rgba(40,96,176,0.09)";
+
 function makeRng(seed: number) {
   let s = seed;
-  return () => {
-    s = (s * 16807) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
+  return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
 }
 function ri(rng: () => number, min: number, max: number) {
   return Math.floor(rng() * (max - min + 1)) + min;
@@ -17,275 +16,242 @@ function pick<T>(rng: () => number, arr: T[]): T {
   return arr[Math.floor(rng() * arr.length)];
 }
 
-// ── Identity pools ────────────────────────────────────────────────────────────
-const BUSINESSES = [
-  "A roofing company","An HVAC contractor","A plumbing business",
-  "A general contractor","A remodeling company","A landscaping business",
-  "A painting company","An electrical contractor","A flooring company",
-  "A window & door business","A cleaning service","A pest control company",
-  "A pool & spa business","A tree service company","A pressure washing company",
-  "A med spa","A dental practice","A chiropractic office",
+const PRACTICES = [
+  "A med spa","A dental practice","An orthodontics office","A chiropractic clinic",
+  "A physical therapy clinic","A mental health practice","A primary care clinic",
+  "An optometry office","A weight loss clinic","A sports medicine practice",
+  "A wellness center","A multi-location medspa","A functional medicine clinic",
+  "A pediatric dental practice","A pain management clinic",
 ];
 
 const CITIES = [
   "Austin, TX","Denver, CO","Phoenix, AZ","Dallas, TX","Nashville, TN",
   "Charlotte, NC","Tampa, FL","Atlanta, GA","Houston, TX","Raleigh, NC",
-  "Orlando, FL","Las Vegas, NV","Minneapolis, MN","Indianapolis, IN",
-  "San Antonio, TX","Columbus, OH","Salt Lake City, UT","Memphis, TN",
-  "Jacksonville, FL","Richmond, VA",
+  "Orlando, FL","Las Vegas, NV","Scottsdale, AZ","San Antonio, TX","Columbus, OH",
+  "Salt Lake City, UT","Jacksonville, FL","Richmond, VA","Boise, ID","Minneapolis, MN",
 ];
 
-// ── Outcome templates — grouped by result type ────────────────────────────────
-// Each returns { label, icon, headline, sub }
-
 type Entry = {
-  business: string;
+  practice: string;
   city: string;
-  icon: string;        // emoji category icon
-  iconBg: string;      // background color for icon pill
+  icon: string;
+  iconBg: string;
   iconColor: string;
-  headline: string;    // bold outcome line
-  sub: string;         // supporting detail
+  headline: string;
+  sub: string;
   minsAgo: number;
 };
 
-type Template = (rng: () => number, business: string, city: string, i: number) => Entry;
+type Template = (rng: () => number, practice: string, city: string, i: number) => Entry;
 
 const TEMPLATES: Template[] = [
 
-  // ── Revenue ──────────────────────────────────────────────────────────────
-  (rng, business, city, i) => {
-    const amount = pick(rng, ["$2,400","$3,800","$4,200","$5,600","$6,400","$7,100","$8,900","$11,200","$14,800"]);
-    const period = pick(rng, ["this week","this month","in 7 days","in under 2 weeks"]);
+  // ── New patient bookings ──────────────────────────────────────────────────
+  (rng, practice, city, i) => {
+    const n = ri(rng, 4, 14);
+    const period = pick(rng, ["this week", "in 7 days", "this month", "in under 2 weeks"]);
     return {
-      business, city,
-      icon: "💰", iconBg: "rgba(22,163,74,0.1)", iconColor: "#16a34a",
-      headline: `Booked ${amount} in new revenue ${period}`,
-      sub: "All from leads that came through their intake page",
+      practice, city,
+      icon: "🗓️", iconBg: "rgba(22,163,74,0.1)", iconColor: "#16a34a",
+      headline: `Booked ${n} new patient appointments ${period}`,
+      sub: "From inquiries that came in after hours — auto-responded and scheduled",
       minsAgo: ri(rng, 4, 52) + i * 2,
     };
   },
 
-  (rng, business, city, i) => {
-    const amount = pick(rng, ["$1,900","$3,200","$5,100","$6,800","$9,400","$13,500","$17,200"]);
+  (rng, practice, city, i) => {
+    const n = ri(rng, 6, 19);
     return {
-      business, city,
-      icon: "💰", iconBg: "rgba(22,163,74,0.1)", iconColor: "#16a34a",
-      headline: `Closed a ${amount} job from a ClozeFlow lead`,
-      sub: `Lead came in at 10pm — auto-responded, booked by morning`,
+      practice, city,
+      icon: "🗓️", iconBg: "rgba(22,163,74,0.1)", iconColor: "#16a34a",
+      headline: `${n} consultations booked automatically this month`,
+      sub: "No manual outreach — ClozeFlow handled every follow-up",
+      minsAgo: ri(rng, 5, 48) + i * 2,
+    };
+  },
+
+  (rng, practice, city, i) => {
+    const slots = ri(rng, 8, 24);
+    return {
+      practice, city,
+      icon: "🗓️", iconBg: "rgba(22,163,74,0.1)", iconColor: "#16a34a",
+      headline: `Filled ${slots} empty appointment slots in the first week`,
+      sub: "Slots that would have sat open — booked before the team even saw the inquiry",
       minsAgo: ri(rng, 6, 44) + i * 2,
     };
   },
 
-  (rng, business, city, i) => {
-    const amount = pick(rng, ["$4,400","$6,200","$8,700","$12,300","$21,000","$34,500"]);
-    const months = pick(rng, ["first month","first 6 weeks","first 30 days"]);
-    return {
-      business, city,
-      icon: "💰", iconBg: "rgba(22,163,74,0.1)", iconColor: "#16a34a",
-      headline: `Generated ${amount} in the ${months} with ClozeFlow`,
-      sub: "ROI positive in week one",
-      minsAgo: ri(rng, 8, 58) + i * 2,
-    };
-  },
-
-  // ── Conversion Rate ───────────────────────────────────────────────────────
-  (rng, business, city, i) => {
+  // ── Booking rate / conversion ─────────────────────────────────────────────
+  (rng, practice, city, i) => {
     const from = pick(rng, [9, 11, 13, 14, 16, 18]);
-    const to   = pick(rng, [28, 31, 34, 37, 41, 44]);
+    const to   = pick(rng, [31, 37, 41, 46, 52, 58]);
     return {
-      business, city,
+      practice, city,
       icon: "📈", iconBg: "rgba(37,99,235,0.1)", iconColor: "#2563eb",
-      headline: `Conversion rate jumped ${from}% → ${to}% in 30 days`,
-      sub: "Faster response time was the only change they made",
+      headline: `New patient booking rate: ${from}% → ${to}% in 30 days`,
+      sub: "Same ad spend — just responding in under 60 seconds instead of next day",
       minsAgo: ri(rng, 3, 49) + i * 2,
     };
   },
 
-  (rng, business, city, i) => {
-    const mult = pick(rng, ["2.1×","2.4×","2.8×","3.1×","3.4×"]);
+  (rng, practice, city, i) => {
+    const mult = pick(rng, ["2.1×", "2.4×", "2.8×", "3.1×", "3.4×"]);
     return {
-      business, city,
+      practice, city,
       icon: "📈", iconBg: "rgba(37,99,235,0.1)", iconColor: "#2563eb",
-      headline: `Lead-to-job conversion rate is up ${mult}`,
-      sub: "Same ad spend — just responding faster than competitors",
+      headline: `Inquiry-to-appointment conversion is up ${mult}`,
+      sub: "Same budget, same channels — faster response wins every time",
       minsAgo: ri(rng, 5, 55) + i * 2,
     };
   },
 
-  (rng, business, city, i) => {
-    const won   = pick(rng, [6, 7, 8, 9]);
-    const total = pick(rng, [9, 10, 11]);
+  // ── Revenue recovered ─────────────────────────────────────────────────────
+  (rng, practice, city, i) => {
+    const k = pick(rng, ["$4k", "$6k", "$8k", "$11k", "$14k", "$18k", "$22k"]);
+    const period = pick(rng, ["this month", "in 30 days", "in the first 6 weeks"]);
     return {
-      business, city,
-      icon: "📈", iconBg: "rgba(37,99,235,0.1)", iconColor: "#2563eb",
-      headline: `Closing ${won} out of every ${total} leads now`,
-      sub: `Was ${won - ri(rng, 2, 3)} of ${total} before — same leads, faster follow-up`,
-      minsAgo: ri(rng, 7, 53) + i * 2,
-    };
-  },
-
-  // ── Lead Engagement & Volume ──────────────────────────────────────────────
-  (rng, business, city, i) => {
-    const leads = pick(rng, [147, 218, 304, 412, 537, 623, 714, 881]);
-    return {
-      business, city,
-      icon: "⚡", iconBg: "rgba(234,88,12,0.1)", iconColor: "#ea580c",
-      headline: `Just crossed ${leads} leads managed automatically`,
-      sub: "Every single one responded to in under 2 minutes",
-      minsAgo: ri(rng, 4, 46) + i * 2,
-    };
-  },
-
-  (rng, business, city, i) => {
-    const leads = ri(rng, 38, 97);
-    return {
-      business, city,
-      icon: "⚡", iconBg: "rgba(234,88,12,0.1)", iconColor: "#ea580c",
-      headline: `${leads} leads responded to this month — zero missed`,
-      sub: "100% contact rate for the first time in their history",
-      minsAgo: ri(rng, 6, 51) + i * 2,
-    };
-  },
-
-  (rng, business, city, i) => {
-    const days = pick(rng, [14, 21, 30, 45, 60]);
-    return {
-      business, city,
-      icon: "⚡", iconBg: "rgba(234,88,12,0.1)", iconColor: "#ea580c",
-      headline: `Zero missed leads — ${days} days straight`,
-      sub: "Leads that used to go cold are now booking estimates",
-      minsAgo: ri(rng, 5, 47) + i * 2,
-    };
-  },
-
-  (rng, business, city, i) => {
-    const leads = ri(rng, 12, 34);
-    return {
-      business, city,
-      icon: "⚡", iconBg: "rgba(234,88,12,0.1)", iconColor: "#ea580c",
-      headline: `${leads} leads came in overnight — all replied by 6am`,
-      sub: "ClozeFlow responded while the owner slept",
-      minsAgo: ri(rng, 3, 42) + i * 2,
-    };
-  },
-
-  // ── Speed / Response Time ─────────────────────────────────────────────────
-  (rng, business, city, i) => {
-    const secs = pick(rng, [23, 31, 38, 44, 47, 52, 58]);
-    return {
-      business, city,
-      icon: "🚀", iconBg: "rgba(124,58,237,0.1)", iconColor: "#7c3aed",
-      headline: `Average response time dropped to ${secs} seconds`,
-      sub: `Was ${pick(rng, ["3–4 hours","2–6 hours","same day","next morning"])} before — leads are noticing`,
-      minsAgo: ri(rng, 4, 50) + i * 2,
-    };
-  },
-
-  (rng, business, city, i) => {
-    const secs = pick(rng, [27, 34, 41, 49, 53]);
-    return {
-      business, city,
-      icon: "🚀", iconBg: "rgba(124,58,237,0.1)", iconColor: "#7c3aed",
-      headline: `Responded to a hot lead in ${secs} seconds`,
-      sub: "Competitor called 4 hours later — job was already booked",
+      practice, city,
+      icon: "💰", iconBg: "rgba(22,163,74,0.1)", iconColor: "#16a34a",
+      headline: `Recovered ${k} in missed appointment revenue ${period}`,
+      sub: "Inquiries were slipping through — now every one gets an instant reply",
       minsAgo: ri(rng, 6, 44) + i * 2,
     };
   },
 
-  // ── Booked Appointments ───────────────────────────────────────────────────
-  (rng, business, city, i) => {
-    const appts = ri(rng, 7, 19);
+  (rng, practice, city, i) => {
+    const k = pick(rng, ["$3,200", "$5,100", "$7,400", "$9,800", "$13,500"]);
     return {
-      business, city,
-      icon: "📅", iconBg: "rgba(8,145,178,0.1)", iconColor: "#0891b2",
-      headline: `${appts} estimate appointments booked automatically this week`,
-      sub: "No manual outreach — ClozeFlow handled every follow-up",
-      minsAgo: ri(rng, 5, 53) + i * 2,
+      practice, city,
+      icon: "💰", iconBg: "rgba(22,163,74,0.1)", iconColor: "#16a34a",
+      headline: `Closed a ${k} treatment plan from a late-night inquiry`,
+      sub: "Patient texted at 9 PM — ClozeFlow replied in 44 seconds, booked by morning",
+      minsAgo: ri(rng, 8, 58) + i * 2,
     };
   },
 
-  (rng, business, city, i) => {
-    const appts = ri(rng, 4, 11);
+  // ── Inquiries handled ─────────────────────────────────────────────────────
+  (rng, practice, city, i) => {
+    const n = pick(rng, [47, 63, 88, 112, 134, 178, 204]);
     return {
-      business, city,
-      icon: "📅", iconBg: "rgba(8,145,178,0.1)", iconColor: "#0891b2",
-      headline: `Booked ${appts} jobs while on-site — inbox handled itself`,
-      sub: "First week live — already ahead of last month's total",
-      minsAgo: ri(rng, 4, 48) + i * 2,
+      practice, city,
+      icon: "⚡", iconBg: "rgba(40,96,176,0.1)", iconColor: SAPPHIRE,
+      headline: `${n} patient inquiries handled automatically this month`,
+      sub: "100% contact rate — zero inquiries left without a response",
+      minsAgo: ri(rng, 4, 46) + i * 2,
     };
   },
 
-  (rng, business, city, i) => {
-    const pct = pick(rng, [34, 41, 47, 53, 58, 62]);
+  (rng, practice, city, i) => {
+    const n = ri(rng, 9, 28);
     return {
-      business, city,
-      icon: "📅", iconBg: "rgba(8,145,178,0.1)", iconColor: "#0891b2",
-      headline: `${pct}% of new leads booked an estimate without a phone call`,
-      sub: "Intake page + instant follow-up — no chasing required",
-      minsAgo: ri(rng, 7, 56) + i * 2,
+      practice, city,
+      icon: "⚡", iconBg: "rgba(40,96,176,0.1)", iconColor: SAPPHIRE,
+      headline: `${n} inquiries came in overnight — all replied by morning`,
+      sub: "ClozeFlow responded while the team slept",
+      minsAgo: ri(rng, 3, 42) + i * 2,
     };
   },
 
-  // ── Time Saved ────────────────────────────────────────────────────────────
-  (rng, business, city, i) => {
-    const hrs = pick(rng, [6, 7, 8, 9, 11, 12, 14]);
+  (rng, practice, city, i) => {
+    const days = pick(rng, [14, 21, 30, 45, 60]);
     return {
-      business, city,
+      practice, city,
+      icon: "⚡", iconBg: "rgba(40,96,176,0.1)", iconColor: SAPPHIRE,
+      headline: `Zero missed patient inquiries — ${days} days straight`,
+      sub: "Every single inquiry qualified and responded to in under 2 minutes",
+      minsAgo: ri(rng, 5, 47) + i * 2,
+    };
+  },
+
+  // ── Speed ─────────────────────────────────────────────────────────────────
+  (rng, practice, city, i) => {
+    const secs = pick(rng, [23, 31, 38, 44, 47, 52, 58]);
+    return {
+      practice, city,
+      icon: "🚀", iconBg: "rgba(124,58,237,0.1)", iconColor: "#7c3aed",
+      headline: `Average response time dropped to ${secs} seconds`,
+      sub: `Was ${pick(rng, ["3–4 hours", "next morning", "same day"])} before — patients are noticing`,
+      minsAgo: ri(rng, 4, 50) + i * 2,
+    };
+  },
+
+  (rng, practice, city, i) => {
+    const secs = pick(rng, [27, 34, 41, 49, 53]);
+    return {
+      practice, city,
+      icon: "🚀", iconBg: "rgba(124,58,237,0.1)", iconColor: "#7c3aed",
+      headline: `Responded to a new patient inquiry in ${secs} seconds`,
+      sub: "Competing practice called back 4 hours later — appointment was already booked",
+      minsAgo: ri(rng, 6, 44) + i * 2,
+    };
+  },
+
+  // ── Time saved for front desk ─────────────────────────────────────────────
+  (rng, practice, city, i) => {
+    const hrs = pick(rng, [6, 7, 9, 11, 14]);
+    return {
+      practice, city,
       icon: "⏱️", iconBg: "rgba(15,23,42,0.07)", iconColor: "#334155",
-      headline: `Saved ${hrs} hours of follow-up calls this week`,
-      sub: "Reinvested that time into closing — revenue up immediately",
+      headline: `Front desk saved ${hrs} hours of follow-up calls this week`,
+      sub: "Staff now focused entirely on patients in the room",
       minsAgo: ri(rng, 5, 51) + i * 2,
     };
   },
 
-  (rng, business, city, i) => {
+  (rng, practice, city, i) => {
     const hrs = pick(rng, [18, 22, 26, 31, 34]);
     return {
-      business, city,
+      practice, city,
       icon: "⏱️", iconBg: "rgba(15,23,42,0.07)", iconColor: "#334155",
-      headline: `Recovered ${hrs} hrs/month of owner time`,
+      headline: `Recovered ${hrs} hrs/month of front desk time`,
       sub: "Follow-ups, reminders, and qualification — all automated",
       minsAgo: ri(rng, 6, 54) + i * 2,
     };
   },
+
+  // ── Patient reactivation ──────────────────────────────────────────────────
+  (rng, practice, city, i) => {
+    const n = ri(rng, 6, 18);
+    return {
+      practice, city,
+      icon: "🔄", iconBg: "rgba(37,99,235,0.1)", iconColor: "#2563eb",
+      headline: `Reactivated ${n} lapsed patients this month`,
+      sub: "Automated outreach to patients who hadn't booked in 90+ days",
+      minsAgo: ri(rng, 4, 48) + i * 2,
+    };
+  },
 ];
 
-// ── Build entry list ──────────────────────────────────────────────────────────
 function buildEntries(count = 24): Entry[] {
   const seed = Date.now() % 999983;
   const rng  = makeRng(seed);
   return Array.from({ length: count }, (_, i) => {
     const tmpl     = TEMPLATES[i % TEMPLATES.length];
-    const business = pick(rng, BUSINESSES);
+    const practice = pick(rng, PRACTICES);
     const city     = pick(rng, CITIES);
-    return tmpl(makeRng(seed + i * 7919), business, city, i);
+    return tmpl(makeRng(seed + i * 7919), practice, city, i);
   });
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function MarketingSocialProof() {
-  const [entries, setEntries]  = useState<Entry[] | null>(null);
-  const [idx, setIdx]          = useState(0);
-  const [visible, setVisible]  = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [entries, setEntries]      = useState<Entry[] | null>(null);
+  const [idx, setIdx]              = useState(0);
+  const [visible, setVisible]      = useState(false);
+  const [dismissed, setDismissed]  = useState(false);
 
   useEffect(() => { setEntries(buildEntries()); }, []);
 
-  // First show after 5 s
   useEffect(() => {
     const t = setTimeout(() => { if (!dismissed) setVisible(true); }, 5000);
     return () => clearTimeout(t);
   }, [dismissed]);
 
-  // Hide after 6 s
   useEffect(() => {
     if (!visible) return;
     const t = setTimeout(() => setVisible(false), 6000);
     return () => clearTimeout(t);
   }, [visible, idx]);
 
-  // Next entry 11 s after hiding
   useEffect(() => {
     if (visible || dismissed || !entries) return;
     const t = setTimeout(() => {
@@ -308,9 +274,9 @@ export default function MarketingSocialProof() {
     <>
       <style>{`
         @keyframes cf-pulse {
-          0%   { box-shadow: 0 0 0 0 rgba(211,84,0,0.55); }
-          70%  { box-shadow: 0 0 0 8px rgba(211,84,0,0); }
-          100% { box-shadow: 0 0 0 0 rgba(211,84,0,0); }
+          0%   { box-shadow: 0 0 0 0 rgba(40,96,176,0.5); }
+          70%  { box-shadow: 0 0 0 8px rgba(40,96,176,0); }
+          100% { box-shadow: 0 0 0 0 rgba(40,96,176,0); }
         }
         @keyframes cf-slide-up {
           from { transform: translateY(16px) scale(0.97); opacity: 0; }
@@ -332,7 +298,6 @@ export default function MarketingSocialProof() {
           transform: translateY(0) scale(1);
           pointer-events: auto;
         }
-        /* Full-width on small phones, stay above browser chrome */
         @media (max-width: 480px) {
           .cf-proof {
             left: 10px;
@@ -351,12 +316,11 @@ export default function MarketingSocialProof() {
           boxShadow: "0 16px 48px rgba(0,0,0,0.12), 0 3px 10px rgba(0,0,0,0.07)",
           border: "1px solid rgba(0,0,0,0.07)",
         }}>
-          {/* Coloured top accent strip */}
-          <div style={{ height: 3, background: "linear-gradient(90deg, #D35400, #ea580c, #f97316)" }} />
+          {/* Sapphire top accent */}
+          <div style={{ height: 3, background: "linear-gradient(90deg, #2860B0, #4f86d8, #8fb4e8)" }} />
 
           <div style={{ padding: "13px 13px 13px 15px", display: "flex", alignItems: "flex-start", gap: 11 }}>
 
-            {/* Category icon pill */}
             <div style={{
               width: 36, height: 36, borderRadius: 10, flexShrink: 0,
               background: e.iconBg,
@@ -366,12 +330,10 @@ export default function MarketingSocialProof() {
               {e.icon}
             </div>
 
-            {/* Content */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              {/* Business + dismiss row */}
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 6, marginBottom: 4 }}>
                 <p style={{ margin: 0, fontSize: 11, color: "#888", fontWeight: 500, lineHeight: 1.3 }}>
-                  {e.business} · <span style={{ color: "#aaa" }}>{e.city}</span>
+                  {e.practice} · <span style={{ color: "#aaa" }}>{e.city}</span>
                 </p>
                 <button
                   onClick={dismiss}
@@ -384,27 +346,18 @@ export default function MarketingSocialProof() {
                 >×</button>
               </div>
 
-              {/* Headline — the outcome */}
-              <p style={{
-                margin: "0 0 5px", fontSize: 13, fontWeight: 800,
-                color: "#111", lineHeight: 1.35,
-              }}>
+              <p style={{ margin: "0 0 5px", fontSize: 13, fontWeight: 800, color: "#111", lineHeight: 1.35 }}>
                 {e.headline}
               </p>
 
-              {/* Sub-detail */}
-              <p style={{
-                margin: "0 0 8px", fontSize: 11.5, color: "#666",
-                lineHeight: 1.45, fontWeight: 400,
-              }}>
+              <p style={{ margin: "0 0 8px", fontSize: 11.5, color: "#666", lineHeight: 1.45, fontWeight: 400 }}>
                 {e.sub}
               </p>
 
-              {/* Footer: badge + time */}
               <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <span style={{
                   fontSize: 10, fontWeight: 700, letterSpacing: "0.4px",
-                  color: "#D35400", background: "rgba(211,84,0,0.09)",
+                  color: SAPPHIRE, background: SAPPHIRE_PALE,
                   borderRadius: 20, padding: "2px 9px",
                 }}>
                   via ClozeFlow
@@ -412,7 +365,6 @@ export default function MarketingSocialProof() {
                 <span style={{ fontSize: 10.5, color: "#bbb", fontWeight: 500 }}>
                   {e.minsAgo} min ago
                 </span>
-                {/* Live dot */}
                 <div style={{
                   width: 6, height: 6, borderRadius: "50%",
                   background: "#22c55e", marginLeft: "auto",
