@@ -41,7 +41,7 @@ export default function ScoreGauge({ score, size = 200, label = "Engagement Scor
       svg.append("path")
         .attr("d", bgPath!)
         .attr("transform", `translate(${cx},${cy})`)
-        .attr("fill", "#ede9e4");
+        .attr("fill", "#DDE4EF");
 
       // Score fill — animate from 0
       const targetAngle = -Math.PI / 2 + (score / 100) * Math.PI;
@@ -86,7 +86,7 @@ export default function ScoreGauge({ score, size = 200, label = "Engagement Scor
         .attr("x", cx)
         .attr("y", cy + Math.round(size * 0.04))
         .attr("text-anchor", "middle")
-        .attr("fill", "#a8a29e")
+        .attr("fill", "#8A9DB0")
         .attr("font-size", `${Math.round(size * 0.065)}px`)
         .attr("font-weight", "600")
         .attr("font-family", "system-ui,-apple-system,sans-serif")
@@ -96,7 +96,7 @@ export default function ScoreGauge({ score, size = 200, label = "Engagement Scor
       svg.append("text")
         .attr("x", cx - outerR + 2)
         .attr("y", cy + Math.round(size * 0.1))
-        .attr("fill", "#c4bfb8")
+        .attr("fill", "#8A9DB0")
         .attr("font-size", `${Math.round(size * 0.058)}px`)
         .attr("font-family", "system-ui,-apple-system,sans-serif")
         .text("0");
@@ -106,7 +106,7 @@ export default function ScoreGauge({ score, size = 200, label = "Engagement Scor
         .attr("x", cx + outerR - 2)
         .attr("y", cy + Math.round(size * 0.1))
         .attr("text-anchor", "end")
-        .attr("fill", "#c4bfb8")
+        .attr("fill", "#8A9DB0")
         .attr("font-size", `${Math.round(size * 0.058)}px`)
         .attr("font-family", "system-ui,-apple-system,sans-serif")
         .text("100");
@@ -119,7 +119,7 @@ export default function ScoreGauge({ score, size = 200, label = "Engagement Scor
         ref={ref}
         style={{ width: "100%", maxWidth: size, height: "auto", display: "block", margin: "0 auto" }}
       />
-      <p style={{ margin: "6px 0 0", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "#a8a29e" }}>
+      <p style={{ margin: "6px 0 0", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "#8A9DB0" }}>
         {label}
       </p>
     </div>

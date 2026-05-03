@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Segment, SegmentRule } from "@/lib/segments";
 import { ruleToLabel } from "@/lib/segments";
-import type { CustomFieldDef } from "@/lib/leads";
+import type { CustomFieldDef } from "@/lib/lead-types";
 import RuleBuilder from "@/components/RuleBuilder";
 
 const TEXT   = "#2C3E50";

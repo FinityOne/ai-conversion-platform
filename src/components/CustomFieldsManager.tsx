@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { CustomFieldDef, CustomFieldKey } from "@/lib/leads";
+import type { CustomFieldDef, CustomFieldKey } from "@/lib/lead-types";
 
-const BORDER = "#e6e2db";
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BG     = "#F9F7F2";
-const ORANGE = "#D35400";
+const BORDER   = "#DDE4EF";
+const TEXT     = "#0D1428";
+const MUTED    = "#8A9DB0";
+const BG       = "#F5F7FB";
+const SAPPHIRE = "#2860B0";
 
 const KEYS: CustomFieldKey[] = ["cf_1", "cf_2", "cf_3"];
 
@@ -102,7 +102,7 @@ export default function CustomFieldsManager({ onSaved }: Props) {
           fontSize: 14, fontWeight: 600, cursor: "pointer",
         }}
       >
-        <i className="fa-solid fa-sliders" style={{ fontSize: 13, color: ORANGE }} />
+        <i className="fa-solid fa-sliders" style={{ fontSize: 13, color: SAPPHIRE }} />
         Custom Fields
       </button>
 
@@ -194,11 +194,11 @@ export default function CustomFieldsManager({ onSaved }: Props) {
                 disabled={saving}
                 style={{
                   padding: "11px 24px", borderRadius: 10, border: "none",
-                  background: saving ? "#fed7aa" : "linear-gradient(135deg,#D35400,#e8641c)",
+                  background: saving ? "#C5D5EF" : "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)",
                   color: "#fff", fontSize: 14, fontWeight: 700,
                   cursor: saving ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", gap: 8,
-                  boxShadow: saving ? "none" : "0 4px 14px rgba(211,84,0,0.25)",
+                  boxShadow: saving ? "none" : "0 4px 14px rgba(40,96,176,0.25)",
                 }}
               >
                 {saving && <i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: 13 }} />}
@@ -235,13 +235,13 @@ function FieldEditor({
 
   return (
     <div style={{
-      border: `1.5px solid ${active ? ORANGE + "55" : BORDER}`,
+      border: `1.5px solid ${active ? SAPPHIRE + "55" : BORDER}`,
       borderRadius: 14, padding: "16px 18px",
-      background: active ? "#fff8f5" : BG,
+      background: active ? "#eef3fc" : BG,
       transition: "border-color 0.15s, background 0.15s",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-        <span style={{ fontSize: 13, fontWeight: 800, color: active ? ORANGE : MUTED, letterSpacing: "0.04em" }}>
+        <span style={{ fontSize: 13, fontWeight: 800, color: active ? SAPPHIRE : MUTED, letterSpacing: "0.04em" }}>
           CUSTOM FIELD {num}
         </span>
         {active && (
@@ -301,7 +301,7 @@ function FieldEditor({
                 {def.options.map(o => (
                   <span key={o} style={{
                     fontSize: 11, fontWeight: 700, padding: "3px 8px",
-                    borderRadius: 20, background: "rgba(211,84,0,0.1)", color: ORANGE,
+                    borderRadius: 20, background: "rgba(40,96,176,0.1)", color: SAPPHIRE,
                   }}>{o}</span>
                 ))}
               </div>

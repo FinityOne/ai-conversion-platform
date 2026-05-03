@@ -5,11 +5,9 @@ import { getLeadStats } from "@/lib/leads";
 import { getEmailDashStats } from "@/lib/email-stats";
 import { getSubscription, PLANS, type PlanId } from "@/lib/subscriptions";
 import { getLocationContext } from "@/lib/location-utils";
-import { getMemberOrgs } from "@/lib/team";
 import Link from "next/link";
 import ShareLinkButton from "@/components/ShareLinkButton";
 import DailyEmailChart from "@/components/DailyEmailChart";
-import PlanGate from "@/components/PlanGate";
 import WeeklyReportButton from "@/components/WeeklyReportButton";
 
 const TEXT   = "#2C3E50";
@@ -62,15 +60,10 @@ export default async function DashboardPage(
   const cfOrg       = cookieStore.get("cf_org")?.value ?? null;
   const sb          = createSupabaseServiceClient();
 
-  // Check real membership (not just cookie) — covers new devices / cleared cookies
-  const [memberOrgs, cookieMembership] = await Promise.all([
-    getMemberOrgs(user!.id),
-    cfOrg
-      ? sb.from("team_memberships").select("id").eq("owner_id", cfOrg).eq("member_user_id", user!.id).eq("status", "active").maybeSingle()
-      : Promise.resolve({ data: null }),
-  ]);
-
-  const isMemberView = memberOrgs.length > 0; // bypass paywall for any active team member
+  // Verify cf_org cookie against a real active membership (covers new devices / cleared cookies)
+  const cookieMembership = cfOrg
+    ? await sb.from("team_memberships").select("id").eq("owner_id", cfOrg).eq("member_user_id", user!.id).eq("status", "active").maybeSingle()
+    : { data: null };
 
   // If cf_org cookie is set and valid, show that org's data; otherwise own data
   const activeUserId = (cfOrg && cookieMembership.data) ? cfOrg : user!.id;
@@ -509,5 +502,5 @@ export default async function DashboardPage(
     </div>
   );
 
-  return <PlanGate hasPlan={!!plan || isMemberView}>{dashboardContent}</PlanGate>;
+  return dashboardContent;
 }

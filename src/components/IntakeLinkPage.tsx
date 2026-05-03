@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 
 const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
@@ -78,9 +78,33 @@ function CopyButton({ intakeUrl }: { intakeUrl: string }) {
   );
 }
 
-// ─── Slug editor ──────────────────────────────────────────────────────────────
+// ─── Slug editor (shared state type) ─────────────────────────────────────────
 
 type CheckState = "idle" | "typing" | "checking" | "available" | "taken" | "invalid" | "saved";
+
+const slugIndicator: Record<CheckState, { icon: string; color: string } | null> = {
+  idle:      null,
+  typing:    { icon: "fa-ellipsis",           color: MUTED      },
+  checking:  { icon: "fa-spinner fa-spin",    color: MUTED      },
+  available: { icon: "fa-circle-check",       color: "#27AE60"  },
+  taken:     { icon: "fa-circle-xmark",       color: "#dc2626"  },
+  invalid:   { icon: "fa-circle-exclamation", color: "#d97706"  },
+  saved:     { icon: "fa-circle-check",       color: "#27AE60"  },
+};
+
+function slugBorderColor(state: CheckState): string {
+  if (state === "taken" || state === "invalid") return "#fecaca";
+  if (state === "available" || state === "saved") return "#bbf7d0";
+  return BORDER;
+}
+
+function slugMessageColor(state: CheckState): string {
+  if (state === "taken" || state === "invalid") return "#dc2626";
+  if (state === "available" || state === "saved") return "#27AE60";
+  return MUTED;
+}
+
+// ─── Account slug editor ──────────────────────────────────────────────────────
 
 function SlugEditor({
   currentSlug, userId, siteBase, suggestedSlug,
@@ -93,16 +117,15 @@ function SlugEditor({
   onSaved:       (slug: string) => void;
 }) {
   const initialValue  = currentSlug ?? suggestedSlug ?? "";
-  const [value,    setValue]    = useState(initialValue);
-  const [checkState, setCheck]  = useState<CheckState>("idle");
-  const [message,  setMessage]  = useState("");
-  const [saving,   setSaving]   = useState(false);
+  const [value,       setValue]   = useState(initialValue);
+  const [checkState,  setCheck]   = useState<CheckState>("idle");
+  const [message,     setMessage] = useState("");
+  const [saving,      setSaving]  = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const check = useCallback(async (slug: string) => {
     const err = validateSlug(slug);
     if (err) { setCheck("invalid"); setMessage(err); return; }
-    // Skip network check if unchanged from saved
     if (slug === currentSlug) { setCheck("available"); setMessage("This is your current link"); return; }
     setCheck("checking");
     setMessage("");
@@ -141,17 +164,7 @@ function SlugEditor({
     }
   }
 
-  // Status indicator config
-  const indicator: Record<CheckState, { icon: string; color: string } | null> = {
-    idle:      null,
-    typing:    { icon: "fa-ellipsis", color: MUTED },
-    checking:  { icon: "fa-spinner fa-spin", color: MUTED },
-    available: { icon: "fa-circle-check", color: "#27AE60" },
-    taken:     { icon: "fa-circle-xmark", color: "#dc2626" },
-    invalid:   { icon: "fa-circle-exclamation", color: "#d97706" },
-    saved:     { icon: "fa-circle-check", color: "#27AE60" },
-  };
-  const ind = indicator[checkState];
+  const ind     = slugIndicator[checkState];
   const canSave = checkState === "available" && value !== currentSlug && !saving;
 
   return (
@@ -159,14 +172,10 @@ function SlugEditor({
       <p style={{ margin: "0 0 10px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: MUTED }}>
         Customize your link
       </p>
-
-      {/* Input row */}
-      <div style={{ display: "flex", alignItems: "stretch", gap: 0, border: `1.5px solid ${checkState === "taken" || checkState === "invalid" ? "#fecaca" : checkState === "available" || checkState === "saved" ? "#bbf7d0" : BORDER}`, borderRadius: 10, overflow: "hidden", background: "#f9f7f4", transition: "border-color 0.15s" }}>
-        {/* Prefix */}
+      <div style={{ display: "flex", alignItems: "stretch", gap: 0, border: `1.5px solid ${slugBorderColor(checkState)}`, borderRadius: 10, overflow: "hidden", background: "#f9f7f4", transition: "border-color 0.15s" }}>
         <div style={{ padding: "12px 10px 12px 14px", fontSize: 13, color: MUTED, whiteSpace: "nowrap", userSelect: "none", background: "#f0ede8", borderRight: `1px solid ${BORDER}`, display: "flex", alignItems: "center" }}>
           clozeflow.com/intake/
         </div>
-        {/* Input */}
         <input
           value={value}
           onChange={handleChange}
@@ -175,42 +184,135 @@ function SlugEditor({
           spellCheck={false}
           style={{ flex: 1, minWidth: 0, padding: "12px 10px", background: "transparent", border: "none", outline: "none", fontSize: 14, fontWeight: 600, color: TEXT }}
         />
-        {/* Status icon */}
         {ind && (
           <div style={{ padding: "0 12px", display: "flex", alignItems: "center", flexShrink: 0 }}>
             <i className={`fa-solid ${ind.icon}`} style={{ fontSize: 16, color: ind.color }} />
           </div>
         )}
-        {/* Save button */}
         <button
           onClick={handleSave}
           disabled={!canSave}
-          style={{
-            flexShrink: 0, padding: "12px 18px", border: "none",
-            background: canSave
-              ? "linear-gradient(135deg,#D35400,#e8641c)"
-              : "#e6e2db",
-            color: canSave ? "#fff" : "#a8a29e",
-            fontSize: 13, fontWeight: 700,
-            cursor: canSave ? "pointer" : "not-allowed",
-            transition: "all 0.15s",
-          }}
+          style={{ flexShrink: 0, padding: "12px 18px", border: "none", background: canSave ? "linear-gradient(135deg,#D35400,#e8641c)" : "#e6e2db", color: canSave ? "#fff" : "#a8a29e", fontSize: 13, fontWeight: 700, cursor: canSave ? "pointer" : "not-allowed", transition: "all 0.15s" }}
         >
           {saving ? <i className="fa-solid fa-spinner fa-spin" /> : "Save"}
         </button>
       </div>
-
-      {/* Status message */}
       {message && (
-        <p style={{ margin: "6px 0 0", fontSize: 12, fontWeight: 600, color: checkState === "taken" || checkState === "invalid" ? "#dc2626" : checkState === "available" || checkState === "saved" ? "#27AE60" : MUTED }}>
+        <p style={{ margin: "6px 0 0", fontSize: 12, fontWeight: 600, color: slugMessageColor(checkState) }}>
           {message}
         </p>
       )}
-
       {!currentSlug && (
         <p style={{ margin: "8px 0 0", fontSize: 12, color: MUTED }}>
           <i className="fa-solid fa-circle-info" style={{ marginRight: 5 }} />
           Your link currently uses your account ID. Set a custom name so it&apos;s easy to share.
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─── Location slug editor ─────────────────────────────────────────────────────
+
+function LocationSlugEditor({
+  locationId, currentSlug, siteBase, locationName, onSaved,
+}: {
+  locationId:   string;
+  currentSlug:  string | null;
+  siteBase:     string;
+  locationName: string;
+  onSaved:      (slug: string) => void;
+}) {
+  const suggested = toSlug(locationName);
+  const [value,      setValue]   = useState(currentSlug ?? suggested ?? "");
+  const [checkState, setCheck]   = useState<CheckState>("idle");
+  const [message,    setMessage] = useState("");
+  const [saving,     setSaving]  = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const check = useCallback(async (slug: string) => {
+    const err = validateSlug(slug);
+    if (err) { setCheck("invalid"); setMessage(err); return; }
+    if (slug === currentSlug) { setCheck("available"); setMessage("This is the current link"); return; }
+    setCheck("checking");
+    setMessage("");
+    try {
+      const res  = await fetch(`/api/location-slug?slug=${encodeURIComponent(slug)}&locationId=${encodeURIComponent(locationId)}`);
+      const body = await res.json();
+      if (body.available) { setCheck("available"); setMessage("Available!"); }
+      else                { setCheck("taken");     setMessage(body.reason ?? "Already taken"); }
+    } catch {
+      setCheck("idle");
+    }
+  }, [currentSlug, locationId]);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+    setValue(raw);
+    setCheck("typing");
+    setMessage("");
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => check(raw), 500);
+  }
+
+  async function handleSave() {
+    if (checkState !== "available") return;
+    setSaving(true);
+    try {
+      const res  = await fetch("/api/location-slug", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ slug: value, locationId }) });
+      const body = await res.json();
+      if (!res.ok) { setCheck("taken"); setMessage(body.error ?? "Failed to save"); return; }
+      setCheck("saved");
+      setMessage("Saved!");
+      onSaved(value);
+      setTimeout(() => { setCheck("available"); setMessage("This is the current link"); }, 3000);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const ind     = slugIndicator[checkState];
+  const canSave = checkState === "available" && value !== currentSlug && !saving;
+
+  return (
+    <div>
+      <p style={{ margin: "0 0 10px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: MUTED }}>
+        Customize location link
+      </p>
+      <div style={{ display: "flex", alignItems: "stretch", gap: 0, border: `1.5px solid ${slugBorderColor(checkState)}`, borderRadius: 10, overflow: "hidden", background: "#f9f7f4", transition: "border-color 0.15s" }}>
+        <div style={{ padding: "12px 10px 12px 14px", fontSize: 13, color: MUTED, whiteSpace: "nowrap", userSelect: "none", background: "#f0ede8", borderRight: `1px solid ${BORDER}`, display: "flex", alignItems: "center" }}>
+          clozeflow.com/intake/
+        </div>
+        <input
+          value={value}
+          onChange={handleChange}
+          placeholder={suggested || "location-name"}
+          maxLength={30}
+          spellCheck={false}
+          style={{ flex: 1, minWidth: 0, padding: "12px 10px", background: "transparent", border: "none", outline: "none", fontSize: 14, fontWeight: 600, color: TEXT }}
+        />
+        {ind && (
+          <div style={{ padding: "0 12px", display: "flex", alignItems: "center", flexShrink: 0 }}>
+            <i className={`fa-solid ${ind.icon}`} style={{ fontSize: 16, color: ind.color }} />
+          </div>
+        )}
+        <button
+          onClick={handleSave}
+          disabled={!canSave}
+          style={{ flexShrink: 0, padding: "12px 18px", border: "none", background: canSave ? "linear-gradient(135deg,#D35400,#e8641c)" : "#e6e2db", color: canSave ? "#fff" : "#a8a29e", fontSize: 13, fontWeight: 700, cursor: canSave ? "pointer" : "not-allowed", transition: "all 0.15s" }}
+        >
+          {saving ? <i className="fa-solid fa-spinner fa-spin" /> : "Save"}
+        </button>
+      </div>
+      {message && (
+        <p style={{ margin: "6px 0 0", fontSize: 12, fontWeight: 600, color: slugMessageColor(checkState) }}>
+          {message}
+        </p>
+      )}
+      {!currentSlug && (
+        <p style={{ margin: "8px 0 0", fontSize: 12, color: MUTED }}>
+          <i className="fa-solid fa-circle-info" style={{ marginRight: 5 }} />
+          No link set yet — save one to create this location&apos;s landing page.
         </p>
       )}
     </div>
@@ -236,6 +338,87 @@ function PlatformCard({ platform, intakeUrl }: { platform: Platform; intakeUrl: 
   );
 }
 
+// ─── Location card ────────────────────────────────────────────────────────────
+
+interface LocationProp {
+  id:          string;
+  name:        string;
+  loc_city:    string | null;
+  intake_slug: string | null;
+}
+
+function LocationCard({ location, siteBase, canEdit }: { location: LocationProp; siteBase: string; canEdit: boolean }) {
+  const [slug,   setSlug]   = useState(location.intake_slug);
+  const [copied, setCopied] = useState(false);
+
+  const intakeUrl = slug ? `${siteBase}${slug}` : null;
+  const label     = [location.name, location.loc_city].filter(Boolean).join(" — ");
+
+  async function copyLink() {
+    if (!intakeUrl) return;
+    try { await navigator.clipboard.writeText(intakeUrl); } catch { /* ignore */ }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  return (
+    <div style={{ background: "#fff", border: `1.5px solid ${BORDER}`, borderRadius: 16, padding: "20px" }}>
+      {/* Location name row */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0, background: "#fff7ed", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <i className="fa-solid fa-location-dot" style={{ fontSize: 13, color: ORANGE }} />
+        </div>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: TEXT }}>{label}</p>
+      </div>
+
+      {/* Active link display */}
+      {intakeUrl ? (
+        <>
+          <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: MUTED }}>
+            Location link
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 0, border: `1.5px solid ${BORDER}`, borderRadius: 10, overflow: "hidden", background: "#f9f7f4", marginBottom: 8 }}>
+            <span style={{ flex: 1, padding: "12px 14px", fontSize: 13, fontWeight: 600, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {intakeUrl}
+            </span>
+            <button onClick={copyLink} style={{ flexShrink: 0, padding: "12px 16px", background: copied ? "linear-gradient(135deg,#27AE60,#2ecc71)" : "linear-gradient(135deg,#D35400,#e8641c)", border: "none", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, transition: "background 0.2s" }}>
+              <i className={`fa-solid ${copied ? "fa-check" : "fa-copy"}`} />
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+          <div style={{ marginBottom: canEdit ? 16 : 0 }}>
+            <a href={intakeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, color: ORANGE, fontWeight: 600, textDecoration: "none" }}>
+              <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: 11 }} />
+              Preview location page
+            </a>
+          </div>
+        </>
+      ) : canEdit ? (
+        <p style={{ margin: "0 0 14px", fontSize: 13, color: MUTED }}>
+          <i className="fa-solid fa-circle-info" style={{ marginRight: 6, color: ORANGE }} />
+          Set a custom link below to create a landing page for this location.
+        </p>
+      ) : (
+        <p style={{ margin: 0, fontSize: 13, color: MUTED }}>No landing page set for this location.</p>
+      )}
+
+      {/* Slug editor (owners only) */}
+      {canEdit && (
+        <>
+          {intakeUrl && <div style={{ height: 1, background: BORDER, margin: "0 0 16px" }} />}
+          <LocationSlugEditor
+            locationId={location.id}
+            currentSlug={slug}
+            siteBase={siteBase}
+            locationName={location.name}
+            onSaved={(s) => setSlug(s)}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function IntakeLinkPage({
@@ -244,14 +427,18 @@ export default function IntakeLinkPage({
   userId,
   siteBase,
   suggestedSlug,
+  locations = [],
+  canEdit   = true,
 }: {
   intakeUrl:     string;
   currentSlug:   string | null;
   userId:        string;
   siteBase:      string;
   suggestedSlug: string;
+  locations?:    LocationProp[];
+  canEdit?:      boolean;
 }) {
-  const [intakeUrl, setIntakeUrl] = useState(initialIntakeUrl);
+  const [intakeUrl,  setIntakeUrl]  = useState(initialIntakeUrl);
   const [mainCopied, setMainCopied] = useState(false);
 
   function handleSlugSaved(slug: string) {
@@ -263,6 +450,8 @@ export default function IntakeLinkPage({
     setMainCopied(true);
     setTimeout(() => setMainCopied(false), 2500);
   }
+
+  const hasLocations = locations.length > 0;
 
   return (
     <div>
@@ -277,9 +466,17 @@ export default function IntakeLinkPage({
         </p>
       </div>
 
-      {/* ── Link hero box ── */}
-      <div style={{ background: "#fff", border: `1.5px solid ${BORDER}`, borderRadius: 16, padding: "20px", marginBottom: 24 }}>
+      {/* ── Business landing page ── */}
+      <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.2px", color: MUTED }}>
+        {hasLocations ? "Business landing page" : "Your landing page"}
+      </p>
+      {hasLocations && (
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: MUTED }}>
+          Your main business page — use this in your social bios and anywhere you want to capture leads across all locations.
+        </p>
+      )}
 
+      <div style={{ background: "#fff", border: `1.5px solid ${BORDER}`, borderRadius: 16, padding: "20px", marginBottom: 24 }}>
         {/* Active URL */}
         <p style={{ margin: "0 0 10px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: MUTED }}>
           Your active link
@@ -296,25 +493,43 @@ export default function IntakeLinkPage({
             {mainCopied ? "Copied!" : "Copy"}
           </button>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: canEdit ? 20 : 0 }}>
           <a href={intakeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, color: ORANGE, fontWeight: 600, textDecoration: "none" }}>
             <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: 11 }} />
             Preview your form
           </a>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: BORDER, margin: "0 0 18px" }} />
-
-        {/* Slug editor */}
-        <SlugEditor
-          currentSlug={currentSlug}
-          userId={userId}
-          siteBase={siteBase}
-          suggestedSlug={suggestedSlug}
-          onSaved={handleSlugSaved}
-        />
+        {canEdit && (
+          <>
+            <div style={{ height: 1, background: BORDER, margin: "0 0 18px" }} />
+            <SlugEditor
+              currentSlug={currentSlug}
+              userId={userId}
+              siteBase={siteBase}
+              suggestedSlug={suggestedSlug}
+              onSaved={handleSlugSaved}
+            />
+          </>
+        )}
       </div>
+
+      {/* ── Location landing pages ── */}
+      {hasLocations && (
+        <>
+          <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.2px", color: MUTED }}>
+            Location landing pages
+          </p>
+          <p style={{ margin: "0 0 14px", fontSize: 13, color: MUTED }}>
+            Each location gets its own landing page with its address, tagline, and contact info. Share the location link for location-specific campaigns.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+            {locations.map(loc => (
+              <LocationCard key={loc.id} location={loc} siteBase={siteBase} canEdit={canEdit} />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* ── How it works ── */}
       <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "18px 20px", marginBottom: 28, display: "grid", gap: 0 }} className="md:grid-cols-3">

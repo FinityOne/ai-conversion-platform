@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { Lead, EmailLogEntry, CustomFieldDef } from "@/lib/leads";
-import { leadFullName } from "@/lib/leads";
+import type { Lead, EmailLogEntry, CustomFieldDef } from "@/lib/lead-types";
+import { leadFullName } from "@/lib/lead-types";
 import type { LeadStatus } from "@/lib/scoring";
 import { getStageConfig, scoreColor, scoreBgColor, scoreBorderColor } from "@/lib/scoring";
 import { formatPhoneDisplay } from "@/lib/phone";

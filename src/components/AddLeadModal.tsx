@@ -6,7 +6,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase";
 import PhoneInput from "@/components/PhoneInput";
 import { formatPhoneE164 } from "@/lib/phone";
 import { useAnalytics } from "@/lib/analytics";
-import type { CustomFieldDef } from "@/lib/leads";
+import type { CustomFieldDef } from "@/lib/lead-types";
 
 const JOB_TYPES = [
   "Roofing",
@@ -22,11 +22,11 @@ const JOB_TYPES = [
   "Landscaping & Lawn Care",
 ];
 
-const BORDER = "#e6e2db";
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BG     = "#F9F7F2";
-const ORANGE = "#D35400";
+const BORDER  = "#DDE4EF";
+const TEXT    = "#0D1428";
+const MUTED   = "#8A9DB0";
+const BG      = "#F5F7FB";
+const SAPPHIRE = "#2860B0";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "14px 16px", borderRadius: 10,
@@ -84,9 +84,9 @@ function CustomFieldInput({
               onClick={() => onChange(opt)}
               style={{
                 flex: 1, padding: "13px", borderRadius: 10,
-                border: `1.5px solid ${boolVal === opt ? ORANGE : BORDER}`,
-                background: boolVal === opt ? "#fff8f5" : "#fff",
-                color: boolVal === opt ? ORANGE : MUTED,
+                border: `1.5px solid ${boolVal === opt ? SAPPHIRE : BORDER}`,
+                background: boolVal === opt ? "#E7EEFB" : "#fff",
+                color: boolVal === opt ? SAPPHIRE : MUTED,
                 fontSize: 15, fontWeight: boolVal === opt ? 700 : 500,
                 cursor: "pointer", transition: "all 0.12s",
               }}
@@ -217,10 +217,10 @@ export default function AddLeadModal() {
         style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "13px 22px", borderRadius: 12,
-          background: "linear-gradient(135deg,#D35400,#e8641c)",
+          background: "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)",
           color: "#fff", fontSize: 15, fontWeight: 700,
           border: "none", cursor: "pointer",
-          boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
+          boxShadow: "0 4px 14px rgba(40,96,176,0.25)",
         }}
       >
         <i className="fa-solid fa-plus" />
@@ -318,7 +318,7 @@ export default function AddLeadModal() {
               {/* Custom fields */}
               {customDefs.length > 0 && (
                 <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 16 }}>
-                  <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 800, color: ORANGE, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 800, color: SAPPHIRE, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                     Custom Fields
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -339,11 +339,11 @@ export default function AddLeadModal() {
                 disabled={loading}
                 style={{
                   marginTop: 4, padding: "16px", borderRadius: 12, border: "none",
-                  background: "linear-gradient(135deg,#D35400,#e8641c)",
+                  background: "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)",
                   color: "#fff", fontSize: 16, fontWeight: 700,
                   cursor: loading ? "not-allowed" : "pointer",
                   opacity: loading ? 0.7 : 1,
-                  boxShadow: "0 4px 14px rgba(211,84,0,0.25)",
+                  boxShadow: "0 4px 14px rgba(40,96,176,0.25)",
                 }}
               >
                 {loading ? "Saving…" : "Save Lead →"}

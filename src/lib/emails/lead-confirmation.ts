@@ -227,6 +227,7 @@ export function buildLeadConfirmationEmail({
               <p style="margin:0;font-size:12px;color:#c4bfb8;">
                 This message was sent because you submitted a request to ${businessName}.
               </p>
+              <p style="margin:8px 0 0;font-size:10px;color:#c4bfb8;letter-spacing:0.01em;">Patient follow-up by <a href="https://clozeflow.com" style="color:inherit;text-decoration:none;">ClozeFlow</a></p>
             </td>
           </tr>
         </table>

@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseServiceClient } from "@/lib/supabase-service";
 import AppShell from "@/components/AppShell";
+import NoAccessShell from "@/components/NoAccessShell";
 import { getSubscription, getLeadCountThisMonth, type PlanId } from "@/lib/subscriptions";
 import { getLocationContext } from "@/lib/location-utils";
-import { getMemberOrgs } from "@/lib/team";
+import { getMemberOrgs, autoActivatePendingInvites } from "@/lib/team";
 import type { TeamRole } from "@/lib/team";
 
 export interface OrgContext {
@@ -25,8 +26,36 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const sb = createSupabaseServiceClient();
 
-  // Always load orgs this user belongs to (for profile dropdown)
-  const memberOrgs = await getMemberOrgs(user.id);
+  // Load orgs this user is an active member of (for profile dropdown + access check)
+  let memberOrgs = await getMemberOrgs(user.id);
+
+  // ── Auto-activate pending invitations ────────────────────────────────────────
+  // When a user creates their account via an invite link, the membership stays
+  // "pending" until explicitly accepted. Activate on first login by email match
+  // so invited users are never blocked by the access gate below.
+  if (memberOrgs.length === 0) {
+    const activated = await autoActivatePendingInvites(user.id, user.email ?? "");
+    if (activated > 0) memberOrgs = await getMemberOrgs(user.id);
+  }
+
+  // ── Access gate ──────────────────────────────────────────────────────────────
+  if (memberOrgs.length === 0) {
+    const ownSubscription = await getSubscription(user.id);
+    if (!ownSubscription) {
+      return <NoAccessShell email={user.email ?? null} />;
+    }
+  }
+
+  // ── Auto-switch into org workspace ───────────────────────────────────────────
+  // Team-member-only users (no own subscription) need the cf_org cookie set so
+  // every page in the app consistently shows org data. Cookie writes require a
+  // Route Handler, so redirect once through /api/org/auto-switch which sets the
+  // cookie then sends the user back to /dashboard.
+  if (memberOrgs.length > 0 && !cfOrg) {
+    const ownSubscription = await getSubscription(user.id);
+    if (!ownSubscription) redirect("/api/org/auto-switch");
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
 
   // Resolve which user_id we're operating as
   let orgCtx: OrgContext | null = null;

@@ -102,7 +102,7 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
     <div>
       {/* Header row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <p style={{ margin: 0, fontSize: 13, color: "#78716c" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#8A9DB0" }}>
           {totalSelected > 0
             ? `${totalSelected} slots selected (${totalSelected * 30} min total)`
             : "Click or drag on time slots to mark when you're available"}
@@ -114,7 +114,7 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
             padding: "10px 20px", borderRadius: 10, border: "none",
             background: saved
               ? "linear-gradient(135deg,#27AE60,#2ecc71)"
-              : "linear-gradient(135deg,#D35400,#e8641c)",
+              : "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)",
             color: "#fff", fontSize: 13, fontWeight: 700,
             cursor: saving ? "not-allowed" : "pointer",
             opacity: saving ? 0.7 : 1,
@@ -137,29 +137,29 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
               const isToday = d === new Date().toISOString().slice(0, 10);
               return (
                 <div key={d} style={{ textAlign: "center" }}>
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: isToday ? "#D35400" : "#78716c" }}>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: isToday ? "#2860B0" : "#8A9DB0" }}>
                     {DAY_NAMES[dt.getDay()]}
                   </p>
                   <p style={{
                     margin: "2px 0 4px",
                     fontSize: 15, fontWeight: 900,
-                    color: isToday ? "#D35400" : "#2C3E50",
+                    color: isToday ? "#2860B0" : "#0D1428",
                   }}>
                     {dt.getDate()}
                   </p>
-                  <p style={{ margin: 0, fontSize: 10, color: "#c4bfb8" }}>
+                  <p style={{ margin: 0, fontSize: 10, color: "#8A9DB0" }}>
                     {MONTH_ABBR[dt.getMonth()]}
                   </p>
                   <div style={{ display: "flex", justifyContent: "center", gap: 3, marginTop: 4 }}>
                     <button
                       onClick={() => selectAll(d)}
                       title="Fill day"
-                      style={{ fontSize: 9, padding: "2px 5px", borderRadius: 4, border: "1px solid #e6e2db", background: "#fff", color: "#78716c", cursor: "pointer", fontWeight: 600 }}
+                      style={{ fontSize: 9, padding: "2px 5px", borderRadius: 4, border: "1px solid #DDE4EF", background: "#fff", color: "#8A9DB0", cursor: "pointer", fontWeight: 600 }}
                     >All</button>
                     <button
                       onClick={() => clearDay(d)}
                       title="Clear day"
-                      style={{ fontSize: 9, padding: "2px 5px", borderRadius: 4, border: "1px solid #e6e2db", background: "#fff", color: "#78716c", cursor: "pointer", fontWeight: 600 }}
+                      style={{ fontSize: 9, padding: "2px 5px", borderRadius: 4, border: "1px solid #DDE4EF", background: "#fff", color: "#8A9DB0", cursor: "pointer", fontWeight: 600 }}
                     >Clear</button>
                   </div>
                 </div>
@@ -173,7 +173,7 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
               {/* Time label — only show on hour */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: 6 }}>
                 {time.endsWith(":00") && (
-                  <span style={{ fontSize: 10, color: "#a8a29e", whiteSpace: "nowrap" }}>
+                  <span style={{ fontSize: 10, color: "#8A9DB0", whiteSpace: "nowrap" }}>
                     {formatTime(time)}
                   </span>
                 )}
@@ -198,10 +198,10 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
                           : !nextActive ? "0 0 6px 6px"
                           : 0)
                         : 4,
-                      background: active ? "#D35400" : "#f0ede8",
+                      background: active ? "#2860B0" : "#F5F7FB",
                       cursor: "pointer",
                       transition: "background 0.1s",
-                      border: active ? "none" : "1px solid #e6e2db",
+                      border: active ? "none" : "1px solid #DDE4EF",
                     }}
                   />
                 );
@@ -211,7 +211,7 @@ export default function AvailabilityCalendar({ initialSlots = [] }: Props) {
         </div>
       </div>
 
-      <p style={{ margin: "12px 0 0", fontSize: 12, color: "#a8a29e" }}>
+      <p style={{ margin: "12px 0 0", fontSize: 12, color: "#8A9DB0" }}>
         <i className="fa-solid fa-circle-info" style={{ marginRight: 4 }} />
         Each cell = 30 min. Leads can book 15-minute consultation slots within your available windows.
       </p>

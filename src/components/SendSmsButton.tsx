@@ -33,8 +33,8 @@ const CONFIG: Record<SmsType, {
     loadingText: "Sending…",
     successText: "Follow-up SMS sent! Lead moved to Follow-Up.",
     icon:        "fa-solid fa-rotate-right",
-    gradient:    "linear-gradient(135deg,#D35400,#e8641c)",
-    shadow:      "0 4px 14px rgba(211,84,0,0.25)",
+    gradient:    "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)",
+    shadow:      "0 4px 14px rgba(40,96,176,0.25)",
   },
   booking: {
     label:       "Send Booking SMS",
@@ -82,8 +82,8 @@ export default function SendSmsButton({ leadId, hasPhone, type }: Props) {
     return (
       <div style={{
         padding: "11px 14px", borderRadius: 10,
-        background: "#f9f7f4", border: "1px solid #e6e2db",
-        fontSize: 13, color: "#a8a29e",
+        background: "#F5F7FB", border: "1px solid #DDE4EF",
+        fontSize: 13, color: "#8A9DB0",
         display: "flex", alignItems: "center", gap: 8,
       }}>
         <i className="fa-solid fa-circle-info" />

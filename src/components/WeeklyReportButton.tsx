@@ -7,11 +7,11 @@ interface WeekOption {
   label: string;
 }
 
-const NAVY   = "#0B1F45";
-const ORANGE = "#D35400";
-const BORDER = "#e6e2db";
-const MUTED  = "#78716c";
-const TEXT   = "#2C3E50";
+const NAVY    = "#0B1F45";
+const SAPPHIRE = "#2860B0";
+const BORDER  = "#DDE4EF";
+const MUTED   = "#8A9DB0";
+const TEXT    = "#0D1428";
 
 export default function WeeklyReportButton() {
   const [open,     setOpen]     = useState(false);
@@ -91,9 +91,9 @@ export default function WeeklyReportButton() {
           }}>
             {/* Modal header */}
             <div style={{ background: NAVY, padding: "20px 24px 18px", position: "relative" }}>
-              <div style={{ height: 3, background: ORANGE, position: "absolute", top: 0, left: 0, right: 0 }} />
+              <div style={{ height: 3, background: SAPPHIRE, position: "absolute", top: 0, left: 0, right: 0 }} />
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                <div style={{ background: ORANGE, borderRadius: 5, padding: "3px 7px", fontSize: 9, fontWeight: 900, color: "#fff", letterSpacing: "0.12em" }}>CLOZEFLOW</div>
+                <div style={{ background: SAPPHIRE, borderRadius: 5, padding: "3px 7px", fontSize: 9, fontWeight: 900, color: "#fff", letterSpacing: "0.12em" }}>CLOZEFLOW</div>
               </div>
               <h2 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 900, color: "#fff" }}>
                 Weekly Performance Report
@@ -133,7 +133,7 @@ export default function WeeklyReportButton() {
                     "Auto-generated insights",
                   ].map(item => (
                     <div key={item} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <div style={{ width: 5, height: 5, borderRadius: 1, background: ORANGE, flexShrink: 0 }} />
+                      <div style={{ width: 5, height: 5, borderRadius: 1, background: SAPPHIRE, flexShrink: 0 }} />
                       <span style={{ fontSize: 12, color: TEXT }}>{item}</span>
                     </div>
                   ))}

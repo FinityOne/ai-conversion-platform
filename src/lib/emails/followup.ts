@@ -112,6 +112,7 @@ export function buildFollowUpEmail({
       <p style="margin:8px 0 0;font-size:11px;color:#c4bfb8;">
         Sent by ${businessName} via ClozeFlow · This link is unique to you.
       </p>
+      <p style="margin:8px 0 0;font-size:10px;color:#c4bfb8;letter-spacing:0.01em;">Patient follow-up by <a href="https://clozeflow.com" style="color:inherit;text-decoration:none;">ClozeFlow</a></p>
     </td></tr>
 
   </table>

@@ -58,6 +58,33 @@ export async function getMemberOrgs(userId: string): Promise<MemberOrg[]> {
   }));
 }
 
+/**
+ * Activates all pending invitations where the invite email matches the user's email.
+ * Called automatically on first app login so invited users don't need to manually
+ * click "Accept Invitation". Returns the count of memberships activated.
+ */
+export async function autoActivatePendingInvites(userId: string, email: string): Promise<number> {
+  if (!email) return 0;
+  const sb = createSupabaseServiceClient();
+
+  // Match by email (case-insensitive stored as lowercase) OR by pre-linked user_id
+  const { data: pending } = await sb
+    .from("team_memberships")
+    .select("id")
+    .eq("status", "pending")
+    .or(`email.eq.${email.toLowerCase()},member_user_id.eq.${userId}`);
+
+  if (!pending?.length) return 0;
+
+  const { data, error } = await sb
+    .from("team_memberships")
+    .update({ status: "active", member_user_id: userId, accepted_at: new Date().toISOString() })
+    .in("id", pending.map(r => r.id))
+    .select("id");
+
+  return error ? 0 : (data?.length ?? 0);
+}
+
 export async function getMembershipByToken(token: string): Promise<TeamMember | null> {
   const sb = createSupabaseServiceClient();
   const { data } = await sb

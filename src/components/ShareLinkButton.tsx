@@ -28,12 +28,12 @@ export default function ShareLinkButton({ url }: { url: string }) {
       {/* URL display */}
       <div style={{
         display: "flex", alignItems: "center", gap: 0,
-        border: "1.5px solid #e6e2db", borderRadius: 12, overflow: "hidden",
-        background: "#f9f7f4",
+        border: "1.5px solid #DDE4EF", borderRadius: 12, overflow: "hidden",
+        background: "#F5F7FB",
       }}>
         <span style={{
           flex: 1, padding: "12px 14px",
-          fontSize: 13, color: "#78716c",
+          fontSize: 13, color: "#8A9DB0",
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>
           {url}
@@ -45,7 +45,7 @@ export default function ShareLinkButton({ url }: { url: string }) {
             padding: "12px 18px",
             background: copied
               ? "linear-gradient(135deg,#27AE60,#2ecc71)"
-              : "linear-gradient(135deg,#D35400,#e8641c)",
+              : "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)",
             border: "none",
             color: "#fff",
             fontSize: 13, fontWeight: 700,
@@ -60,7 +60,7 @@ export default function ShareLinkButton({ url }: { url: string }) {
       </div>
 
       {/* Share hint */}
-      <p style={{ margin: 0, fontSize: 12, color: "#a8a29e" }}>
+      <p style={{ margin: 0, fontSize: 12, color: "#8A9DB0" }}>
         <i className="fa-solid fa-circle-info" style={{ marginRight: 5 }} />
         Share on Facebook, text it to customers, or add it to your Instagram bio.
       </p>

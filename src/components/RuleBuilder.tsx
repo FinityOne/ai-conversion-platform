@@ -1,14 +1,14 @@
 "use client";
 
 import type { SegmentRule, RuleOperator } from "@/lib/segments";
-import type { CustomFieldDef } from "@/lib/leads";
+import type { CustomFieldDef } from "@/lib/lead-types";
 
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BORDER = "#e6e2db";
-const BG     = "#F9F7F2";
-const ORANGE = "#D35400";
-const WHITE  = "#ffffff";
+const TEXT     = "#0D1428";
+const MUTED    = "#8A9DB0";
+const BORDER   = "#DDE4EF";
+const BG       = "#F5F7FB";
+const SAPPHIRE = "#2860B0";
+const WHITE    = "#ffffff";
 
 // ─── Field definitions ────────────────────────────────────────────────────────
 
@@ -287,7 +287,7 @@ export default function RuleBuilder({ rules, customDefs, onChange }: Props) {
           transition: "border-color 0.15s, color 0.15s",
         }}
       >
-        <i className="fa-solid fa-plus" style={{ fontSize: 11, color: ORANGE }} />
+        <i className="fa-solid fa-plus" style={{ fontSize: 11, color: SAPPHIRE }} />
         Add Rule
       </button>
     </div>

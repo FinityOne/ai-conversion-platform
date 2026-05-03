@@ -18,8 +18,8 @@ const CSS = `
     100% { transform: scale(2.8); opacity: 0;    }
   }
   @keyframes cf-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(211,84,0,0.0); }
-    50%       { box-shadow: 0 0 0 10px rgba(211,84,0,0.15); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(40,96,176,0.0); }
+    50%       { box-shadow: 0 0 0 10px rgba(40,96,176,0.15); }
   }
   @keyframes cf-spin {
     to { transform: rotate(360deg); }
@@ -64,7 +64,7 @@ const STAGES = [
 ];
 
 // ── Inline spinner ────────────────────────────────────────────────────────────
-export function InlineSpinner({ size = 18, color = "#D35400" }: { size?: number; color?: string }) {
+export function InlineSpinner({ size = 18, color = "#2860B0" }: { size?: number; color?: string }) {
   return (
     <>
       <style>{`@keyframes cf-spin { to { transform: rotate(360deg); } }`}</style>

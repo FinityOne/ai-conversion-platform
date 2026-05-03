@@ -54,8 +54,8 @@ export default function SendFollowUpButton({ leadId, hasEmail }: Props) {
     return (
       <div style={{
         padding: "12px 16px", borderRadius: 10,
-        background: "#f9f7f4", border: "1px solid #e6e2db",
-        fontSize: 13, color: "#a8a29e",
+        background: "#F5F7FB", border: "1px solid #DDE4EF",
+        fontSize: 13, color: "#8A9DB0",
         display: "flex", alignItems: "center", gap: 8,
       }}>
         <i className="fa-solid fa-circle-info" />
@@ -102,8 +102,8 @@ export default function SendFollowUpButton({ leadId, hasEmail }: Props) {
 
       {/* Copy project link */}
       {projectUrl && (
-        <div style={{ display: "flex", gap: 0, border: "1.5px solid #e6e2db", borderRadius: 10, overflow: "hidden", background: "#f9f7f4" }}>
-          <span style={{ flex: 1, padding: "11px 14px", fontSize: 12, color: "#78716c", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <div style={{ display: "flex", gap: 0, border: "1.5px solid #DDE4EF", borderRadius: 10, overflow: "hidden", background: "#F5F7FB" }}>
+          <span style={{ flex: 1, padding: "11px 14px", fontSize: 12, color: "#8A9DB0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {projectUrl}
           </span>
           <button

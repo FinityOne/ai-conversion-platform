@@ -42,9 +42,35 @@ async function getProfile(slug: string): Promise<BizProfile | null> {
   const sb = createSupabaseServiceClient();
   const fields = "id,business_name,email,business_email,business_website,business_logo_url,business_tagline,business_description,business_address,business_city,business_state,business_zip,service_area,business_license,years_in_business,business_instagram,business_facebook,business_google_profile,business_industry,intake_slug";
 
+  // 1. Check profiles.intake_slug (account-level page)
   const { data: bySlug } = await sb.from("profiles").select(fields).eq("intake_slug", slug).maybeSingle();
   if (bySlug) return bySlug as BizProfile;
 
+  // 2. Check user_locations.intake_slug (location-specific page)
+  const { data: loc } = await sb
+    .from("user_locations")
+    .select("user_id, loc_address, loc_city, loc_state, loc_zip, loc_tagline, loc_description, loc_service_area, loc_email")
+    .eq("intake_slug", slug)
+    .maybeSingle();
+
+  if (loc) {
+    const { data: ownerProfile } = await sb.from("profiles").select(fields).eq("id", loc.user_id).maybeSingle();
+    if (!ownerProfile) return null;
+    // Merge: location fields take priority over profile defaults
+    return {
+      ...ownerProfile,
+      ...(loc.loc_address      && { business_address:     loc.loc_address }),
+      ...(loc.loc_city         && { business_city:        loc.loc_city }),
+      ...(loc.loc_state        && { business_state:       loc.loc_state }),
+      ...(loc.loc_zip          && { business_zip:         loc.loc_zip }),
+      ...(loc.loc_tagline      && { business_tagline:     loc.loc_tagline }),
+      ...(loc.loc_description  && { business_description: loc.loc_description }),
+      ...(loc.loc_service_area && { service_area:         loc.loc_service_area }),
+      ...(loc.loc_email        && { business_email:       loc.loc_email }),
+    } as BizProfile;
+  }
+
+  // 3. Fallback: check profiles.id (used for preview before any slug is set)
   const { data: byId } = await sb.from("profiles").select(fields).eq("id", slug).maybeSingle();
   return (byId ?? null) as BizProfile | null;
 }

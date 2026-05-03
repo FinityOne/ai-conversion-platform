@@ -28,14 +28,13 @@ export async function GET(req: Request) {
   if (!user) return NextResponse.json({ available: false, reason: "Not authenticated" }, { status: 401 });
 
   const sb = createSupabaseServiceClient();
-  const { data } = await sb
-    .from("profiles")
-    .select("id")
-    .eq("intake_slug", slug)
-    .maybeSingle();
+  const [{ data: inProfiles }, { data: inLocations }] = await Promise.all([
+    sb.from("profiles").select("id").eq("intake_slug", slug).maybeSingle(),
+    sb.from("user_locations").select("id").eq("intake_slug", slug).maybeSingle(),
+  ]);
 
-  // Available if: no row found, OR the only match is the current user (they already own it)
-  const available = !data || data.id === user.id;
+  // Available if: not claimed by another profile, and not claimed by any location
+  const available = (!inProfiles || inProfiles.id === user.id) && !inLocations;
   return NextResponse.json({ available, reason: available ? null : "That link is already taken" });
 }
 
@@ -55,14 +54,13 @@ export async function PATCH(req: Request) {
 
   const sb = createSupabaseServiceClient();
 
-  // Double-check availability (race-condition safe — unique constraint catches it too)
-  const { data: existing } = await sb
-    .from("profiles")
-    .select("id")
-    .eq("intake_slug", normalized)
-    .maybeSingle();
+  // Double-check availability across both tables (race-condition safe)
+  const [{ data: existing }, { data: inLocations }] = await Promise.all([
+    sb.from("profiles").select("id").eq("intake_slug", normalized).maybeSingle(),
+    sb.from("user_locations").select("id").eq("intake_slug", normalized).maybeSingle(),
+  ]);
 
-  if (existing && existing.id !== user.id) {
+  if ((existing && existing.id !== user.id) || inLocations) {
     return NextResponse.json({ error: "That link is already taken" }, { status: 409 });
   }
 

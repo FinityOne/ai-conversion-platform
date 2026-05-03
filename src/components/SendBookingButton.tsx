@@ -44,7 +44,7 @@ export default function SendBookingButton({ leadId, hasEmail }: Props) {
 
   if (!hasEmail) {
     return (
-      <div style={{ padding: "12px 14px", borderRadius: 10, background: "#f9f7f4", border: "1px solid #e6e2db", fontSize: 13, color: "#a8a29e", display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ padding: "12px 14px", borderRadius: 10, background: "#F5F7FB", border: "1px solid #DDE4EF", fontSize: 13, color: "#8A9DB0", display: "flex", alignItems: "center", gap: 8 }}>
         <i className="fa-solid fa-circle-info" />
         Add an email address to send a booking request.
       </div>
@@ -77,8 +77,8 @@ export default function SendBookingButton({ leadId, hasEmail }: Props) {
         </div>
       )}
       {bookingUrl && (
-        <div style={{ display: "flex", border: "1.5px solid #e6e2db", borderRadius: 10, overflow: "hidden", background: "#f9f7f4" }}>
-          <span style={{ flex: 1, padding: "10px 12px", fontSize: 12, color: "#78716c", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <div style={{ display: "flex", border: "1.5px solid #DDE4EF", borderRadius: 10, overflow: "hidden", background: "#F5F7FB" }}>
+          <span style={{ flex: 1, padding: "10px 12px", fontSize: 12, color: "#8A9DB0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {bookingUrl}
           </span>
           <button

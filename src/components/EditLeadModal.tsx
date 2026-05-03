@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { LeadStatus } from "@/lib/scoring";
-import type { CustomFieldDef } from "@/lib/leads";
+import type { CustomFieldDef } from "@/lib/lead-types";
 import PhoneInput from "@/components/PhoneInput";
 import { formatPhoneE164, formatPhoneDisplay } from "@/lib/phone";
 
@@ -35,11 +35,11 @@ const STATUSES: { value: LeadStatus; label: string; emoji: string }[] = [
   { value: "closed_lost",       label: "Closed (Lost)",     emoji: "❌" },
 ];
 
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BORDER = "#e6e2db";
-const ORANGE = "#D35400";
-const BG     = "#F9F7F2";
+const TEXT    = "#0D1428";
+const MUTED   = "#8A9DB0";
+const BORDER  = "#DDE4EF";
+const SAPPHIRE = "#2860B0";
+const BG      = "#F5F7FB";
 
 export default function EditLeadModal({ lead }: Props) {
   const router = useRouter();
@@ -153,7 +153,7 @@ export default function EditLeadModal({ lead }: Props) {
           transition: "border-color 0.15s",
         }}
       >
-        <i className="fa-solid fa-pen-to-square" style={{ fontSize: 13, color: ORANGE }} />
+        <i className="fa-solid fa-pen-to-square" style={{ fontSize: 13, color: SAPPHIRE }} />
         Edit Lead
       </button>
 
@@ -186,7 +186,7 @@ export default function EditLeadModal({ lead }: Props) {
                 onClick={() => setOpen(false)}
                 style={{
                   width: 34, height: 34, borderRadius: 8, border: `1px solid ${BORDER}`,
-                  background: "#f9f7f4", cursor: "pointer",
+                  background: "#F5F7FB", cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: MUTED, fontSize: 14,
                 }}
@@ -202,7 +202,7 @@ export default function EditLeadModal({ lead }: Props) {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>First Name <span style={{ color: ORANGE }}>*</span></label>
+                  <label style={labelStyle}>First Name <span style={{ color: SAPPHIRE }}>*</span></label>
                   <input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Jake" style={inputStyle} />
                 </div>
                 <div>
@@ -250,7 +250,7 @@ export default function EditLeadModal({ lead }: Props) {
               {/* Custom fields */}
               {customDefs.length > 0 && (
                 <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 16 }}>
-                  <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 800, color: ORANGE, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 800, color: SAPPHIRE, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                     Custom Fields
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -288,11 +288,11 @@ export default function EditLeadModal({ lead }: Props) {
                 disabled={saving}
                 style={{
                   padding: "11px 24px", borderRadius: 10, border: "none",
-                  background: saving ? "#fed7aa" : "linear-gradient(135deg,#D35400,#e8641c)",
+                  background: saving ? "#C5D5EF" : "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)",
                   color: "#fff", fontSize: 14, fontWeight: 700,
                   cursor: saving ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", gap: 8,
-                  boxShadow: saving ? "none" : "0 4px 14px rgba(211,84,0,0.25)",
+                  boxShadow: saving ? "none" : "0 4px 14px rgba(40,96,176,0.25)",
                   transition: "opacity 0.15s",
                 }}
               >
@@ -354,9 +354,9 @@ function CustomFieldInput({
               onClick={() => onChange(opt.val)}
               style={{
                 flex: 1, padding: "10px", borderRadius: 10,
-                border: `1.5px solid ${boolVal === opt.val ? "#D35400" : BORDER}`,
-                background: boolVal === opt.val ? "#fff8f5" : "#fff",
-                color: boolVal === opt.val ? "#D35400" : MUTED,
+                border: `1.5px solid ${boolVal === opt.val ? SAPPHIRE : BORDER}`,
+                background: boolVal === opt.val ? "#E7EEFB" : "#fff",
+                color: boolVal === opt.val ? SAPPHIRE : MUTED,
                 fontSize: 14, fontWeight: boolVal === opt.val ? 700 : 500,
                 cursor: "pointer",
                 transition: "all 0.12s",
@@ -373,8 +373,8 @@ function CustomFieldInput({
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "11px 13px",
-  borderRadius: 10, border: "1.5px solid #e6e2db",
-  fontSize: 14, color: "#2C3E50",
+  borderRadius: 10, border: "1.5px solid #DDE4EF",
+  fontSize: 14, color: "#0D1428",
   background: BG,
   outline: "none", boxSizing: "border-box",
   fontFamily: "inherit",
@@ -383,7 +383,7 @@ const inputStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: 12, fontWeight: 700,
-  color: "#78716c",
+  color: "#8A9DB0",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
   marginBottom: 6,

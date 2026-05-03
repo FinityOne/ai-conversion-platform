@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BORDER = "#e6e2db";
-const BG     = "#F9F7F2";
+const TEXT   = "#0D1428";
+const MUTED  = "#8A9DB0";
+const BORDER = "#DDE4EF";
+const BG     = "#F5F7FB";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "13px 16px", borderRadius: 10,
@@ -15,8 +15,8 @@ const inputStyle: React.CSSProperties = {
 };
 const focusStyle: React.CSSProperties = {
   ...inputStyle,
-  border: "1.5px solid #D35400",
-  boxShadow: "0 0 0 3px rgba(211,84,0,0.1)",
+  border: "1.5px solid #2860B0",
+  boxShadow: "0 0 0 3px rgba(40,96,176,0.1)",
 };
 
 function strengthLabel(pw: string): { label: string; color: string; pct: number } {
@@ -122,10 +122,10 @@ export default function ChangePasswordForm() {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{
             width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-            background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.18)",
+            background: "rgba(40,96,176,0.08)", border: "1px solid rgba(40,96,176,0.18)",
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <i className="fa-solid fa-lock" style={{ fontSize: 15, color: "#D35400" }} />
+            <i className="fa-solid fa-lock" style={{ fontSize: 15, color: "#2860B0" }} />
           </div>
           <div>
             <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: TEXT }}>Change Password</p>
@@ -171,7 +171,7 @@ export default function ChangePasswordForm() {
               {/* Strength meter */}
               {password.length > 0 && (
                 <div style={{ marginTop: -6 }}>
-                  <div style={{ height: 4, borderRadius: 2, background: "#f0ede8", overflow: "hidden" }}>
+                  <div style={{ height: 4, borderRadius: 2, background: "#F5F7FB", overflow: "hidden" }}>
                     <div style={{ height: "100%", borderRadius: 2, width: `${strength.pct}%`, background: strength.color, transition: "width 0.3s, background 0.3s" }} />
                   </div>
                   <p style={{ margin: "4px 0 0", fontSize: 12, color: strength.color, fontWeight: 600 }}>{strength.label}</p>
@@ -196,13 +196,13 @@ export default function ChangePasswordForm() {
                   style={{
                     flex: 2, padding: "14px", borderRadius: 12, border: "none",
                     background: password.length >= 8 && !mismatch
-                      ? "linear-gradient(135deg,#D35400,#e8641c)"
+                      ? "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)"
                       : "#e5e5e5",
                     color: password.length >= 8 && !mismatch ? "#fff" : "#a8a29e",
                     fontSize: 15, fontWeight: 700,
                     cursor: loading || password.length < 8 || mismatch ? "not-allowed" : "pointer",
                     opacity: loading ? 0.7 : 1,
-                    boxShadow: password.length >= 8 && !mismatch ? "0 4px 14px rgba(211,84,0,0.25)" : "none",
+                    boxShadow: password.length >= 8 && !mismatch ? "0 4px 14px rgba(40,96,176,0.25)" : "none",
                   }}
                 >
                   {loading ? "Updating…" : "Update Password"}

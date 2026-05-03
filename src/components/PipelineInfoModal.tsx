@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { PIPELINE_STAGES } from "@/lib/scoring";
 
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BORDER = "#e6e2db";
+const TEXT   = "#0D1428";
+const MUTED  = "#8A9DB0";
+const BORDER = "#DDE4EF";
 
 export default function PipelineInfoModal() {
   const [open, setOpen] = useState(false);
@@ -55,7 +55,7 @@ export default function PipelineInfoModal() {
               </div>
               <button
                 onClick={() => setOpen(false)}
-                style={{ background: "#F9F7F2", border: "none", borderRadius: 8, padding: "7px 9px", cursor: "pointer", color: MUTED, fontSize: 14 }}
+                style={{ background: "#F5F7FB", border: "none", borderRadius: 8, padding: "7px 9px", cursor: "pointer", color: MUTED, fontSize: 14 }}
               >
                 <i className="fa-solid fa-xmark" />
               </button>
@@ -100,7 +100,7 @@ export default function PipelineInfoModal() {
             </div>
 
             {/* Score explanation */}
-            <div style={{ marginTop: 8, padding: "16px 16px", background: "#F9F7F2", borderRadius: 12, border: `1px solid ${BORDER}` }}>
+            <div style={{ marginTop: 8, padding: "16px 16px", background: "#F5F7FB", borderRadius: 12, border: `1px solid ${BORDER}` }}>
               <p style={{ margin: "0 0 8px", fontSize: 13, fontWeight: 700, color: TEXT }}>📊 Engagement Score (0–100)</p>
               <p style={{ margin: "0 0 10px", fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
                 Each lead gets a live score based on their pipeline stage, email interactions, and how recently they were active.

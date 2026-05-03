@@ -142,9 +142,10 @@ function ConfigRow({
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function LeadScorePage() {
-  const [cfg, setCfg]         = useState<ScoringConfig>(DEFAULT_CONFIG);
-  const [saved, setSaved]     = useState(false);
+  const [cfg, setCfg]             = useState<ScoringConfig>(DEFAULT_CONFIG);
+  const [saved, setSaved]         = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   // Simulator state
   const [simStatus, setSimStatus]   = useState("replied");
@@ -421,83 +422,152 @@ export default function LeadScorePage() {
       {/* ── Configuration panel ── */}
       <Card style={{ marginBottom: 24 }}>
         <SectionTitle icon="🎛️">Adjust Your Scoring Parameters</SectionTitle>
-        <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 10, background: "rgba(37,99,235,0.06)", border: "1px solid rgba(37,99,235,0.15)" }}>
+        <div style={{ marginBottom: 20, padding: "12px 14px", borderRadius: 10, background: "rgba(37,99,235,0.06)", border: "1px solid rgba(37,99,235,0.15)" }}>
           <p style={{ margin: 0, fontSize: 12, color: "#2563eb", lineHeight: 1.6 }}>
-            <strong>How adjustments work:</strong> These parameters shift the thresholds and bonuses used in the scoring algorithm. Changes apply to all leads in your pipeline and update scores in real time. The simulator above reflects your current settings instantly.
+            <strong>How adjustments work:</strong> These parameters shift the thresholds and bonuses used in the scoring algorithm. The simulator above reflects your settings instantly — save when you&apos;re happy.
           </p>
         </div>
 
-        <div className="ls-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
-          {/* Recency */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 800, color: MUTED, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>⏱️ Recency Thresholds</div>
-            <ConfigRow
-              label="Very Fresh Window" value={cfg.recency_immediate_hours} min={6} max={48} unit="h"
-              hint="Leads with activity within this window receive the maximum recency bonus."
-              onChange={v => update("recency_immediate_hours", v)}
-            />
-            <ConfigRow
-              label="Very Fresh Bonus" value={cfg.recency_immediate_pts} min={5} max={20} unit=" pts"
-              hint="Points added when a lead's last activity falls within the Very Fresh window."
-              onChange={v => update("recency_immediate_pts", v)}
-            />
-            <ConfigRow
-              label="Fresh Window" value={cfg.recency_bonus_hours} min={24} max={120} unit="h"
-              hint="Broader window for a smaller recency bonus. Must be greater than Very Fresh."
-              onChange={v => update("recency_bonus_hours", v)}
-            />
-            <ConfigRow
-              label="Fresh Bonus" value={cfg.recency_bonus_pts} min={2} max={12} unit=" pts"
-              hint="Points added when activity falls in the Fresh (but not Very Fresh) window."
-              onChange={v => update("recency_bonus_pts", v)}
-            />
-            <ConfigRow
-              label="Stale Threshold" value={cfg.recency_penalty_days} min={3} max={21} unit="d"
-              hint="After this many days of inactivity, a recency penalty is applied."
-              onChange={v => update("recency_penalty_days", v)}
-            />
-            <ConfigRow
-              label="Stale Penalty" value={Math.abs(cfg.recency_penalty_pts)} min={2} max={15} unit=" pts"
-              hint="Points deducted from leads with no activity beyond the Stale Threshold."
-              onChange={v => update("recency_penalty_pts", -v)}
-            />
+        {/* ── Basic settings ── */}
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: MUTED, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 16 }}>
+            Basic Settings
           </div>
+          <div className="ls-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
 
-          {/* Engagement + New Lead */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 800, color: MUTED, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>📧 Email Engagement</div>
-            <ConfigRow
-              label="Email Click Bonus" value={cfg.email_click_pts} min={5} max={25} unit=" pts"
-              hint="Points added when a lead clicks a link in any email. Strong intent signal."
-              onChange={v => update("email_click_pts", v)}
-            />
-            <ConfigRow
-              label="Email Open Bonus" value={cfg.email_open_pts} min={2} max={15} unit=" pts"
-              hint="Points added when a lead opens (but does not click) an email. Mild interest signal."
-              onChange={v => update("email_open_pts", v)}
-            />
+            {/* Recency bonus card */}
+            <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(234,88,12,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>⚡</div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: TEXT }}>Recent Activity</div>
+                  <div style={{ fontSize: 11, color: MUTED }}>Bonus for fast responses</div>
+                </div>
+              </div>
+              <ConfigRow
+                label={`Hot window`} value={cfg.recency_immediate_hours} min={6} max={48} unit="h"
+                hint={`Leads active within ${cfg.recency_immediate_hours}h get the full bonus`}
+                onChange={v => update("recency_immediate_hours", v)}
+              />
+              <ConfigRow
+                label="Hot bonus" value={cfg.recency_immediate_pts} min={5} max={20} unit=" pts"
+                hint="Points added for activity inside the hot window"
+                onChange={v => update("recency_immediate_pts", v)}
+              />
+            </div>
 
-            <div style={{ fontSize: 12, fontWeight: 800, color: MUTED, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14, marginTop: 24 }}>🆕 New Lead Age Decay</div>
-            <ConfigRow
-              label="Grace Period" value={cfg.new_lead_penalty_start_days} min={1} max={5} unit="d"
-              hint="New leads are not penalized for age until after this many days."
-              onChange={v => update("new_lead_penalty_start_days", v)}
-            />
-            <ConfigRow
-              label="Daily Decay Rate" value={cfg.new_lead_penalty_per_day} min={1} max={5} unit=" pts/day"
-              hint="Points deducted for each day a New lead remains uncontacted past the grace period."
-              onChange={v => update("new_lead_penalty_per_day", v)}
-            />
-            <ConfigRow
-              label="Maximum Decay Cap" value={cfg.new_lead_penalty_max} min={5} max={30} unit=" pts"
-              hint="Maximum total points that can be removed due to age decay, regardless of lead age."
-              onChange={v => update("new_lead_penalty_max", v)}
-            />
+            {/* Stale penalty card */}
+            <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(220,38,38,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>❄️</div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: TEXT }}>Stale Lead Penalty</div>
+                  <div style={{ fontSize: 11, color: MUTED }}>Deduction for inactivity</div>
+                </div>
+              </div>
+              <ConfigRow
+                label="Goes stale after" value={cfg.recency_penalty_days} min={3} max={21} unit="d"
+                hint="No-activity days before penalty kicks in"
+                onChange={v => update("recency_penalty_days", v)}
+              />
+              <ConfigRow
+                label="Stale deduction" value={Math.abs(cfg.recency_penalty_pts)} min={2} max={15} unit=" pts"
+                hint="Points removed when a lead goes stale"
+                onChange={v => update("recency_penalty_pts", -v)}
+              />
+            </div>
+
+            {/* Email engagement card */}
+            <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(124,58,237,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>📧</div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: TEXT }}>Email Engagement</div>
+                  <div style={{ fontSize: 11, color: MUTED }}>Bonus for opens &amp; clicks</div>
+                </div>
+              </div>
+              <ConfigRow
+                label="Email clicked bonus" value={cfg.email_click_pts} min={5} max={25} unit=" pts"
+                hint="Strong intent — patient clicked a link"
+                onChange={v => update("email_click_pts", v)}
+              />
+              <ConfigRow
+                label="Email opened bonus" value={cfg.email_open_pts} min={2} max={15} unit=" pts"
+                hint="Mild interest — patient opened but didn't click"
+                onChange={v => update("email_open_pts", v)}
+              />
+            </div>
           </div>
         </div>
 
+        {/* ── Advanced toggle ── */}
+        <div style={{ marginTop: 20, borderTop: `1px solid ${BORDER}`, paddingTop: 16 }}>
+          <button
+            onClick={() => setAdvancedOpen(o => !o)}
+            style={{
+              width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+              background: "none", border: "none", cursor: "pointer", padding: "4px 0",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 22, height: 22, borderRadius: 6, background: `${ORANGE}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>⚙️</div>
+              <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>Advanced Settings</span>
+              <span style={{ fontSize: 11, color: MUTED }}>— fine-tune secondary thresholds &amp; age decay</span>
+            </div>
+            <span style={{
+              fontSize: 18, color: MUTED, lineHeight: 1,
+              transform: advancedOpen ? "rotate(90deg)" : "rotate(0deg)",
+              transition: "transform 0.2s ease",
+              display: "inline-block",
+            }}>›</span>
+          </button>
+
+          {advancedOpen && (
+            <div style={{ marginTop: 16 }}>
+              <div className="ls-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+
+                {/* Secondary recency card */}
+                <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 16px" }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 14 }}>⏱️ Secondary Recency Window</div>
+                  <ConfigRow
+                    label="Warm window" value={cfg.recency_bonus_hours} min={24} max={120} unit="h"
+                    hint="Broader freshness window for a smaller bonus. Must be greater than the hot window."
+                    onChange={v => update("recency_bonus_hours", v)}
+                  />
+                  <ConfigRow
+                    label="Warm bonus" value={cfg.recency_bonus_pts} min={2} max={12} unit=" pts"
+                    hint="Points added when activity is within the warm window but outside the hot window."
+                    onChange={v => update("recency_bonus_pts", v)}
+                  />
+                </div>
+
+                {/* Age decay card */}
+                <div style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 16px" }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 14 }}>🆕 New Lead Age Decay</div>
+                  <ConfigRow
+                    label="Grace period" value={cfg.new_lead_penalty_start_days} min={1} max={5} unit="d"
+                    hint="New leads aren't penalized for age until after this many days."
+                    onChange={v => update("new_lead_penalty_start_days", v)}
+                  />
+                  <ConfigRow
+                    label="Daily decay rate" value={cfg.new_lead_penalty_per_day} min={1} max={5} unit=" pts/day"
+                    hint="Points removed per day a new lead goes uncontacted past the grace period."
+                    onChange={v => update("new_lead_penalty_per_day", v)}
+                  />
+                  <ConfigRow
+                    label="Decay cap" value={cfg.new_lead_penalty_max} min={5} max={30} unit=" pts"
+                    hint="Maximum total points removable due to age, no matter how old the lead is."
+                    onChange={v => update("new_lead_penalty_max", v)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Save / Reset bar */}
-        <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between" }}>
+        <div style={{ marginTop: 20, paddingTop: 18, borderTop: `1px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between", flexWrap: "wrap" }}>
           <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.5 }}>
             {saved
               ? <span style={{ color: GREEN, fontWeight: 700 }}>✓ Saved to your browser preferences</span>

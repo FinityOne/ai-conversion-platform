@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { CustomFieldDef, CustomFieldKey } from "@/lib/leads";
+import type { CustomFieldDef, CustomFieldKey } from "@/lib/lead-types";
 
 const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";

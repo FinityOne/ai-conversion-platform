@@ -10,9 +10,12 @@ import AddLeadModal from "@/components/AddLeadModal";
 import ImportLeadsModal from "@/components/ImportLeadsModal";
 import PipelineInfoModal from "@/components/PipelineInfoModal";
 
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BORDER = "#e6e2db";
+const TEXT     = "#0D1428";  // Midnight Navy
+const MUTED    = "#8A9DB0";  // Steel
+const BORDER   = "#DDE4EF";  // Cloud
+const SAPPHIRE = "#2860B0";  // Primary
+const LAVENDER = "#8B6FC4";  // Accent
+const GRAD_PRIMARY = "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -61,7 +64,7 @@ function ScoreBadge({ score }: { score: number }) {
       }}>
         {score}
       </span>
-      <span style={{ fontSize: 9, fontWeight: 700, color: "#c4bfb8", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+      <span style={{ fontSize: 9, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.5px" }}>
         score
       </span>
     </div>
@@ -88,10 +91,10 @@ function LeadCard({ lead, customDefs }: { lead: Lead; customDefs: CustomFieldDef
           <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800, color: TEXT, lineHeight: 1.2 }}>
             {leadFullName(lead)}
           </h3>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#D35400" }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#2860B0" }}>
             {lead.job_type ?? "No job type"}
           </span>
-          <p style={{ margin: "4px 0 0", fontSize: 12, color: "#a8a29e" }}>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: MUTED }}>
             <i className="fa-regular fa-clock" style={{ marginRight: 4 }} />
             {timeAgo(lead.last_activity_at ?? lead.created_at)}
           </p>
@@ -106,7 +109,7 @@ function LeadCard({ lead, customDefs }: { lead: Lead; customDefs: CustomFieldDef
                 return (
                   <span key={d.key} style={{
                     fontSize: 11, fontWeight: 600, padding: "2px 8px",
-                    borderRadius: 20, background: "#f5f3f0",
+                    borderRadius: 20, background: "#EEF2F8",
                     color: MUTED, border: `1px solid ${BORDER}`,
                     maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                   }}>
@@ -121,7 +124,7 @@ function LeadCard({ lead, customDefs }: { lead: Lead; customDefs: CustomFieldDef
         {/* Status + chevron */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <StatusBadge status={lead.status} />
-          <i className="fa-solid fa-chevron-right" style={{ fontSize: 12, color: "#c4bfb8" }} />
+          <i className="fa-solid fa-chevron-right" style={{ fontSize: 12, color: MUTED }} />
         </div>
       </div>
     </Link>
@@ -190,7 +193,7 @@ export default async function LeadsPage() {
       <div style={{ marginBottom: 20, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div>
-            <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#D35400" }}>
+            <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#2860B0" }}>
               Your Pipeline
             </p>
             <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, color: TEXT }}>Leads</h1>
@@ -206,17 +209,19 @@ export default async function LeadsPage() {
       {/* AI Summary */}
       <div style={{
         background: "#fff", border: `1px solid ${BORDER}`,
-        borderLeft: "4px solid #D35400",
+        borderLeft: "4px solid #2860B0",
         borderRadius: "0 12px 12px 0",
-        padding: "14px 16px", marginBottom: 18,
-        display: "flex", alignItems: "flex-start", gap: 10,
+        padding: "14px 18px", marginBottom: 20,
+        display: "flex", alignItems: "flex-start", gap: 12,
       }}>
-        <span style={{ fontSize: 20, flexShrink: 0 }}>✨</span>
+        <div style={{ width: 32, height: 32, borderRadius: 9, flexShrink: 0, background: "linear-gradient(135deg,#2860B0,#8B6FC4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <i className="fa-solid fa-wand-magic-sparkles" style={{ fontSize: 13, color: "#fff" }} />
+        </div>
         <div>
-          <p style={{ margin: "0 0 1px", fontSize: 11, fontWeight: 700, color: "#D35400", textTransform: "uppercase", letterSpacing: "1px" }}>
-            Today's Summary
+          <p style={{ margin: "0 0 2px", fontSize: 11, fontWeight: 700, color: "#2860B0", textTransform: "uppercase", letterSpacing: "1px" }}>
+            Today&rsquo;s AI Summary
           </p>
-          <p style={{ margin: 0, fontSize: 14, color: "#44403c", lineHeight: 1.6 }}>{blurb}</p>
+          <p style={{ margin: 0, fontSize: 14, color: TEXT, lineHeight: 1.65 }}>{blurb}</p>
         </div>
       </div>
 
@@ -231,7 +236,7 @@ export default async function LeadsPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <i
                 className={`fa-solid ${atLimit ? "fa-circle-xmark" : nearLimit ? "fa-circle-exclamation" : "fa-circle-info"}`}
-                style={{ fontSize: 14, color: atLimit ? "#dc2626" : nearLimit ? "#d97706" : "#D35400", flexShrink: 0 }}
+                style={{ fontSize: 14, color: atLimit ? "#dc2626" : nearLimit ? "#d97706" : "#2860B0", flexShrink: 0 }}
               />
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: atLimit ? "#dc2626" : nearLimit ? "#d97706" : TEXT }}>
                 {atLimit
@@ -245,16 +250,16 @@ export default async function LeadsPage() {
               href="/profile/billing"
               style={{
                 flexShrink: 0, fontSize: 12, fontWeight: 700, padding: "5px 12px", borderRadius: 20,
-                background: atLimit ? "linear-gradient(135deg,#D35400,#e8641c)" : "#f9f7f4",
-                color: atLimit ? "#fff" : "#D35400",
-                border: atLimit ? "none" : "1px solid #fed7aa",
+                background: atLimit ? GRAD_PRIMARY : "#EEF2F8",
+                color: atLimit ? "#fff" : SAPPHIRE,
+                border: atLimit ? "none" : `1px solid #C5D5EF`,
                 textDecoration: "none",
               }}
             >
               {atLimit ? "Upgrade now" : "Upgrade"}
             </Link>
           </div>
-          <div style={{ height: 6, borderRadius: 3, background: "#f0ede8", overflow: "hidden" }}>
+          <div style={{ height: 6, borderRadius: 3, background: "#E7EEFB", overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 3, transition: "width 0.3s",
               width: `${usagePct}%`,
@@ -262,7 +267,7 @@ export default async function LeadsPage() {
                 ? "linear-gradient(90deg,#dc2626,#ef4444)"
                 : nearLimit
                   ? "linear-gradient(90deg,#d97706,#f59e0b)"
-                  : "linear-gradient(90deg,#D35400,#e8641c)",
+                  : GRAD_PRIMARY,
             }} />
           </div>
           <p style={{ margin: "6px 0 0", fontSize: 11, color: MUTED }}>
@@ -276,10 +281,10 @@ export default async function LeadsPage() {
       {stats.total > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 20 }}>
           {[
-            { label: "Total",     value: stats.total,     color: TEXT },
-            { label: "Contacted", value: stats.contacted, color: "#d97706" },
+            { label: "Total",     value: stats.total,     color: SAPPHIRE  },
+            { label: "Contacted", value: stats.contacted, color: LAVENDER  },
             { label: "Replied",   value: stats.replied,   color: "#27AE60" },
-            { label: "Booked",    value: stats.booked,    color: "#0891b2" },
+            { label: "Booked",    value: stats.booked,    color: "#3D7A8A" },
           ].map(s => (
             <div key={s.label} style={{
               background: "#fff", border: `1px solid ${BORDER}`,

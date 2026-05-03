@@ -90,7 +90,8 @@ export async function POST(request: Request) {
     </table>
   </td></tr>
   <tr><td style="background:#f9f7f4;border-radius:0 0 16px 16px;padding:16px 32px;text-align:center;">
-    <p style="margin:0;font-size:12px;color:#a8a29e;">Sent by ${businessName} via ClozeFlow</p>
+    <p style="margin:0;font-size:12px;color:#a8a29e;">Sent by ${businessName}</p>
+    <p style="margin:8px 0 0;font-size:10px;color:#c4bfb8;letter-spacing:0.01em;">Patient follow-up by <a href="https://clozeflow.com" style="color:inherit;text-decoration:none;">ClozeFlow</a></p>
   </td></tr>
 </table>
 </td></tr>

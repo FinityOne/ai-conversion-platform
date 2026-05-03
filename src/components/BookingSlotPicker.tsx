@@ -49,16 +49,16 @@ export default function BookingSlotPicker({ token, slots, isDefaultSlots, busine
     return (
       <div style={{ textAlign: "center", padding: "32px 20px" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
-        <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 900, color: "#2C3E50" }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 900, color: "#0D1428" }}>
           You're booked!
         </h2>
-        <p style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700, color: "#2C3E50" }}>
+        <p style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700, color: "#0D1428" }}>
           {formatDateFull(confirmed.slot.date)}
         </p>
-        <p style={{ margin: "0 0 28px", fontSize: 16, color: "#57534e" }}>
+        <p style={{ margin: "0 0 28px", fontSize: 16, color: "#4A6274" }}>
           {confirmed.slot.label} · 15-min consultation
         </p>
-        <p style={{ margin: "0 0 16px", fontSize: 14, color: "#78716c" }}>
+        <p style={{ margin: "0 0 16px", fontSize: 14, color: "#8A9DB0" }}>
           A confirmation email with calendar details is on its way.
         </p>
         <a
@@ -75,7 +75,7 @@ export default function BookingSlotPicker({ token, slots, isDefaultSlots, busine
           <i className="fa-solid fa-calendar-plus" />
           Add to Google Calendar
         </a>
-        <p style={{ margin: "12px 0 0", fontSize: 12, color: "#a8a29e" }}>
+        <p style={{ margin: "12px 0 0", fontSize: 12, color: "#8A9DB0" }}>
           Or check your email for the .ics file (Apple Calendar / Outlook)
         </p>
       </div>
@@ -86,7 +86,7 @@ export default function BookingSlotPicker({ token, slots, isDefaultSlots, busine
     return (
       <div style={{ textAlign: "center", padding: "32px 20px" }}>
         <p style={{ fontSize: 36, marginBottom: 12 }}>😕</p>
-        <p style={{ fontSize: 15, color: "#78716c" }}>
+        <p style={{ fontSize: 15, color: "#8A9DB0" }}>
           No available slots right now. <strong>{businessName}</strong> will reach out to schedule manually.
         </p>
       </div>
@@ -121,19 +121,19 @@ export default function BookingSlotPicker({ token, slots, isDefaultSlots, busine
               onClick={() => setSelected(byDate[d][0])}
               style={{
                 flexShrink: 0, padding: "8px 14px", borderRadius: 10,
-                border: isSelected ? `2px solid ${ACCENT}` : "2px solid #e6e2db",
+                border: isSelected ? `2px solid ${ACCENT}` : "2px solid #DDE4EF",
                 background: isSelected ? "#ecfeff" : "#fff",
                 cursor: "pointer",
                 textAlign: "center",
               }}
             >
-              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: isSelected ? ACCENT : "#a8a29e" }}>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: isSelected ? ACCENT : "#8A9DB0" }}>
                 {dt.toLocaleDateString("en-US", { weekday: "short" })}
               </p>
               <p style={{ margin: "2px 0 0", fontSize: 17, fontWeight: 900, color: isSelected ? ACCENT : "#2C3E50" }}>
                 {dt.getDate()}
               </p>
-              <p style={{ margin: 0, fontSize: 10, color: isSelected ? ACCENT : "#c4bfb8" }}>
+              <p style={{ margin: 0, fontSize: 10, color: isSelected ? ACCENT : "#8A9DB0" }}>
                 {dt.toLocaleDateString("en-US", { month: "short" })}
               </p>
             </button>
@@ -147,7 +147,7 @@ export default function BookingSlotPicker({ token, slots, isDefaultSlots, busine
         const dateSlots  = byDate[activeDate] ?? [];
         return (
           <div>
-            <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 700, color: "#78716c" }}>
+            <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 700, color: "#8A9DB0" }}>
               {formatDateFull(activeDate)}
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
@@ -159,9 +159,9 @@ export default function BookingSlotPicker({ token, slots, isDefaultSlots, busine
                     onClick={() => setSelected(s)}
                     style={{
                       padding: "12px 8px", borderRadius: 10, cursor: "pointer",
-                      border: isSelected ? `2px solid ${ACCENT}` : "2px solid #e6e2db",
+                      border: isSelected ? `2px solid ${ACCENT}` : "2px solid #DDE4EF",
                       background: isSelected ? "#ecfeff" : "#fff",
-                      color: isSelected ? ACCENT : "#2C3E50",
+                      color: isSelected ? ACCENT : "#0D1428",
                       fontWeight: isSelected ? 800 : 500, fontSize: 14,
                       transition: "all 0.1s",
                     }}
@@ -183,7 +183,7 @@ export default function BookingSlotPicker({ token, slots, isDefaultSlots, busine
           marginTop: 20, width: "100%", padding: "16px", borderRadius: 12, border: "none",
           background: selected
             ? `linear-gradient(135deg, ${ACCENT}, #06b6d4)`
-            : "#e6e2db",
+            : "#DDE4EF",
           color: selected ? "#fff" : "#a8a29e",
           fontSize: 16, fontWeight: 800,
           cursor: !selected || loading ? "not-allowed" : "pointer",
@@ -194,7 +194,7 @@ export default function BookingSlotPicker({ token, slots, isDefaultSlots, busine
         {loading ? "Booking…" : selected ? `Confirm ${selected.label}` : "Select a time above"}
       </button>
 
-      <p style={{ margin: "10px 0 0", textAlign: "center", fontSize: 12, color: "#a8a29e" }}>
+      <p style={{ margin: "10px 0 0", textAlign: "center", fontSize: 12, color: "#8A9DB0" }}>
         15-minute consultation · No account needed
       </p>
     </div>
