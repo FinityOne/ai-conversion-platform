@@ -5,9 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 interface AdminShellProps {
-  firstName?: string | null;
-  email?:     string | null;
-  children:   React.ReactNode;
+  firstName?:      string | null;
+  email?:          string | null;
+  demoLeadCount?:  number;
+  children:        React.ReactNode;
 }
 
 // ─── Nav structure ────────────────────────────────────────────────────────────
@@ -23,9 +24,10 @@ const NAV_GROUPS = [
   {
     label: "People",
     items: [
-      { href: "/admin/users",      label: "Users",      fa: "fa-solid fa-users"            },
-      { href: "/admin/leads",      label: "CRM",        fa: "fa-solid fa-address-card"     },
-      { href: "/admin/chat-leads", label: "Chat Leads", fa: "fa-solid fa-message"          },
+      { href: "/admin/users",      label: "Users",          fa: "fa-solid fa-users"            },
+      { href: "/admin/leads",      label: "CRM",            fa: "fa-solid fa-address-card"     },
+      { href: "/admin/demo-requests", label: "Demo Requests", fa: "fa-solid fa-calendar-check" },
+      { href: "/admin/chat-leads", label: "Chat Leads",     fa: "fa-solid fa-message"          },
     ],
   },
   {
@@ -56,7 +58,7 @@ const CONTENT_BG   = "#f8f9fb";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function AdminShell({ firstName, email, children }: AdminShellProps) {
+export default function AdminShell({ firstName, email, demoLeadCount = 0, children }: AdminShellProps) {
   const pathname = usePathname();
   const router   = useRouter();
 
@@ -69,7 +71,10 @@ export default function AdminShell({ firstName, email, children }: AdminShellPro
 
   const initials = (firstName?.[0] ?? email?.[0] ?? "A").toUpperCase();
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  const isActive = (href: string) => {
+    const path = href.split("?")[0];
+    return pathname === path || pathname.startsWith(path + "/");
+  };
 
   return (
     <div style={{ background: CONTENT_BG, minHeight: "100vh", display: "flex" }}>
@@ -101,6 +106,8 @@ export default function AdminShell({ firstName, email, children }: AdminShellPro
               </p>
               {group.items.map(({ href, label, fa }) => {
                 const active = isActive(href);
+                const isDemo = label === "Demo Requests";
+                const badge  = isDemo && demoLeadCount > 0 ? demoLeadCount : 0;
                 return (
                   <Link
                     key={href}
@@ -109,11 +116,17 @@ export default function AdminShell({ firstName, email, children }: AdminShellPro
                     onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = NAV_HOVER_BG; }}
                     onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: 7, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: active ? "rgba(99,102,241,0.2)" : "rgba(255,255,255,0.05)" }}>
-                      <i className={fa} style={{ fontSize: 12, color: active ? NAV_ACTIVE : NAV_MUTED }} />
+                    <div style={{ width: 28, height: 28, borderRadius: 7, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: isDemo && badge > 0 ? "rgba(239,68,68,0.15)" : active ? "rgba(99,102,241,0.2)" : "rgba(255,255,255,0.05)", position: "relative" }}>
+                      <i className={fa} style={{ fontSize: 12, color: isDemo && badge > 0 ? "#ef4444" : active ? NAV_ACTIVE : NAV_MUTED }} />
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: active ? 700 : 500, color: active ? NAV_TEXT : "#94a3b8" }}>{label}</span>
-                    {active && <div style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: NAV_ACTIVE, boxShadow: "0 0 6px rgba(99,102,241,0.8)" }} />}
+                    <span style={{ fontSize: 13, fontWeight: active || badge > 0 ? 700 : 500, color: active ? NAV_TEXT : badge > 0 ? "#f87171" : "#94a3b8" }}>{label}</span>
+                    {badge > 0 ? (
+                      <div style={{ marginLeft: "auto", minWidth: 18, height: 18, borderRadius: 9, background: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 5px" }}>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: "#fff" }}>{badge}</span>
+                      </div>
+                    ) : active ? (
+                      <div style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: NAV_ACTIVE, boxShadow: "0 0 6px rgba(99,102,241,0.8)" }} />
+                    ) : null}
                   </Link>
                 );
               })}

@@ -6,7 +6,8 @@ export type LeadStatus   = "new" | "contacted" | "demo_scheduled" | "trialing" |
 export type LeadPriority = "low" | "medium" | "high" | "urgent";
 export type LeadSource   =
   | "referral" | "google_ad" | "organic" | "linkedin"
-  | "cold_outreach" | "trade_event" | "partner" | "csv_import" | "other";
+  | "cold_outreach" | "trade_event" | "partner" | "csv_import"
+  | "healthcare_landing" | "homepage_demo" | "other";
 export type ActivityType =
   | "note" | "call" | "email" | "meeting" | "in_person" | "demo"
   | "follow_up" | "status_change" | "import";
@@ -91,15 +92,17 @@ export const PRIORITY_CONFIG: Record<LeadPriority, { label: string; color: strin
 };
 
 export const SOURCE_LABELS: Record<LeadSource, string> = {
-  referral:      "Referral",
-  google_ad:     "Google Ad",
-  organic:       "Organic Search",
-  linkedin:      "LinkedIn",
-  cold_outreach: "Cold Outreach",
-  trade_event:   "Trade Event",
-  partner:       "Partner",
-  csv_import:    "CSV Import",
-  other:         "Other",
+  referral:            "Referral",
+  google_ad:           "Google Ad",
+  organic:             "Organic Search",
+  linkedin:            "LinkedIn",
+  cold_outreach:       "Cold Outreach",
+  trade_event:         "Trade Event",
+  partner:             "Partner",
+  csv_import:          "CSV Import",
+  healthcare_landing:  "Demo Request (Healthcare LP)",
+  homepage_demo:       "Demo Request (Homepage)",
+  other:               "Other",
 };
 
 export const TRADE_OPTIONS = [

@@ -22,7 +22,6 @@ const MARKETING_LINKS = [
   { href: "/features",     label: "Features"     },
   { href: "/blog",         label: "Blog"          },
   { href: "/pricing",      label: "Pricing"       },
-  { href: "/calculator",   label: "Calculator"    },
 ];
 
 export default function Nav({ variant = "marketing", userName }: NavProps) {

@@ -178,7 +178,7 @@ function DemoForm() {
     if (!fn.trim() || !email.trim() || !phone.trim()) { setError("Please fill in your name, email, and phone."); return; }
     setError(""); setLoading(true);
     try {
-      const r = await fetch("/api/healthcare-demo", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ first_name: fn, last_name: ln, email, phone }) });
+      const r = await fetch("/api/healthcare-demo", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ first_name: fn, last_name: ln, email, phone, source: "homepage_demo" }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
       setLeadId(d.id); setStep(2);
@@ -420,14 +420,14 @@ function DemoModal({ open, onClose }: { open: boolean; onClose: () => void }) {
 const CF_BOOKING_RATE = 55;
 
 const SPECIALTY_PRESETS = [
-  { label: "Med Spa",        icon: "fa-solid fa-spa",                  avg: 350  },
-  { label: "Dental",         icon: "fa-solid fa-tooth",                avg: 450  },
-  { label: "Ortho",          icon: "fa-solid fa-teeth",                avg: 550  },
-  { label: "Physical Therapy", icon: "fa-solid fa-person-walking",     avg: 200  },
-  { label: "Chiropractic",   icon: "fa-solid fa-hand-holding-medical", avg: 175  },
-  { label: "Mental Health",  icon: "fa-solid fa-brain",                avg: 250  },
-  { label: "Primary Care",   icon: "fa-solid fa-stethoscope",          avg: 180  },
-  { label: "Optometry",      icon: "fa-solid fa-eye",                  avg: 220  },
+  { label: "Med Spa",        icon: "fa-solid fa-spa",                  avg: 900  },
+  { label: "Dental",         icon: "fa-solid fa-tooth",                avg: 1200 },
+  { label: "Ortho",          icon: "fa-solid fa-teeth",                avg: 5500 },
+  { label: "Physical Therapy", icon: "fa-solid fa-person-walking",     avg: 1600 },
+  { label: "Chiropractic",   icon: "fa-solid fa-hand-holding-medical", avg: 1200 },
+  { label: "Mental Health",  icon: "fa-solid fa-brain",                avg: 1600 },
+  { label: "Primary Care",   icon: "fa-solid fa-stethoscope",          avg: 600  },
+  { label: "Optometry",      icon: "fa-solid fa-eye",                  avg: 500  },
 ];
 
 function CalcSlider({
@@ -482,7 +482,7 @@ function CalcSlider({
 function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
   const [inquiries,    setInquiries]    = useState(60);
   const [bookingRate,  setBookingRate]  = useState(20);
-  const [avgValue,     setAvgValue]     = useState(350);
+  const [avgValue,     setAvgValue]     = useState(800);
   const [activePreset, setActivePreset] = useState<number>(0);
 
   const currentPatients  = Math.round(inquiries * (bookingRate / 100));
@@ -510,8 +510,8 @@ function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
           }}>
             How many patients are slipping through?
           </h2>
-          <p style={{ fontSize: 16, color: "rgba(249,247,242,0.55)", maxWidth: 480, margin: "0 auto" }}>
-            Dial in your numbers and see exactly what you&apos;re leaving on the table every month.
+          <p style={{ fontSize: 16, color: "rgba(249,247,242,0.55)", maxWidth: 520, margin: "0 auto" }}>
+            Every unanswered inquiry is a patient who found someone else. See exactly how much that costs you every year.
           </p>
         </div>
 
@@ -574,14 +574,14 @@ function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
               onChange={setBookingRate}
             />
             <CalcSlider
-              label="Avg patient value"
-              value={avgValue} min={50} max={2000} step={25}
+              label="Avg Treatment Plan Value"
+              value={avgValue} min={200} max={8000} step={50}
               prefix="$"
               onChange={setAvgValue}
             />
 
             <p style={{ fontSize: 11, color: MUTED, lineHeight: 1.5, marginTop: 4 }}>
-              ClozeFlow scenario uses 55% booking rate — our medical practice average with automated follow-up.
+              Treatment plan value pre-filled from specialty averages. ClozeFlow scenario uses 55% booking rate — our medical practice average with automated follow-up.
             </p>
           </div>
 

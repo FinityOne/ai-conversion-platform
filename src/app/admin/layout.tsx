@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { createSupabaseServiceClient } from "@/lib/supabase-service";
 import AdminShell from "@/components/AdminShell";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -16,8 +17,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (profile?.role !== "admin") redirect("/dashboard");
 
+  const service = createSupabaseServiceClient();
+  const { count: demoLeadCount } = await service
+    .from("internal_leads")
+    .select("id", { count: "exact", head: true })
+    .in("source", ["healthcare_landing", "homepage_demo"])
+    .eq("status", "new");
+
   return (
-    <AdminShell firstName={profile?.first_name ?? null} email={user.email ?? null}>
+    <AdminShell
+      firstName={profile?.first_name ?? null}
+      email={user.email ?? null}
+      demoLeadCount={demoLeadCount ?? 0}
+    >
       {children}
     </AdminShell>
   );
