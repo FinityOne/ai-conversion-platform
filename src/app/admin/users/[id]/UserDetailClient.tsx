@@ -425,6 +425,10 @@ function AccessTab({ user, onUserUpdated }: { user: UserDetail; onUserUpdated: (
   const [banLoading,  setBanLoading]  = useState(false);
   const [banMsg,      setBanMsg]      = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
+  // Reset password state
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMsg,     setResetMsg]     = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
   // Administrator tabs state
   const [adminTabsEnabled,  setAdminTabsEnabled]  = useState(user.administrator_tabs_enabled);
   const [adminTabsLoading,  setAdminTabsLoading]  = useState(false);
@@ -502,6 +506,19 @@ function AccessTab({ user, onUserUpdated }: { user: UserDetail; onUserUpdated: (
     if (!res.ok) { setBanMsg({ type: "err", text: d.error ?? "Failed." }); return; }
     setBanMsg({ type: "ok", text: "Account reinstated." });
     onUserUpdated({ banned_until: null });
+  }
+
+  async function handleResetPassword() {
+    if (!confirm(`Reset password to the default for ${user.email}? They will need to use the new password on their next login.`)) return;
+    setResetLoading(true); setResetMsg(null);
+    const res = await fetch(`/api/admin/users/${user.id}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "reset_password" }),
+    });
+    const d = await res.json();
+    setResetLoading(false);
+    if (!res.ok) { setResetMsg({ type: "err", text: d.error ?? "Failed." }); return; }
+    setResetMsg({ type: "ok", text: "Password reset to ClozeFlow1! — user should change it after logging in." });
   }
 
   async function handleAdminTabsToggle(enabled: boolean) {
@@ -694,6 +711,29 @@ function AccessTab({ user, onUserUpdated }: { user: UserDetail; onUserUpdated: (
           )}
         </div>
         <Msg msg={adminTabsMsg} />
+      </div>
+
+      {/* ── Password Reset ── */}
+      <div style={sectionStyle}>
+        <p style={sectionTitle}><i className="fa-solid fa-key" style={{ color: "#dc2626", marginRight: 8 }} />Reset Password</p>
+        <p style={sectionSub}>Resets this user&apos;s password to the default. The user must change it after their next login.</p>
+
+        <div style={{ padding: "14px 18px", borderRadius: 12, marginBottom: 16, background: "rgba(220,38,38,0.04)", border: "1px solid rgba(220,38,38,0.18)", display: "flex", alignItems: "center", gap: 12 }}>
+          <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: 18, color: "#dc2626", flexShrink: 0 }} />
+          <div>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#dc2626" }}>This will override their current password</p>
+            <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED }}>New password: <code style={{ fontFamily: "monospace", background: "#f1f5f9", padding: "1px 6px", borderRadius: 4 }}>ClozeFlow1!</code> — share this with the user securely.</p>
+          </div>
+        </div>
+
+        <button
+          onClick={handleResetPassword}
+          disabled={resetLoading}
+          style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid rgba(220,38,38,0.3)", background: "rgba(220,38,38,0.05)", color: "#dc2626", fontSize: 13, fontWeight: 700, cursor: resetLoading ? "not-allowed" : "pointer", opacity: resetLoading ? 0.75 : 1 }}
+        >
+          <i className="fa-solid fa-key" style={{ marginRight: 7 }} />{resetLoading ? "Resetting…" : "Reset to Default Password"}
+        </button>
+        <Msg msg={resetMsg} />
       </div>
     </div>
   );

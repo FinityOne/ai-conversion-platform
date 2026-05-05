@@ -60,5 +60,13 @@ export async function PATCH(
     return NextResponse.json({ success: true });
   }
 
+  if (action === "reset_password") {
+    const { error } = await sb.auth.admin.updateUserById(userId, {
+      password: "ClozeFlow1!",
+    });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
+  }
+
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });
 }
