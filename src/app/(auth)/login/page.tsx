@@ -6,10 +6,11 @@ import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import { useAnalytics } from "@/lib/analytics";
 
-const TEXT = "#2C3E50";
-const MUTED = "#78716c";
-const VERY_MUTED = "#a8a29e";
-const BORDER = "#e6e2db";
+const TEXT      = "#0D1428";
+const MUTED     = "#4A6274";
+const VERY_MUTED= "#8A9DB0";
+const BORDER    = "#DDE4EF";
+const SAPPHIRE  = "#2860B0";
 
 const inputStyle = {
   background: "#ffffff",
@@ -26,26 +27,15 @@ const inputStyle = {
 
 const inputFocusStyle = {
   ...inputStyle,
-  border: "1px solid rgba(211,84,0,0.55)",
-  boxShadow: "0 0 0 3px rgba(211,84,0,0.1)",
+  border: `1px solid rgba(40,96,176,0.6)`,
+  boxShadow: "0 0 0 3px rgba(40,96,176,0.12)",
 };
 
 function FocusInput({
-  label,
-  type,
-  value,
-  onChange,
-  placeholder,
-  inputMode,
-  autoFocus,
+  label, type, value, onChange, placeholder, inputMode, autoFocus,
 }: {
-  label: string;
-  type: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
-  autoFocus?: boolean;
+  label: string; type: string; value: string; onChange: (v: string) => void;
+  placeholder?: string; inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"]; autoFocus?: boolean;
 }) {
   const [focused, setFocused] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
@@ -75,10 +65,10 @@ function FocusInput({
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
 
   const supabase = createSupabaseBrowserClient();
   const { track } = useAnalytics();
@@ -87,18 +77,8 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      setError(signInError.message);
-      setLoading(false);
-      return;
-    }
-
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) { setError(signInError.message); setLoading(false); return; }
     track({ event: "login", properties: { method: "email" } });
     router.push("/dashboard");
     router.refresh();
@@ -108,9 +88,7 @@ export default function LoginPage() {
     track({ event: "login", properties: { method: "google" } });
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
-      },
+      options: { redirectTo: `${window.location.origin}/api/auth/callback` },
     });
   }
 
@@ -121,22 +99,17 @@ export default function LoginPage() {
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-black mb-2" style={{ color: TEXT }}>Welcome back</h1>
-          <p className="text-sm" style={{ color: MUTED }}>
-            Sign in to your ClozeFlow account
-          </p>
+          <p className="text-sm" style={{ color: MUTED }}>Sign in to your ClozeFlow account</p>
         </div>
 
         {/* Google */}
         <button
           type="button"
           onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98] mb-5"
+          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-semibold transition-all active:scale-[0.98] mb-5"
           style={{
-            background: "#ffffff",
-            border: `1px solid ${BORDER}`,
-            color: TEXT,
-            fontSize: "15px",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+            background: "#ffffff", border: `1px solid ${BORDER}`,
+            color: TEXT, fontSize: "15px", boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
           }}
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0">
@@ -157,35 +130,19 @@ export default function LoginPage() {
 
         {/* Error */}
         {error && (
-          <div
-            className="mb-4 px-4 py-3 rounded-xl text-sm"
-            style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", color: "#b91c1c" }}
-          >
+          <div className="mb-4 px-4 py-3 rounded-xl text-sm"
+            style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.2)", color: "#b91c1c" }}>
             {error}
           </div>
         )}
 
         {/* Form */}
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <FocusInput
-            label="Email address"
-            type="email"
-            inputMode="email"
-            placeholder="you@company.com"
-            value={email}
-            onChange={setEmail}
-            autoFocus
-          />
-          <FocusInput
-            label="Password"
-            type="password"
-            placeholder="Your password"
-            value={password}
-            onChange={setPassword}
-          />
+          <FocusInput label="Email address" type="email" inputMode="email" placeholder="you@practice.com" value={email} onChange={setEmail} autoFocus />
+          <FocusInput label="Password" type="password" placeholder="Your password" value={password} onChange={setPassword} />
 
           <div className="flex justify-end">
-            <Link href="/forgot-password" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: "#D35400" }}>
+            <Link href="/forgot-password" className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: SAPPHIRE }}>
               Forgot password?
             </Link>
           </div>
@@ -200,14 +157,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Sign up link */}
         <p className="text-center text-sm mt-8" style={{ color: MUTED }}>
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-semibold hover:opacity-70 transition-opacity" style={{ color: "#D35400" }}>
+          <Link href="/signup" className="font-semibold hover:opacity-70 transition-opacity" style={{ color: SAPPHIRE }}>
             Get started free
           </Link>
         </p>
-
       </div>
     </div>
   );

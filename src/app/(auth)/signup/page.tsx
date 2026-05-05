@@ -11,10 +11,12 @@ import { useAnalytics } from "@/lib/analytics";
 // Steps: email → firstName → lastName → phone → businessName → password
 const TOTAL_STEPS = 6;
 
-const TEXT = "#2C3E50";
-const MUTED = "#78716c";
-const VERY_MUTED = "#a8a29e";
-const BORDER = "#e6e2db";
+const TEXT       = "#0D1428";
+const MUTED      = "#4A6274";
+const VERY_MUTED = "#8A9DB0";
+const BORDER     = "#DDE4EF";
+const SAPPHIRE   = "#2860B0";
+const SAPPHIRE_PALE = "#E7EEFB";
 
 const inputStyle = {
   background: "#ffffff",
@@ -31,8 +33,8 @@ const inputStyle = {
 
 const inputFocusStyle = {
   ...inputStyle,
-  border: "1px solid rgba(211,84,0,0.55)",
-  boxShadow: "0 0 0 3px rgba(211,84,0,0.1)",
+  border: "1px solid rgba(40,96,176,0.6)",
+  boxShadow: "0 0 0 3px rgba(40,96,176,0.12)",
 };
 
 function GoogleButton({ onClick, label }: { onClick: () => void; label: string }) {
@@ -250,17 +252,14 @@ export default function SignupPage() {
             <span className="text-xs font-semibold" style={{ color: MUTED }}>
               Step {step} of {TOTAL_STEPS}
             </span>
-            <span className="text-xs font-semibold" style={{ color: "#D35400" }}>
+            <span className="text-xs font-semibold" style={{ color: SAPPHIRE }}>
               {progressPct}%
             </span>
           </div>
           <div className="h-1.5 rounded-full overflow-hidden" style={{ background: BORDER }}>
             <div
               className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${progressPct}%`,
-                background: "linear-gradient(90deg,#D35400,#e8641c)",
-              }}
+              style={{ width: `${progressPct}%`, background: "linear-gradient(135deg,#2860B0,#8B6FC4)" }}
             />
           </div>
         </div>
@@ -305,7 +304,7 @@ export default function SignupPage() {
             <>
               <StepInput
                 label="Email address"
-                placeholder="you@company.com"
+                placeholder="you@practice.com"
                 type="email"
                 inputMode="email"
                 value={email}
@@ -410,8 +409,8 @@ export default function SignupPage() {
                 onClick={() => setWantsSetupCall((v) => !v)}
                 className="w-full text-left p-5 rounded-2xl transition-all active:scale-[0.99]"
                 style={{
-                  background: wantsSetupCall ? "rgba(211,84,0,0.06)" : "#ffffff",
-                  border: wantsSetupCall ? "1px solid rgba(211,84,0,0.35)" : `1px solid ${BORDER}`,
+                  background: wantsSetupCall ? "rgba(40,96,176,0.06)" : "#ffffff",
+                  border: wantsSetupCall ? "1px solid rgba(40,96,176,0.35)" : `1px solid ${BORDER}`,
                   boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
                 }}
               >
@@ -420,11 +419,11 @@ export default function SignupPage() {
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                       style={{
-                        background: wantsSetupCall ? "rgba(211,84,0,0.1)" : "#F9F7F2",
-                        border: wantsSetupCall ? "1px solid rgba(211,84,0,0.25)" : `1px solid ${BORDER}`,
+                        background: wantsSetupCall ? "rgba(40,96,176,0.1)" : SAPPHIRE_PALE,
+                        border: wantsSetupCall ? "1px solid rgba(40,96,176,0.25)" : `1px solid ${BORDER}`,
                       }}
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: wantsSetupCall ? "#D35400" : MUTED }}>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: wantsSetupCall ? SAPPHIRE : MUTED }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                       </svg>
                     </div>
@@ -439,7 +438,7 @@ export default function SignupPage() {
                   <div
                     className="relative shrink-0 w-11 h-6 rounded-full transition-all duration-200"
                     style={{
-                      background: wantsSetupCall ? "linear-gradient(90deg,#D35400,#e8641c)" : "#e6e2db",
+                      background: wantsSetupCall ? "linear-gradient(135deg,#2860B0,#8B6FC4)" : BORDER,
                     }}
                   >
                     <div
@@ -521,7 +520,7 @@ export default function SignupPage() {
         {/* Sign in link */}
         <p className="text-center text-sm mt-8" style={{ color: MUTED }}>
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold hover:opacity-70 transition-opacity" style={{ color: "#D35400" }}>
+          <Link href="/login" className="font-semibold hover:opacity-70 transition-opacity" style={{ color: SAPPHIRE }}>
             Sign&nbsp;in
           </Link>
         </p>
