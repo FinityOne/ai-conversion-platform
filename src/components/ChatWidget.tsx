@@ -2,6 +2,10 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import {
+  MIDNIGHT_NAVY, DEEP_NAVY, SAPPHIRE, LAVENDER,
+  CLOUD, STEEL, FROST, WHITE, GRAD_PRIMARY, FONT_SANS,
+} from "@/lib/brand";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -83,10 +87,10 @@ function AvaAvatar({ size = 40 }: { size?: number }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
-      background: "linear-gradient(135deg, #D35400 0%, #e8641c 50%, #f59e0b 100%)",
+      background: GRAD_PRIMARY,
       display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.38, fontWeight: 900, color: "#fff",
-      boxShadow: "0 2px 8px rgba(211,84,0,0.35)",
+      fontSize: size * 0.38, fontWeight: 900, color: WHITE,
+      boxShadow: "0 2px 8px rgba(40,96,176,0.35)",
       position: "relative",
       userSelect: "none",
     }}>
@@ -107,14 +111,14 @@ function TypingDots() {
     <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 16px" }}>
       <AvaAvatar size={30} />
       <div style={{
-        background: "#fff", border: "1px solid #e6e2db",
+        background: WHITE, border: `1px solid ${CLOUD}`,
         borderRadius: "18px 18px 18px 4px",
         padding: "10px 16px", display: "flex", gap: 5, alignItems: "center",
       }}>
         {[0, 1, 2].map(i => (
           <span key={i} style={{
             width: 7, height: 7, borderRadius: "50%",
-            background: "#D35400",
+            background: SAPPHIRE,
             display: "inline-block",
             animation: `cfDot 1.2s ${i * 0.2}s infinite ease-in-out`,
           }} />
@@ -138,14 +142,14 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
       {isBot && <div style={{ flexShrink: 0, alignSelf: "flex-end", marginBottom: 2 }}><AvaAvatar size={30} /></div>}
       <div style={{
         maxWidth: "78%",
-        background: isBot ? "#fff" : "linear-gradient(135deg,#D35400,#e8641c)",
-        color: isBot ? "#2C3E50" : "#fff",
-        border: isBot ? "1px solid #e6e2db" : "none",
+        background: isBot ? WHITE : GRAD_PRIMARY,
+        color: isBot ? MIDNIGHT_NAVY : WHITE,
+        border: isBot ? `1px solid ${CLOUD}` : "none",
         borderRadius: isBot ? "18px 18px 18px 4px" : "18px 18px 4px 18px",
         padding: "10px 14px",
         fontSize: 14,
         lineHeight: 1.55,
-        boxShadow: isBot ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 10px rgba(211,84,0,0.25)",
+        boxShadow: isBot ? "0 1px 4px rgba(0,0,0,0.06)" : "0 2px 10px rgba(40,96,176,0.25)",
         whiteSpace: "pre-line",
       }}>
         {msg.text}
@@ -169,19 +173,19 @@ function QuickReplies({ buttons, onSelect }: { buttons: QuickReply[]; onSelect: 
           onClick={() => onSelect(btn.value, btn.label)}
           style={{
             padding: "8px 14px", borderRadius: 20,
-            border: "1.5px solid #D35400",
-            background: "rgba(211,84,0,0.05)",
-            color: "#D35400", fontSize: 13, fontWeight: 600,
+            border: `1.5px solid ${SAPPHIRE}`,
+            background: "rgba(40,96,176,0.06)",
+            color: SAPPHIRE, fontSize: 13, fontWeight: 600,
             cursor: "pointer", transition: "all 0.15s",
             whiteSpace: "nowrap",
           }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = "#D35400";
-            (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+            (e.currentTarget as HTMLButtonElement).style.background = SAPPHIRE;
+            (e.currentTarget as HTMLButtonElement).style.color = WHITE;
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = "rgba(211,84,0,0.05)";
-            (e.currentTarget as HTMLButtonElement).style.color = "#D35400";
+            (e.currentTarget as HTMLButtonElement).style.background = "rgba(40,96,176,0.06)";
+            (e.currentTarget as HTMLButtonElement).style.color = SAPPHIRE;
           }}
         >
           {btn.label}
@@ -218,9 +222,9 @@ function InlineForm({ onSubmit, submitting }: {
 
   const inputStyle = (err?: string): React.CSSProperties => ({
     width: "100%", padding: "10px 12px",
-    borderRadius: 8, fontSize: 14, color: "#2C3E50",
-    border: `1.5px solid ${err ? "#ef4444" : "#e6e2db"}`,
-    outline: "none", background: "#fff",
+    borderRadius: 8, fontSize: 14, color: MIDNIGHT_NAVY,
+    border: `1.5px solid ${err ? "#ef4444" : CLOUD}`,
+    outline: "none", background: WHITE,
     boxSizing: "border-box",
     transition: "border-color 0.15s",
   });
@@ -228,47 +232,47 @@ function InlineForm({ onSubmit, submitting }: {
   return (
     <div style={{ padding: "4px 12px 12px 52px", animation: "cfFadeUp 0.25s ease both" }}>
       <div style={{
-        background: "#fff", border: "1px solid #e6e2db",
+        background: WHITE, border: `1px solid ${CLOUD}`,
         borderRadius: 14, padding: "16px",
         boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
       }}>
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: "#78716c", display: "block", marginBottom: 4 }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: STEEL, display: "block", marginBottom: 4 }}>
               Your name
             </label>
             <input
               type="text" placeholder="e.g. Mike Johnson"
               value={name} onChange={e => setName(e.target.value)}
               style={inputStyle(errors.name)}
-              onFocus={e => (e.target as HTMLInputElement).style.borderColor = "#D35400"}
-              onBlur={e => (e.target as HTMLInputElement).style.borderColor = errors.name ? "#ef4444" : "#e6e2db"}
+              onFocus={e => (e.target as HTMLInputElement).style.borderColor = SAPPHIRE}
+              onBlur={e => (e.target as HTMLInputElement).style.borderColor = errors.name ? "#ef4444" : CLOUD}
             />
             {errors.name && <p style={{ fontSize: 11, color: "#ef4444", margin: "3px 0 0" }}>{errors.name}</p>}
           </div>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: "#78716c", display: "block", marginBottom: 4 }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: STEEL, display: "block", marginBottom: 4 }}>
               Phone number
             </label>
             <input
               type="tel" placeholder="(555) 000-0000"
               value={phone} onChange={e => setPhone(e.target.value)}
               style={inputStyle(errors.phone)}
-              onFocus={e => (e.target as HTMLInputElement).style.borderColor = "#D35400"}
-              onBlur={e => (e.target as HTMLInputElement).style.borderColor = errors.phone ? "#ef4444" : "#e6e2db"}
+              onFocus={e => (e.target as HTMLInputElement).style.borderColor = SAPPHIRE}
+              onBlur={e => (e.target as HTMLInputElement).style.borderColor = errors.phone ? "#ef4444" : CLOUD}
             />
             {errors.phone && <p style={{ fontSize: 11, color: "#ef4444", margin: "3px 0 0" }}>{errors.phone}</p>}
           </div>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 700, color: "#78716c", display: "block", marginBottom: 4 }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: STEEL, display: "block", marginBottom: 4 }}>
               Email address
             </label>
             <input
               type="email" placeholder="you@company.com"
               value={email} onChange={e => setEmail(e.target.value)}
               style={inputStyle(errors.email)}
-              onFocus={e => (e.target as HTMLInputElement).style.borderColor = "#D35400"}
-              onBlur={e => (e.target as HTMLInputElement).style.borderColor = errors.email ? "#ef4444" : "#e6e2db"}
+              onFocus={e => (e.target as HTMLInputElement).style.borderColor = SAPPHIRE}
+              onBlur={e => (e.target as HTMLInputElement).style.borderColor = errors.email ? "#ef4444" : CLOUD}
             />
             {errors.email && <p style={{ fontSize: 11, color: "#ef4444", margin: "3px 0 0" }}>{errors.email}</p>}
           </div>
@@ -278,17 +282,17 @@ function InlineForm({ onSubmit, submitting }: {
             style={{
               marginTop: 4,
               padding: "12px", borderRadius: 10,
-              background: submitting ? "#f0ede8" : "linear-gradient(135deg,#D35400,#e8641c)",
-              color: submitting ? "#a8a29e" : "#fff",
+              background: submitting ? FROST : GRAD_PRIMARY,
+              color: submitting ? STEEL : WHITE,
               border: "none", fontWeight: 800, fontSize: 14,
               cursor: submitting ? "not-allowed" : "pointer",
               transition: "all 0.2s",
-              boxShadow: submitting ? "none" : "0 3px 12px rgba(211,84,0,0.3)",
+              boxShadow: submitting ? "none" : "0 3px 12px rgba(40,96,176,0.3)",
             }}
           >
             {submitting ? "Sending…" : "Get in touch →"}
           </button>
-          <p style={{ textAlign: "center", fontSize: 11, color: "#a8a29e", margin: 0 }}>
+          <p style={{ textAlign: "center", fontSize: 11, color: STEEL, margin: 0 }}>
             We'll reach back within 2 hours · No spam, ever.
           </p>
         </form>
@@ -348,23 +352,18 @@ export default function ChatWidget() {
       ]);
       if (item.buttons) setActiveButtons(item.buttons);
       processingRef.current = false;
-      // Process next after a small pause
       setTimeout(processQueue, 320);
     }, Math.min(delay, 1800));
   }, []);
 
   function queueMessages(items: typeof queueRef.current) {
-    // Clear previous active buttons when new messages come
     setActiveButtons(null);
     queueRef.current.push(...items);
     processQueue();
   }
 
   function handleQuickReply(value: string, label: string) {
-    // Dismiss buttons
     setActiveButtons(null);
-
-    // Add user bubble
     setMessages(prev => [...prev, { id: uid(), role: "user", text: label }]);
 
     if (value === "book_demo" || value === "speak_expert") {
@@ -391,7 +390,6 @@ export default function ChatWidget() {
     setSubmitting(true);
     submittedNameRef.current = data.name.split(" ")[0];
 
-    // Build transcript for storage
     const transcript = messages.map(m => ({ role: m.role, text: m.text }));
 
     try {
@@ -412,15 +410,10 @@ export default function ChatWidget() {
 
     setSubmitting(false);
     setStep("submitted");
-    // Hide the form bubble by removing showForm flag
     setMessages(prev => prev.map(m => ({ ...m, showForm: false })));
     queueMessages([
-      {
-        text: `You're all set, ${submittedNameRef.current}! 🎉`,
-      },
-      {
-        text: "Our team will reach out within 2 hours via phone or text.\n\nWhile you wait, feel free to explore pricing and features — we can't wait to show you what's possible! 🚀",
-      },
+      { text: `You're all set, ${submittedNameRef.current}! 🎉` },
+      { text: "Our team will reach out within 2 hours via phone or text.\n\nWhile you wait, feel free to explore pricing and features — we can't wait to show you what's possible! 🚀" },
     ]);
   }
 
@@ -460,27 +453,27 @@ export default function ChatWidget() {
             width: 370,
             maxWidth: "calc(100vw - 32px)",
             borderRadius: 20,
-            background: "#F9F7F2",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.18), 0 4px 20px rgba(211,84,0,0.12)",
-            border: "1px solid rgba(211,84,0,0.15)",
+            background: FROST,
+            boxShadow: "0 20px 60px rgba(13,20,40,0.18), 0 4px 20px rgba(40,96,176,0.12)",
+            border: `1px solid rgba(40,96,176,0.15)`,
             overflow: "hidden",
             animation: "cfSlideUp 0.3s cubic-bezier(0.34,1.56,0.64,1) both",
             display: "flex", flexDirection: "column",
+            fontFamily: FONT_SANS,
           }}
         >
           {/* Header */}
           <div style={{
-            background: "#fff",
-            borderBottom: "1px solid #e6e2db",
+            background: GRAD_PRIMARY,
             padding: "14px 16px",
             display: "flex", alignItems: "center", gap: 10,
           }}>
             <AvaAvatar size={44} />
             <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#2C3E50" }}>Ava</p>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: WHITE }}>Ava</p>
               <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-                <p style={{ margin: 0, fontSize: 12, color: "#78716c", fontWeight: 500 }}>
+                <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>
                   ClozeFlow Guide · Typically replies instantly
                 </p>
               </div>
@@ -489,9 +482,9 @@ export default function ChatWidget() {
               onClick={() => setOpen(false)}
               style={{
                 width: 30, height: 30, borderRadius: "50%",
-                border: "none", background: "#f0ede8",
+                border: "none", background: "rgba(255,255,255,0.18)",
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#78716c", fontSize: 16, fontWeight: 700,
+                color: WHITE, fontSize: 16, fontWeight: 700,
                 flexShrink: 0,
               }}
             >
@@ -515,7 +508,6 @@ export default function ChatWidget() {
 
             {isTyping && <TypingDots />}
 
-            {/* Active quick reply buttons (always at bottom) */}
             {activeButtons && !isTyping && step !== "form" && step !== "submitted" && (
               <QuickReplies buttons={activeButtons} onSelect={handleQuickReply} />
             )}
@@ -523,10 +515,10 @@ export default function ChatWidget() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Footer */}
+          {/* Footer — post-submit CTAs */}
           {step === "submitted" && (
             <div style={{
-              borderTop: "1px solid #e6e2db", padding: "12px 16px",
+              borderTop: `1px solid ${CLOUD}`, padding: "12px 16px",
               display: "flex", gap: 8,
             }}>
               <Link
@@ -534,8 +526,8 @@ export default function ChatWidget() {
                 style={{
                   flex: 1, textAlign: "center", padding: "10px",
                   borderRadius: 10, textDecoration: "none",
-                  background: "linear-gradient(135deg,#D35400,#e8641c)",
-                  color: "#fff", fontSize: 13, fontWeight: 700,
+                  background: GRAD_PRIMARY,
+                  color: WHITE, fontSize: 13, fontWeight: 700,
                 }}
               >
                 See Pricing →
@@ -545,9 +537,9 @@ export default function ChatWidget() {
                 style={{
                   flex: 1, textAlign: "center", padding: "10px",
                   borderRadius: 10, textDecoration: "none",
-                  background: "#f0ede8", color: "#2C3E50",
+                  background: FROST, color: MIDNIGHT_NAVY,
                   fontSize: 13, fontWeight: 700,
-                  border: "1px solid #e6e2db",
+                  border: `1px solid ${CLOUD}`,
                 }}
               >
                 See Features →
@@ -557,11 +549,11 @@ export default function ChatWidget() {
 
           {/* Branding */}
           <div style={{
-            background: "#fff", borderTop: "1px solid #e6e2db",
+            background: WHITE, borderTop: `1px solid ${CLOUD}`,
             padding: "8px 16px", textAlign: "center",
           }}>
-            <p style={{ margin: 0, fontSize: 11, color: "#c4bfb8", fontWeight: 500 }}>
-              Powered by <span style={{ color: "#D35400", fontWeight: 700 }}>ClozeFlow</span>
+            <p style={{ margin: 0, fontSize: 11, color: STEEL, fontWeight: 500 }}>
+              Powered by <span style={{ color: SAPPHIRE, fontWeight: 700 }}>ClozeFlow</span>
             </p>
           </div>
         </div>
@@ -582,7 +574,6 @@ export default function ChatWidget() {
               onClick={() => {
                 setOpen(true);
                 setNotifDot(false);
-                // Kick off that branch after chat opens + greeting finishes (~2s)
                 setTimeout(() => {
                   setMessages(prev => [...prev, { id: uid(), role: "user", text: label }]);
                   const branch = BRANCH[value];
@@ -600,30 +591,30 @@ export default function ChatWidget() {
                 padding: "10px 18px",
                 borderRadius: 24,
                 border: "none",
-                background: "#fff",
-                color: "#2C3E50",
+                background: WHITE,
+                color: MIDNIGHT_NAVY,
                 fontSize: 13,
                 fontWeight: 700,
                 cursor: "pointer",
-                boxShadow: "0 4px 18px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.07)",
+                boxShadow: "0 4px 18px rgba(13,20,40,0.13), 0 1px 4px rgba(0,0,0,0.07)",
                 whiteSpace: "nowrap",
                 animation: `cfFloatIn 0.35s ${delay} cubic-bezier(0.34,1.56,0.64,1) both`,
                 display: "flex", alignItems: "center", gap: 6,
                 transition: "box-shadow 0.15s, transform 0.15s",
               }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 6px 24px rgba(211,84,0,0.2), 0 1px 4px rgba(0,0,0,0.08)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 6px 24px rgba(40,96,176,0.2), 0 1px 4px rgba(0,0,0,0.08)";
                 (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 18px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.07)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 18px rgba(13,20,40,0.13), 0 1px 4px rgba(0,0,0,0.07)";
                 (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
               }}
             >
               {label}
               <span style={{
                 width: 18, height: 18, borderRadius: "50%",
-                background: "linear-gradient(135deg,#D35400,#e8641c)",
+                background: GRAD_PRIMARY,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0,
               }}>
@@ -642,13 +633,11 @@ export default function ChatWidget() {
         style={{
           position: "fixed", bottom: 20, right: 20, zIndex: 9999,
           width: 60, height: 60, borderRadius: "50%",
-          background: open
-            ? "#fff"
-            : "linear-gradient(135deg,#D35400,#e8641c)",
-          border: open ? "2px solid #e6e2db" : "none",
+          background: open ? WHITE : GRAD_PRIMARY,
+          border: open ? `2px solid ${CLOUD}` : "none",
           boxShadow: open
             ? "0 4px 20px rgba(0,0,0,0.12)"
-            : "0 4px 20px rgba(211,84,0,0.4), 0 0 0 0 rgba(211,84,0,0.3)",
+            : "0 4px 20px rgba(40,96,176,0.4), 0 0 0 0 rgba(40,96,176,0.3)",
           cursor: "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
           transition: "all 0.25s",
@@ -658,14 +647,14 @@ export default function ChatWidget() {
       >
         {open ? (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6l12 12" stroke="#78716c" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M18 6L6 18M6 6l12 12" stroke={STEEL} strokeWidth="2.5" strokeLinecap="round" />
           </svg>
         ) : (
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="white" fillOpacity="0.9" />
-            <circle cx="8.5" cy="10.5" r="1" fill="#D35400" />
-            <circle cx="12" cy="10.5" r="1" fill="#D35400" />
-            <circle cx="15.5" cy="10.5" r="1" fill="#D35400" />
+            <circle cx="8.5" cy="10.5" r="1" fill="rgba(255,255,255,0.6)" />
+            <circle cx="12" cy="10.5" r="1" fill="rgba(255,255,255,0.6)" />
+            <circle cx="15.5" cy="10.5" r="1" fill="rgba(255,255,255,0.6)" />
           </svg>
         )}
 

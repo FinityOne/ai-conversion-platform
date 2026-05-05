@@ -112,7 +112,7 @@ export default function Nav({ variant = "marketing", userName }: NavProps) {
           {/* Logo */}
           <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
             <div style={{ width: 140, height: 40, position: "relative", flexShrink: 0 }}>
-              <Image src="/logo/ClozeFlow - Horizontal Logo.png" alt="ClozeFlow" fill style={{ objectFit: "contain" }} />
+              <Image src="/logo/ClozeFlow Logo - Transparent.png" alt="ClozeFlow" fill style={{ objectFit: "contain" }} />
             </div>
           </Link>
 

@@ -28,10 +28,10 @@ export default function MarketingFooter() {
             <Link href="/" style={{ display: "inline-flex", textDecoration: "none", marginBottom: 20 }}>
               <div style={{ width: 140, height: 50, overflow: "hidden", position: "relative", flexShrink: 0 }}>
                 <Image
-                  src="/logo/ClozeFlow - Horizontal Logo.png"
+                  src="/logo/ClozeFlow Logo - Transparent.png"
                   alt="ClozeFlow"
                   fill
-                  style={{ objectFit: "contain", filter: "brightness(0) invert(1) opacity(0.9)" }}
+                  style={{ objectFit: "contain" }}
                 />
               </div>
             </Link>

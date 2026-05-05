@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { DEEP_NAVY, SAPPHIRE, LAVENDER, WHITE } from "@/lib/brand";
 
-const STORAGE_KEY = "cf_banner_v1";
+const STORAGE_KEY = "cf_banner_v2";
 export const BANNER_H = 36; // px — keep in sync with CSS var default in Nav + layout
 
 export default function TopBanner() {
@@ -32,7 +33,7 @@ export default function TopBanner() {
       top: 0, left: 0, right: 0,
       zIndex: 200,
       height: BANNER_H,
-      background: "#1c1917",
+      background: `linear-gradient(135deg, ${DEEP_NAVY} 0%, ${SAPPHIRE} 100%)`,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -40,14 +41,14 @@ export default function TopBanner() {
       gap: 10,
     }}>
       {/* Desktop copy */}
-      <span className="hidden sm:inline" style={{ fontSize: 12, fontWeight: 500, color: "#d6d3d1", whiteSpace: "nowrap" }}>
-        <span style={{ color: "#fb923c", fontWeight: 700 }}>Limited offer</span>
-        {" — Save up to 50% on annual plans · 30-day money-back guarantee"}
+      <span className="hidden sm:inline" style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.85)", whiteSpace: "nowrap" }}>
+        <span style={{ color: LAVENDER, fontWeight: 700 }}>Limited offer</span>
+        {" — Save up to 20% on annual plans · 30-day money-back guarantee"}
       </span>
 
       {/* Mobile copy */}
-      <span className="sm:hidden" style={{ fontSize: 11, fontWeight: 500, color: "#d6d3d1", whiteSpace: "nowrap" }}>
-        <span style={{ color: "#fb923c", fontWeight: 700 }}>50% off</span>
+      <span className="sm:hidden" style={{ fontSize: 11, fontWeight: 500, color: "rgba(255,255,255,0.85)", whiteSpace: "nowrap" }}>
+        <span style={{ color: LAVENDER, fontWeight: 700 }}>20% off</span>
         {" annual · 30-day guarantee"}
       </span>
 
@@ -55,13 +56,14 @@ export default function TopBanner() {
         href="/pricing?cycle=annual"
         style={{
           fontSize: 11, fontWeight: 800,
-          background: "#D35400",
-          color: "#fff",
+          background: `linear-gradient(135deg, ${SAPPHIRE} 0%, ${LAVENDER} 100%)`,
+          color: WHITE,
           padding: "4px 11px",
           borderRadius: 20,
           textDecoration: "none",
           whiteSpace: "nowrap",
           flexShrink: 0,
+          boxShadow: "0 2px 8px rgba(40,96,176,0.35)",
         }}
       >
         Get started →
@@ -74,7 +76,7 @@ export default function TopBanner() {
         style={{
           position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
           background: "none", border: "none", cursor: "pointer",
-          color: "#78716c", fontSize: 18, lineHeight: 1, padding: "4px 6px",
+          color: "rgba(255,255,255,0.45)", fontSize: 18, lineHeight: 1, padding: "4px 6px",
         }}
       >
         ×

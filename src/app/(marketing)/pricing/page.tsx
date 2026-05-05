@@ -2,402 +2,618 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import {
+  MIDNIGHT_NAVY, DEEP_NAVY, SAPPHIRE, SAPPHIRE_PALE, LAVENDER,
+  SLATE, STEEL, CLOUD, FROST, WHITE,
+  GRAD_PRIMARY, GRAD_DARK, FONT_SANS, FONT_DISPLAY,
+} from "@/lib/brand";
+import { DemoModal } from "@/components/DemoModal";
 
-const BG     = "#F9F7F2";
-const TEXT   = "#2C3E50";
-const MUTED  = "#78716c";
-const BORDER = "#e6e2db";
-const ORANGE = "#D35400";
-const GREEN  = "#27AE60";
+// ── Constants ─────────────────────────────────────────────────────────────────
 
-function PlanIcon({ plan }: { plan: "pro" | "growth" | "max" }) {
-  if (plan === "pro") return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+const GREEN = "#27AE60";
+
+const PLANS = [
+  {
+    id: "base" as const,
+    name: "Base",
+    tagline: "For solo operators",
+    sixMonthPrice: 299,
+    sixMonthSetup: 299,
+    annualPrice: 249,
+    annualSetup: 299,
+    sixMonthTotal: 2093,
+    annualTotal: 3287,
+    sixMonthPerDay: "9.59",
+    annualPerDay: "8.19",
+    highlight: false,
+    cta: "Get Started",
+    subBadge: null,
+    badge: null,
+    features: [
+      "Lead capture (up to 50/month)",
+      "60-second auto-response",
+      "3–5 follow-ups",
+      "Appointment reminders",
+      "Basic segmentation",
+      "Booking calendar",
+      "Weekly report",
+      "Basic landing page",
+      "Team (up to 2 users)",
+      "HIPAA/GDPR compliant",
+    ],
+  },
+  {
+    id: "pro" as const,
+    name: "Pro",
+    tagline: "For clinics ready to grow",
+    sixMonthPrice: 499,
+    sixMonthSetup: 499,
+    annualPrice: 399,
+    annualSetup: 499,
+    sixMonthTotal: 3493,
+    annualTotal: 5287,
+    sixMonthPerDay: "15.99",
+    annualPerDay: "13.12",
+    highlight: true,
+    cta: "Choose Pro",
+    subBadge: "Most clinics choose this",
+    badge: "Most Popular",
+    features: [
+      "Everything in Base, plus:",
+      "Dedicated Account Manager",
+      "Custom intake forms",
+      "Advanced follow-ups",
+      "Custom segmentation",
+      "Unlimited SMS campaigns",
+      "Real-time analytics",
+      "Monthly strategy calls",
+      "Advanced lead scoring",
+      "Patient LTV tracking",
+    ],
+  },
+];
+
+type PlanId = "base" | "pro";
+
+const FLAT_ROWS: { feature: string; base?: boolean; pro?: boolean; values?: [string, string]; divider?: boolean }[] = [
+  { feature: "Lead capture / month",               values: ["50", "Unlimited"] },
+  { feature: "60-second auto-response",             base: true,  pro: true  },
+  { feature: "Follow-up sequences",                values: ["3–5", "Advanced"] },
+  { feature: "Appointment reminders",               base: true,  pro: true  },
+  { feature: "Basic segmentation",                  base: true,  pro: true  },
+  { feature: "Booking calendar",                    base: true,  pro: true  },
+  { feature: "Weekly report",                       base: true,  pro: true  },
+  { feature: "Basic landing page",                  base: true,  pro: true  },
+  { feature: "Team members",                       values: ["2 users", "Unlimited"] },
+  { feature: "HIPAA/GDPR compliant",                base: true,  pro: true  },
+  { feature: "Dedicated Account Manager",           base: false, pro: true,  divider: true },
+  { feature: "Custom intake forms",                 base: false, pro: true  },
+  { feature: "Custom segmentation",                 base: false, pro: true  },
+  { feature: "Unlimited SMS campaigns",             base: false, pro: true  },
+  { feature: "Real-time analytics",                 base: false, pro: true  },
+  { feature: "Monthly strategy calls",              base: false, pro: true  },
+  { feature: "Advanced lead scoring",               base: false, pro: true  },
+  { feature: "Patient LTV tracking",                base: false, pro: true  },
+];
+
+const ADDON_FEATURES_LEFT = [
+  "AI chatbot + voice",
+  "Landing page + website",
+  "Blog/content creation",
+  "Local targeting contacts",
+];
+const ADDON_FEATURES_RIGHT = [
+  "Google Ads + Meta Ads integration",
+  "Social media management",
+  "AI indexing + competitor tracking",
+  "Conversion tracking + analytics",
+];
+
+const FAQS = [
+  {
+    q: "Is there really no credit card required to start?",
+    a: "Correct. You can create an account and explore ClozeFlow completely free. No card on file until you decide to go live with a paid plan.",
+  },
+  {
+    q: "Why should I choose 6 months instead of annual?",
+    a: "The 6-month commitment is for practices that want to accelerate quickly without a 12-month lock-in. It gives our team time to fully optimize your patient acquisition pipeline and deliver measurable results — typically 2–3× ROI — before you evaluate the annual commitment.",
+  },
+  {
+    q: "What's the difference between 6-month and annual pricing?",
+    a: "The 6-month plan is billed every 6 months at the stated monthly rate. Annual plans are billed once per year at approximately 17–20% off the 6-month rate. Both receive the full feature set for their plan tier.",
+  },
+  {
+    q: "Does ClozeFlow work with my EHR or practice management software?",
+    a: "ClozeFlow is designed to work alongside your existing systems. It captures and converts patient inquiries, then hands off pre-qualified, ready-to-schedule patients to your front desk — no EHR integration required to get started. Deep integrations are available on the Pro plan.",
+  },
+  {
+    q: "What happens when my 6-month commitment ends?",
+    a: "At the end of your 6-month term, you can renew for another 6 months, upgrade to an annual plan (and save up to 20%), or cancel with no penalties. Your patient data and pipeline history are always yours.",
+  },
+  {
+    q: "Is there a money-back guarantee?",
+    a: "Yes. If ClozeFlow doesn't book you at least one qualified patient appointment in your first 30 days, we'll refund every penny — no questions asked. We're that confident in the results.",
+  },
+  {
+    q: "Who is the Marketing & Growth Add-On for?",
+    a: "The Add-On replaces your marketing agency with one platform for ads, content, and automation. It includes AI chatbot + voice, a custom landing page and website, blog content creation, Google and Meta Ads, social media management, and conversion analytics. It pairs with any plan — no setup fee.",
+  },
+];
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function BoltIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
     </svg>
   );
-  if (plan === "growth") return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-      <polyline points="17 6 23 6 23 12"/>
-    </svg>
-  );
+}
+function StarIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
     </svg>
   );
 }
 
-function Check() {
+function CheckMark({ color }: { color: string }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, margin: "0 auto", display: "block" }}>
-      <circle cx="10" cy="10" r="10" fill={ORANGE} fillOpacity="0.12"/>
-      <path d="M6 10l3 3 5-5.5" stroke={ORANGE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="10" cy="10" r="10" fill={color} fillOpacity="0.13"/>
+      <path d="M6 10l3 3 5-5.5" stroke={color} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
-
-function Dash() {
+function DashMark() {
   return (
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, margin: "0 auto", display: "block" }}>
-      <circle cx="10" cy="10" r="10" fill="#ebe8e3"/>
-      <line x1="7" y1="10" x2="13" y2="10" stroke="#c4bfb9" strokeWidth="1.8" strokeLinecap="round"/>
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="10" cy="10" r="10" fill={CLOUD} fillOpacity="0.6"/>
+      <line x1="7" y1="10" x2="13" y2="10" stroke={STEEL} strokeWidth="1.8" strokeLinecap="round"/>
     </svg>
   );
 }
-
-function ShieldIcon() {
+function ShieldCheck() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
       <path d="M9 12l2 2 4-4"/>
     </svg>
   );
 }
 
-type PlanId = "pro" | "growth" | "max";
-
-const PLANS: {
-  id: PlanId; name: string; tagline: string;
-  annualPrice: number; monthlyPrice: number;
-  badge?: string; highlight: boolean; cta: string;
-  features: string[];
-}[] = [
-  {
-    id: "pro", name: "Pro", tagline: "Solo operators & small crews",
-    annualPrice: 79, monthlyPrice: 99,
-    highlight: false, cta: "Start Free — No Card Needed",
-    features: [
-      "Up to 50 leads / month",
-      "Custom intake form with photo upload",
-      "60-second automated response",
-      "Email follow-up sequences",
-      "Lead inbox with AI scoring",
-      "AI-powered custom messaging",
-      "Flyer generator",
-      "Calendar bookings & reminders",
-      "Email support",
-    ],
-  },
-  {
-    id: "growth", name: "Growth", tagline: "Growing businesses ready to scale",
-    annualPrice: 149, monthlyPrice: 299,
-    badge: "Most Popular", highlight: true, cta: "Start Free — No Card Needed",
-    features: [
-      "Everything in Pro, plus:",
-      "Up to 500 leads / month",
-      "Smart AI reply detection",
-      "Full multi-step follow-up sequences",
-      "Performance tracking & analytics",
-      "Daily lead digest email",
-      "Priority support",
-    ],
-  },
-  {
-    id: "max", name: "Max", tagline: "High-volume & multi-location",
-    annualPrice: 799, monthlyPrice: 999,
-    highlight: false, cta: "Start Free — No Card Needed",
-    features: [
-      "Everything in Growth, plus:",
-      "Unlimited leads",
-      "Hot lead SMS alerts",
-      "White-label booking pages",
-      "Advanced analytics",
-      "Dedicated account manager",
-      "Custom integrations",
-      "Phone support",
-    ],
-  },
-];
-
-const PLAN_STYLE: Record<PlanId, { color: string; bg: string; border: string }> = {
-  pro:    { color: ORANGE, bg: "rgba(211,84,0,0.06)",  border: "rgba(211,84,0,0.2)"  },
-  growth: { color: ORANGE, bg: "rgba(211,84,0,0.10)",  border: ORANGE                },
-  max:    { color: TEXT,   bg: "rgba(44,62,80,0.06)",  border: "rgba(44,62,80,0.22)" },
-};
-
-type FlatRow = {
-  feature: string;
-  pro?: boolean; growth?: boolean; max?: boolean;
-  values?: [string, string, string];
-  divider?: boolean;
-};
-
-const FLAT_ROWS: FlatRow[] = [
-  { feature: "Leads per month",               values: ["50", "500", "Unlimited"] },
-  { feature: "Custom intake form",             pro: true,  growth: true,  max: true  },
-  { feature: "Photo upload on intake",         pro: true,  growth: true,  max: true  },
-  { feature: "Custom intake link",             pro: true,  growth: true,  max: true  },
-  { feature: "60-second automated response",   pro: true,  growth: true,  max: true  },
-  { feature: "Email follow-up sequences",      pro: true,  growth: true,  max: true  },
-  { feature: "Lead inbox with AI scoring",     pro: true,  growth: true,  max: true  },
-  { feature: "AI-powered custom messaging",    pro: true,  growth: true,  max: true  },
-  { feature: "Flyer generator",                pro: true,  growth: true,  max: true  },
-  { feature: "Calendar bookings",              pro: true,  growth: true,  max: true  },
-  { feature: "Automatic reminders",            pro: true,  growth: true,  max: true  },
-  { feature: "Email support",                  pro: true,  growth: true,  max: true  },
-  { feature: "Full multi-step sequences",      pro: false, growth: true,  max: true,  divider: true },
-  { feature: "Smart AI reply detection",       pro: false, growth: true,  max: true  },
-  { feature: "Performance tracking",           pro: false, growth: true,  max: true  },
-  { feature: "Daily lead digest email",        pro: false, growth: true,  max: true  },
-  { feature: "Priority support",               pro: false, growth: true,  max: true  },
-  { feature: "White-label booking page",       pro: false, growth: false, max: true,  divider: true },
-  { feature: "Hot lead SMS alerts",            pro: false, growth: false, max: true  },
-  { feature: "Advanced analytics",             pro: false, growth: false, max: true  },
-  { feature: "Custom integrations",            pro: false, growth: false, max: true  },
-  { feature: "Dedicated account manager",      pro: false, growth: false, max: true  },
-  { feature: "Phone support",                  pro: false, growth: false, max: true  },
-];
-
-const FAQS = [
-  { q: "Is there really no credit card required?",     a: "Correct. You can create an account and explore ClozeFlow completely free. No card on file until you decide to go live with a paid plan." },
-  { q: "What happens if I hit my monthly lead limit?", a: "We'll notify you when you're approaching your limit. You can upgrade at any time with one click — your existing leads and settings carry over. We won't cut you off mid-month." },
-  { q: "Can I cancel anytime?",                        a: "Yes, absolutely. No long-term contracts. Cancel from your account settings with no penalties. If you cancel an annual plan, we'll prorate your remaining months." },
-  { q: "What does 'annual billing' mean exactly?",     a: "Annual plans are billed once per year at the discounted rate. Pro at $79/mo annual = $948 billed once per year. Monthly plans are charged month-to-month with no long-term commitment." },
-  { q: "How is Growth different from Pro?",            a: "Growth gives you 500 leads/month (vs 50 on Pro), smart AI reply detection, full multi-step follow-up sequences, performance tracking, a daily lead digest, and priority support." },
-  { q: "Do you offer a money-back guarantee?",         a: "Yes. If ClozeFlow doesn't book you at least one qualified appointment in your first 30 days, we'll refund every penny — no questions asked." },
-];
-
-// Helper: get the value/bool for a plan in a flat row
-function rowValue(row: FlatRow, pid: PlanId, pi: number) {
-  if (row.values) return { type: "value" as const, val: row.values[pi] };
-  return { type: "bool" as const, val: !!row[pid] };
-}
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function PricingPage() {
-  const [annual, setAnnual]   = useState(true);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [sixMonth, setSixMonth] = useState(true);
+  const [openFaq, setOpenFaq]   = useState<number | null>(null);
+  const [demoOpen, setDemoOpen] = useState(false);
 
   return (
-    <div style={{ background: BG, color: TEXT }}>
-
+    <div style={{ background: FROST, color: MIDNIGHT_NAVY, fontFamily: FONT_SANS }}>
+      <DemoModal open={demoOpen} onClose={() => setDemoOpen(false)} source="pricing_page" />
       <style>{`
-        /* ── Responsive switches ── */
         .compare-desktop { display: block; }
         .compare-mobile  { display: none;  }
 
-        @media (max-width: 640px) {
-          /* Header */
+        @media (max-width: 680px) {
           .pricing-hero { padding: 40px 16px 28px !important; }
-          .pricing-hero h1 { font-size: 26px !important; margin-bottom: 10px !important; }
-          .pricing-hero p  { font-size: 14px !important; margin-bottom: 20px !important; }
-          .billing-toggle button { padding: 8px 14px !important; font-size: 13px !important; }
-          .save-badge { font-size: 10px !important; }
-
-          /* Plan cards */
-          .pricing-cards-wrap { padding: 0 14px 40px !important; }
-          .pricing-cards-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
-          .plan-card { padding: 22px 18px !important; }
-          .plan-price-num { font-size: 38px !important; }
-
-          /* Comparison */
+          .pricing-hero h1 { font-size: 26px !important; }
+          .billing-toggle button { padding: 9px 14px !important; font-size: 13px !important; }
+          .cards-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .cards-wrap { padding: 0 16px 40px !important; }
+          .plan-card { padding: 24px 20px !important; }
+          .plan-price-num { font-size: 40px !important; }
           .compare-desktop { display: none !important; }
           .compare-mobile  { display: block !important; }
-          .comparison-outer { margin-top: 16px !important; border-radius: 12px !important; }
-
-          /* Enterprise / guarantee */
           .enterprise-block { flex-direction: column !important; align-items: flex-start !important; padding: 20px 18px !important; }
-          .guarantee-block  { padding: 24px 18px !important; }
-
-          /* FAQ */
-          .faq-section    { padding: 48px 16px !important; }
-          .faq-section h2 { font-size: 22px !important; margin-bottom: 28px !important; }
-          .faq-q          { font-size: 14px !important; }
-
-          /* Bottom CTA */
-          .bottom-cta-sect    { padding: 44px 16px !important; }
-          .bottom-cta-sect h2 { font-size: 20px !important; }
+          .guarantee-grid { grid-template-columns: 1fr !important; }
+          .faq-section { padding: 48px 16px !important; }
+          .addon-grid { grid-template-columns: 1fr !important; }
+          .bottom-cta { padding: 48px 16px !important; }
+        }
+        @media (min-width: 681px) and (max-width: 960px) {
+          .cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
 
-        @media (min-width: 641px) and (max-width: 900px) {
-          .pricing-cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        }
+        .plan-card-hover { transition: box-shadow 0.2s, transform 0.2s; }
+        .plan-card-hover:hover { transform: translateY(-3px); }
+        .faq-btn:hover { background: ${SAPPHIRE_PALE} !important; }
       `}</style>
 
-      {/* ── Header ── */}
-      <section className="pricing-hero" style={{ padding: "64px 24px 48px", textAlign: "center" }}>
-        <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          <h1 style={{ fontSize: "clamp(26px, 5vw, 44px)", fontWeight: 900, color: TEXT, marginBottom: 12, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
-            Simple, honest pricing. Start free.
-          </h1>
-          <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.6, marginBottom: 32 }}>
-            Create your account for free. Pick a plan when you&apos;re ready to go live.
-            No hidden fees, no long-term contracts.
+      {/* ── Hero ── */}
+      <section className="pricing-hero" style={{ background: GRAD_DARK, padding: "68px 24px 56px", textAlign: "center" }}>
+        <div style={{ maxWidth: 580, margin: "0 auto" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginBottom: 16 }}>
+            ClozeFlow Pricing
           </p>
+          <h1 style={{
+            fontSize: "clamp(28px, 5vw, 46px)", fontWeight: 900,
+            color: WHITE, marginBottom: 14, letterSpacing: "-0.025em", lineHeight: 1.1,
+            fontFamily: FONT_DISPLAY,
+          }}>
+            Simple pricing.<br />Real patient results.
+          </h1>
+          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.75)", lineHeight: 1.65 }}>
+            Commit to growth and we commit back. Every plan starts with our 30-day money-back guarantee — no risk, no long contracts.
+          </p>
+        </div>
+      </section>
 
-          {/* Billing toggle */}
+      {/* ── Plan cards ── */}
+      <section className="cards-wrap" style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px 56px" }}>
+
+        {/* Billing toggle */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, paddingTop: 40, paddingBottom: 8 }}>
           <div className="billing-toggle" style={{
             display: "inline-flex", alignItems: "center",
-            background: "#fff", border: `1px solid ${BORDER}`,
-            borderRadius: 100, padding: 4,
+            background: CLOUD, border: `1px solid ${CLOUD}`,
+            borderRadius: 100, padding: 4, gap: 2,
           }}>
-            {([true, false] as const).map(isAnnual => (
+            {([
+              { label: "6 Month", val: true,  badge: null },
+              { label: "Annual",  val: false, badge: "Save up to 20%" },
+            ] as const).map(opt => (
               <button
-                key={String(isAnnual)}
-                onClick={() => setAnnual(isAnnual)}
+                key={String(opt.val)}
+                onClick={() => setSixMonth(opt.val)}
                 style={{
-                  padding: "9px 20px", borderRadius: 100, border: "none", cursor: "pointer",
+                  padding: "10px 22px", borderRadius: 100, border: "none", cursor: "pointer",
                   fontSize: 14, fontWeight: 700, transition: "all 0.2s",
-                  background: annual === isAnnual ? "linear-gradient(135deg,#D35400,#e8641c)" : "transparent",
-                  color: annual === isAnnual ? "#fff" : MUTED,
+                  background: sixMonth === opt.val ? GRAD_PRIMARY : "transparent",
+                  color: sixMonth === opt.val ? WHITE : SLATE,
+                  boxShadow: sixMonth === opt.val ? "0 2px 12px rgba(40,96,176,0.35)" : "none",
                 }}
               >
-                {isAnnual ? "Annual" : "Monthly"}
-                {isAnnual && (
-                  <span className="save-badge" style={{
-                    marginLeft: 6, fontSize: 11, fontWeight: 700, padding: "2px 7px", borderRadius: 100,
-                    background: annual ? "rgba(255,255,255,0.25)" : "rgba(39,174,96,0.1)",
-                    color: annual ? "#fff" : GREEN,
+                {opt.label}
+                {opt.badge && (
+                  <span style={{
+                    marginLeft: 7, fontSize: 10, fontWeight: 800,
+                    padding: "2px 8px", borderRadius: 100,
+                    background: sixMonth === opt.val ? "rgba(255,255,255,0.22)" : "rgba(39,174,96,0.18)",
+                    color: sixMonth === opt.val ? WHITE : GREEN,
                   }}>
-                    Save up to 50%
+                    {opt.badge}
                   </span>
                 )}
               </button>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ── Plan cards ── */}
-      <section className="pricing-cards-wrap" style={{ maxWidth: 1080, margin: "0 auto", padding: "0 20px 64px" }}>
-        <div className="pricing-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, alignItems: "stretch" }}>
-          {PLANS.map(plan => (
-            <div
-              key={plan.name}
-              className="plan-card"
-              style={{
-                background: "#fff",
-                border: plan.highlight ? `2px solid ${ORANGE}` : `1px solid ${BORDER}`,
-                borderRadius: 16, padding: "28px 24px",
-                display: "flex", flexDirection: "column", position: "relative",
-                boxShadow: plan.highlight ? "0 8px 32px rgba(211,84,0,0.12)" : "none",
-              }}
-            >
-              {plan.badge && (
-                <div style={{
-                  position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
-                  background: "linear-gradient(135deg,#D35400,#e8641c)",
-                  color: "#fff", fontSize: 11, fontWeight: 800,
-                  padding: "3px 14px", borderRadius: 100, whiteSpace: "nowrap",
-                  display: "flex", alignItems: "center", gap: 6,
-                }}>
-                  <PlanIcon plan={plan.id} />
-                  {plan.badge}
-                </div>
-              )}
-
+          {/* 6-Month commitment note */}
+          {sixMonth && (
+            <div style={{
+              maxWidth: 660, width: "100%",
+              background: `linear-gradient(135deg, rgba(40,96,176,0.06) 0%, rgba(139,111,196,0.06) 100%)`,
+              border: `1px solid rgba(40,96,176,0.15)`,
+              borderRadius: 12, padding: "12px 18px",
+              display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+            }}>
               <div style={{
-                width: 36, height: 36, borderRadius: 10, marginBottom: 14,
-                background: "rgba(211,84,0,0.08)", border: "1px solid rgba(211,84,0,0.15)",
-                display: "flex", alignItems: "center", justifyContent: "center", color: ORANGE,
+                width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center",
               }}>
-                <PlanIcon plan={plan.id} />
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
               </div>
-
-              <p style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 }}>
-                {plan.tagline}
-              </p>
-              <h2 style={{ fontSize: 22, fontWeight: 900, color: TEXT, marginBottom: 16 }}>{plan.name}</h2>
-
-              <div style={{ marginBottom: 22 }}>
-                {annual && (
-                  <p style={{ fontSize: 12, color: MUTED, marginBottom: 3 }}>
-                    <span style={{ textDecoration: "line-through" }}>${plan.monthlyPrice}/mo</span>
-                    <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 700, color: GREEN }}>
-                      Save ${plan.monthlyPrice - plan.annualPrice}/mo
-                    </span>
-                  </p>
-                )}
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 3, marginBottom: 3 }}>
-                  <span className="plan-price-num" style={{ fontSize: 44, fontWeight: 900, color: TEXT, lineHeight: 1 }}>
-                    ${annual ? plan.annualPrice : plan.monthlyPrice}
-                  </span>
-                  <span style={{ fontSize: 14, color: MUTED, paddingBottom: 5 }}>/mo</span>
-                </div>
-                <p style={{ fontSize: 12, color: MUTED }}>
-                  {annual
-                    ? `Billed annually · ${Math.round((1 - plan.annualPrice / plan.monthlyPrice) * 100)}% off`
-                    : "Billed monthly · No commitment"}
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: SAPPHIRE }}>
+                  Why we recommend the 6-month commitment
+                </p>
+                <p style={{ margin: 0, fontSize: 12, color: SLATE, lineHeight: 1.5, marginTop: 2 }}>
+                  Practices that commit to a 6-month runway see 2–3× ROI within the first 90 days — and it only improves from there.
                 </p>
               </div>
-
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 22px", display: "flex", flexDirection: "column", gap: 8, flexGrow: 1 }}>
-                {plan.features.map(feature => (
-                  <li key={feature} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: feature.endsWith(":") ? TEXT : MUTED, fontWeight: feature.endsWith(":") ? 700 : 400 }}>
-                    {!feature.endsWith(":") && (
-                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
-                        <path d="M3 8l3.5 3.5 6.5-7" stroke={ORANGE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <Link href="/signup" style={{
-                display: "block", textAlign: "center", padding: "13px 16px",
-                borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none",
-                background: plan.highlight ? "linear-gradient(135deg,#D35400,#e8641c)" : BG,
-                color: plan.highlight ? "#fff" : TEXT,
-                border: plan.highlight ? "none" : `1px solid ${BORDER}`,
-                boxShadow: plan.highlight ? "0 4px 16px rgba(211,84,0,0.22)" : "none",
+              <div style={{
+                fontSize: 11, fontWeight: 700, color: SAPPHIRE, whiteSpace: "nowrap",
+                background: SAPPHIRE_PALE, border: `1px solid rgba(40,96,176,0.2)`,
+                padding: "4px 12px", borderRadius: 100,
               }}>
-                {plan.cta} →
-              </Link>
-              {plan.highlight && (
-                <p style={{ textAlign: "center", fontSize: 11, color: MUTED, marginTop: 8 }}>No credit card required</p>
-              )}
+                Recommended
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24, paddingTop: 16, alignItems: "stretch" }}>
+          {PLANS.map(plan => {
+            const price     = sixMonth ? plan.sixMonthPrice : plan.annualPrice;
+            const setup     = sixMonth ? plan.sixMonthSetup : plan.annualSetup;
+            const total     = sixMonth ? plan.sixMonthTotal : plan.annualTotal;
+            const perDay    = sixMonth ? plan.sixMonthPerDay : plan.annualPerDay;
+            const savings   = Math.round((1 - plan.annualPrice / plan.sixMonthPrice) * 100);
+
+            return (
+              <div
+                key={plan.id}
+                className="plan-card plan-card-hover"
+                style={{
+                  background: WHITE, position: "relative",
+                  border: plan.highlight ? `2px solid ${SAPPHIRE}` : `1px solid ${CLOUD}`,
+                  borderRadius: 18, padding: "32px 28px",
+                  display: "flex", flexDirection: "column",
+                  boxShadow: plan.highlight
+                    ? "0 8px 40px rgba(40,96,176,0.15)"
+                    : "0 2px 12px rgba(13,20,40,0.05)",
+                }}
+              >
+                {/* Most Popular badge */}
+                {plan.badge && (
+                  <div style={{
+                    position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
+                    background: GRAD_PRIMARY,
+                    color: WHITE, fontSize: 11, fontWeight: 800,
+                    padding: "4px 16px", borderRadius: 100, whiteSpace: "nowrap",
+                    display: "flex", alignItems: "center", gap: 6,
+                    boxShadow: "0 2px 12px rgba(40,96,176,0.35)",
+                  }}>
+                    <StarIcon /> {plan.badge}
+                  </div>
+                )}
+
+                {/* Plan header */}
+                <div style={{
+                  width: 38, height: 38, borderRadius: 10, marginBottom: 16,
+                  background: plan.highlight ? "rgba(40,96,176,0.1)" : SAPPHIRE_PALE,
+                  border: `1px solid rgba(40,96,176,0.18)`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: SAPPHIRE,
+                }}>
+                  {plan.highlight ? <StarIcon /> : <BoltIcon />}
+                </div>
+
+                <h2 style={{ fontSize: 24, fontWeight: 900, color: MIDNIGHT_NAVY, marginBottom: 2, letterSpacing: "-0.015em" }}>
+                  {plan.name}
+                </h2>
+                <p style={{ fontSize: 13, color: SLATE, marginBottom: 18 }}>
+                  {plan.tagline}
+                </p>
+
+                {/* Pricing block */}
+                <div style={{
+                  background: plan.highlight ? "rgba(40,96,176,0.04)" : FROST,
+                  border: `1px solid ${CLOUD}`,
+                  borderRadius: 12, padding: "18px 20px", marginBottom: 22,
+                }}>
+                  {!sixMonth && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontSize: 12, color: STEEL, textDecoration: "line-through" }}>
+                        ${plan.sixMonthPrice}/mo
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: GREEN, background: "rgba(39,174,96,0.1)", padding: "1px 8px", borderRadius: 100 }}>
+                        Save {savings}%
+                      </span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
+                    <span className="plan-price-num" style={{ fontSize: 48, fontWeight: 900, color: MIDNIGHT_NAVY, lineHeight: 1 }}>
+                      ${price}
+                    </span>
+                    <span style={{ fontSize: 14, color: STEEL, paddingBottom: 6 }}>/mo</span>
+                  </div>
+                  {setup > 0 && (
+                    <p style={{ fontSize: 12, color: SLATE, margin: "0 0 2px" }}>
+                      +${setup} setup
+                    </p>
+                  )}
+                  <p style={{ fontSize: 12, color: SLATE, margin: 0 }}>
+                    {sixMonth ? "Billed every 6 months" : "Billed annually"}
+                    <span style={{ color: STEEL }}> · ${perDay}/day</span>
+                  </p>
+                </div>
+
+                {/* Features */}
+                <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", display: "flex", flexDirection: "column", gap: 9, flexGrow: 1 }}>
+                  {plan.features.map(feat => {
+                    const isHeader = feat.endsWith(":");
+                    return (
+                      <li key={feat} style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+                        {!isHeader && (
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 3 }}>
+                            <path d="M3 8l3.5 3.5 6.5-7" stroke={plan.highlight ? SAPPHIRE : SAPPHIRE} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                        <span style={{
+                          fontSize: 13, lineHeight: 1.5,
+                          color: isHeader ? MIDNIGHT_NAVY : SLATE,
+                          fontWeight: isHeader ? 700 : 400,
+                          paddingLeft: isHeader ? 0 : 0,
+                        }}>
+                          {feat}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {/* CTA */}
+                <button
+                  onClick={() => setDemoOpen(true)}
+                  style={{
+                    display: "block", width: "100%", textAlign: "center", padding: "14px 16px",
+                    borderRadius: 11, fontWeight: 800, fontSize: 15, cursor: "pointer",
+                    background: plan.highlight ? GRAD_PRIMARY : WHITE,
+                    color: plan.highlight ? WHITE : SAPPHIRE,
+                    border: plan.highlight ? "none" : `1.5px solid ${CLOUD}`,
+                    boxShadow: plan.highlight ? "0 4px 20px rgba(40,96,176,0.28)" : "none",
+                    transition: "opacity 0.15s",
+                  }}
+                >
+                  {plan.cta} →
+                </button>
+                {plan.subBadge ? (
+                  <p style={{ textAlign: "center", fontSize: 12, color: SAPPHIRE, fontWeight: 600, marginTop: 8 }}>
+                    ★ {plan.subBadge}
+                  </p>
+                ) : (
+                  <p style={{ textAlign: "center", fontSize: 11, color: STEEL, marginTop: 8 }}>
+                    30-day money-back guarantee
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Total callout row ── */}
+        <div style={{
+          marginTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
+        }} className="cards-grid">
+          {PLANS.map(plan => {
+            const total  = sixMonth ? plan.sixMonthTotal : plan.annualTotal;
+            const perDay = sixMonth ? plan.sixMonthPerDay : plan.annualPerDay;
+            return (
+              <div key={plan.id} style={{
+                background: plan.highlight ? "rgba(40,96,176,0.05)" : FROST,
+                border: `1px solid ${plan.highlight ? "rgba(40,96,176,0.15)" : CLOUD}`,
+                borderRadius: 10, padding: "10px 16px",
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+              }}>
+                <span style={{ fontSize: 12, color: SLATE }}>
+                  {plan.name} — {sixMonth ? "6-month" : "annual"} total
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 900, color: plan.highlight ? SAPPHIRE : MIDNIGHT_NAVY }}>
+                  ${total.toLocaleString()}
+                  <span style={{ fontSize: 11, fontWeight: 500, color: STEEL }}> (${perDay}/day)</span>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Marketing & Growth Add-On ── */}
+        <div style={{
+          marginTop: 28,
+          background: WHITE, border: `1px solid ${CLOUD}`,
+          borderRadius: 16, overflow: "hidden",
+          boxShadow: "0 2px 12px rgba(13,20,40,0.05)",
+        }}>
+          {/* Header */}
+          <div style={{
+            background: `linear-gradient(135deg, rgba(13,20,40,0.96) 0%, rgba(28,72,138,0.96) 100%)`,
+            padding: "20px 28px",
+            display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12,
+          }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>
+                  Optional Add-On
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: WHITE }}>Marketing &amp; Growth Add-On</p>
+              <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>
+                Replace your marketing agency. One platform for ads, content, and automation.
+              </p>
+            </div>
+            <div style={{ textAlign: "right", flexShrink: 0 }}>
+              <p style={{ margin: 0, fontSize: 28, fontWeight: 900, color: WHITE }}>$999<span style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.6)" }}>/mo</span></p>
+              <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.5)" }}>No setup fee</p>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="addon-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "20px 28px", gap: 10 }}>
+            {[...ADDON_FEATURES_LEFT, ...ADDON_FEATURES_RIGHT].map(feat => (
+              <div key={feat} style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 3 }}>
+                  <path d="M3 8l3.5 3.5 6.5-7" stroke={SAPPHIRE} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span style={{ fontSize: 13, color: SLATE }}>{feat}</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{
+            padding: "14px 28px 18px",
+            borderTop: `1px solid ${CLOUD}`,
+            background: "rgba(40,96,176,0.03)",
+            display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12,
+          }}>
+            <p style={{ margin: 0, fontSize: 13, color: SAPPHIRE, fontWeight: 600 }}>
+              🚀 Pair with Pro to fully automate and scale your pipeline.
+            </p>
+            <Link href="/signup?addon=marketing" style={{
+              display: "inline-block", padding: "10px 20px", borderRadius: 9,
+              fontWeight: 700, fontSize: 13, textDecoration: "none",
+              background: SAPPHIRE_PALE, border: `1.5px solid rgba(40,96,176,0.25)`,
+              color: SAPPHIRE,
+            }}>
+              Add to Your Plan →
+            </Link>
+          </div>
+        </div>
+
+        {/* ── Trust row ── */}
+        <div style={{
+          marginTop: 28, display: "flex", flexWrap: "wrap",
+          gap: 0, background: WHITE, border: `1px solid ${CLOUD}`, borderRadius: 14, overflow: "hidden",
+        }}>
+          {[
+            { icon: "🛡️", label: "30-Day Money-Back",   sub: "Full refund, no questions asked" },
+            { icon: "❌", label: "Cancel Anytime",        sub: "No penalties, no lock-in" },
+            { icon: "🏥", label: "HIPAA & GDPR",          sub: "Compliant by design" },
+          ].map((t, i, arr) => (
+            <div key={t.label} style={{
+              flex: "1 1 180px", padding: "18px 20px", textAlign: "center",
+              borderRight: i < arr.length - 1 ? `1px solid ${CLOUD}` : "none",
+            }}>
+              <span style={{ fontSize: 22, display: "block", marginBottom: 6 }}>{t.icon}</span>
+              <p style={{ fontSize: 13, fontWeight: 800, color: MIDNIGHT_NAVY, margin: 0 }}>{t.label}</p>
+              <p style={{ fontSize: 11, color: STEEL, margin: 0 }}>{t.sub}</p>
             </div>
           ))}
         </div>
 
-        {/* ── Comparison: DESKTOP TABLE ── */}
-        <div className="compare-desktop comparison-outer" style={{
-          background: "#fff", border: `1px solid ${BORDER}`,
-          borderRadius: 16, overflow: "hidden", marginTop: 36,
+        {/* ── Feature comparison: DESKTOP ── */}
+        <div className="compare-desktop" style={{
+          background: WHITE, border: `1px solid ${CLOUD}`,
+          borderRadius: 16, overflow: "hidden", marginTop: 28,
         }}>
-          <div style={{ padding: "36px 36px 0", textAlign: "center" }}>
-            <h2 style={{ fontSize: "clamp(20px,4vw,28px)", fontWeight: 900, color: TEXT, marginBottom: 6 }}>
+          <div style={{ padding: "32px 36px 0", textAlign: "center" }}>
+            <h2 style={{ fontSize: 24, fontWeight: 900, color: MIDNIGHT_NAVY, marginBottom: 6, letterSpacing: "-0.02em" }}>
               The full picture
             </h2>
-            <p style={{ color: MUTED, fontSize: 14, marginBottom: 36, lineHeight: 1.6 }}>
-              Every feature, every plan. Features accumulate as you move right.
+            <p style={{ color: SLATE, fontSize: 14, marginBottom: 32 }}>
+              Every feature, both plans. Pro includes everything in Base.
             </p>
           </div>
-
-          <div style={{ overflowX: "auto", padding: "0 36px 36px", WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
-            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 480 }}>
+          <div style={{ overflowX: "auto", padding: "0 36px 36px" } as React.CSSProperties}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 440 }}>
               <thead>
                 <tr>
-                  <th style={{ width: "46%", padding: "0 0 20px", textAlign: "left" }} />
-                  {(["pro", "growth", "max"] as PlanId[]).map(pid => (
-                    <th key={pid} style={{ padding: "0 6px 20px", textAlign: "center", width: "18%" }}>
-                      <div style={{
-                        display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 5,
-                        background: PLAN_STYLE[pid].bg, border: `1.5px solid ${PLAN_STYLE[pid].border}`,
-                        borderRadius: 10, padding: "8px 14px",
-                      }}>
-                        <span style={{ color: PLAN_STYLE[pid].color }}><PlanIcon plan={pid} /></span>
-                        <span style={{ fontSize: 12, fontWeight: 900, color: PLAN_STYLE[pid].color }}>
-                          {pid === "pro" ? "Pro" : pid === "growth" ? "Growth" : "Max"}
-                        </span>
-                      </div>
-                    </th>
-                  ))}
+                  <th style={{ width: "56%", padding: "0 0 20px", textAlign: "left" }} />
+                  {(["base", "pro"] as PlanId[]).map(pid => {
+                    const plan = PLANS.find(p => p.id === pid)!;
+                    return (
+                      <th key={pid} style={{ padding: "0 8px 20px", textAlign: "center", width: "22%" }}>
+                        <div style={{
+                          display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 4,
+                          background: pid === "pro" ? "rgba(40,96,176,0.08)" : FROST,
+                          border: `1.5px solid ${pid === "pro" ? "rgba(40,96,176,0.25)" : CLOUD}`,
+                          borderRadius: 10, padding: "8px 18px",
+                        }}>
+                          <span style={{ color: SAPPHIRE }}>{pid === "pro" ? <StarIcon /> : <BoltIcon />}</span>
+                          <span style={{ fontSize: 12, fontWeight: 900, color: SAPPHIRE }}>{plan.name}</span>
+                        </div>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
                 {FLAT_ROWS.map((row, i) => (
-                  <tr key={i} style={{ borderTop: row.divider ? `2px solid ${BORDER}` : `1px solid ${BORDER}` }}>
-                    <td style={{ padding: "11px 0", fontSize: 13, color: TEXT, fontWeight: 500 }}>{row.feature}</td>
-                    {(["pro", "growth", "max"] as PlanId[]).map((pid, pi) => {
-                      const v = rowValue(row, pid, pi);
+                  <tr key={i} style={{ borderTop: row.divider ? `2px solid ${CLOUD}` : `1px solid ${CLOUD}` }}>
+                    <td style={{ padding: "11px 0", fontSize: 13, color: MIDNIGHT_NAVY, fontWeight: 500 }}>{row.feature}</td>
+                    {(["base", "pro"] as PlanId[]).map((pid, pi) => {
+                      const hasValues = !!row.values;
+                      const val = hasValues ? row.values![pi] : !!row[pid];
                       return (
-                        <td key={pid} style={{ padding: "11px 6px", textAlign: "center" }}>
-                          {v.type === "value"
-                            ? <span style={{ fontSize: 12, fontWeight: 800, color: PLAN_STYLE[pid].color }}>{v.val}</span>
-                            : v.val ? <Check /> : <Dash />
+                        <td key={pid} style={{ padding: "11px 8px", textAlign: "center" }}>
+                          {hasValues
+                            ? <span style={{ fontSize: 12, fontWeight: 800, color: SAPPHIRE }}>{val as string}</span>
+                            : val ? <CheckMark color={SAPPHIRE} /> : <DashMark />
                           }
                         </td>
                       );
@@ -406,105 +622,87 @@ export default function PricingPage() {
                 ))}
               </tbody>
             </table>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginTop: 28, paddingTop: 20, borderTop: `1px solid ${BORDER}` }}>
-              {(["pro", "growth", "max"] as PlanId[]).map(pid => (
-                <Link key={pid} href={`/signup?plan=${pid}`} style={{
-                  display: "block", textAlign: "center", padding: "12px 14px",
-                  borderRadius: 9, fontWeight: 800, fontSize: 13, textDecoration: "none",
-                  background: PLAN_STYLE[pid].bg, border: `1.5px solid ${PLAN_STYLE[pid].border}`,
-                  color: PLAN_STYLE[pid].color,
-                }}>
-                  Start {pid === "pro" ? "Pro" : pid === "growth" ? "Growth" : "Max"} →
-                </Link>
-              ))}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 24, paddingTop: 20, borderTop: `1px solid ${CLOUD}` }}>
+              {(["base", "pro"] as PlanId[]).map(pid => {
+                const plan = PLANS.find(p => p.id === pid)!;
+                return (
+                  <button key={pid} onClick={() => setDemoOpen(true)} style={{
+                    display: "block", width: "100%", textAlign: "center", padding: "13px 14px",
+                    borderRadius: 9, fontWeight: 800, fontSize: 14, cursor: "pointer",
+                    background: pid === "pro" ? GRAD_PRIMARY : SAPPHIRE_PALE,
+                    border: pid === "pro" ? "none" : `1.5px solid rgba(40,96,176,0.2)`,
+                    color: pid === "pro" ? WHITE : SAPPHIRE,
+                    boxShadow: pid === "pro" ? "0 4px 16px rgba(40,96,176,0.25)" : "none",
+                  }}>
+                    {plan.cta} →
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* ── Comparison: MOBILE STACKED CARDS ── */}
-        <div className="compare-mobile" style={{ marginTop: 16 }}>
-          <div style={{ textAlign: "center", marginBottom: 20 }}>
-            <p style={{ fontSize: 17, fontWeight: 900, color: TEXT, marginBottom: 4 }}>The full picture</p>
-            <p style={{ fontSize: 13, color: MUTED }}>Scroll through each plan to compare features.</p>
-          </div>
-
-          {(["pro", "growth", "max"] as PlanId[]).map((pid, pi) => {
+        {/* ── Feature comparison: MOBILE ── */}
+        <div className="compare-mobile" style={{ marginTop: 20 }}>
+          <p style={{ fontSize: 17, fontWeight: 900, color: MIDNIGHT_NAVY, textAlign: "center", marginBottom: 4 }}>The full picture</p>
+          <p style={{ fontSize: 13, color: SLATE, textAlign: "center", marginBottom: 16 }}>Scroll through each plan to compare.</p>
+          {(["base", "pro"] as PlanId[]).map((pid, pi) => {
             const plan = PLANS[pi];
-            const style = PLAN_STYLE[pid];
-            const price = annual ? plan.annualPrice : plan.monthlyPrice;
+            const price = sixMonth ? plan.sixMonthPrice : plan.annualPrice;
             return (
               <div key={pid} style={{
-                background: "#fff",
-                border: `2px solid ${style.border}`,
-                borderRadius: 14,
-                overflow: "hidden",
-                marginBottom: 12,
+                background: WHITE, border: `${pid === "pro" ? 2 : 1}px solid ${pid === "pro" ? SAPPHIRE : CLOUD}`,
+                borderRadius: 14, overflow: "hidden", marginBottom: 12,
+                boxShadow: pid === "pro" ? "0 4px 20px rgba(40,96,176,0.12)" : "none",
               }}>
-                {/* Plan header */}
                 <div style={{
-                  background: style.bg,
-                  borderBottom: `1px solid ${style.border}`,
+                  background: pid === "pro" ? "rgba(40,96,176,0.06)" : FROST,
+                  borderBottom: `1px solid ${CLOUD}`,
                   padding: "14px 16px",
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{
-                      width: 30, height: 30, borderRadius: 8,
-                      background: style.color, color: "#fff",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}>
-                      <PlanIcon plan={pid} />
+                    <div style={{ width: 30, height: 30, borderRadius: 8, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", color: WHITE }}>
+                      {pid === "pro" ? <StarIcon /> : <BoltIcon />}
                     </div>
-                    <div>
-                      <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: style.color, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                        {plan.tagline}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: TEXT }}>{plan.name}</p>
-                    </div>
+                    <p style={{ margin: 0, fontSize: 16, fontWeight: 900, color: MIDNIGHT_NAVY }}>{plan.name}</p>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <p style={{ margin: 0, fontSize: 22, fontWeight: 900, color: style.color }}>${price}<span style={{ fontSize: 12, color: MUTED, fontWeight: 500 }}>/mo</span></p>
-                    {annual && <p style={{ margin: 0, fontSize: 10, color: GREEN, fontWeight: 700 }}>Save ${plan.monthlyPrice - plan.annualPrice}/mo</p>}
-                  </div>
+                  <p style={{ margin: 0, fontSize: 20, fontWeight: 900, color: SAPPHIRE }}>${price}<span style={{ fontSize: 12, color: STEEL, fontWeight: 500 }}>/mo</span></p>
                 </div>
-
-                {/* Feature rows */}
-                <div style={{ padding: "6px 0 4px" }}>
+                <div style={{ padding: "4px 0" }}>
                   {FLAT_ROWS.map((row, ri) => {
-                    const v = rowValue(row, pid, pi);
-                    const included = v.type === "value" || v.val;
+                    const hasValues = !!row.values;
+                    const val = hasValues ? row.values![pi] : !!row[pid];
+                    const included = hasValues || !!val;
                     return (
                       <div key={ri} style={{
                         display: "flex", alignItems: "center", justifyContent: "space-between",
-                        padding: "8px 16px",
-                        borderTop: ri > 0 && row.divider ? `2px solid ${BORDER}` : ri > 0 ? `1px solid #f0ede8` : undefined,
-                        opacity: included ? 1 : 0.45,
+                        padding: "9px 16px",
+                        borderTop: ri > 0 && row.divider ? `2px solid ${CLOUD}` : ri > 0 ? `1px solid ${FROST}` : undefined,
+                        opacity: included ? 1 : 0.4,
                       }}>
-                        <span style={{ fontSize: 13, color: TEXT, fontWeight: 500 }}>{row.feature}</span>
-                        <span style={{ flexShrink: 0, marginLeft: 12 }}>
-                          {v.type === "value"
-                            ? <span style={{ fontSize: 12, fontWeight: 800, color: style.color }}>{v.val}</span>
-                            : v.val ? <Check /> : <Dash />
+                        <span style={{ fontSize: 13, color: MIDNIGHT_NAVY }}>{row.feature}</span>
+                        <span style={{ marginLeft: 12, flexShrink: 0 }}>
+                          {hasValues
+                            ? <span style={{ fontSize: 12, fontWeight: 800, color: SAPPHIRE }}>{val as string}</span>
+                            : val ? <CheckMark color={SAPPHIRE} /> : <DashMark />
                           }
                         </span>
                       </div>
                     );
                   })}
                 </div>
-
-                {/* CTA */}
                 <div style={{ padding: "12px 16px" }}>
-                  <Link href={`/signup?plan=${pid}`} style={{
-                    display: "block", textAlign: "center", padding: "13px",
-                    borderRadius: 9, fontWeight: 800, fontSize: 14, textDecoration: "none",
-                    background: pid === "growth" ? "linear-gradient(135deg,#D35400,#e8641c)" : style.bg,
-                    color: pid === "growth" ? "#fff" : style.color,
-                    border: pid === "growth" ? "none" : `1.5px solid ${style.border}`,
-                    boxShadow: pid === "growth" ? "0 3px 14px rgba(211,84,0,0.22)" : "none",
+                  <button onClick={() => setDemoOpen(true)} style={{
+                    display: "block", width: "100%", textAlign: "center", padding: "13px",
+                    borderRadius: 9, fontWeight: 800, fontSize: 14, cursor: "pointer",
+                    background: pid === "pro" ? GRAD_PRIMARY : SAPPHIRE_PALE,
+                    color: pid === "pro" ? WHITE : SAPPHIRE,
+                    border: pid === "pro" ? "none" : `1.5px solid rgba(40,96,176,0.2)`,
+                    boxShadow: pid === "pro" ? "0 3px 14px rgba(40,96,176,0.25)" : "none",
                   }}>
-                    Start {plan.name} — Free →
-                  </Link>
+                    {plan.cta} →
+                  </button>
                 </div>
               </div>
             );
@@ -513,71 +711,89 @@ export default function PricingPage() {
 
         {/* ── Enterprise callout ── */}
         <div className="enterprise-block" style={{
-          background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14,
-          padding: "24px 28px", margin: "28px 0 0",
+          background: WHITE, border: `1px solid ${CLOUD}`, borderRadius: 14,
+          padding: "24px 28px", marginTop: 20,
           display: "flex", alignItems: "center", justifyContent: "space-between",
           flexWrap: "wrap", gap: 16,
         }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 5 }}>Enterprise</p>
-            <h3 style={{ fontSize: 18, fontWeight: 900, color: TEXT, marginBottom: 5 }}>Need something bigger?</h3>
-            <p style={{ fontSize: 13, color: MUTED, lineHeight: 1.6, maxWidth: 480 }}>
-              We work with enterprise systems, multi-location operators, and custom integrations.
-              Custom pricing available — let&apos;s build something that fits.
+            <p style={{ fontSize: 10, fontWeight: 700, color: STEEL, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>Enterprise</p>
+            <h3 style={{ fontSize: 18, fontWeight: 900, color: MIDNIGHT_NAVY, marginBottom: 5 }}>Multi-location or custom needs?</h3>
+            <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, maxWidth: 480 }}>
+              We work with multi-location practices, health systems, and DSOs that need custom integrations, white-label infrastructure, and dedicated support. Custom pricing available.
             </p>
           </div>
           <a href="mailto:hello@clozeflow.com" style={{
             display: "inline-block", padding: "12px 24px", borderRadius: 10,
             fontWeight: 700, fontSize: 14, textDecoration: "none",
-            background: TEXT, color: "#fff", whiteSpace: "nowrap", flexShrink: 0,
+            background: GRAD_DARK, color: WHITE, whiteSpace: "nowrap", flexShrink: 0,
+            boxShadow: "0 3px 12px rgba(13,20,40,0.2)",
           }}>
             Contact us →
           </a>
         </div>
 
-        {/* ── Guarantee ── */}
-        <div className="guarantee-block" style={{
-          background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14,
-          padding: "28px 24px", maxWidth: 540, margin: "28px auto 0", textAlign: "center",
+        {/* ── 30-Day Guarantee (prominent) ── */}
+        <div style={{
+          marginTop: 20,
+          background: `linear-gradient(135deg, rgba(39,174,96,0.04) 0%, rgba(39,174,96,0.08) 100%)`,
+          border: `1.5px solid rgba(39,174,96,0.25)`,
+          borderRadius: 16, padding: "28px 32px",
+          display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
         }}>
           <div style={{
-            width: 44, height: 44, borderRadius: "50%",
-            background: "rgba(39,174,96,0.08)", border: "1px solid rgba(39,174,96,0.2)",
-            display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px",
+            width: 52, height: 52, borderRadius: "50%", flexShrink: 0,
+            background: "rgba(39,174,96,0.1)", border: "1.5px solid rgba(39,174,96,0.25)",
+            display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <ShieldIcon />
+            <ShieldCheck />
           </div>
-          <h3 style={{ fontWeight: 800, fontSize: 18, color: TEXT, marginBottom: 8 }}>30-Day Money-Back Guarantee</h3>
-          <p style={{ fontSize: 13, color: MUTED, lineHeight: 1.65 }}>
-            If ClozeFlow doesn&apos;t book you at least one qualified appointment in 30 days,
-            we&apos;ll refund every penny — no questions asked.
-          </p>
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <p style={{ margin: 0, fontSize: 17, fontWeight: 900, color: MIDNIGHT_NAVY }}>
+              30-Day Money-Back Guarantee
+            </p>
+            <p style={{ margin: 0, fontSize: 14, color: SLATE, lineHeight: 1.6, marginTop: 4 }}>
+              If ClozeFlow doesn&apos;t book you at least one qualified patient appointment in your first 30 days, we&apos;ll refund every penny — no questions asked. Zero risk.
+            </p>
+          </div>
+          <div style={{ textAlign: "center", flexShrink: 0 }}>
+            <p style={{ margin: 0, fontSize: 32, fontWeight: 900, color: GREEN }}>30</p>
+            <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: GREEN }}>DAY GUARANTEE</p>
+          </div>
         </div>
       </section>
 
       {/* ── FAQ ── */}
-      <section className="faq-section" style={{ background: "#fff", borderTop: `1px solid ${BORDER}`, padding: "72px 24px" }}>
-        <div style={{ maxWidth: 660, margin: "0 auto" }}>
-          <h2 style={{ fontSize: "clamp(22px,4vw,30px)", fontWeight: 900, color: TEXT, textAlign: "center", marginBottom: 40, letterSpacing: "-0.02em" }}>
-            Common questions about pricing
+      <section className="faq-section" style={{ background: WHITE, borderTop: `1px solid ${CLOUD}`, padding: "72px 24px" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: SAPPHIRE, textAlign: "center", marginBottom: 10 }}>
+            Common Questions
+          </p>
+          <h2 style={{ fontSize: "clamp(22px,4vw,30px)", fontWeight: 900, color: MIDNIGHT_NAVY, textAlign: "center", marginBottom: 36, letterSpacing: "-0.02em" }}>
+            Everything about pricing
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {FAQS.map((faq, i) => (
-              <div key={i} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
+              <div key={i} style={{ background: FROST, border: `1px solid ${CLOUD}`, borderRadius: 12, overflow: "hidden" }}>
                 <button
+                  className="faq-btn"
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   style={{
                     width: "100%", display: "flex", alignItems: "center",
                     justifyContent: "space-between", gap: 14,
-                    padding: "16px 18px", background: "none", border: "none",
-                    cursor: "pointer", textAlign: "left",
+                    padding: "16px 20px", background: "none", border: "none",
+                    cursor: "pointer", textAlign: "left", borderRadius: 12,
+                    transition: "background 0.15s",
                   }}
                 >
-                  <span className="faq-q" style={{ fontWeight: 600, fontSize: 14, color: TEXT, lineHeight: 1.4 }}>{faq.q}</span>
-                  <span style={{ fontSize: 20, color: MUTED, flexShrink: 0, lineHeight: 1 }}>{openFaq === i ? "−" : "+"}</span>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: MIDNIGHT_NAVY, lineHeight: 1.4 }}>{faq.q}</span>
+                  <span style={{
+                    fontSize: 18, color: SAPPHIRE, flexShrink: 0, lineHeight: 1,
+                    fontWeight: 700,
+                  }}>{openFaq === i ? "−" : "+"}</span>
                 </button>
                 {openFaq === i && (
-                  <div style={{ padding: "12px 18px 16px", fontSize: 13, color: MUTED, lineHeight: 1.65, borderTop: `1px solid ${BORDER}` }}>
+                  <div style={{ padding: "4px 20px 18px", fontSize: 14, color: SLATE, lineHeight: 1.7, borderTop: `1px solid ${CLOUD}`, marginTop: 0 }}>
                     {faq.a}
                   </div>
                 )}
@@ -588,22 +804,48 @@ export default function PricingPage() {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="bottom-cta-sect" style={{ padding: "64px 24px", textAlign: "center" }}>
-        <div style={{ maxWidth: 480, margin: "0 auto" }}>
-          <h2 style={{ fontSize: "clamp(20px,4vw,26px)", fontWeight: 900, color: TEXT, marginBottom: 10, letterSpacing: "-0.02em" }}>
-            Still not sure? Try it free — no card needed.
-          </h2>
-          <p style={{ fontSize: 14, color: MUTED, marginBottom: 24, lineHeight: 1.6 }}>
-            Create your account and explore everything ClozeFlow can do before you spend a dollar.
+      <section className="bottom-cta" style={{ background: GRAD_DARK, padding: "72px 24px", textAlign: "center" }}>
+        <div style={{ maxWidth: 520, margin: "0 auto" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: 14 }}>
+            Start Today
           </p>
-          <Link href="/signup" style={{
-            background: "linear-gradient(135deg,#D35400,#e8641c)",
-            color: "#fff", fontWeight: 800, fontSize: 15,
-            padding: "14px 28px", borderRadius: 10, textDecoration: "none",
-            display: "inline-block", boxShadow: "0 4px 18px rgba(211,84,0,0.25)",
+          <h2 style={{
+            fontSize: "clamp(22px,4vw,34px)", fontWeight: 900, color: WHITE,
+            marginBottom: 12, letterSpacing: "-0.02em", fontFamily: FONT_DISPLAY,
           }}>
-            Create Free Account →
-          </Link>
+            Ready to stop losing patient inquiries?
+          </h2>
+          <p style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", marginBottom: 32, lineHeight: 1.65 }}>
+            Book a free 15-minute demo. No credit card. No commitment.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
+            <button
+              onClick={() => setDemoOpen(true)}
+              style={{
+                background: GRAD_PRIMARY, color: WHITE,
+                fontWeight: 800, fontSize: 15, cursor: "pointer",
+                padding: "15px 30px", borderRadius: 10, border: "none",
+                boxShadow: "0 4px 20px rgba(40,96,176,0.45)",
+              }}
+            >
+              Book My Free Demo →
+            </button>
+            <Link href="/how-it-works" style={{
+              background: "rgba(255,255,255,0.1)", color: WHITE,
+              fontWeight: 600, fontSize: 15,
+              padding: "15px 24px", borderRadius: 10, textDecoration: "none",
+              border: "1px solid rgba(255,255,255,0.2)",
+            }}>
+              See How It Works
+            </Link>
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "8px 24px", marginTop: 20 }}>
+            {["No credit card required", "30-day money-back guarantee", "Cancel anytime"].map(t => (
+              <span key={t} style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>
+                ✓ {t}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
     </div>
