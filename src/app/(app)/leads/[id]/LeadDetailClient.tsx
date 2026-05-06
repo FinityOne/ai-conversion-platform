@@ -254,51 +254,107 @@ function EmailPanel({
   );
 }
 
-// ─── Email activity log ───────────────────────────────────────────────────────
+// ─── Email engagement log ─────────────────────────────────────────────────────
 
 function EmailLog({ logs }: { logs: EmailLogEntry[] }) {
   if (logs.length === 0) {
     return (
-      <div style={{ padding: "18px", textAlign: "center", color: MUTED, fontSize: 13 }}>
+      <div style={{ padding: "24px 18px", textAlign: "center", color: MUTED, fontSize: 13 }}>
         <i className="fa-solid fa-inbox" style={{ fontSize: 22, marginBottom: 6, display: "block", color: "#d4cfc9" }} />
         No emails sent yet.
       </div>
     );
   }
 
-  const SC: Record<string, { label: string; color: string; bg: string }> = {
-    sent:    { label: "Sent",    color: "#2563eb", bg: "#eff6ff" },
-    opened:  { label: "Opened", color: "#d97706", bg: "#fffbeb" },
-    clicked: { label: "Clicked",color: "#27AE60", bg: "#f0fdf4" },
-    failed:  { label: "Failed", color: "#dc2626", bg: "#fef2f2" },
+  const openedCount  = logs.filter(l => l.opened_at).length;
+  const clickedCount = logs.filter(l => l.clicked_at).length;
+
+  const SC: Record<string, { label: string; color: string; bg: string; border: string }> = {
+    sent:       { label: "Sent",      color: "#2563eb", bg: "#eff6ff",  border: "#bfdbfe" },
+    delivered:  { label: "Delivered", color: "#0891b2", bg: "#ecfeff",  border: "#a5f3fc" },
+    opened:     { label: "Opened",    color: "#d97706", bg: "#fffbeb",  border: "#fde68a" },
+    clicked:    { label: "Clicked",   color: "#27AE60", bg: "#f0fdf4",  border: "#bbf7d0" },
+    bounced:    { label: "Bounced",   color: "#dc2626", bg: "#fef2f2",  border: "#fecaca" },
+    complained: { label: "Flagged",   color: "#7c3aed", bg: "#f5f3ff",  border: "#ddd6fe" },
+    failed:     { label: "Failed",    color: "#dc2626", bg: "#fef2f2",  border: "#fecaca" },
   };
 
-  function fmt(iso: string) {
-    return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  function fmtDateTime(iso: string) {
+    return new Date(iso).toLocaleDateString("en-US", {
+      month: "short", day: "numeric", year: "numeric",
+      hour: "numeric", minute: "2-digit",
+    });
   }
 
   return (
     <div>
+      {/* Engagement summary */}
+      <div style={{ display: "flex", gap: 8, paddingBottom: 14, borderBottom: `1px solid ${BORDER}`, marginBottom: 4 }}>
+        <div style={{ flex: 1, textAlign: "center", padding: "8px 4px", borderRadius: 8, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#2563eb", lineHeight: 1 }}>{logs.length}</div>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "#3b82f6", textTransform: "uppercase", letterSpacing: "0.5px", marginTop: 3 }}>Sent</div>
+        </div>
+        <div style={{ flex: 1, textAlign: "center", padding: "8px 4px", borderRadius: 8, background: openedCount > 0 ? "#fffbeb" : BG, border: `1px solid ${openedCount > 0 ? "#fde68a" : BORDER}` }}>
+          <div style={{ fontSize: 20, fontWeight: 900, color: openedCount > 0 ? "#d97706" : "#c4bfb8", lineHeight: 1 }}>{openedCount}</div>
+          <div style={{ fontSize: 10, fontWeight: 700, color: openedCount > 0 ? "#d97706" : MUTED, textTransform: "uppercase", letterSpacing: "0.5px", marginTop: 3 }}>Opened</div>
+        </div>
+        <div style={{ flex: 1, textAlign: "center", padding: "8px 4px", borderRadius: 8, background: clickedCount > 0 ? "#f0fdf4" : BG, border: `1px solid ${clickedCount > 0 ? "#bbf7d0" : BORDER}` }}>
+          <div style={{ fontSize: 20, fontWeight: 900, color: clickedCount > 0 ? "#27AE60" : "#c4bfb8", lineHeight: 1 }}>{clickedCount}</div>
+          <div style={{ fontSize: 10, fontWeight: 700, color: clickedCount > 0 ? "#27AE60" : MUTED, textTransform: "uppercase", letterSpacing: "0.5px", marginTop: 3 }}>Clicked</div>
+        </div>
+      </div>
+
+      {/* Per-email rows */}
       {logs.map((log, i) => {
-        const sc = SC[log.email_status] ?? SC.sent;
+        const sc       = SC[log.email_status] ?? SC.sent;
+        const hasOpen  = !!log.opened_at;
+        const hasClick = !!log.clicked_at;
+
         return (
           <div key={log.id} style={{
-            display: "flex", alignItems: "center", gap: 10,
-            padding: "9px 0",
+            padding: "12px 0",
             borderBottom: i < logs.length - 1 ? `1px solid ${BORDER}` : "none",
           }}>
-            <i className="fa-solid fa-envelope" style={{ fontSize: 11, color: "#a8a29e", flexShrink: 0 }} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {log.subject ?? "Email"}
-              </p>
-              <p style={{ margin: 0, fontSize: 11, color: MUTED }}>{fmt(log.created_at)}</p>
+            {/* Subject row */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 7, flexShrink: 0, marginTop: 1,
+                background: sc.bg, border: `1px solid ${sc.border}`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <i className="fa-solid fa-envelope" style={{ fontSize: 11, color: sc.color }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {log.subject ?? "Email"}
+                  </span>
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 20, background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`, flexShrink: 0 }}>
+                    {sc.label}
+                  </span>
+                </div>
+                <span style={{ fontSize: 11, color: "#b0a89e" }}>Sent {fmtDateTime(log.created_at)}</span>
+              </div>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: sc.bg, color: sc.color, flexShrink: 0 }}>
-              {sc.label}
-            </span>
-            {log.opened_at && (
-              <i className="fa-solid fa-eye" style={{ fontSize: 11, color: "#27AE60", flexShrink: 0 }} title={`Opened ${fmt(log.opened_at)}`} />
+
+            {/* Open / click timestamps */}
+            {(hasOpen || hasClick) && (
+              <div style={{ marginTop: 8, marginLeft: 38, display: "flex", flexDirection: "column", gap: 5 }}>
+                {hasOpen && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 10px", borderRadius: 7, background: "#fffbeb", border: "1px solid #fde68a" }}>
+                    <i className="fa-solid fa-eye" style={{ fontSize: 11, color: "#d97706", flexShrink: 0 }} />
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#92400e" }}>Opened</span>
+                    <span style={{ fontSize: 11, color: "#b45309", marginLeft: "auto" }}>{fmtDateTime(log.opened_at!)}</span>
+                  </div>
+                )}
+                {hasClick && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "5px 10px", borderRadius: 7, background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
+                    <i className="fa-solid fa-arrow-pointer" style={{ fontSize: 11, color: "#27AE60", flexShrink: 0 }} />
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#166534" }}>Clicked a link</span>
+                    <span style={{ fontSize: 11, color: "#16a34a", marginLeft: "auto" }}>{fmtDateTime(log.clicked_at!)}</span>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         );
