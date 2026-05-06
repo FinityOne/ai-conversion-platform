@@ -36,7 +36,7 @@ const MOBILE_NAV = [
   { href: "/profile",   label: "Account",   fa: "fa-solid fa-user"                 },
 ];
 
-const SIDEBAR_W = 224;
+const SIDEBAR_W = 248;
 const TOPBAR_H  = 56;
 const LOCBAR_H  = 34;
 
