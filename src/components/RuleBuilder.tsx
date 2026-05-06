@@ -28,8 +28,6 @@ const STATUS_OPTIONS = [
   { value: "follow_up_sent",    label: "🔄 Follow-Up Sent" },
   { value: "project_submitted", label: "📋 Details Submitted" },
   { value: "booked",            label: "📅 Booked" },
-  { value: "closed_won",        label: "✅ Closed Won" },
-  { value: "closed_lost",       label: "❌ Closed Lost" },
 ];
 
 const SOURCE_OPTIONS = [

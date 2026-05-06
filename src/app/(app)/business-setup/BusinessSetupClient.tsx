@@ -21,7 +21,6 @@ interface UserProfile {
   business_zip: string | null;
   business_tagline: string | null;
   business_description: string | null;
-  business_license: string | null;
   business_instagram: string | null;
   business_facebook: string | null;
   business_google_profile: string | null;
@@ -233,7 +232,6 @@ function BrandTab({ profile, onChange }: { profile: UserProfile; onChange: (p: P
   // ── About group
   const [industry,    setIndustry] = useState(profile.business_industry ?? "");
   const [description, setDesc]     = useState(profile.business_description ?? "");
-  const [license,     setLicense]  = useState(profile.business_license ?? "");
   const [years,       setYears]    = useState(profile.years_in_business?.toString() ?? "");
   const [aboutSave,   setAboutSave] = useState<SaveState>("idle");
   const selectedGroup = INDUSTRY_GROUPS.find(g => g.items.includes(industry));
@@ -246,7 +244,6 @@ function BrandTab({ profile, onChange }: { profile: UserProfile; onChange: (p: P
         body: JSON.stringify({
           business_industry: industry || null,
           business_description: description || null,
-          business_license: license || null,
           years_in_business: years ? parseInt(years) : null,
         }),
       });
@@ -356,14 +353,9 @@ function BrandTab({ profile, onChange }: { profile: UserProfile; onChange: (p: P
             />
           </Field>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <Field label="Years in Business">
-              <input style={INP} type="number" min="0" max="200" value={years} onChange={e => setYears(e.target.value)} placeholder="e.g. 12" />
-            </Field>
-            <Field label="Contractor / License #">
-              <input style={INP} value={license} onChange={e => setLicense(e.target.value)} placeholder="e.g. LIC-123456" />
-            </Field>
-          </div>
+          <Field label="Years in Business">
+            <input style={INP} type="number" min="0" max="200" value={years} onChange={e => setYears(e.target.value)} placeholder="e.g. 12" />
+          </Field>
         </div>
       </GroupCard>
 

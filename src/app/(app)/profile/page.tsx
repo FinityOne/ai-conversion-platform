@@ -15,7 +15,7 @@ export default async function ProfilePage() {
       "id, email, first_name, last_name, phone, business_name, role, created_at, " +
       "avatar_url, business_logo_url, business_website, business_email, business_phone, " +
       "business_address, business_city, business_state, business_zip, " +
-      "business_tagline, business_description, business_license, " +
+      "business_tagline, business_description, " +
       "business_instagram, business_facebook, business_google_profile, " +
       "years_in_business, service_area, timezone"
     )

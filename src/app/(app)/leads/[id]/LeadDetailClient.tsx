@@ -77,31 +77,15 @@ const EMAIL_SEQUENCE: EmailDef[] = [
 const CHIRO_STAGES: LeadStatus[] = ["new", "contacted", "follow_up_sent", "replied", "booked"];
 
 const SHORT: Record<LeadStatus, string> = {
-  new:               "New",
-  contacted:         "Contacted",
-  replied:           "Replied",
+  new:               "New Inquiry",
+  contacted:         "Awaiting",
+  replied:           "Qualified",
   follow_up_sent:    "Follow-Up",
-  project_submitted: "Details",
-  booked:            "Booked",
-  closed_won:        "Won",
-  closed_lost:       "Lost",
+  project_submitted: "Intake",
+  booked:            "Scheduled",
 };
 
 function PipelineStrip({ status }: { status: string }) {
-  const isWon  = status === "closed_won";
-  const isLost = status === "closed_lost";
-  const cfg    = getStageConfig(status as LeadStatus);
-
-  if (isWon || isLost) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 10, background: cfg.bg, border: `1px solid ${cfg.border}` }}>
-        <span style={{ fontSize: 18 }}>{cfg.emoji}</span>
-        <span style={{ fontSize: 14, fontWeight: 700, color: cfg.color }}>{cfg.label}</span>
-        <span style={{ fontSize: 12, color: MUTED }}>— {cfg.description}</span>
-      </div>
-    );
-  }
-
   const currentIdx = CHIRO_STAGES.indexOf(status as LeadStatus);
 
   return (
@@ -370,7 +354,18 @@ export default function LeadDetailClient({
   const sBorder = scoreBorderColor(lead.score);
 
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  }
+
+  function leadAge(iso: string): string {
+    const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+    if (days === 0) return "Today";
+    if (days === 1) return "Yesterday";
+    if (days < 7)  return `${days} days ago`;
+    if (days < 14) return "1 week ago";
+    if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+    if (days < 60) return "1 month ago";
+    return `${Math.floor(days / 30)} months ago`;
   }
 
   return (
@@ -398,10 +393,6 @@ export default function LeadDetailClient({
                 </p>
               </div>
             </div>
-            <span style={{ fontSize: 12, color: "#c4bfb8" }}>
-              <i className="fa-regular fa-calendar" style={{ marginRight: 4 }} />
-              {formatDate(lead.created_at)}
-            </span>
           </div>
 
           {/* Status + source row */}
@@ -419,6 +410,38 @@ export default function LeadDetailClient({
         </div>
 
         <EditLeadModal lead={lead} />
+      </div>
+
+      {/* ── Lead Started banner ── */}
+      <div style={{
+        background: WHITE, border: `1px solid ${BORDER}`, borderRadius: 12,
+        padding: "14px 18px", marginBottom: 10,
+        display: "flex", alignItems: "center", gap: 14,
+      }}>
+        <div style={{
+          width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+          background: "rgba(211,84,0,0.07)", border: "1.5px solid rgba(211,84,0,0.18)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <i className="fa-solid fa-calendar-day" style={{ fontSize: 17, color: ORANGE }} />
+        </div>
+        <div>
+          <p style={{ margin: "0 0 2px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.7px" }}>
+            Lead Started
+          </p>
+          <p style={{ margin: 0, fontSize: 17, fontWeight: 900, color: TEXT, lineHeight: 1.2 }}>
+            {formatDate(lead.created_at)}
+          </p>
+        </div>
+        <span style={{
+          marginLeft: "auto", flexShrink: 0,
+          fontSize: 13, fontWeight: 800,
+          padding: "5px 14px", borderRadius: 20,
+          background: "rgba(211,84,0,0.07)", border: "1.5px solid rgba(211,84,0,0.18)",
+          color: ORANGE,
+        }}>
+          {leadAge(lead.created_at)}
+        </span>
       </div>
 
       {/* ── Pipeline strip ── */}
@@ -524,10 +547,8 @@ function StatusActions({ lead }: { lead: Lead }) {
   const router = useRouter();
   const [updating, setUpdating] = useState(false);
 
-  const canMarkReplied = !["replied", "booked", "closed_won", "closed_lost"].includes(lead.status);
-  const canMarkBooked  = !["booked", "closed_won", "closed_lost"].includes(lead.status);
-  const canMarkWon     = lead.status !== "closed_won" && lead.status !== "closed_lost";
-  const canMarkLost    = lead.status !== "closed_lost";
+  const canMarkReplied = !["replied", "booked"].includes(lead.status);
+  const canMarkBooked  = lead.status !== "booked";
 
   async function updateStatus(status: string) {
     setUpdating(true);
@@ -552,7 +573,7 @@ function StatusActions({ lead }: { lead: Lead }) {
             disabled={updating}
             style={actionBtnStyle("#0891b2", "rgba(8,145,178,0.08)", "rgba(8,145,178,0.25)")}
           >
-            <i className="fa-solid fa-reply" /> They replied / engaged
+            <i className="fa-solid fa-reply" /> Mark as Qualified · Ready to Book
           </button>
         )}
         {canMarkBooked && (
@@ -561,25 +582,7 @@ function StatusActions({ lead }: { lead: Lead }) {
             disabled={updating}
             style={actionBtnStyle("#7c3aed", "rgba(124,58,237,0.08)", "rgba(124,58,237,0.25)")}
           >
-            <i className="fa-solid fa-calendar-check" /> Mark as Booked
-          </button>
-        )}
-        {canMarkWon && (
-          <button
-            onClick={() => updateStatus("closed_won")}
-            disabled={updating}
-            style={actionBtnStyle("#27AE60", "rgba(39,174,96,0.08)", "rgba(39,174,96,0.25)")}
-          >
-            <i className="fa-solid fa-trophy" /> Closed Won
-          </button>
-        )}
-        {canMarkLost && (
-          <button
-            onClick={() => updateStatus("closed_lost")}
-            disabled={updating}
-            style={actionBtnStyle("#ef4444", "rgba(239,68,68,0.06)", "rgba(239,68,68,0.2)")}
-          >
-            <i className="fa-solid fa-xmark" /> Closed Lost
+            <i className="fa-solid fa-calendar-check" /> Schedule Appointment
           </button>
         )}
       </div>

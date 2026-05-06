@@ -29,11 +29,9 @@ export interface PulseData {
   cold:      PulseLead[];   // score < 30 OR inactive 7-30 days, not terminal
   dormant:   PulseLead[];   // inactive > 30 days, not terminal
   booked:    PulseLead[];   // status = booked
-  won:       PulseLead[];   // status = closed_won
   totalLeads:      number;
   avgScore:        number;
   totalBooked:     number;
-  totalWon:        number;
   newToday:        number;
   emailsSentTotal: number;
 }
@@ -68,8 +66,6 @@ export default async function PulsePage() {
   // Confirmed booking lead IDs
   const bookedLeadIds = new Set((bookingsRes.data ?? []).map((b: { lead_id: string }) => b.lead_id));
 
-  const terminal = new Set(["closed_won", "closed_lost"]);
-
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
@@ -78,7 +74,6 @@ export default async function PulsePage() {
   const cold:    PulseLead[] = [];
   const dormant: PulseLead[] = [];
   const booked:  PulseLead[] = [];
-  const won:     PulseLead[] = [];
 
   let scoreSum = 0;
   let newToday = 0;
@@ -102,9 +97,7 @@ export default async function PulsePage() {
       emailsSent:        emailCounts[lead.id] ?? 0,
     };
 
-    if (lead.status === "closed_won") { won.push(pl); continue; }
-    if (lead.status === "booked")     { booked.push(pl); continue; }
-    if (terminal.has(lead.status))    { continue; }
+    if (lead.status === "booked") { booked.push(pl); continue; }
 
     if (pl.daysSinceActivity > 30) {
       dormant.push(pl);
@@ -118,11 +111,10 @@ export default async function PulsePage() {
   }
 
   const data: PulseData = {
-    hot, warm, cold, dormant, booked, won,
+    hot, warm, cold, dormant, booked,
     totalLeads:      rawLeads.length,
     avgScore:        rawLeads.length ? Math.round(scoreSum / rawLeads.length) : 0,
     totalBooked:     booked.length,
-    totalWon:        won.length,
     newToday,
     emailsSentTotal: Object.values(emailCounts).reduce((a, b) => a + b, 0),
   };

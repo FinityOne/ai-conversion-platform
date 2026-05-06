@@ -38,6 +38,7 @@ const MOBILE_NAV = [
 
 const SIDEBAR_W = 224;
 const TOPBAR_H  = 56;
+const LOCBAR_H  = 34;
 
 // ─── Brand tokens ─────────────────────────────────────────────────────────────
 const SIDEBAR_BG    = "#FFFFFF";  // White sidebar — easy to read
@@ -259,7 +260,10 @@ export default function AppShell({
         .app-topbar { position:fixed; top:0; left:0; right:0; z-index:45; height:${TOPBAR_H}px; background:rgba(255,255,255,0.94); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid ${CLOUD}; display:flex; align-items:center; padding:0 20px; gap:8px; }
         @media(min-width:768px){ .app-topbar{ left:${SIDEBAR_W}px; } }
 
-        .app-main { margin-left:0; padding-top:${TOPBAR_H}px; padding-bottom:80px; }
+        .app-locbar { position:fixed; top:${TOPBAR_H}px; left:0; right:0; z-index:44; height:${LOCBAR_H}px; display:flex; align-items:center; padding:0 16px; gap:10px; background:linear-gradient(135deg,#2d1a6e 0%,#5e3ba8 100%); }
+        @media(min-width:768px){ .app-locbar{ left:${SIDEBAR_W}px; } }
+
+        .app-main { margin-left:0; padding-bottom:80px; }
         @media(min-width:768px){ .app-main{ margin-left:${SIDEBAR_W}px; padding-bottom:0; } }
 
         .app-nav-scroll { flex:1; min-height:0; overflow-y:auto; }
@@ -288,7 +292,7 @@ export default function AppShell({
           <Link href="/" style={{ textDecoration: "none", display: "block" }}>
             <div style={{ position: "relative", width: 136, height: 34 }}>
               <Image
-                src="/logo/ClozeFlow - Horizontal Logo.png"
+                src="/logo/ClozeFlow Logo - Transparent.png"
                 alt="ClozeFlow"
                 fill
                 style={{ objectFit: "contain", objectPosition: "left" }}
@@ -306,6 +310,7 @@ export default function AppShell({
           <div style={{ padding: "8px 6px 12px" }}>
             <div style={{ padding: "6px 0 2px" }}>
               <NavItem href="/dashboard" label="Dashboard" fa="fa-solid fa-gauge-high" active={is("/dashboard")} />
+              <NavItem href="/pulse"     label="Pulse"     fa="fa-solid fa-heart-pulse" active={is("/pulse")} />
             </div>
 
             <NavDivider />
@@ -323,7 +328,6 @@ export default function AppShell({
             <NavItem href="/leads"    label="Pipeline"   fa="fa-solid fa-bolt-lightning" active={is("/leads") && !is("/leads/")} />
             <NavItem href="/imports"  label="Imports"    fa="fa-solid fa-file-arrow-up"  active={is("/imports")} />
             <NavItem href="/segments" label="Segments"   fa="fa-solid fa-layer-group"    active={is("/segments")} />
-            <NavItem href="/pulse"    label="Pulse"      fa="fa-solid fa-heart-pulse"    active={is("/pulse")} />
             <div style={{ marginTop: 2 }}>
               <ComingSoonItem label="AI Voice" fa="fa-solid fa-phone-volume" />
             </div>
@@ -605,9 +609,35 @@ export default function AppShell({
         </div>
       </header>
 
+      {/* ══ Location context bar (multi-location only) ═══════════════════════ */}
+      {isMultiLocation && activeLocation && (
+        <div className="app-locbar">
+          <i className="fa-solid fa-location-dot" style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", flexShrink: 0 }} />
+          <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(255,255,255,0.65)", letterSpacing: "0.02em", flexShrink: 0 }}>
+            Viewing
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: "#fff", flexShrink: 0 }}>
+            {activeLocation.name}
+          </span>
+          {activeLocation.is_primary && (
+            <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 6px", borderRadius: 20, background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.9)", border: "1px solid rgba(255,255,255,0.25)", flexShrink: 0, letterSpacing: "0.04em" }}>
+              PRIMARY
+            </span>
+          )}
+          {activeLocation.location && (
+            <>
+              <span style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>·</span>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {activeLocation.location}
+              </span>
+            </>
+          )}
+        </div>
+      )}
+
       {/* ══ Main content ═════════════════════════════════════════════════════ */}
-      <main className="app-main" style={{ minHeight: "100vh" }}>
-        <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px" }}>
+      <main className="app-main" style={{ minHeight: "100vh", paddingTop: TOPBAR_H + (isMultiLocation && activeLocation ? LOCBAR_H : 0) }}>
+        <div style={{ padding: "20px" }}>
           {children}
         </div>
       </main>

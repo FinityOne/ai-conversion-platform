@@ -25,14 +25,12 @@ interface Props {
 }
 
 const STATUSES: { value: LeadStatus; label: string; emoji: string }[] = [
-  { value: "new",               label: "New",               emoji: "🆕" },
-  { value: "contacted",         label: "Contacted",         emoji: "📤" },
-  { value: "replied",           label: "Replied",           emoji: "💬" },
-  { value: "follow_up_sent",    label: "Follow-Up Sent",    emoji: "🔄" },
-  { value: "project_submitted", label: "Details Submitted", emoji: "📋" },
-  { value: "booked",            label: "Booked",            emoji: "📅" },
-  { value: "closed_won",        label: "Closed (Won)",      emoji: "✅" },
-  { value: "closed_lost",       label: "Closed (Lost)",     emoji: "❌" },
+  { value: "new",               label: "New Inquiry",              emoji: "✨" },
+  { value: "contacted",         label: "Awaiting Response",        emoji: "📤" },
+  { value: "replied",           label: "Qualified · Ready to Book", emoji: "✅" },
+  { value: "follow_up_sent",    label: "Follow-Up Sent",           emoji: "🔄" },
+  { value: "project_submitted", label: "Intake Submitted",          emoji: "📋" },
+  { value: "booked",            label: "Appointment Scheduled",     emoji: "🗓️" },
 ];
 
 const TEXT    = "#0D1428";

@@ -432,7 +432,6 @@ export interface UserDetail {
   business_google_profile: string | null;
   years_in_business:       number | null;
   service_area:            string | null;
-  business_license:        string | null;
   business_logo_url:       string | null;
   business_industry:       string | null;
   // Auth state
@@ -491,7 +490,7 @@ export function computeUserHealthScore(data: {
   const leadQtyScore = lq === 0 ? 0 : lq < 6 ? 5 : lq < 21 ? 12 : lq < 51 ? 18 : lq < 101 ? 22 : 25;
 
   // Lead quality (0–20) — % in positive funnel stages
-  const positiveStatuses = ["replied", "project_submitted", "booked", "closed_won"];
+  const positiveStatuses = ["replied", "project_submitted", "booked"];
   const positiveCount    = positiveStatuses.reduce((s, st) => s + (data.leads_by_status[st] ?? 0), 0);
   const qualityPct       = lq > 0 ? positiveCount / lq : 0;
   const leadQualityScore = Math.round(qualityPct * 20);
@@ -622,7 +621,6 @@ export async function getAdminUserDetail(userId: string): Promise<UserDetail | n
     business_google_profile: profile.business_google_profile ?? null,
     years_in_business:       profile.years_in_business       ?? null,
     service_area:            profile.service_area            ?? null,
-    business_license:        profile.business_license        ?? null,
     business_logo_url:       profile.business_logo_url       ?? null,
     business_industry:       profile.business_industry       ?? null,
     last_sign_in_at:    stats?.last_sign_in_at    ?? null,

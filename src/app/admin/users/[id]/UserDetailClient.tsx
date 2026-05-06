@@ -777,7 +777,6 @@ function BusinessProfileTab({ user, onUserUpdated }: { user: UserDetail; onUserU
   const [oZip,   setOZip]   = useState(user.business_zip      ?? "");
   const [oArea,  setOArea]  = useState(user.service_area      ?? "");
   const [oYears, setOYears] = useState(user.years_in_business?.toString() ?? "");
-  const [oLic,   setOLic]   = useState(user.business_license  ?? "");
   const [oDesc,  setODesc]  = useState(user.business_description ?? "");
   const [ooState, setOoState] = useState<"idle"|"saving"|"ok"|"err">("idle");
   const [ooMsg,   setOoMsg]   = useState("");
@@ -955,17 +954,13 @@ function BusinessProfileTab({ user, onUserUpdated }: { user: UserDetail; onUserU
           <div><label style={labelStyle}>Years in Business</label><input style={inputStyle} type="number" min={0} value={oYears} onChange={e => setOYears(e.target.value)} placeholder="12" /></div>
         </div>
         <div style={{ marginTop: 12 }}>
-          <label style={labelStyle}>License Number</label>
-          <input style={inputStyle} value={oLic} onChange={e => setOLic(e.target.value)} placeholder="TX-RLC-123456" />
-        </div>
-        <div style={{ marginTop: 12 }}>
           <label style={labelStyle}>Business Description</label>
           <textarea style={{ ...inputStyle, resize: "vertical", minHeight: 80 } as React.CSSProperties} value={oDesc} onChange={e => setODesc(e.target.value)} placeholder="Describe the business, specialties, and what sets them apart…" />
         </div>
         <SectionSaveBtn state={ooState} msg={ooMsg} onClick={() => save(
-          { business_address: oAddr, business_city: oCity, business_state: oState, business_zip: oZip, service_area: oArea, years_in_business: oYears ? Number(oYears) : null, business_license: oLic, business_description: oDesc },
+          { business_address: oAddr, business_city: oCity, business_state: oState, business_zip: oZip, service_area: oArea, years_in_business: oYears ? Number(oYears) : null, business_description: oDesc },
           setOoState, setOoMsg,
-          { business_address: oAddr || null, business_city: oCity || null, business_state: oState || null, business_zip: oZip || null, service_area: oArea || null, years_in_business: oYears ? Number(oYears) : null, business_license: oLic || null, business_description: oDesc || null },
+          { business_address: oAddr || null, business_city: oCity || null, business_state: oState || null, business_zip: oZip || null, service_area: oArea || null, years_in_business: oYears ? Number(oYears) : null, business_description: oDesc || null },
         )} />
       </div>
 

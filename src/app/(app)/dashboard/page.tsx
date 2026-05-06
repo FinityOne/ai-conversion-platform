@@ -20,8 +20,7 @@ const FUNNEL_STAGES = [
   { key: "new",     label: "New",       color: "#64748b", bg: "rgba(100,116,139,0.1)" },
   { key: "reached", label: "Contacted", color: "#2563eb", bg: "rgba(37,99,235,0.1)"   },
   { key: "engaged", label: "Engaged",   color: "#7c3aed", bg: "rgba(124,58,237,0.1)"  },
-  { key: "booked",  label: "Booked",    color: "#f59e0b", bg: "rgba(245,158,11,0.1)"  },
-  { key: "won",     label: "Won",       color: "#27AE60", bg: "rgba(39,174,96,0.1)"   },
+  { key: "booked",  label: "Booked",    color: "#0891b2", bg: "rgba(8,145,178,0.1)"   },
 ] as const;
 
 function pct(n: number, of: number) {
@@ -104,12 +103,8 @@ export default async function DashboardPage(
     reached: stats.contacted + stats.followUpSent,
     engaged: stats.replied   + stats.projectSubmitted,
     booked:  stats.booked,
-    won:     stats.closedWon,
   };
-  const active    = stats.total - stats.closedLost;
-  const closeRate = (stats.closedWon + stats.closedLost) > 0
-    ? pct(stats.closedWon, stats.closedWon + stats.closedLost)
-    : null;
+  const active = stats.total - stats.booked;
 
   const openRate = emailStats.totalSent > 0
     ? Math.round((emailStats.openedCount / emailStats.totalSent) * 100)
@@ -122,7 +117,19 @@ export default async function DashboardPage(
   const now = new Date();
   const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
+  // Current calendar week label (Mon–Sun)
+  const weekStartDate = new Date(now);
+  const dayOfWeek = now.getDay();
+  weekStartDate.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  const weekEndDate = new Date(weekStartDate);
+  weekEndDate.setDate(weekStartDate.getDate() + 6);
+  const fmtShort = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const weekRangeLabel = weekStartDate.getMonth() === weekEndDate.getMonth()
+    ? `${weekStartDate.toLocaleDateString("en-US", { month: "short" })} ${weekStartDate.getDate()}–${weekEndDate.getDate()}`
+    : `${fmtShort(weekStartDate)} – ${fmtShort(weekEndDate)}`;
+
   const dashboardContent = (
+    <div style={{ maxWidth: 900, margin: "0 auto" }}>
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
       {/* ── Header ── */}
@@ -132,52 +139,12 @@ export default async function DashboardPage(
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: TEXT }}>
             {businessName ?? `Welcome back, ${firstName}!`}
           </h1>
-          {/* Location context badge */}
-          {isMultiLocation && activeLocation && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 5 }}>
-              <i className="fa-solid fa-location-dot" style={{ fontSize: 11, color: ORANGE }} />
-              <span style={{ fontSize: 13, fontWeight: 700, color: MUTED }}>
-                {activeLocation.name}
-              </span>
-              {activeLocation.is_primary && (
-                <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 6px", borderRadius: 10, background: "rgba(22,163,74,0.08)", color: "#16a34a", border: "1px solid rgba(22,163,74,0.2)" }}>
-                  PRIMARY
-                </span>
-              )}
-              <span style={{ fontSize: 11, color: "#c4bfb8" }}>·</span>
-              <span style={{ fontSize: 12, color: MUTED }}>{activeLocation.location}</span>
-            </div>
-          )}
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
           <span style={{ fontSize: 12, color: MUTED, fontWeight: 500 }}>{dateLabel}</span>
           <WeeklyReportButton />
-          {isMultiLocation && (
-            <span style={{ fontSize: 11, color: MUTED }}>
-              <i className="fa-solid fa-location-dot" style={{ marginRight: 4, color: ORANGE, fontSize: 10 }} />
-              {locations.length} location{locations.length !== 1 ? "s" : ""} · use sidebar to switch
-            </span>
-          )}
         </div>
       </div>
-
-      {/* ── Multi-location no-data notice ── */}
-      {isMultiLocation && !activeLocation?.is_primary && stats.total === 0 && (
-        <div style={{
-          background: "rgba(99,102,241,0.04)", border: "1px solid rgba(99,102,241,0.15)",
-          borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12,
-        }}>
-          <i className="fa-solid fa-location-dot" style={{ fontSize: 18, color: "#6366f1", flexShrink: 0 }} />
-          <div>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: TEXT }}>
-              {activeLocation?.name} — clean slate
-            </p>
-            <p style={{ margin: "2px 0 0", fontSize: 13, color: MUTED }}>
-              No leads here yet. Share this location&apos;s intake link or add leads manually to get started.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* ── Welcome banner (first login) ── */}
       {isWelcome && plan && (
@@ -219,63 +186,26 @@ export default async function DashboardPage(
 
       {/* ── Top KPIs row ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
+        {/* Box 1: Total leads all time */}
         {[
-          { label: "Total Leads",  value: stats.total,    color: ORANGE,    icon: "fa-bolt-lightning"  },
-          { label: "This Week",    value: stats.thisWeek, color: "#2563eb",  icon: "fa-calendar-week"  },
-          { label: "Active",       value: active,          color: "#7c3aed",  icon: "fa-fire"            },
-          { label: "Booked",       value: stats.booked,   color: "#f59e0b",  icon: "fa-calendar-check" },
-          {
-            label: closeRate !== null ? "Close Rate" : "Won",
-            value: closeRate !== null ? `${closeRate}%` : stats.closedWon,
-            color: "#27AE60", icon: "fa-trophy",
-          },
+          { label: "Total Leads All Time", sub: null,             value: stats.total,           color: ORANGE,    icon: "fa-bolt-lightning"  },
+          { label: "Leads This Week",       sub: weekRangeLabel,  value: stats.thisWeek,        color: "#2563eb", icon: "fa-calendar-week"   },
+          { label: "Active In Pipeline",    sub: null,            value: active,               color: "#7c3aed", icon: "fa-fire"           },
+          { label: "Booked This Week",      sub: weekRangeLabel,  value: stats.bookedThisWeek, color: "#0891b2", icon: "fa-calendar-check"  },
+          { label: "Total Booked",          sub: "All Time",      value: stats.booked,         color: "#27AE60", icon: "fa-trophy"          },
         ].map(s => (
           <div key={s.label} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "12px 14px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
               <i className={`fa-solid ${s.icon}`} style={{ fontSize: 11, color: s.color }} />
-              <span style={{ fontSize: 11, color: MUTED, fontWeight: 500 }}>{s.label}</span>
+              <span style={{ fontSize: 10, color: MUTED, fontWeight: 600 }}>{s.label}</span>
             </div>
+            {s.sub && (
+              <p style={{ margin: "0 0 4px", fontSize: 9, fontWeight: 500, color: MUTED, letterSpacing: "0.02em" }}>{s.sub}</p>
+            )}
             <p style={{ margin: 0, fontSize: 24, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</p>
           </div>
         ))}
       </div>
-
-      {/* ── Multi-location summary strip ── */}
-      {isMultiLocation && locations.length > 1 && (
-        <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "12px 16px" }}>
-          <p style={{ margin: "0 0 10px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1px" }}>
-            <i className="fa-solid fa-location-dot" style={{ marginRight: 5, color: ORANGE }} />
-            All Locations Overview
-          </p>
-          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}>
-            {locations.map(loc => {
-              const isActive = loc.id === currentLocationId;
-              return (
-                <div key={loc.id} style={{
-                  flexShrink: 0, padding: "8px 14px", borderRadius: 10,
-                  background: isActive ? "rgba(211,84,0,0.06)" : "#F9F7F2",
-                  border: `1px solid ${isActive ? "rgba(211,84,0,0.25)" : BORDER}`,
-                  minWidth: 140,
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 2 }}>
-                    <i className="fa-solid fa-location-dot" style={{ fontSize: 10, color: isActive ? ORANGE : MUTED }} />
-                    <span style={{ fontSize: 12, fontWeight: 800, color: isActive ? ORANGE : TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 100 }}>
-                      {loc.name}
-                    </span>
-                    {loc.is_primary && (
-                      <span style={{ fontSize: 8, fontWeight: 800, padding: "1px 4px", borderRadius: 6, background: "rgba(22,163,74,0.1)", color: "#16a34a" }}>P</span>
-                    )}
-                  </div>
-                  <p style={{ margin: 0, fontSize: 10, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{loc.location}</p>
-                  {isActive && (
-                    <p style={{ margin: "3px 0 0", fontSize: 10, fontWeight: 700, color: ORANGE }}>{stats.total} leads · viewing now</p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* ── Funnel + Email split ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 12 }}>
@@ -284,16 +214,9 @@ export default async function DashboardPage(
         <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: TEXT }}>
-                Pipeline Funnel
-                {isMultiLocation && activeLocation && (
-                  <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: MUTED }}>
-                    — {activeLocation.name}
-                  </span>
-                )}
-              </p>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: TEXT }}>Pipeline Funnel</p>
               <p style={{ margin: "2px 0 0", fontSize: 11, color: MUTED }}>
-                {stats.total} leads · {stats.closedLost > 0 ? `${stats.closedLost} lost` : "0 lost"}
+                {stats.total} leads · {stats.booked} booked
               </p>
             </div>
             <Link href="/leads" style={{
@@ -307,7 +230,7 @@ export default async function DashboardPage(
 
           {stats.total === 0 ? (
             <div style={{ textAlign: "center", padding: "24px 0" }}>
-              <p style={{ fontSize: 14, color: MUTED }}>No leads yet{isMultiLocation && activeLocation ? ` at ${activeLocation.name}` : ""}.</p>
+              <p style={{ fontSize: 14, color: MUTED }}>No leads yet.</p>
               <Link href="/leads" style={{
                 display: "inline-flex", alignItems: "center", gap: 6, marginTop: 10,
                 background: "linear-gradient(135deg,#D35400,#e8641c)",
@@ -352,9 +275,6 @@ export default async function DashboardPage(
                         <div key={stage.key} title={`${stage.label}: ${count}`} style={{ width: `${w}%`, background: stage.color, flexShrink: 0 }} />
                       ) : null;
                     })}
-                    {stats.closedLost > 0 && (
-                      <div style={{ width: `${(stats.closedLost / stats.total) * 100}%`, background: "#e2ddd6", flexShrink: 0 }} title={`Lost: ${stats.closedLost}`} />
-                    )}
                   </div>
                   <div style={{ display: "flex", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
                     {FUNNEL_STAGES.filter(s => funnelCounts[s.key] > 0).map(stage => (
@@ -363,12 +283,6 @@ export default async function DashboardPage(
                         <span style={{ fontSize: 10, color: MUTED }}>{stage.label}</span>
                       </div>
                     ))}
-                    {stats.closedLost > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <div style={{ width: 7, height: 7, borderRadius: 2, background: "#e2ddd6", flexShrink: 0 }} />
-                        <span style={{ fontSize: 10, color: MUTED }}>Lost</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -378,12 +292,7 @@ export default async function DashboardPage(
 
         {/* Email Performance */}
         <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "18px 20px" }}>
-          <p style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 800, color: TEXT }}>
-            Email Automation
-            {isMultiLocation && activeLocation && (
-              <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: MUTED }}>— {activeLocation.name}</span>
-            )}
-          </p>
+          <p style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 800, color: TEXT }}>Email Automation</p>
 
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
             <OpenRateRing rate={openRate} />
@@ -425,12 +334,7 @@ export default async function DashboardPage(
       <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "16px 18px 12px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
           <div>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: TEXT }}>
-              Email Volume — Last 7 Days
-              {isMultiLocation && activeLocation && (
-                <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: MUTED }}>· {activeLocation.name}</span>
-              )}
-            </p>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: TEXT }}>Email Volume — Last 7 Days</p>
             <p style={{ margin: "2px 0 0", fontSize: 11, color: MUTED }}>Automated emails sent per day</p>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
@@ -449,7 +353,7 @@ export default async function DashboardPage(
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {[
-            { href: "/leads",        icon: "fa-bolt-lightning", label: "Leads Pipeline",  sub: `${stats.total} lead${stats.total !== 1 ? "s" : ""}${isMultiLocation && activeLocation ? ` at ${activeLocation.name}` : ""}`, color: ORANGE,   bg: "rgba(211,84,0,0.09)"  },
+            { href: "/leads",        icon: "fa-bolt-lightning", label: "Leads Pipeline",  sub: `${stats.total} lead${stats.total !== 1 ? "s" : ""} in pipeline`, color: ORANGE,   bg: "rgba(211,84,0,0.09)"  },
             { href: "/integrations", icon: "fa-plug",           label: "Integrations",    sub: "Webhook, CSV import, Zapier",                                                                                                    color: "#2563eb", bg: "rgba(37,99,235,0.08)" },
           ].map(item => (
             <Link key={item.href} href={item.href} style={{
@@ -499,6 +403,7 @@ export default async function DashboardPage(
         </div>
       </div>
 
+    </div>
     </div>
   );
 

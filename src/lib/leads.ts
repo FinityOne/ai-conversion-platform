@@ -61,50 +61,6 @@ async function syncProjectSubmittedStatus(
   return updates;
 }
 
-/**
- * For leads currently in "booked" status, check if their confirmed booking
- * date is in the past. If so, auto-advance to "closed_won".
- * Leads in any other status are left untouched.
- */
-async function syncBookedToClosedWon(
-  leads: { id: string; status: LeadStatus; created_at: string; last_activity_at: string | null }[],
-): Promise<Record<string, LeadStatus>> {
-  const bookedLeads = leads.filter(l => l.status === "booked");
-  if (!bookedLeads.length) return {};
-
-  const sb   = createSupabaseServiceClient();
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-
-  const { data: pastBookings } = await sb
-    .from("bookings")
-    .select("lead_id")
-    .in("lead_id", bookedLeads.map(l => l.id))
-    .eq("status", "confirmed")
-    .lt("booking_date", today);
-
-  if (!pastBookings?.length) return {};
-
-  const pastIds = new Set(pastBookings.map(r => r.lead_id));
-  const toAdvance = bookedLeads.filter(l => pastIds.has(l.id));
-  if (!toAdvance.length) return {};
-
-  const now = new Date().toISOString();
-  const updates: Record<string, LeadStatus> = {};
-
-  await Promise.all(
-    toAdvance.map(async lead => {
-      const newScore = computeScore({ ...lead, status: "closed_won" }, []);
-      await sb.from("leads").update({
-        status:           "closed_won",
-        score:            newScore,
-        last_activity_at: now,
-      }).eq("id", lead.id);
-      updates[lead.id] = "closed_won";
-    }),
-  );
-
-  return updates;
-}
 
 export type {
   LeadStatus,
@@ -141,11 +97,7 @@ export async function getLeads(locationFilter?: LocationFilter): Promise<Lead[]>
   }
 
   // Auto-advance any leads whose project details were submitted outside this session
-  const [projectUpdates, bookedUpdates] = await Promise.all([
-    syncProjectSubmittedStatus((leads as Lead[]).map(l => l.id), leads as Lead[]),
-    syncBookedToClosedWon(leads as Lead[]),
-  ]);
-  const statusUpdates = { ...projectUpdates, ...bookedUpdates };
+  const statusUpdates = await syncProjectSubmittedStatus((leads as Lead[]).map(l => l.id), leads as Lead[]);
 
   const scored = (leads as Lead[]).map(lead => {
     const overrideStatus = statusUpdates[lead.id];
@@ -156,12 +108,10 @@ export async function getLeads(locationFilter?: LocationFilter): Promise<Lead[]>
     };
   });
 
-  // Sort: closed_lost at bottom, everything else by score desc
+  // Booked leads float to top (goal achieved), rest sorted by score desc
   return scored.sort((a, b) => {
-    if (a.status === "closed_lost" && b.status !== "closed_lost") return 1;
-    if (b.status === "closed_lost" && a.status !== "closed_lost") return -1;
-    if (a.status === "closed_won"  && b.status !== "closed_won")  return -1;
-    if (b.status === "closed_won"  && a.status !== "closed_won")  return 1;
+    if (a.status === "booked" && b.status !== "booked") return -1;
+    if (b.status === "booked" && a.status !== "booked") return 1;
     return b.score - a.score;
   });
 }
@@ -188,12 +138,7 @@ export async function getLeadById(id: string): Promise<{
   const emailLog       = (logs ?? []) as EmailLogEntry[];
   const projectDetails = pd ? (pd as ProjectDetails) : null;
 
-  // Auto-advance: project submitted check + past booking → closed_won
-  const [projectUpdates, bookedUpdates] = await Promise.all([
-    syncProjectSubmittedStatus([lead.id], [lead as Lead]),
-    syncBookedToClosedWon([lead as Lead]),
-  ]);
-  const statusUpdates = { ...projectUpdates, ...bookedUpdates };
+  const statusUpdates = await syncProjectSubmittedStatus([lead.id], [lead as Lead]);
   const effectiveLead = {
     ...lead as Lead,
     ...(statusUpdates[lead.id] ? { status: statusUpdates[lead.id] } : {}),
@@ -211,17 +156,21 @@ export async function getLeadById(id: string): Promise<{
 export async function getLeadStats(locationFilter?: LocationFilter): Promise<LeadStats> {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { total: 0, today: 0, thisWeek: 0, new: 0, contacted: 0, followUpSent: 0, replied: 0, projectSubmitted: 0, booked: 0, closedWon: 0, closedLost: 0 };
+  if (!user) return { total: 0, today: 0, thisWeek: 0, new: 0, contacted: 0, followUpSent: 0, replied: 0, projectSubmitted: 0, booked: 0, bookedThisWeek: 0 };
 
   let q = supabase.from("leads").select("status, created_at").eq("user_id", user.id);
   if (locationFilter) q = applyLocationFilter(q, locationFilter);
   const { data } = await q;
 
-  if (!data) return { total: 0, today: 0, thisWeek: 0, new: 0, contacted: 0, followUpSent: 0, replied: 0, projectSubmitted: 0, booked: 0, closedWon: 0, closedLost: 0 };
+  if (!data) return { total: 0, today: 0, thisWeek: 0, new: 0, contacted: 0, followUpSent: 0, replied: 0, projectSubmitted: 0, booked: 0, bookedThisWeek: 0 };
 
   const now        = new Date();
   const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
-  const weekStart  = new Date(now); weekStart.setDate(now.getDate() - 6); weekStart.setHours(0, 0, 0, 0);
+  // Current calendar week: Monday 00:00 → Sunday 23:59
+  const weekStart  = new Date(now);
+  const dayOfWeek  = now.getDay(); // 0=Sun … 6=Sat
+  weekStart.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  weekStart.setHours(0, 0, 0, 0);
 
   return {
     total:            data.length,
@@ -233,14 +182,13 @@ export async function getLeadStats(locationFilter?: LocationFilter): Promise<Lea
     replied:          data.filter(l => l.status === "replied").length,
     projectSubmitted: data.filter(l => l.status === "project_submitted").length,
     booked:           data.filter(l => l.status === "booked").length,
-    closedWon:        data.filter(l => l.status === "closed_won").length,
-    closedLost:       data.filter(l => l.status === "closed_lost").length,
+    bookedThisWeek:   data.filter(l => l.status === "booked" && new Date(l.created_at) >= weekStart).length,
   };
 }
 
 export function buildSummaryBlurb(stats: LeadStats, firstName?: string | null): string {
   const name = firstName || "there";
-  const active = stats.total - stats.closedWon - stats.closedLost;
+  const active = stats.total - stats.booked;
   const hot    = stats.replied + stats.booked;
 
   if (stats.total === 0)

@@ -75,6 +75,5 @@ export interface LeadStats {
   replied: number;
   projectSubmitted: number;
   booked: number;
-  closedWon: number;
-  closedLost: number;
+  bookedThisWeek: number;
 }

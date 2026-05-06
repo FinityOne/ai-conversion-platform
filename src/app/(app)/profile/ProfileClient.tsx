@@ -27,7 +27,6 @@ interface UserProfile {
   business_zip: string | null;
   business_tagline: string | null;
   business_description: string | null;
-  business_license: string | null;
   business_instagram: string | null;
   business_facebook: string | null;
   business_google_profile: string | null;
@@ -441,7 +440,6 @@ function BusinessOperationsSection({ profile, onChange }: { profile: UserProfile
     business_state:    profile.business_state    ?? "",
     business_zip:      profile.business_zip      ?? "",
     service_area:      profile.service_area      ?? "",
-    business_license:  profile.business_license  ?? "",
     years_in_business: profile.years_in_business?.toString() ?? "",
   });
   const [saveState, setSave] = useState<SaveState>("idle");
@@ -466,7 +464,6 @@ function BusinessOperationsSection({ profile, onChange }: { profile: UserProfile
           business_state:    form.business_state    || null,
           business_zip:      form.business_zip      || null,
           service_area:      form.service_area      || null,
-          business_license:  form.business_license  || null,
         }),
       });
       if (!res.ok) throw new Error();
@@ -517,9 +514,6 @@ function BusinessOperationsSection({ profile, onChange }: { profile: UserProfile
 
       <p style={{ margin: "16px 0 12px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.8px" }}>Credentials</p>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
-        <Field label="Contractor / Business License #" hint="Displayed on landing pages to build trust">
-          <input style={INP} value={form.business_license} onChange={set("business_license")} placeholder="e.g. LIC-123456" />
-        </Field>
         <Field label="Years in Business">
           <input style={INP} type="number" min="0" max="200" value={form.years_in_business} onChange={set("years_in_business")} placeholder="e.g. 12" />
         </Field>

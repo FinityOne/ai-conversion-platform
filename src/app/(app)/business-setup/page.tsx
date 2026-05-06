@@ -20,7 +20,7 @@ export default async function BusinessSetupPage() {
         "id, email, first_name, last_name, business_name, business_logo_url, " +
         "business_website, business_email, business_phone, " +
         "business_address, business_city, business_state, business_zip, " +
-        "business_tagline, business_description, business_license, " +
+        "business_tagline, business_description, " +
         "business_instagram, business_facebook, business_google_profile, " +
         "years_in_business, service_area, business_industry, intake_slug"
       )

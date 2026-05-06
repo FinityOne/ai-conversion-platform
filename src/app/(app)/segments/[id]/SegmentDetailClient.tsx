@@ -22,8 +22,6 @@ const STATUS_COLORS: Record<string, { bg: string; color: string; label: string }
   follow_up_sent:    { bg: "#fff7ed", color: "#c2410c", label: "Follow-Up" },
   project_submitted: { bg: "#faf5ff", color: "#7e22ce", label: "Submitted" },
   booked:            { bg: "#f0fdfa", color: "#0f766e", label: "Booked" },
-  closed_won:        { bg: "#f0fdf4", color: "#15803d", label: "Won" },
-  closed_lost:       { bg: "#fef2f2", color: "#dc2626", label: "Lost" },
 };
 
 interface Props {

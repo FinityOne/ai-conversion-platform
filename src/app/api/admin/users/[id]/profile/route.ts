@@ -17,7 +17,7 @@ const ALLOWED = [
   "business_email", "business_phone", "business_website",
   "business_address", "business_city", "business_state", "business_zip",
   "business_instagram", "business_facebook", "business_google_profile",
-  "years_in_business", "service_area", "business_license",
+  "years_in_business", "service_area",
   "business_logo_url", "business_industry", "intake_slug",
 ] as const;
 

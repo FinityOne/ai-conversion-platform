@@ -56,7 +56,7 @@ function generateObservations(data: {
   newLeads: number; priorLeads: number;
   bookedThisWeek: number; emailsSent: number;
   openRate: number; avgScore: number;
-  contactedPct: number; wonThisWeek: number;
+  contactedPct: number;
 }): string[] {
   const obs: string[] = [];
 
@@ -173,8 +173,7 @@ export default async function WeeklyReportPage({
   const newCount      = weekLeads.length;
   const priorCount    = priorLeads.length;
   const contactedWeek = weekLeads.filter(l => l.status !== "new").length;
-  const bookedWeek    = weekLeads.filter(l => l.status === "booked" || l.status === "closed_won").length;
-  const wonWeek       = weekLeads.filter(l => l.status === "closed_won").length;
+  const bookedWeek    = weekLeads.filter(l => l.status === "booked").length;
   const avgScore      = newCount > 0
     ? Math.round(weekLeads.reduce((s, l) => s + (l.score ?? 0), 0) / newCount)
     : 0;
@@ -229,7 +228,6 @@ export default async function WeeklyReportPage({
     bookedThisWeek: bookedWeek,
     emailsSent: emailSent, openRate,
     avgScore, contactedPct: newCount > 0 ? (contactedWeek / newCount) * 100 : 0,
-    wonThisWeek: wonWeek,
   });
 
   const businessName = profile?.business_name ?? profile?.first_name ?? "Your Business";
@@ -484,8 +482,7 @@ export default async function WeeklyReportPage({
               {PIPELINE_STAGES.map((stage, i) => {
                 const count    = pipelineMap[stage.status] ?? 0;
                 const fraction = pipelineTotal > 0 ? count / pipelineTotal : 0;
-                const isWon    = stage.status === "closed_won";
-                const isLost   = stage.status === "closed_lost";
+                const isBooked = stage.status === "booked";
                 return (
                   <tr key={stage.status} style={{ background: i % 2 === 0 ? "#fff" : "#F8FAFC", borderBottom: "1px solid #F1F5F9" }}>
                     <td style={{ padding: "11px 14px" }}>
@@ -505,11 +502,11 @@ export default async function WeeklyReportPage({
                       {count > 0 && (
                         <span style={{
                           fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 12,
-                          background: isWon ? "#ECFDF5" : isLost ? "#F8FAFC" : stage.bg,
-                          color: isWon ? "#059669" : isLost ? "#64748B" : stage.color,
+                          background: isBooked ? "#ECFDF5" : stage.bg,
+                          color: isBooked ? "#059669" : stage.color,
                           letterSpacing: "0.05em",
                         }}>
-                          {isWon ? "REVENUE" : isLost ? "CLOSED" : "ACTIVE"}
+                          {isBooked ? "BOOKED" : "ACTIVE"}
                         </span>
                       )}
                     </td>

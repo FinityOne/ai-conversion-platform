@@ -29,7 +29,6 @@ interface BizProfile {
   business_state: string | null;
   business_zip: string | null;
   service_area: string | null;
-  business_license: string | null;
   years_in_business: number | null;
   business_instagram: string | null;
   business_facebook: string | null;
@@ -40,7 +39,7 @@ interface BizProfile {
 
 async function getProfile(slug: string): Promise<BizProfile | null> {
   const sb = createSupabaseServiceClient();
-  const fields = "id,business_name,email,business_email,business_website,business_logo_url,business_tagline,business_description,business_address,business_city,business_state,business_zip,service_area,business_license,years_in_business,business_instagram,business_facebook,business_google_profile,business_industry,intake_slug";
+  const fields = "id,business_name,email,business_email,business_website,business_logo_url,business_tagline,business_description,business_address,business_city,business_state,business_zip,service_area,years_in_business,business_instagram,business_facebook,business_google_profile,business_industry,intake_slug";
 
   // 1. Check profiles.intake_slug (account-level page)
   const { data: bySlug } = await sb.from("profiles").select(fields).eq("intake_slug", slug).maybeSingle();
@@ -146,7 +145,7 @@ export default async function IntakePage(
   // Trust bullets — static from config + dynamic from profile
   const trustBullets = [
     ...cfg.trustBullets,
-    p.business_license ? `License #${p.business_license}` : "Licensed & Insured",
+    "Licensed & Insured",
     p.years_in_business ? `${p.years_in_business}+ Years Serving ${location}` : `Proudly Serving ${location}`,
     "Free Estimates — No Obligation",
   ].slice(0, 4);
@@ -405,7 +404,7 @@ export default async function IntakePage(
                 alt={biz}
                 style={{ width: "100%", height: 400, objectFit: "cover", borderRadius: 18, position: "relative", zIndex: 1, boxShadow: "0 20px 60px rgba(0,0,0,0.14)" }}
               />
-              {(p.years_in_business || p.business_license) && (
+              {p.years_in_business && (
                 <div style={{ position: "absolute", bottom: -10, right: -10, zIndex: 2, background: "#fff", borderRadius: 14, padding: "14px 18px", boxShadow: "0 8px 32px rgba(0,0,0,0.12)", border: `1px solid ${accent}22`, textAlign: "center", minWidth: 130 }}>
                   {p.years_in_business ? (
                     <>
@@ -433,7 +432,6 @@ export default async function IntakePage(
                 {[
                   { icon: "fa-shield-halved", label: "Licensed & Insured" },
                   { icon: "fa-location-dot",  label: p.service_area ?? location },
-                  ...(p.business_license ? [{ icon: "fa-certificate", label: `License: ${p.business_license}` }] : []),
                   ...(contactEmail ? [{ icon: "fa-envelope", label: contactEmail }] : []),
                 ].map(pill => (
                   <div key={pill.label} style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 50, background: `${accent}0e`, border: `1px solid ${accent}22`, fontSize: 12, fontWeight: 600, color: "#333" }}>
