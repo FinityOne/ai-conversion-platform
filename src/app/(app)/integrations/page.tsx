@@ -582,16 +582,16 @@ function IntegrationGuide({
 function CsvTab() {
   function downloadTemplate() {
     const csv = [
-      "Full Name,Email,Phone,Job Type,Notes",
-      "Jake Rivera,jake@email.com,(555) 000-0001,Roofing,Needs inspection after storm",
-      "Maria Santos,maria@email.com,(555) 000-0002,HVAC,AC unit not cooling properly",
-      "Tom Bradley,,( 555) 000-0003,Plumbing,Leaking pipe under kitchen sink",
+      "First Name,Last Name,Email,Phone,Notes",
+      "Jake,Rivera,jake@email.com,(555) 000-0001,Needs inspection after storm",
+      "Maria,Santos,maria@email.com,(555) 000-0002,AC unit not cooling properly",
+      "Tom,Bradley,,( 555) 000-0003,Leaking pipe under kitchen sink",
     ].join("\r\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href     = url;
-    a.download = "homehive-leads-template.csv";
+    a.download = "clozeflow-leads-import.csv";
     a.click();
     URL.revokeObjectURL(url);
   }
