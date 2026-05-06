@@ -753,7 +753,7 @@ function LaptopMockup() {
 
       {/* Floating toast 1 — new inquiry */}
       <div className="hero-notif hero-notif-1" style={{
-        position: "absolute", top: "12%", right: 0,
+        position: "absolute", top: "12%", right: 0, zIndex: 10,
         background: "#fff", borderRadius: 12, padding: "9px 13px",
         boxShadow: "0 8px 28px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.05)",
         display: "flex", alignItems: "center", gap: 9, width: 192,
@@ -768,7 +768,7 @@ function LaptopMockup() {
 
       {/* Floating toast 2 — appointment booked */}
       <div className="hero-notif hero-notif-2" style={{
-        position: "absolute", bottom: "22%", left: 0,
+        position: "absolute", bottom: "22%", left: 0, zIndex: 10,
         background: "#fff", borderRadius: 12, padding: "9px 13px",
         boxShadow: "0 8px 28px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.05)",
         display: "flex", alignItems: "center", gap: 9, width: 200,
@@ -788,7 +788,7 @@ function LaptopMockup() {
 
       {/* Floating toast 3 — AI responded */}
       <div className="hero-notif hero-notif-3" style={{
-        position: "absolute", top: "44%", right: -4,
+        position: "absolute", top: "44%", right: -4, zIndex: 10,
         background: "#fff", borderRadius: 12, padding: "9px 13px",
         boxShadow: "0 8px 28px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.05)",
         display: "flex", alignItems: "center", gap: 9, width: 172,
@@ -806,7 +806,7 @@ function LaptopMockup() {
         </div>
       </div>
 
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "relative", zIndex: 1 }}>
         {/* Laptop lid */}
         <div style={{
           width: W,
