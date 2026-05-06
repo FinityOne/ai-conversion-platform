@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { createSupabaseServiceClient } from "@/lib/supabase-service";
 
+// Health-check — lets you verify the route is reachable without a POST body
+export async function GET() {
+  return NextResponse.json({ ok: true, endpoint: "resend-webhook" });
+}
+
 // Resend fires these webhook event types for email tracking.
 // We handle the ones that update our email_log table.
 type ResendEvent =
