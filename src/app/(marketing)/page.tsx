@@ -728,6 +728,207 @@ function HowItWorks() {
   );
 }
 
+const LAPTOP_LEADS = [
+  { initials: "AM", name: "Ashley M.",   job: "Botox Consult",       status: "Booked",    statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 94, detail: "May 8 · 10:00 AM"  },
+  { initials: "RK", name: "Ryan K.",     job: "Invisalign Inquiry",  status: "AI Active", statusColor: "#f59e0b", statusBg: "rgba(245,158,11,0.12)", score: 71, detail: "Following up…"     },
+  { initials: "NP", name: "Nina P.",     job: "PT Evaluation",       status: "Qualified", statusColor: "#6366f1", statusBg: "rgba(99,102,241,0.12)", score: 88, detail: "May 9 · 2:30 PM"   },
+  { initials: "DL", name: "David L.",    job: "Chiro Initial Visit",  status: "Booked",   statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 82, detail: "May 8 · 3:00 PM"   },
+  { initials: "SC", name: "Sarah C.",    job: "Med Spa Facial",      status: "New",       statusColor: "#3b82f6", statusBg: "rgba(59,130,246,0.12)", score: 55, detail: "Just arrived"      },
+  { initials: "TH", name: "Tom H.",      job: "Mental Health Intake", status: "Booked",   statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 90, detail: "May 10 · 11:00 AM" },
+];
+
+function LaptopMockup() {
+  return (
+    <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "flex-end" }}>
+      {/* Glow */}
+      <div style={{
+        position: "absolute",
+        width: 480, height: 280,
+        borderRadius: "50%",
+        background: "radial-gradient(ellipse, rgba(40,96,176,0.18) 0%, transparent 70%)",
+        bottom: 20, left: "50%", transform: "translateX(-50%)",
+        pointerEvents: "none",
+      }} />
+
+      <div style={{ position: "relative" }}>
+        {/* Laptop lid */}
+        <div style={{
+          width: 580,
+          background: "#1a1f2e",
+          borderRadius: "16px 16px 4px 4px",
+          padding: "8px 8px 0",
+          boxShadow: "0 32px 64px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)",
+        }}>
+          {/* Camera notch */}
+          <div style={{ display: "flex", justifyContent: "center", paddingBottom: 6 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#374151" }} />
+          </div>
+
+          {/* Screen */}
+          <div style={{
+            background: "#f1f5f9",
+            borderRadius: "8px 8px 0 0",
+            overflow: "hidden",
+            height: 340,
+            display: "flex",
+          }}>
+            {/* Sidebar */}
+            <div style={{
+              width: 130, flexShrink: 0,
+              background: "#141E38",
+              display: "flex", flexDirection: "column",
+              padding: "12px 0",
+              gap: 2,
+            }}>
+              <div style={{ padding: "0 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.07)", marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 5, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 900, color: "#fff" }}>C</div>
+                  <span style={{ fontSize: 9, fontWeight: 800, color: "rgba(231,238,251,0.9)" }}>ClozeFlow</span>
+                </div>
+              </div>
+              {[
+                { icon: "fa-gauge-high",      label: "Dashboard",   active: false },
+                { icon: "fa-users",           label: "Patients",    active: true  },
+                { icon: "fa-calendar",        label: "Calendar",    active: false },
+                { icon: "fa-paper-plane",     label: "Follow-Up",   active: false },
+                { icon: "fa-chart-bar",       label: "Analytics",   active: false },
+              ].map(item => (
+                <div key={item.label} style={{
+                  display: "flex", alignItems: "center", gap: 7,
+                  padding: "7px 10px", margin: "0 6px", borderRadius: 7,
+                  background: item.active ? "rgba(40,96,176,0.22)" : "transparent",
+                  boxShadow: item.active ? "inset 3px 0 0 #2860B0" : "none",
+                }}>
+                  <i className={`fa-solid ${item.icon}`} style={{ fontSize: 10, color: item.active ? "#8B6FC4" : "rgba(138,157,176,0.55)", width: 12, textAlign: "center" }} />
+                  <span style={{ fontSize: 9, fontWeight: item.active ? 700 : 500, color: item.active ? "#fff" : "rgba(231,238,251,0.55)" }}>{item.label}</span>
+                </div>
+              ))}
+              <div style={{ marginTop: "auto", padding: "6px 10px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <div style={{ width: 18, height: 18, borderRadius: 5, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff" }}>DR</div>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 8, fontWeight: 700, color: "rgba(231,238,251,0.8)" }}>Dr. Rivera</p>
+                    <p style={{ margin: 0, fontSize: 7, color: "rgba(138,157,176,0.6)" }}>Admin</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main content */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+              {/* Top bar */}
+              <div style={{ background: "#fff", padding: "8px 14px", borderBottom: "1px solid #e8ecf0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 900, color: TEXT }}>Patient Pipeline</p>
+                  <p style={{ margin: 0, fontSize: 8, color: MUTED }}>Wednesday, May 8 · 9 active today</p>
+                </div>
+                <div style={{ display: "flex", gap: 5 }}>
+                  <div style={{ padding: "4px 8px", background: GRAD_PRIMARY, borderRadius: 6, display: "flex", alignItems: "center", gap: 4 }}>
+                    <i className="fa-solid fa-plus" style={{ fontSize: 8, color: "#fff" }} />
+                    <span style={{ fontSize: 8, fontWeight: 700, color: "#fff" }}>Add Patient</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats row */}
+              <div style={{ padding: "8px 12px 6px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6 }}>
+                {[
+                  { label: "New",      value: "7",  color: "#3b82f6", bg: "rgba(59,130,246,0.08)"  },
+                  { label: "AI Active",value: "4",  color: "#f59e0b", bg: "rgba(245,158,11,0.08)"  },
+                  { label: "Qualified",value: "3",  color: "#6366f1", bg: "rgba(99,102,241,0.08)"  },
+                  { label: "Booked",   value: "9",  color: "#27AE60", bg: "rgba(39,174,96,0.08)"   },
+                ].map(s => (
+                  <div key={s.label} style={{ background: s.bg, borderRadius: 7, padding: "5px 6px", textAlign: "center" }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</p>
+                    <p style={{ margin: 0, fontSize: 7, fontWeight: 700, color: s.color, opacity: 0.8, marginTop: 2 }}>{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* AI banner */}
+              <div style={{
+                margin: "0 12px 6px",
+                background: "linear-gradient(135deg,rgba(40,96,176,0.07),rgba(139,111,196,0.04))",
+                border: "1px solid rgba(40,96,176,0.18)",
+                borderRadius: 7, padding: "5px 9px",
+                display: "flex", alignItems: "center", gap: 6,
+              }}>
+                <span style={{ fontSize: 10, flexShrink: 0 }}>⚡</span>
+                <p style={{ margin: 0, fontSize: 8, fontWeight: 600, color: SAPPHIRE, lineHeight: 1.4 }}>
+                  AI replied to 4 new inquiries today · avg response 38 seconds
+                </p>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 3 }}>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: GREEN }} />
+                  <span style={{ fontSize: 7, fontWeight: 700, color: GREEN }}>Live</span>
+                </div>
+              </div>
+
+              {/* Lead rows */}
+              <div style={{ flex: 1, overflowY: "hidden", padding: "0 12px" }}>
+                {/* Header row */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 90px 60px 70px", gap: 6, padding: "3px 8px", marginBottom: 2 }}>
+                  {["Patient", "Service", "Score", "Status"].map(h => (
+                    <span key={h} style={{ fontSize: 7, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</span>
+                  ))}
+                </div>
+                {LAPTOP_LEADS.map(lead => (
+                  <div key={lead.initials} style={{
+                    display: "grid", gridTemplateColumns: "1fr 90px 60px 70px", gap: 6,
+                    background: "#fff", borderRadius: 8, padding: "6px 8px", marginBottom: 4,
+                    alignItems: "center",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{
+                        width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                        background: lead.statusBg, display: "flex", alignItems: "center",
+                        justifyContent: "center", fontSize: 7, fontWeight: 800, color: lead.statusColor,
+                      }}>{lead.initials}</div>
+                      <div>
+                        <p style={{ margin: 0, fontSize: 9, fontWeight: 800, color: TEXT }}>{lead.name}</p>
+                        <p style={{ margin: 0, fontSize: 7, color: "#a8a29e" }}>{lead.detail}</p>
+                      </div>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 8, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lead.job}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                      <div style={{ flex: 1, height: 3, borderRadius: 2, background: "#e8ecf0", overflow: "hidden" }}>
+                        <div style={{ width: `${lead.score}%`, height: "100%", background: lead.score >= 80 ? "#27AE60" : lead.score >= 60 ? "#f59e0b" : "#3b82f6", borderRadius: 2 }} />
+                      </div>
+                      <span style={{ fontSize: 8, fontWeight: 700, color: TEXT }}>{lead.score}</span>
+                    </div>
+                    <span style={{ fontSize: 7, fontWeight: 700, padding: "2px 6px", borderRadius: 5, background: lead.statusBg, color: lead.statusColor, whiteSpace: "nowrap" }}>{lead.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Laptop base */}
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={{
+            width: 600, height: 12,
+            background: "linear-gradient(180deg, #232a3b 0%, #1a1f2e 100%)",
+            borderRadius: "0 0 4px 4px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+          }}>
+            <div style={{ display: "flex", justifyContent: "center", paddingTop: 3 }}>
+              <div style={{ width: 60, height: 4, borderRadius: 2, background: "#374151" }} />
+            </div>
+          </div>
+        </div>
+        <div style={{
+          width: 640, height: 6,
+          background: "#111827",
+          borderRadius: "0 0 8px 8px",
+          margin: "0 auto",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
+        }} />
+      </div>
+    </div>
+  );
+}
+
 function PhoneMockup() {
   return (
     <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -875,12 +1076,12 @@ export default function Home() {
       <DemoModal open={modalOpen} onClose={() => setModalOpen(false)} />
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section style={{ padding: "72px 24px 80px", background: GRAD_HERO_BG }}>
+      <section style={{ padding: "72px 24px 80px", background: GRAD_HERO_BG, overflow: "hidden" }}>
         <div style={{
-          maxWidth: 1100, margin: "0 auto",
+          maxWidth: 1300, margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 64,
+          gridTemplateColumns: "420px 1fr",
+          gap: 56,
           alignItems: "center",
         }}
           className="hero-grid"
@@ -956,7 +1157,7 @@ export default function Home() {
           </div>
 
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <PhoneMockup />
+            <LaptopMockup />
           </div>
         </div>
 
@@ -964,6 +1165,7 @@ export default function Home() {
           @media (max-width: 768px) {
             .hero-grid { grid-template-columns: 1fr !important; gap: 48px !important; text-align: center; }
             .hero-grid > div:first-child { display: flex; flex-direction: column; align-items: center; }
+            .hero-laptop { display: none !important; }
           }
         `}</style>
       </section>
