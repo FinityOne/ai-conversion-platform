@@ -202,6 +202,11 @@ export default function LeadScorePage() {
   const [hasChanges, setHasChanges] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
+  // Save-confirm modal
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [impactData, setImpactData]   = useState<{ total: number; locations: { id: string; name: string; count: number }[] } | null>(null);
+  const [impactLoading, setImpactLoading] = useState(false);
+
   // Simulator state
   const [simStatus, setSimStatus]   = useState("replied");
   const [simHours, setSimHours]     = useState(18);
@@ -228,11 +233,37 @@ export default function LeadScorePage() {
     setSaved(false);
   }
 
-  function saveConfig() {
+  async function requestSave() {
+    setImpactLoading(true);
+    try {
+      const res = await fetch("/api/leads/score-impact");
+      const data = await res.json();
+      setImpactData(data);
+    } catch {
+      setImpactData({ total: 0, locations: [] });
+    }
+    setImpactLoading(false);
+    setShowConfirm(true);
+  }
+
+  function confirmSave() {
     localStorage.setItem(LS_KEY, JSON.stringify(cfg));
+    setShowConfirm(false);
     setHasChanges(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  }
+
+  function cancelSave() {
+    // Revert cfg to last persisted state
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      setCfg(raw ? { ...DEFAULT_CONFIG, ...JSON.parse(raw) } : DEFAULT_CONFIG);
+    } catch {
+      setCfg(DEFAULT_CONFIG);
+    }
+    setShowConfirm(false);
+    setHasChanges(false);
   }
 
   function resetConfig() {
@@ -703,11 +734,11 @@ export default function LeadScorePage() {
               </button>
             )}
             <button
-              onClick={saveConfig}
-              disabled={!hasChanges}
+              onClick={requestSave}
+              disabled={!hasChanges || impactLoading}
               style={{ padding: "10px 20px", borderRadius: 9, border: "none", background: hasChanges ? `linear-gradient(135deg, ${ORANGE}, #ea580c)` : BORDER, color: hasChanges ? WHITE : MUTED, fontSize: 13, fontWeight: 800, cursor: hasChanges ? "pointer" : "not-allowed" }}
             >
-              {saved ? "✓ Saved" : "Save Changes"}
+              {impactLoading ? <><i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: 12 }} /> Checking…</> : saved ? "✓ Saved" : "Save Changes"}
             </button>
           </div>
         </div>
@@ -722,6 +753,86 @@ export default function LeadScorePage() {
           </p>
         </div>
       </div>
+
+      {/* ── Save confirmation modal ── */}
+      {showConfirm && (
+        <div
+          onClick={cancelSave}
+          style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: WHITE, borderRadius: 20, width: "100%", maxWidth: 460, boxShadow: "0 24px 64px rgba(0,0,0,0.22)", overflow: "hidden" }}
+          >
+            {/* Header */}
+            <div style={{ padding: "22px 24px 18px", background: "#fffbeb", borderBottom: "1px solid #fde68a", display: "flex", gap: 14, alignItems: "flex-start" }}>
+              <div style={{ width: 42, height: 42, borderRadius: 11, background: "#fef3c7", border: "1.5px solid #fde68a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                ⚠️
+              </div>
+              <div>
+                <h3 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 900, color: TEXT }}>
+                  Recalibrating all lead scores
+                </h3>
+                <p style={{ margin: 0, fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
+                  Saving these parameters will immediately rescore every lead across your entire account, including all locations.
+                </p>
+              </div>
+            </div>
+
+            {/* Impact details */}
+            <div style={{ padding: "18px 24px" }}>
+              {impactData && impactData.total > 0 ? (
+                <>
+                  {impactData.locations.length > 1 ? (
+                    <>
+                      <p style={{ margin: "0 0 12px", fontSize: 13, color: TEXT, fontWeight: 600 }}>
+                        This will affect <strong style={{ color: ORANGE }}>{impactData.total.toLocaleString()} leads</strong> across {impactData.locations.length} location{impactData.locations.length !== 1 ? "s" : ""}:
+                      </p>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}>
+                        {impactData.locations.map(loc => (
+                          <div key={loc.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: BG, borderRadius: 9, border: `1px solid ${BORDER}` }}>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{loc.name}</span>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: ORANGE }}>{loc.count.toLocaleString()} lead{loc.count !== 1 ? "s" : ""}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <p style={{ margin: "0 0 16px", fontSize: 13, color: TEXT }}>
+                      This will rescore all <strong style={{ color: ORANGE }}>{impactData.total.toLocaleString()} leads</strong> in your account using the new parameters.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p style={{ margin: "0 0 16px", fontSize: 13, color: MUTED }}>
+                  No leads found in your account yet — scoring parameters will apply to future leads.
+                </p>
+              )}
+
+              <div style={{ padding: "10px 14px", background: "rgba(234,88,12,0.06)", borderRadius: 10, border: "1px solid rgba(234,88,12,0.18)", marginBottom: 20 }}>
+                <p style={{ margin: 0, fontSize: 12, color: "#92400e", lineHeight: 1.6 }}>
+                  Score changes take effect on the next pipeline refresh. Existing lead history is not modified — only the calculated score is updated.
+                </p>
+              </div>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={cancelSave}
+                  style={{ flex: 1, padding: "12px", borderRadius: 10, border: `1.5px solid ${BORDER}`, background: WHITE, fontSize: 14, fontWeight: 700, color: TEXT, cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSave}
+                  style={{ flex: 2, padding: "12px", borderRadius: 10, border: "none", background: `linear-gradient(135deg, ${ORANGE}, #ea580c)`, color: WHITE, fontSize: 14, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(211,84,0,0.25)" }}
+                >
+                  Yes, update scoring →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
