@@ -13,6 +13,7 @@ export interface EmailDashStats {
   sentThisMonth: number;
   totalSent:     number;
   openedCount:   number;
+  clickedCount:  number;
   dailyVolume:   DailyVolume[];
   awaitingCount: number;
 }
@@ -23,7 +24,7 @@ export async function getEmailDashStats(locationFilter?: LocationFilter): Promis
 
   const empty: EmailDashStats = {
     sentToday: 0, sentThisWeek: 0, sentThisMonth: 0,
-    totalSent: 0, openedCount: 0, dailyVolume: [], awaitingCount: 0,
+    totalSent: 0, openedCount: 0, clickedCount: 0, dailyVolume: [], awaitingCount: 0,
   };
   if (!user) return empty;
 
@@ -45,7 +46,7 @@ export async function getEmailDashStats(locationFilter?: LocationFilter): Promis
 
   let emailQ = supabase
     .from("email_log")
-    .select("created_at, opened_at, email_status")
+    .select("created_at, opened_at, clicked_at, email_status")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
@@ -61,6 +62,7 @@ export async function getEmailDashStats(locationFilter?: LocationFilter): Promis
   const sentThisMonth = all.filter(l => new Date(l.created_at) >= start30).length;
   const totalSent     = all.length;
   const openedCount   = all.filter(l => l.opened_at).length;
+  const clickedCount  = all.filter(l => l.clicked_at).length;
 
   // Build last-7-days daily buckets
   const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -96,5 +98,5 @@ export async function getEmailDashStats(locationFilter?: LocationFilter): Promis
   const { data: awaitingLeads } = await awaitQ;
   const awaitingCount = awaitingLeads?.length ?? 0;
 
-  return { sentToday, sentThisWeek, sentThisMonth, totalSent, openedCount, dailyVolume, awaitingCount };
+  return { sentToday, sentThisWeek, sentThisMonth, totalSent, openedCount, clickedCount, dailyVolume, awaitingCount };
 }

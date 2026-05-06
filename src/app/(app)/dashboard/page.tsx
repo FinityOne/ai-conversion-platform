@@ -310,11 +310,20 @@ export default async function DashboardPage(
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
             <div style={{ background: "rgba(39,174,96,0.05)", border: "1px solid rgba(39,174,96,0.15)", borderRadius: 10, padding: "10px 12px" }}>
               <p style={{ margin: "0 0 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "#27AE60" }}>Opened</p>
               <p style={{ margin: 0, fontSize: 20, fontWeight: 900, color: "#27AE60" }}>{emailStats.openedCount}</p>
-              <p style={{ margin: 0, fontSize: 10, color: MUTED }}>emails opened</p>
+              <p style={{ margin: 0, fontSize: 10, color: MUTED }}>
+                {emailStats.totalSent > 0 ? `${Math.round((emailStats.openedCount / emailStats.totalSent) * 100)}% rate` : "open rate"}
+              </p>
+            </div>
+            <div style={{ background: "rgba(124,58,237,0.05)", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 10, padding: "10px 12px" }}>
+              <p style={{ margin: "0 0 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "#7c3aed" }}>Clicked</p>
+              <p style={{ margin: 0, fontSize: 20, fontWeight: 900, color: "#7c3aed" }}>{emailStats.clickedCount}</p>
+              <p style={{ margin: 0, fontSize: 10, color: MUTED }}>
+                {emailStats.totalSent > 0 ? `${Math.round((emailStats.clickedCount / emailStats.totalSent) * 100)}% rate` : "click rate"}
+              </p>
             </div>
             <div style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 10, padding: "10px 12px" }}>
               <p style={{ margin: "0 0 2px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "#d97706" }}>Queued</p>
