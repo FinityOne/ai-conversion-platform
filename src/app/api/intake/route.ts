@@ -8,7 +8,7 @@ import { trackServer } from "@/lib/analytics-server";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
-  const { slug, name, phone, email, jobType, description } = await request.json();
+  const { slug, name, phone, email, description } = await request.json();
 
   if (!slug || !name?.trim()) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -42,7 +42,6 @@ export async function POST(request: Request) {
     name:        name.trim(),
     phone:       phone?.trim() || null,
     email:       email?.trim() || null,
-    job_type:    jobType      || null,
     description: description?.trim() || null,
     status:      "new",
     score:       5,
@@ -57,7 +56,6 @@ export async function POST(request: Request) {
   // Track the new lead in PostHog (attributed to the contractor, not the lead visitor).
   trackServer(profile.id, "lead_created", {
     source: "intake_form",
-    job_type: jobType || null,
     lead_id: lead.id,
     slug,
   });
@@ -67,14 +65,11 @@ export async function POST(request: Request) {
     const businessName = profile.business_name ?? "Your Service Provider";
     const contactEmail = profile.email ?? null;
     const toName       = name.trim();
-    const subject      = jobType
-      ? `We got your ${jobType} request, ${toName.split(" ")[0]}! — ${businessName}`
-      : `We received your request — ${businessName} will be in touch soon`;
+    const subject = `We received your request — ${businessName} will be in touch soon`;
 
     const html = buildLeadConfirmationEmail({
       leadName: toName,
       businessName,
-      jobType,
       description: description?.trim() || null,
       contactEmail,
     });

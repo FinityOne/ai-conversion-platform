@@ -1,38 +1,17 @@
 export function buildLeadConfirmationEmail({
   leadName,
   businessName,
-  jobType,
   description,
   contactEmail,
 }: {
   leadName: string;
   businessName: string;
-  jobType?: string | null;
   description?: string | null;
   contactEmail?: string | null;
 }): string {
   const firstName = leadName.split(" ")[0];
 
-  // Map job type to action language
-  const actionMap: Record<string, string> = {
-    "Roofing":           "discuss your roofing project and arrange an estimate",
-    "Siding":            "discuss your siding work and schedule a site visit",
-    "Windows & Doors":   "review your window and door needs and get you a quote",
-    "HVAC":              "assess your HVAC requirements and schedule service",
-    "Plumbing":          "talk through your plumbing needs and arrange a visit",
-    "Electrical":        "review your electrical work and schedule an inspection",
-    "Kitchen Remodel":   "discuss your kitchen project and share design ideas",
-    "Bathroom Remodel":  "talk through your bathroom plans and get you a quote",
-    "Flooring":          "review your flooring options and measure your space",
-    "Painting":          "discuss your painting project and provide an estimate",
-    "Deck / Patio":      "talk through your outdoor project and get you a quote",
-    "Landscaping":       "discuss your landscaping vision and schedule a walkthrough",
-    "General Contractor":"review your project and put together a plan",
-  };
-
-  const nextStepCopy = jobType && actionMap[jobType]
-    ? actionMap[jobType]
-    : "review your project details and get back to you with next steps";
+  const nextStepCopy = "review your project details and get back to you with next steps";
 
   const descriptionSection = description
     ? `
@@ -51,10 +30,6 @@ export function buildLeadConfirmationEmail({
           </tr>`
     : "";
 
-  const jobTypeSection = jobType
-    ? `<p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#ea580c;text-transform:uppercase;letter-spacing:0.5px;">${jobType}</p>`
-    : "";
-
   const contactSection = contactEmail
     ? `<a href="mailto:${contactEmail}" style="color:#ea580c;text-decoration:none;font-weight:600;">${contactEmail}</a>`
     : `the ${businessName} team`;
@@ -70,7 +45,7 @@ export function buildLeadConfirmationEmail({
 
   <!-- Preheader -->
   <span style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-    Thanks for reaching out! ${businessName} will be in touch shortly about your ${jobType || "project"}.
+    Thanks for reaching out! ${businessName} will be in touch shortly about your project.
   </span>
 
   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f3ee;min-height:100vh;">
@@ -136,7 +111,6 @@ export function buildLeadConfirmationEmail({
                 <tr>
                   <td>
                     <p style="margin:0 0 12px;font-size:15px;font-weight:800;color:#1c1917;">Your request summary</p>
-                    ${jobTypeSection}
                     ${descriptionSection}
                   </td>
                 </tr>

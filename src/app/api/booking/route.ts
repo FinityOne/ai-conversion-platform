@@ -41,21 +41,20 @@ export async function POST(request: Request) {
 
   // Fetch lead + profile for emails
   const [{ data: lead }, { data: profile }] = await Promise.all([
-    sb.from("leads").select("name, email, job_type").eq("id", booking.lead_id).single(),
+    sb.from("leads").select("name, email").eq("id", booking.lead_id).single(),
     sb.from("profiles").select("business_name, email, first_name").eq("id", booking.user_id).single(),
   ]);
 
   const businessName   = profile?.business_name ?? "Your Service Provider";
   const bizEmail       = profile?.email ?? "";
   const leadName       = lead?.name ?? "Customer";
-  const jobType        = lead?.job_type ?? "";
   const dateLabel      = formatDateFull(date);
   const startLabel     = formatTime12(time);
   const endLabel       = formatTime12(endTime);
 
   const dtStart = toICSDateTime(date, time);
   const dtEnd   = toICSDateTime(date, endTime);
-  const summary = `Consultation: ${jobType ? `${jobType} — ` : ""}${leadName}`;
+  const summary = `Consultation: ${leadName}`;
   const description = `15-minute consultation call with ${leadName} from ${businessName}.\n\nDate: ${dateLabel}\nTime: ${startLabel} – ${endLabel}`;
 
   const icsContent = buildICS({
@@ -73,7 +72,7 @@ export async function POST(request: Request) {
   const icsBase64 = Buffer.from(icsContent).toString("base64");
 
   const emailHtml = buildConfirmationEmail({
-    leadName, businessName, dateLabel, startLabel, endLabel, gcalUrl, jobType,
+    leadName, businessName, dateLabel, startLabel, endLabel, gcalUrl,
   });
 
   const TEST_TO = process.env.RESEND_TEST_TO;
@@ -95,7 +94,7 @@ export async function POST(request: Request) {
     from:    FROM,
     to:      TEST_TO ?? bizEmail,
     subject: `New booking: ${leadName} — ${dateLabel} at ${startLabel}`,
-    html:    buildOwnerNotificationEmail({ leadName, jobType, dateLabel, startLabel, endLabel, gcalUrl }),
+    html:    buildOwnerNotificationEmail({ leadName, dateLabel, startLabel, endLabel, gcalUrl }),
     attachments: [{ filename: "booking.ics", content: icsBase64 }],
   });
 
@@ -129,10 +128,10 @@ export async function POST(request: Request) {
 }
 
 function buildConfirmationEmail({
-  leadName, businessName, dateLabel, startLabel, endLabel, gcalUrl, jobType,
+  leadName, businessName, dateLabel, startLabel, endLabel, gcalUrl,
 }: {
   leadName: string; businessName: string; dateLabel: string;
-  startLabel: string; endLabel: string; gcalUrl: string; jobType: string;
+  startLabel: string; endLabel: string; gcalUrl: string;
 }): string {
   const firstName = leadName.split(" ")[0];
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
@@ -147,7 +146,7 @@ function buildConfirmationEmail({
   <tr><td style="background:#fff;padding:28px 32px;">
     <p style="margin:0 0 20px;font-size:16px;color:#44403c;">Hi ${firstName},</p>
     <p style="margin:0 0 20px;font-size:15px;color:#57534e;line-height:1.7;">
-      Your consultation with <strong>${businessName}</strong>${jobType ? ` about your ${jobType} project` : ""} is confirmed.
+      Your consultation with <strong>${businessName}</strong> is confirmed.
     </p>
     <div style="background:#f5f3ee;border-radius:12px;padding:20px;margin-bottom:24px;border-left:4px solid #0891b2;">
       <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#0891b2;text-transform:uppercase;letter-spacing:1px;">Appointment Details</p>
@@ -174,9 +173,9 @@ function buildConfirmationEmail({
 }
 
 function buildOwnerNotificationEmail({
-  leadName, jobType, dateLabel, startLabel, endLabel, gcalUrl,
+  leadName, dateLabel, startLabel, endLabel, gcalUrl,
 }: {
-  leadName: string; jobType: string; dateLabel: string;
+  leadName: string; dateLabel: string;
   startLabel: string; endLabel: string; gcalUrl: string;
 }): string {
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
@@ -189,7 +188,7 @@ function buildOwnerNotificationEmail({
   </td></tr>
   <tr><td style="background:#fff;padding:24px 32px;">
     <p style="margin:0 0 16px;font-size:15px;color:#57534e;line-height:1.7;">
-      <strong>${leadName}</strong>${jobType ? ` (${jobType})` : ""} just booked a consultation:
+      <strong>${leadName}</strong> just booked a consultation:
     </p>
     <div style="background:#f5f3ee;border-radius:12px;padding:18px;margin-bottom:20px;border-left:4px solid #ea580c;">
       <p style="margin:0 0 4px;font-size:18px;font-weight:900;color:#1c1917;">${dateLabel}</p>

@@ -20,7 +20,6 @@ export interface Lead {
   last_name: string | null;
   phone: string | null;
   email: string | null;
-  job_type: string | null;
   description: string | null;
   status: import("./scoring").LeadStatus;
   score: number;
@@ -53,7 +52,6 @@ export interface EmailLogEntry {
 export interface ProjectDetails {
   id: string;
   token: string;
-  job_type: string | null;
   description: string | null;
   property_type: string | null;
   budget_range: string | null;

@@ -6,7 +6,7 @@ export type RuleOperator =
   | "is_not_set"; // field is null / empty
 
 export interface SegmentRule {
-  field:    string;       // e.g. "status", "job_type", "email", "cf_1"
+  field:    string;       // e.g. "status", "email", "cf_1"
   operator: RuleOperator;
   value?:   string;       // used by eq, not_eq, contains
 }

@@ -304,7 +304,7 @@ export default async function IntakePage(
                   <p style={{ margin: 0, fontSize: 12, color: "#92400e", fontWeight: 600, lineHeight: 1.4 }}>{cfg.urgencyText}</p>
                 </div>
                 <div style={{ padding: "20px 24px 26px" }}>
-                  <IntakeForm slug={ownerId} businessName={biz} accent={accent} jobTypes={cfg.jobTypes} ctaLabel={cfg.ctaLabel} />
+                  <IntakeForm slug={ownerId} businessName={biz} accent={accent} ctaLabel={cfg.ctaLabel} />
                 </div>
               </div>
             </div>

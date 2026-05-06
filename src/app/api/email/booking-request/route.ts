@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
   const { data: lead } = await supabase
     .from("leads")
-    .select("name, email, job_type")
+    .select("name, email")
     .eq("id", leadId)
     .eq("user_id", user.id)
     .single();
@@ -57,7 +57,6 @@ export async function POST(request: Request) {
   const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const bookingUrl = `${siteUrl}/book/${token}`;
   const firstName  = lead.name.split(" ")[0];
-  const jobPhrase  = lead.job_type ? ` for your ${lead.job_type} project` : "";
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
 <body style="margin:0;padding:0;background:#f5f3ee;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
@@ -71,7 +70,7 @@ export async function POST(request: Request) {
   <tr><td style="background:#fff;padding:28px 32px;">
     <p style="margin:0 0 16px;font-size:16px;color:#44403c;">Hi ${firstName},</p>
     <p style="margin:0 0 20px;font-size:15px;color:#57534e;line-height:1.7;">
-      We've reviewed your project details${jobPhrase}. We're ready to jump on a quick
+      We've reviewed your project details. We're ready to jump on a quick
       <strong>15-minute consultation call</strong> to discuss next steps and give you
       an accurate estimate.
     </p>

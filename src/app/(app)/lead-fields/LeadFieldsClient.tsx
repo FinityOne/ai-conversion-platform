@@ -15,7 +15,6 @@ const STANDARD_FIELDS: { label: string; key: string; type: string; required?: bo
   { label: "Full Name",    key: "name",        type: "Text",    required: true },
   { label: "Phone",        key: "phone",       type: "Text" },
   { label: "Email",        key: "email",       type: "Text" },
-  { label: "Job Type",     key: "job_type",    type: "Text" },
   { label: "Notes",        key: "description", type: "Long Text" },
   { label: "Status",       key: "status",      type: "Pipeline Stage", note: "Managed automatically by pipeline" },
   { label: "Lead Score",   key: "score",       type: "Number",          note: "Calculated automatically" },

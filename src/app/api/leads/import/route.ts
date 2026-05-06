@@ -7,7 +7,6 @@ export interface ImportRow {
   last_name?: string | null;
   phone?: string | null;
   email?: string | null;
-  job_type?: string | null;
   description?: string | null;
   custom_fields?: Record<string, string | boolean | null>;
 }
@@ -72,7 +71,6 @@ export async function POST(req: NextRequest) {
       last_name:     row.last_name?.trim()    || null,
       phone:         row.phone?.trim()         || null,
       email:         row.email?.trim()         || null,
-      job_type:      row.job_type?.trim()      || null,
       description:   row.description?.trim()   || null,
       custom_fields: row.custom_fields ?? undefined,
     });
@@ -94,7 +92,6 @@ export async function POST(req: NextRequest) {
         last_name:     r.last_name,
         phone:         r.phone,
         email:         r.email,
-        job_type:      r.job_type,
         description:   r.description,
         custom_fields: r.custom_fields ?? null,
         status:        "new",

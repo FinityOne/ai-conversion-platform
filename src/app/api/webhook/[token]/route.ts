@@ -9,7 +9,7 @@ const supabaseAdmin = createClient(
 
 // ─── Field alias normalisation ────────────────────────────────────────────────
 // Maps common keys from Zapier, Make, Meta Ads, Google Ads, JotForm, Typeform, etc.
-const ALIASES: Record<string, "name" | "email" | "phone" | "job_type" | "description"> = {
+const ALIASES: Record<string, "name" | "email" | "phone" | "description"> = {
   // name
   name:           "name",
   full_name:      "name",
@@ -41,17 +41,6 @@ const ALIASES: Record<string, "name" | "email" | "phone" | "job_type" | "descrip
   tel:              "phone",
   contact_number:   "phone",
   whatsapp:         "phone",
-  // job_type
-  job_type:       "job_type",
-  "job type":     "job_type",
-  service:        "job_type",
-  service_type:   "job_type",
-  "service type": "job_type",
-  category:       "job_type",
-  type:           "job_type",
-  project_type:   "job_type",
-  "type of work": "job_type",
-  interest:       "job_type",
   // description / notes
   description:         "description",
   notes:               "description",
@@ -71,7 +60,7 @@ const ALIASES: Record<string, "name" | "email" | "phone" | "job_type" | "descrip
 
 function normalisePayload(raw: Record<string, unknown>) {
   const out: Record<string, string | null> = {
-    name: null, email: null, phone: null, job_type: null, description: null,
+    name: null, email: null, phone: null, description: null,
   };
 
   let firstName = "";
@@ -158,7 +147,6 @@ export async function POST(
       name:        lead.name,
       email:       lead.email   || null,
       phone:       lead.phone   || null,
-      job_type:    lead.job_type || null,
       description: lead.description || null,
       status:      "new",
       score:       5,

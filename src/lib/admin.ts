@@ -351,7 +351,6 @@ export interface UserLead {
   name:             string;
   email:            string | null;
   phone:            string | null;
-  job_type:         string | null;
   status:           string;
   score:            number;
   source:           string;
@@ -545,7 +544,7 @@ export async function getAdminUserDetail(userId: string): Promise<UserDetail | n
       .select("id, user_id, plan, billing_cycle, status, stripe_subscription_id, card_last4, card_brand, current_period_start, current_period_end, created_at, granted_by_admin, grant_type, grant_note, granted_at, granted_by")
       .eq("user_id", userId).maybeSingle(),
     sb.from("leads")
-      .select("id, name, email, phone, job_type, status, score, source, created_at, last_activity_at")
+      .select("id, name, email, phone, status, score, source, created_at, last_activity_at")
       .eq("user_id", userId).order("created_at", { ascending: false }),
     sb.from("email_log")
       .select("id, lead_id, type, subject, to_email, email_status, opened_at, clicked_at, created_at")

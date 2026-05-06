@@ -38,7 +38,7 @@ const SOURCE_OPTIONS = [
 const STANDARD_FIELDS: FieldDef[] = [
   { key: "status",      label: "Pipeline Status",  type: "status" },
   { key: "source",      label: "Lead Source",       type: "source" },
-  { key: "job_type",    label: "Job Type",          type: "text" },
+
   { key: "email",       label: "Email",             type: "boolean_presence" },
   { key: "phone",       label: "Phone",             type: "boolean_presence" },
   { key: "name",        label: "Name",              type: "text" },

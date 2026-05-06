@@ -147,11 +147,6 @@ function LeadRow({ lead, isEven }: { lead: Lead; isEven: boolean }) {
         <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {leadFullName(lead)}
         </p>
-        {lead.job_type && (
-          <p style={{ margin: "2px 0 0", fontSize: 11, color: SAPPHIRE, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {lead.job_type}
-          </p>
-        )}
       </div>
 
       {/* Phone */}

@@ -285,10 +285,11 @@ function LeadRow({
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {String(lead.name ?? "")}
           </p>
-          <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {lead.job_type ? String(lead.job_type) : "No job type"}
-            {lead.email ? ` · ${String(lead.email)}` : ""}
-          </p>
+          {lead.email ? (
+            <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {String(lead.email)}
+            </p>
+          ) : null}
         </div>
 
         {/* Custom field chips */}

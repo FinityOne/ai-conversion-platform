@@ -86,7 +86,7 @@ export default async function ImportDetailPage({ params }: { params: Promise<{ i
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 560 }}>
               <thead>
                 <tr style={{ background: "#f9f7f4", borderBottom: `1px solid ${BORDER}` }}>
-                  {["Name", "Email", "Phone", "Job Type", "Status"].map(h => (
+                  {["Name", "Email", "Phone", "Status"].map(h => (
                     <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.5px", whiteSpace: "nowrap" }}>
                       {h}
                     </th>
@@ -105,7 +105,6 @@ export default async function ImportDetailPage({ params }: { params: Promise<{ i
                       </td>
                       <td style={{ padding: "10px 14px", fontSize: 13, color: MUTED }}>{lead.email ?? <em style={{ color: "#c4bfb8" }}>—</em>}</td>
                       <td style={{ padding: "10px 14px", fontSize: 13, color: MUTED }}>{lead.phone ?? <em style={{ color: "#c4bfb8" }}>—</em>}</td>
-                      <td style={{ padding: "10px 14px", fontSize: 13, color: MUTED }}>{lead.job_type ?? <em style={{ color: "#c4bfb8" }}>—</em>}</td>
                       <td style={{ padding: "10px 14px" }}>
                         <span style={{
                           display: "inline-flex", alignItems: "center", gap: 4,

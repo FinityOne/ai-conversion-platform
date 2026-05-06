@@ -1,7 +1,6 @@
 interface FollowUpEmailProps {
   leadName: string;
   businessName: string;
-  jobType?: string | null;
   projectUrl: string;
   contactEmail?: string | null;
 }
@@ -9,12 +8,11 @@ interface FollowUpEmailProps {
 export function buildFollowUpEmail({
   leadName,
   businessName,
-  jobType,
   projectUrl,
   contactEmail,
 }: FollowUpEmailProps): string {
   const firstName = leadName.split(" ")[0] || "there";
-  const jobPhrase = jobType ? `your ${jobType} project` : "your project";
+  const jobPhrase = "your project";
 
   return `<!DOCTYPE html>
 <html lang="en">

@@ -17,7 +17,7 @@ type AnalyticsEvent =
   | { event: "logout" }
 
   // ── Leads ─────────────────────────────────────────────────────────────────
-  | { event: "lead_created"; properties: { source: "manual" | "import" | "intake_form" | "webhook"; job_type?: string } }
+  | { event: "lead_created"; properties: { source: "manual" | "import" | "intake_form" | "webhook" } }
   | { event: "lead_viewed"; properties: { lead_id: string } }
   | { event: "lead_status_changed"; properties: { lead_id: string; from: string; to: string } }
   | { event: "leads_imported"; properties: { count: number } }

@@ -7,7 +7,7 @@ import { computeScore } from "@/lib/scoring";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
-  const { leadId, toEmail, toName, jobType, description } = await request.json();
+  const { leadId, toEmail, toName, description } = await request.json();
 
   if (!leadId || !toEmail) {
     return NextResponse.json({ error: "Missing leadId or toEmail" }, { status: 400 });
@@ -30,14 +30,11 @@ export async function POST(request: Request) {
   const html = buildLeadConfirmationEmail({
     leadName:     toName || "there",
     businessName,
-    jobType,
     description,
     contactEmail,
   });
 
-  const subject = jobType
-    ? `We got your ${jobType} request, ${(toName || "").split(" ")[0] || "there"}! — ${businessName}`
-    : `We received your request — ${businessName} will be in touch soon`;
+  const subject = `We received your request — ${businessName} will be in touch soon`;
 
   const { data: sendData, error: sendError } = await resend.emails.send({
     from:    process.env.RESEND_FROM_EMAIL ?? `${businessName} <hello@clozeflow.com>`,

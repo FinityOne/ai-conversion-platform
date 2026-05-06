@@ -26,7 +26,6 @@ export async function POST() {
     full_name:    "Test Lead",
     email:        "test@example.com",
     phone_number: "(555) 000-0000",
-    job_type:     "Test Service",
     message:      "This is a test lead from ClozeFlow to confirm your webhook is working.",
   };
 

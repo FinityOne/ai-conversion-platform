@@ -14,7 +14,6 @@ interface LeadFields {
   last_name:     string | null;
   phone:         string | null;
   email:         string | null;
-  job_type:      string | null;
   description:   string | null;
   status:        LeadStatus;
   custom_fields?: Record<string, string | boolean | null>;
@@ -49,7 +48,6 @@ export default function EditLeadModal({ lead }: Props) {
   const [lastName,    setLastName]    = useState(lead.last_name ?? (lead.name.split(" ").slice(1).join(" ") || ""));
   const [phone,       setPhone]       = useState(formatPhoneDisplay(lead.phone));
   const [email,       setEmail]       = useState(lead.email ?? "");
-  const [jobType,     setJobType]     = useState(lead.job_type ?? "");
   const [description, setDescription] = useState(lead.description ?? "");
   const [status,      setStatus]      = useState<LeadStatus>(lead.status);
 
@@ -74,7 +72,6 @@ export default function EditLeadModal({ lead }: Props) {
     setLastName(lead.last_name ?? (lead.name.split(" ").slice(1).join(" ") || ""));
     setPhone(formatPhoneDisplay(lead.phone));
     setEmail(lead.email ?? "");
-    setJobType(lead.job_type ?? "");
     setDescription(lead.description ?? "");
     setStatus(lead.status);
     setCustomValues(Object.fromEntries(
@@ -119,7 +116,6 @@ export default function EditLeadModal({ lead }: Props) {
         last_name:     lastName.trim() || null,
         phone:         formatPhoneE164(phone) ?? (phone.trim() || null),
         email:         email.trim()       || null,
-        job_type:      jobType.trim()     || null,
         description:   description.trim() || null,
         status,
         ...(customDefs.length > 0 ? { custom_fields } : {}),
@@ -218,11 +214,6 @@ export default function EditLeadModal({ lead }: Props) {
                   <label style={labelStyle}>Email</label>
                   <input value={email} onChange={e => setEmail(e.target.value)} placeholder="name@email.com" type="email" style={inputStyle} />
                 </div>
-              </div>
-
-              <div>
-                <label style={labelStyle}>Job Type</label>
-                <input value={jobType} onChange={e => setJobType(e.target.value)} placeholder="e.g. Roof replacement, HVAC install" style={inputStyle} />
               </div>
 
               <div>

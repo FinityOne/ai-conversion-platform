@@ -80,7 +80,6 @@ export async function PATCH(
     };
     if (row.phone?.trim())       patch.phone       = row.phone.trim();
     if (row.email?.trim())       patch.email       = row.email.trim();
-    if (row.job_type?.trim())    patch.job_type    = row.job_type.trim();
     if (row.description?.trim()) patch.description = row.description.trim();
     if (row.custom_fields)       patch.custom_fields = row.custom_fields;
 

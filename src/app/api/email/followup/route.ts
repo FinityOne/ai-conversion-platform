@@ -56,7 +56,6 @@ export async function POST(request: Request) {
       .insert({
         lead_id:     leadId,
         user_id:     user.id,
-        job_type:    lead.job_type,
         description: lead.description,
       })
       .select("token")
@@ -75,7 +74,6 @@ export async function POST(request: Request) {
   const html    = buildFollowUpEmail({
     leadName:     lead.name,
     businessName,
-    jobType:      lead.job_type,
     projectUrl,
     contactEmail,
   });

@@ -10,7 +10,7 @@ export default async function ProjectPage(
 
   const { data: pd } = await sb
     .from("project_details")
-    .select("lead_id, user_id, job_type, description, submitted_at")
+    .select("lead_id, user_id, description, submitted_at")
     .eq("token", token)
     .single();
 
@@ -76,7 +76,6 @@ export default async function ProjectPage(
         }}>
           <ProjectDetailsForm
             token={token}
-            initialJobType={pd.job_type}
             initialDescription={pd.description}
             businessName={businessName}
           />

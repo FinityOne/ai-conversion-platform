@@ -299,7 +299,6 @@ function LeadsTab({ leads, leadsByStatus }: { leads: UserLead[]; leadsByStatus: 
           <div key={lead.id} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 110px 55px 55px 130px", gap: 10, padding: "12px 18px", borderBottom: i < filtered.length - 1 ? `1px solid ${BG}` : "none", alignItems: "center" }}>
             <div style={{ minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lead.name}</p>
-              {lead.job_type && <p style={{ margin: "1px 0 0", fontSize: 11, color: MUTED }}>{lead.job_type}</p>}
             </div>
             <div style={{ minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 12, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lead.email ?? lead.phone ?? "—"}</p>

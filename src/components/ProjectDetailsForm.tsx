@@ -2,19 +2,12 @@
 
 import { useState, useRef } from "react";
 
-const JOB_TYPES = [
-  "Roofing", "Siding & Gutters", "Windows & Doors", "HVAC", "Plumbing",
-  "Electrical", "Kitchen Remodel", "Bathroom Remodel", "Flooring",
-  "Painting & Drywall", "Landscaping & Lawn Care",
-];
-
 const PROPERTY_TYPES = ["Single-Family Home", "Condo / Townhouse", "Multi-Family", "Commercial", "Other"];
 const BUDGET_RANGES  = ["Under $1,000", "$1,000 – $5,000", "$5,000 – $15,000", "$15,000 – $30,000", "$30,000+", "Not sure yet"];
 const TIMELINES      = ["As soon as possible", "Within 2 weeks", "Within a month", "1–3 months", "Just planning ahead"];
 
 interface Props {
   token: string;
-  initialJobType?: string | null;
   initialDescription?: string | null;
   businessName: string;
 }
@@ -41,8 +34,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-export default function ProjectDetailsForm({ token, initialJobType, initialDescription, businessName }: Props) {
-  const [jobType,          setJobType]          = useState(initialJobType ?? "");
+export default function ProjectDetailsForm({ token, initialDescription, businessName }: Props) {
   const [description,      setDescription]      = useState(initialDescription ?? "");
   const [propertyType,     setPropertyType]     = useState("");
   const [budgetRange,      setBudgetRange]       = useState("");
@@ -78,7 +70,6 @@ export default function ProjectDetailsForm({ token, initialJobType, initialDescr
 
     const fd = new FormData();
     fd.append("token",           token);
-    fd.append("jobType",         jobType);
     fd.append("description",     description);
     fd.append("propertyType",    propertyType);
     fd.append("budgetRange",     budgetRange);
@@ -161,22 +152,6 @@ export default function ProjectDetailsForm({ token, initialJobType, initialDescr
           1 · Project Info
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <Field label="Service Type">
-            <div style={{ position: "relative" }}>
-              <select
-                style={{ ...fieldStyle(focusedField === "jobType"), appearance: "none", paddingRight: 40, cursor: "pointer" }}
-                value={jobType}
-                onChange={e => setJobType(e.target.value)}
-                onFocus={() => setFocusedField("jobType")}
-                onBlur={() => setFocusedField(null)}
-              >
-                <option value="">Select a service...</option>
-                {JOB_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-              <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#a8a29e", fontSize: 12 }}>▼</span>
-            </div>
-          </Field>
-
           <Field label="Describe your project *" hint="What's the issue or goal? The more detail, the better.">
             <textarea
               style={{ ...fieldStyle(focusedField === "description"), resize: "vertical", minHeight: 100 }}

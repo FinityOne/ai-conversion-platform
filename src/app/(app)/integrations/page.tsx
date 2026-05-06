@@ -403,7 +403,7 @@ function WebhookTab({
               { n: 1, title: "Create a new Zap", body: 'In Zapier, click "Create Zap" and choose your trigger app — e.g. Meta Ads Lead Ad, Google Ads, or a form tool.' },
               { n: 2, title: "Set up a Webhooks action", body: 'Search for "Webhooks by Zapier" as your action step, then choose the "POST" event.' },
               { n: 3, title: "Paste your webhook URL", body: `Set the URL to your webhook above. Set Payload Type to "JSON".`, url: webhookUrl },
-              { n: 4, title: "Map your lead fields", body: 'In the Data section, map: name → full_name, email → email, phone → phone_number, service → job_type, notes → message. Field names are flexible — we auto-detect them.' },
+              { n: 4, title: "Map your lead fields", body: 'In the Data section, map: name → full_name, email → email, phone → phone_number, notes → message. Field names are flexible — we auto-detect them.' },
               { n: 5, title: "Test & publish", body: 'Use Zapier\'s built-in test, then check your Leads page to confirm the test lead arrived. Turn on your Zap and you\'re live!' },
             ]}
           />
@@ -415,7 +415,7 @@ function WebhookTab({
               { n: 1, title: "Create a new scenario", body: "In Make, create a new scenario and add your trigger module — e.g. Facebook Lead Ads, Google Sheets, or a Webhook trigger." },
               { n: 2, title: "Add an HTTP module", body: 'Click +, search for "HTTP", and choose "Make a request".' },
               { n: 3, title: "Configure the request", body: `Set Method to POST, URL to your webhook. Set Body type to "Raw" with content type "application/json".`, url: webhookUrl },
-              { n: 4, title: "Build the JSON body", body: 'In the Body field, build a JSON object: { "name": "...", "email": "...", "phone": "...", "job_type": "...", "description": "..." }' },
+              { n: 4, title: "Build the JSON body", body: 'In the Body field, build a JSON object: { "name": "...", "email": "...", "phone": "...", "description": "..." }' },
               { n: 5, title: "Test & activate", body: "Run the scenario once to verify a test lead appears in ClozeFlow, then schedule it to run continuously." },
             ]}
           />
@@ -426,8 +426,8 @@ function WebhookTab({
             steps={[
               { n: 1, title: "Send a POST request", body: "Any tool that can make HTTP requests works — cURL, Postman, your own backend, or a form builder's webhook." },
               { n: 2, title: "Use JSON body", body: 'Set Content-Type: application/json. Fields can be in any order — we normalise them automatically.' },
-              { n: 3, title: "Supported field names", body: "name, full_name, email, phone, phone_number, mobile, job_type, service, description, notes, message, comments. First name + last name are combined if sent separately." },
-              { n: 4, title: "Example payload", body: "", code: JSON.stringify({ full_name: "Sarah Chen", email: "sarah@example.com", phone_number: "(555) 123-4567", job_type: "HVAC", message: "Need AC serviced before summer." }, null, 2) },
+              { n: 3, title: "Supported field names", body: "name, full_name, email, phone, phone_number, mobile, description, notes, message, comments. First name + last name are combined if sent separately." },
+              { n: 4, title: "Example payload", body: "", code: JSON.stringify({ full_name: "Sarah Chen", email: "sarah@example.com", phone_number: "(555) 123-4567", message: "Need AC serviced before summer." }, null, 2) },
               { n: 5, title: "Response", body: 'On success you get: { "ok": true, "lead_id": "..." } with HTTP 201. On error, a JSON error message with 4xx/5xx.' },
             ]}
           />
@@ -685,11 +685,10 @@ function CsvTab() {
         <p style={{ margin: "0 0 12px", fontSize: 13, color: MUTED }}>Any of these column names will be auto-detected — pick whichever your export uses.</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
           {[
-            { field: "Name",     aliases: "name, full_name, full name, contact_name" },
-            { field: "Email",    aliases: "email, email_address, e-mail" },
-            { field: "Phone",    aliases: "phone, phone_number, mobile, telephone, tel" },
-            { field: "Job Type", aliases: "job_type, service, category, type" },
-            { field: "Notes",    aliases: "description, notes, message, details, comments" },
+            { field: "Name",  aliases: "name, full_name, full name, contact_name" },
+            { field: "Email", aliases: "email, email_address, e-mail" },
+            { field: "Phone", aliases: "phone, phone_number, mobile, telephone, tel" },
+            { field: "Notes", aliases: "description, notes, message, details, comments" },
           ].map(r => (
             <div key={r.field} style={{ background: BG, borderRadius: 10, padding: "10px 12px" }}>
               <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 800, color: TEXT }}>{r.field}</p>

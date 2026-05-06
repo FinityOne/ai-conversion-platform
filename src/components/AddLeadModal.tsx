@@ -112,7 +112,6 @@ export default function AddLeadModal() {
   const [lastName,    setLastName]    = useState("");
   const [phone,       setPhone]       = useState("");
   const [email,       setEmail]       = useState("");
-  const [jobType,     setJobType]     = useState("");
   const [description, setDescription] = useState("");
 
   const [customDefs,   setCustomDefs]   = useState<CustomFieldDef[]>([]);
@@ -137,7 +136,7 @@ export default function AddLeadModal() {
 
   function resetAndClose() {
     setFirstName(""); setLastName(""); setPhone(""); setEmail("");
-    setJobType(""); setDescription("");
+    setDescription("");
     setError(""); setEmailNote(""); setOpen(false);
     setCustomValues({});
   }
@@ -171,7 +170,6 @@ export default function AddLeadModal() {
       name:          fullName,
       phone:         formatPhoneE164(phone) ?? (phone.trim() || null),
       email:         email.trim()       || null,
-      job_type:      jobType            || null,
       description:   description.trim() || null,
       custom_fields: customDefs.length > 0 ? custom_fields : null,
       status:        "new",
@@ -192,7 +190,6 @@ export default function AddLeadModal() {
             leadId:      lead.id,
             toEmail:     email.trim(),
             toName:      fullName,
-            jobType:     jobType || null,
             description: description.trim() || null,
           }),
         });
@@ -204,7 +201,7 @@ export default function AddLeadModal() {
       }
     }
 
-    track({ event: "lead_created", properties: { source: "manual", job_type: jobType || undefined } });
+    track({ event: "lead_created", properties: { source: "manual" } });
     setLoading(false);
     resetAndClose();
     router.refresh();
@@ -298,13 +295,6 @@ export default function AddLeadModal() {
                   <span style={{ fontSize: 13, color: "#15803d" }}>A confirmation email will be sent to this address</span>
                 </div>
               )}
-
-              <Field label="Job Type">
-                <select style={{ ...inputStyle, appearance: "none" as const }} value={jobType} onChange={e => setJobType(e.target.value)}>
-                  <option value="">Select a job type...</option>
-                  {JOB_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </Field>
 
               <Field label="Notes / Description">
                 <textarea

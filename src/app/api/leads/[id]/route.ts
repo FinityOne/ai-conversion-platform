@@ -20,7 +20,7 @@ export async function PATCH(
   }
 
   // Only allow these fields to be updated
-  const allowed = ["name", "first_name", "last_name", "phone", "email", "job_type", "description", "status"] as const;
+  const allowed = ["name", "first_name", "last_name", "phone", "email", "description", "status"] as const;
   const updates: Record<string, unknown> = {};
 
   for (const key of allowed) {

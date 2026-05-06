@@ -13,7 +13,7 @@ const BG       = "#F5F7FB";
 const SAPPHIRE = "#2860B0";
 
 // ─── Target fields we want to capture ────────────────────────────────────────
-export type TargetField = "first_name" | "last_name" | "email" | "phone" | "job_type" | "description" | "cf_1" | "cf_2" | "cf_3" | "__skip__";
+export type TargetField = "first_name" | "last_name" | "email" | "phone" | "description" | "cf_1" | "cf_2" | "cf_3" | "__skip__";
 
 interface FieldMeta {
   label: string;
@@ -24,7 +24,6 @@ const CORE_FIELDS: Record<Exclude<TargetField, "__skip__" | CustomFieldKey>, Fie
   last_name:   { label: "Last Name",          required: false },
   email:       { label: "Email",              required: false },
   phone:       { label: "Phone",              required: false },
-  job_type:    { label: "Job Type",           required: false },
   description: { label: "Notes / Description",required: false },
 };
 
@@ -48,13 +47,6 @@ const FIELD_ALIASES: Record<Exclude<TargetField, "__skip__" | CustomFieldKey>, s
     "phone", "phone number", "phone_number", "phonenumber",
     "mobile", "mobile number", "mobile_number", "cell", "cell phone",
     "telephone", "tel", "contact number", "contact_number", "whatsapp",
-  ],
-  job_type: [
-    "job type", "job_type", "jobtype", "service", "service type",
-    "service_type", "services", "job", "work type", "work_type",
-    "category", "project type", "project_type", "type of service",
-    "service needed", "what do you need", "type of work", "interest",
-    "interested in",
   ],
   description: [
     "description", "notes", "note", "message", "details", "comments",
@@ -246,7 +238,6 @@ export default function ImportLeadsModal() {
         last_name:     built["last_name"] || null,
         phone:         built["phone"] || null,
         email:         built["email"] || null,
-        job_type:      built["job_type"] || null,
         description:   built["description"] || null,
         custom_fields: customFields,
       };
@@ -459,7 +450,7 @@ function UploadStep({
           <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 380 }}>
             <thead>
               <tr>
-                {["Full Name *", "Email", "Phone", "Job Type", "Notes"].map(h => (
+                {["Full Name *", "Email", "Phone", "Notes"].map(h => (
                   <th key={h} style={{ padding: "6px 10px", background: "#fff", border: `1px solid ${BORDER}`, fontWeight: 700, color: TEXT, textAlign: "left", whiteSpace: "nowrap" }}>
                     {h}
                   </th>
@@ -468,7 +459,7 @@ function UploadStep({
             </thead>
             <tbody>
               <tr>
-                {["Jake Rivera", "jake@email.com", "(555) 000-0000", "Roofing", "Needs inspection"].map((v, i) => (
+                {["Jake Rivera", "jake@email.com", "(555) 000-0000", "Needs inspection"].map((v, i) => (
                   <td key={i} style={{ padding: "6px 10px", border: `1px solid ${BORDER}`, color: MUTED }}>
                     {v}
                   </td>
@@ -503,7 +494,6 @@ function MappingStep({
     { value: "last_name",   label: "Last Name" },
     { value: "email",       label: "Email" },
     { value: "phone",       label: "Phone" },
-    { value: "job_type",    label: "Job Type" },
     { value: "description", label: "Notes / Description" },
     ...customDefs.map(d => ({
       value: d.key as TargetField,
@@ -622,8 +612,8 @@ function PreviewStep({
   const skippedCount = totalRows - validCount;
   const activeCFs = customDefs.filter(d => Object.values(mapping).includes(d.key as TargetField));
 
-  const coreHeaders = ["First Name", "Last Name", "Email", "Phone", "Job Type", "Notes"];
-  const coreFields  = ["first_name", "last_name", "email", "phone", "job_type", "description"];
+  const coreHeaders = ["First Name", "Last Name", "Email", "Phone", "Notes"];
+  const coreFields  = ["first_name", "last_name", "email", "phone", "description"];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

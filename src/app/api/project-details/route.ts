@@ -13,7 +13,6 @@ export async function POST(request: Request) {
   }
 
   const token          = formData.get("token") as string;
-  const jobType        = formData.get("jobType") as string | null;
   const description    = formData.get("description") as string | null;
   const propertyType   = formData.get("propertyType") as string | null;
   const budgetRange    = formData.get("budgetRange") as string | null;
@@ -56,7 +55,6 @@ export async function POST(request: Request) {
 
   // Update project_details record
   await sb.from("project_details").update({
-    job_type:         jobType        || null,
     description:      description    || null,
     property_type:    propertyType   || null,
     budget_range:     budgetRange    || null,

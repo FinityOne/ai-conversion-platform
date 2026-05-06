@@ -4,25 +4,12 @@ import { useState } from "react";
 import PhoneInput from "@/components/PhoneInput";
 import { formatPhoneE164 } from "@/lib/phone";
 
-const DEFAULT_JOB_TYPES = [
-  "Roofing",
-  "Siding & Gutters",
-  "Windows & Doors",
-  "HVAC",
-  "Plumbing",
-  "Electrical",
-  "Kitchen Remodel",
-  "Bathroom Remodel",
-  "Flooring",
-  "Painting & Drywall",
-  "Landscaping & Lawn Care",
-];
+
 
 interface Props {
   slug: string;
   businessName: string;
   accent: string;
-  jobTypes?: string[];
   ctaLabel?: string;
 }
 
@@ -56,12 +43,10 @@ function Field({
   );
 }
 
-export default function IntakeForm({ slug, businessName, accent, jobTypes, ctaLabel }: Props) {
-  const JOB_TYPES = jobTypes ?? DEFAULT_JOB_TYPES;
+export default function IntakeForm({ slug, businessName, accent, ctaLabel }: Props) {
   const [name,        setName]        = useState("");
   const [phone,       setPhone]       = useState("");
   const [email,       setEmail]       = useState("");
-  const [jobType,     setJobType]     = useState("");
   const [description, setDescription] = useState("");
 
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -82,7 +67,7 @@ export default function IntakeForm({ slug, businessName, accent, jobTypes, ctaLa
     const res = await fetch("/api/intake", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug, name, phone: formatPhoneE164(phone) ?? phone, email, jobType, description }),
+      body: JSON.stringify({ slug, name, phone: formatPhoneE164(phone) ?? phone, email, description }),
     });
 
     setLoading(false);
@@ -118,8 +103,7 @@ export default function IntakeForm({ slug, businessName, accent, jobTypes, ctaLa
           You&apos;re all set!
         </h2>
         <p style={{ margin: "0 0 6px", fontSize: 17, color: "#44403c", lineHeight: 1.6 }}>
-          <strong>{businessName}</strong> received your request
-          {jobType ? ` for ${jobType}` : ""}.
+          <strong>{businessName}</strong> received your request.
         </p>
         <p style={{ margin: 0, fontSize: 15, color: "#78716c", lineHeight: 1.6 }}>
           {email.trim()
@@ -184,29 +168,6 @@ export default function IntakeForm({ slug, businessName, accent, jobTypes, ctaLa
         </Field>
       </div>
 
-      <Field label="What do you need help with?">
-        <div style={{ position: "relative" }}>
-          <select
-            style={{
-              ...inputStyle(accent, focusedField === "jobType"),
-              appearance: "none",
-              paddingRight: 44,
-              cursor: "pointer",
-            }}
-            value={jobType}
-            onChange={e => setJobType(e.target.value)}
-            onFocus={() => setFocusedField("jobType")}
-            onBlur={() => setFocusedField(null)}
-          >
-            <option value="">Select a service...</option>
-            {JOB_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <span style={{
-            position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)",
-            pointerEvents: "none", color: "#a8a29e", fontSize: 13,
-          }}>▼</span>
-        </div>
-      </Field>
 
       <Field label="Any details? (optional)">
         <textarea

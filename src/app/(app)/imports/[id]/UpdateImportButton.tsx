@@ -10,14 +10,13 @@ const MUTED  = "#78716c";
 const ORANGE = "#D35400";
 const BG     = "#F9F7F2";
 
-type TargetField = "first_name" | "last_name" | "email" | "phone" | "job_type" | "description" | "__skip__";
+type TargetField = "first_name" | "last_name" | "email" | "phone" | "description" | "__skip__";
 
 const FIELD_ALIASES: Record<Exclude<TargetField, "__skip__">, string[]> = {
   first_name: ["first name", "first_name", "firstname", "fname", "name", "full name", "fullname", "full_name", "contact name"],
   last_name:  ["last name", "last_name", "lastname", "surname", "lname"],
   email:      ["email", "email address", "email_address", "e-mail", "mail"],
   phone:      ["phone", "phone number", "mobile", "cell", "telephone", "tel"],
-  job_type:   ["job type", "job_type", "service", "service type", "category"],
   description:["description", "notes", "note", "message", "details", "comments"],
 };
 
@@ -51,7 +50,6 @@ const FIELD_OPTIONS: { value: TargetField; label: string }[] = [
   { value: "last_name",   label: "Last Name" },
   { value: "email",       label: "Email" },
   { value: "phone",       label: "Phone" },
-  { value: "job_type",    label: "Job Type" },
   { value: "description", label: "Notes" },
 ];
 

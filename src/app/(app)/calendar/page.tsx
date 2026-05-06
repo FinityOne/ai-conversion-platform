@@ -42,7 +42,7 @@ export default async function CalendarPage() {
   // Fetch lead names for those bookings
   const leadIds = [...new Set((bookings ?? []).map((b: { lead_id: string }) => b.lead_id))];
   const { data: leads } = leadIds.length
-    ? await sb.from("leads").select("id, name, job_type").in("id", leadIds)
+    ? await sb.from("leads").select("id, name").in("id", leadIds)
     : { data: [] };
 
   const leadMap = Object.fromEntries((leads ?? []).map(l => [l.id, l]));
@@ -120,11 +120,6 @@ export default async function CalendarPage() {
                       <p style={{ margin: "0 0 2px", fontSize: 15, fontWeight: 800, color: TEXT }}>
                         {lead?.name ?? "Lead"}
                       </p>
-                      {lead?.job_type && (
-                        <p style={{ margin: 0, fontSize: 12, color: "#D35400", fontWeight: 600 }}>
-                          {lead.job_type}
-                        </p>
-                      )}
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: TEXT }}>

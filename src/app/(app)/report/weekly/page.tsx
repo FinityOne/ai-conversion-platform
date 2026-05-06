@@ -129,7 +129,7 @@ export default async function WeeklyReportPage({
     { data: profile },
   ] = await Promise.all([
     supabase.from("leads")
-      .select("id, first_name, last_name, name, email, phone, status, score, source, job_type, created_at")
+      .select("id, first_name, last_name, name, email, phone, status, score, source, created_at")
       .eq("user_id", user.id)
       .gte("created_at", weekStart.toISOString())
       .lt("created_at", weekEnd.toISOString())
@@ -658,7 +658,7 @@ export default async function WeeklyReportPage({
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
                 <tr style={{ background: "#0B1F45" }}>
-                  {["#", "Name", "Contact", "Job Type", "Status", "Score", "Added"].map(h => (
+                  {["#", "Name", "Contact", "Status", "Score", "Added"].map(h => (
                     <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontSize: 10, fontWeight: 800, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
@@ -676,7 +676,6 @@ export default async function WeeklyReportPage({
                         <div>{lead.email ?? ""}</div>
                         {lead.phone && <div style={{ fontSize: 11, color: "#94A3B8" }}>{lead.phone}</div>}
                       </td>
-                      <td style={{ padding: "10px 12px", color: "#475569" }}>{lead.job_type ?? "—"}</td>
                       <td style={{ padding: "10px 12px" }}>
                         <span style={{ fontSize: 10, fontWeight: 800, padding: "3px 8px", borderRadius: 10, background: stage.bg, color: stage.color, whiteSpace: "nowrap" }}>
                           {stage.label}

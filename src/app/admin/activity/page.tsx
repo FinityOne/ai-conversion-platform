@@ -49,7 +49,6 @@ function EventRow({ event }: { event: ActivityEvent }) {
   let detail = "";
   if (event.event_type === "signup"       && (meta.business_name || meta.email)) detail = meta.business_name || meta.email;
   if (event.event_type === "subscription" && meta.plan)          detail = `${meta.plan} · ${meta.billing_cycle}`;
-  if (event.event_type === "lead"         && meta.job_type)      detail = meta.job_type;
   if (event.event_type === "email"        && meta.to_email)      detail = meta.to_email;
 
   return (
