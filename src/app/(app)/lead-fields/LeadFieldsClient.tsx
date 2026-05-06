@@ -60,10 +60,24 @@ export default function LeadFieldsClient({ initialDefs }: { initialDefs: CustomF
     });
   }
 
-  function removeDef(key: CustomFieldKey) {
+  async function handleRemoveAndSave(key: CustomFieldKey) {
+    const nextDefs = defs.filter(d => d.key !== key);
+    setDefs(nextDefs);
+    setSaving(true);
     setSaved(false);
     setError("");
-    setDefs(prev => prev.filter(d => d.key !== key));
+    const toSave = nextDefs.filter(d => d.label.trim());
+    const res = await fetch("/api/leads/custom-field-defs", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ defs: toSave }),
+    });
+    const body = await res.json();
+    setSaving(false);
+    if (!res.ok) { setError(body.error ?? "Failed to save"); return; }
+    setDefs(body.defs ?? toSave);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
   }
 
   async function handleSave() {
@@ -222,7 +236,7 @@ export default function LeadFieldsClient({ initialDefs }: { initialDefs: CustomF
               def={getOrEmpty(key)}
               active={defs.some(d => d.key === key && d.label.trim())}
               onUpdate={patch => updateDef(key, patch)}
-              onRemove={() => removeDef(key)}
+              onRemove={() => handleRemoveAndSave(key)}
             />
           ))}
         </div>
@@ -254,8 +268,9 @@ function CustomFieldCard({
   onUpdate: (patch: Partial<CustomFieldDef>) => void;
   onRemove: () => void;
 }) {
-  const [optionsText, setOptionsText] = useState((def.options ?? []).join(", "));
-  const [expanded,    setExpanded]    = useState(active);
+  const [optionsText,  setOptionsText]  = useState((def.options ?? []).join(", "));
+  const [expanded,     setExpanded]     = useState(active);
+  const [showConfirm,  setShowConfirm]  = useState(false);
 
   function handleOptionsBlur() {
     const parsed = optionsText
@@ -435,7 +450,7 @@ function CustomFieldCard({
           {active && (
             <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 4 }}>
               <button
-                onClick={onRemove}
+                onClick={() => setShowConfirm(true)}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 6,
                   padding: "8px 14px", borderRadius: 9,
@@ -447,6 +462,47 @@ function CustomFieldCard({
                 <i className="fa-solid fa-trash-can" style={{ fontSize: 11 }} />
                 Remove this field
               </button>
+            </div>
+          )}
+
+          {/* Confirm removal dialog */}
+          {showConfirm && (
+            <div
+              onClick={() => setShowConfirm(false)}
+              style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+            >
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{ background: WHITE, borderRadius: 20, width: "100%", maxWidth: 420, boxShadow: "0 20px 60px rgba(0,0,0,0.22)", overflow: "hidden" }}
+              >
+                {/* Header */}
+                <div style={{ padding: "22px 24px 18px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "flex-start", gap: 14 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: "#fef2f2", border: "1px solid #fecaca", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <i className="fa-solid fa-triangle-exclamation" style={{ color: "#dc2626", fontSize: 16 }} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 900, color: TEXT }}>Remove "{def.label}"?</h3>
+                    <p style={{ margin: 0, fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
+                      This custom field will be removed. Any data already saved to leads under this field may be lost and won't be recoverable.
+                    </p>
+                  </div>
+                </div>
+                {/* Actions */}
+                <div style={{ padding: "16px 24px", display: "flex", gap: 10 }}>
+                  <button
+                    onClick={() => setShowConfirm(false)}
+                    style={{ flex: 1, padding: "11px", borderRadius: 10, border: `1.5px solid ${BORDER}`, background: WHITE, fontSize: 14, fontWeight: 700, color: TEXT, cursor: "pointer" }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => { setShowConfirm(false); onRemove(); }}
+                    style={{ flex: 1, padding: "11px", borderRadius: 10, border: "none", background: "#dc2626", color: WHITE, fontSize: 14, fontWeight: 700, cursor: "pointer" }}
+                  >
+                    Yes, remove field
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
