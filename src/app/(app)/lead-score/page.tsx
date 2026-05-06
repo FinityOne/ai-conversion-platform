@@ -526,7 +526,14 @@ export default function LeadScorePage() {
                         </span>
                       )}
                       <div style={{ fontSize: 18, marginBottom: 6 }}>{preset.emoji}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: isActive ? accentColor : TEXT, marginBottom: 4 }}>{preset.label}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: isActive ? accentColor : TEXT }}>{preset.label}</span>
+                        {key === "balanced" && (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: "#78716c", background: "#f0ede8", border: "1px solid #e6e2db", padding: "1px 6px", borderRadius: 20, letterSpacing: "0.04em" }}>
+                            ClozeFlow Default
+                          </span>
+                        )}
+                      </div>
                       <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.5 }}>{preset.description}</div>
                     </button>
                   );
