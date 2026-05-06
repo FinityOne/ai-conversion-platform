@@ -317,31 +317,51 @@ function RowMenu({ member, onEdit, onResend, onRemove }: {
   onResend: () => void;
   onRemove: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const ref             = useRef<HTMLDivElement>(null);
+  const [open, setOpen]   = useState(false);
+  const [coords, setCoords] = useState({ top: 0, right: 0 });
+  const btnRef            = useRef<HTMLButtonElement>(null);
+  const menuRef           = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const fn = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const fn = (e: MouseEvent) => {
+      if (
+        btnRef.current && !btnRef.current.contains(e.target as Node) &&
+        menuRef.current && !menuRef.current.contains(e.target as Node)
+      ) setOpen(false);
+    };
     document.addEventListener("mousedown", fn);
     return () => document.removeEventListener("mousedown", fn);
   }, [open]);
 
+  function toggle() {
+    if (!btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+    setCoords({ top: r.bottom + 4, right: window.innerWidth - r.right });
+    setOpen(o => !o);
+  }
+
+  const items = [
+    { label: "Edit",          icon: "fa-solid fa-pen",        action: onEdit },
+    ...(member.status === "pending" ? [{ label: "Resend invite", icon: "fa-solid fa-paper-plane", action: onResend }] : []),
+    { label: "Remove",        icon: "fa-solid fa-user-minus", action: onRemove, danger: true },
+  ];
+
   return (
-    <div ref={ref} style={{ position: "relative" }}>
+    <>
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={btnRef}
+        onClick={toggle}
         style={{ width: 30, height: 30, borderRadius: 7, border: `1px solid ${BORDER}`, background: open ? BG : CARD, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
       >
         <i className="fa-solid fa-ellipsis" style={{ fontSize: 12, color: MUTED }} />
       </button>
       {open && (
-        <div style={{ position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 100, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", overflow: "hidden", minWidth: 160 }}>
-          {[
-            { label: "Edit", icon: "fa-solid fa-pen", action: onEdit },
-            ...(member.status === "pending" ? [{ label: "Resend invite", icon: "fa-solid fa-paper-plane", action: onResend }] : []),
-            { label: "Remove", icon: "fa-solid fa-user-minus", action: onRemove, danger: true },
-          ].map(item => (
+        <div
+          ref={menuRef}
+          style={{ position: "fixed", top: coords.top, right: coords.right, zIndex: 999, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", overflow: "hidden", minWidth: 160 }}
+        >
+          {items.map(item => (
             <button
               key={item.label}
               onClick={() => { setOpen(false); item.action(); }}
@@ -355,7 +375,7 @@ function RowMenu({ member, onEdit, onResend, onRemove }: {
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
