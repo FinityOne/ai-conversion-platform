@@ -42,6 +42,61 @@ const DEFAULT_CONFIG: ScoringConfig = {
   new_lead_penalty_max: 14,
 };
 
+// ── Scoring presets ───────────────────────────────────────────────────────────
+type PresetKey = "conservative" | "balanced" | "aggressive";
+
+const PRESETS: Record<PresetKey, { label: string; emoji: string; description: string; config: ScoringConfig }> = {
+  conservative: {
+    label: "Conservative",
+    emoji: "🌿",
+    description: "Generous windows, light penalties. Good for longer sales cycles where leads take more time to warm up.",
+    config: {
+      recency_immediate_hours: 48,
+      recency_immediate_pts: 7,
+      recency_bonus_hours: 120,
+      recency_bonus_pts: 3,
+      recency_penalty_days: 14,
+      recency_penalty_pts: -3,
+      email_open_pts: 5,
+      email_click_pts: 10,
+      new_lead_penalty_start_days: 5,
+      new_lead_penalty_per_day: 1,
+      new_lead_penalty_max: 8,
+    },
+  },
+  balanced: {
+    label: "Balanced",
+    emoji: "⚖️",
+    description: "ClozeFlow defaults. Works well for most service businesses — rewards engagement without being too aggressive.",
+    config: DEFAULT_CONFIG,
+  },
+  aggressive: {
+    label: "Aggressive",
+    emoji: "🚀",
+    description: "Tight windows, high bonuses, fast decay. Best when speed-to-contact is critical and you want maximum urgency.",
+    config: {
+      recency_immediate_hours: 12,
+      recency_immediate_pts: 15,
+      recency_bonus_hours: 48,
+      recency_bonus_pts: 8,
+      recency_penalty_days: 4,
+      recency_penalty_pts: -10,
+      email_open_pts: 12,
+      email_click_pts: 20,
+      new_lead_penalty_start_days: 1,
+      new_lead_penalty_per_day: 4,
+      new_lead_penalty_max: 25,
+    },
+  },
+};
+
+function detectPreset(cfg: ScoringConfig): PresetKey | null {
+  for (const [key, preset] of Object.entries(PRESETS) as [PresetKey, typeof PRESETS[PresetKey]][]) {
+    if (JSON.stringify(cfg) === JSON.stringify(preset.config)) return key;
+  }
+  return null;
+}
+
 const LS_KEY = "cf_scoring_config_v1";
 
 // ── Live score simulator ──────────────────────────────────────────────────────
@@ -166,6 +221,12 @@ export default function LeadScorePage() {
     setHasChanges(true);
     setSaved(false);
   }, []);
+
+  function applyPreset(key: PresetKey) {
+    setCfg(PRESETS[key].config);
+    setHasChanges(true);
+    setSaved(false);
+  }
 
   function saveConfig() {
     localStorage.setItem(LS_KEY, JSON.stringify(cfg));
@@ -427,6 +488,58 @@ export default function LeadScorePage() {
             <strong>How adjustments work:</strong> These parameters shift the thresholds and bonuses used in the scoring algorithm. The simulator above reflects your settings instantly — save when you&apos;re happy.
           </p>
         </div>
+
+        {/* ── Presets ── */}
+        {(() => {
+          const activePreset = detectPreset(cfg);
+          return (
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: MUTED, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
+                Quick Presets
+              </div>
+              <div className="ls-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                {(Object.entries(PRESETS) as [PresetKey, typeof PRESETS[PresetKey]][]).map(([key, preset]) => {
+                  const isActive = activePreset === key;
+                  const accentColor = key === "conservative" ? "#16a34a" : key === "balanced" ? ORANGE : "#7c3aed";
+                  const accentBg   = key === "conservative" ? "#f0fdf4" : key === "balanced" ? "#fff8f5" : "#faf5ff";
+                  const accentBorder = key === "conservative" ? "#bbf7d0" : key === "balanced" ? `${ORANGE}44` : "#e9d5ff";
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => applyPreset(key)}
+                      style={{
+                        textAlign: "left", padding: "14px 16px", borderRadius: 14, cursor: "pointer",
+                        border: isActive ? `2px solid ${accentColor}` : `1.5px solid ${BORDER}`,
+                        background: isActive ? accentBg : WHITE,
+                        transition: "all 0.15s",
+                        position: "relative",
+                      }}
+                    >
+                      {isActive && (
+                        <span style={{
+                          position: "absolute", top: 8, right: 10,
+                          fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em",
+                          color: accentColor, background: accentBg,
+                          padding: "2px 7px", borderRadius: 20, border: `1px solid ${accentBorder}`,
+                        }}>
+                          Active
+                        </span>
+                      )}
+                      <div style={{ fontSize: 18, marginBottom: 6 }}>{preset.emoji}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: isActive ? accentColor : TEXT, marginBottom: 4 }}>{preset.label}</div>
+                      <div style={{ fontSize: 12, color: MUTED, lineHeight: 1.5 }}>{preset.description}</div>
+                    </button>
+                  );
+                })}
+              </div>
+              {!activePreset && (
+                <p style={{ margin: "10px 0 0", fontSize: 12, color: MUTED }}>
+                  Your settings don't match a preset — you've customized the sliders below.
+                </p>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── Basic settings ── */}
         <div style={{ marginBottom: 8 }}>
