@@ -41,25 +41,24 @@ const TOPBAR_H  = 56;
 const LOCBAR_H  = 34;
 
 // ─── Brand tokens ─────────────────────────────────────────────────────────────
-const SIDEBAR_BG    = "#FFFFFF";  // White sidebar — easy to read
+const SIDEBAR_BG    = "#141E38";  // Deep Navy — "Nav, header, dark UI" per brand guide
 const APP_BG        = "#F5F7FB";  // Frost — main content background
 const WHITE         = "#ffffff";
-const CLOUD         = "#DDE4EF";  // Borders, dividers
-const MIDNIGHT_NAVY = "#0D1428";  // Headings
-const SLATE         = "#4A6274";  // Nav item text
-const STEEL         = "#8A9DB0";  // Muted / caption text
+const CLOUD         = "#DDE4EF";  // Borders, dividers (topbar / dropdowns)
+const MIDNIGHT_NAVY = "#0D1428";  // Headings (content area)
+const STEEL         = "#8A9DB0";  // Muted / caption text (content area)
 const SAPPHIRE      = "#2860B0";  // Primary — active links, icons
 const LAVENDER      = "#8B6FC4";  // Accent
 
-// Sidebar-on-light tokens
-const SB_TEXT       = SLATE;                     // Nav item text
-const SB_MUTED      = STEEL;                     // Group labels, captions
-const SB_DIVIDER    = CLOUD;                     // Dividers
-const SB_ACTIVE_BG  = "#EEF3FB";                 // Active item background (sapphire pale tint)
-const SB_ACTIVE_BDR = "rgba(40,96,176,0.20)";   // Active item border
-const SB_HOVER_BG   = "#F5F7FB";                 // Hover background (frost)
-const SB_ICON       = STEEL;                     // Inactive icon
-const SB_ACTIVE_ICO = SAPPHIRE;                  // Active icon
+// Sidebar-on-dark tokens (brand guide: Deep Navy nav, Lavender accent on dark)
+const SB_TEXT       = "rgba(231,238,251,0.68)";  // Sapphire Pale at 68% — resting nav items
+const SB_MUTED      = "rgba(138,157,176,0.45)";  // Steel faded — group labels
+const SB_DIVIDER    = "rgba(255,255,255,0.07)";  // Hairline dividers
+const SB_ACTIVE_BG  = "rgba(40,96,176,0.22)";   // Sapphire tint for active row
+const SB_ACTIVE_BDR = "rgba(40,96,176,0.00)";   // Border handled via inset shadow
+const SB_HOVER_BG   = "rgba(255,255,255,0.05)";  // Subtle hover lift
+const SB_ICON       = "rgba(138,157,176,0.55)";  // Steel — inactive icons
+const SB_ACTIVE_ICO = LAVENDER;                  // Lavender — active icons on dark (brand guide)
 
 const GRAD_PRIMARY  = "linear-gradient(135deg, #2860B0 0%, #8B6FC4 100%)";
 
@@ -93,8 +92,8 @@ function usePageTitle(pathname: string) {
 
 function GroupLabel({ icon, children }: { icon: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "10px 10px 3px", fontSize: 9, fontWeight: 800, color: SB_MUTED, letterSpacing: "0.09em", textTransform: "uppercase" }}>
-      <span>{icon}</span>{children}
+    <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "10px 10px 3px", fontSize: 9, fontWeight: 800, color: SB_MUTED, letterSpacing: "0.10em", textTransform: "uppercase" }}>
+      <span style={{ opacity: 0.6 }}>{icon}</span>{children}
     </div>
   );
 }
@@ -103,40 +102,38 @@ function NavItem({ href, label, fa, active, isGetLeads, badge }: {
   href: string; label: string; fa: string; active: boolean; isGetLeads?: boolean; badge?: string;
 }) {
   return (
-    <Link href={href} style={{
+    <Link href={href} className={active || isGetLeads ? "" : "sb-nav-link"} style={{
       display: "flex", alignItems: "center", gap: 9, padding: "7px 10px", borderRadius: 8, marginBottom: 1,
       textDecoration: "none",
       background: active
         ? SB_ACTIVE_BG
         : isGetLeads
-          ? "rgba(139,111,196,0.12)"
+          ? "rgba(139,111,196,0.13)"
           : "transparent",
-      color: active ? SAPPHIRE : isGetLeads ? LAVENDER : SB_TEXT,
+      color: active ? "#ffffff" : isGetLeads ? "#c4b5f4" : SB_TEXT,
       fontWeight: active ? 700 : isGetLeads ? 600 : 500, fontSize: 13,
-      border: active
-        ? `1px solid ${SB_ACTIVE_BDR}`
-        : isGetLeads && !active
-          ? "1px solid rgba(139,111,196,0.22)"
-          : "1px solid transparent",
-      transition: "background 0.15s, color 0.15s",
+      border: "1px solid transparent",
+      boxShadow: active ? "inset 3px 0 0 #2860B0" : isGetLeads ? "inset 3px 0 0 rgba(139,111,196,0.55)" : "none",
+      transition: "background 0.15s, color 0.15s, box-shadow 0.15s",
     }}>
-      <i className={fa} style={{ width: 15, textAlign: "center", fontSize: 12, flexShrink: 0, color: active ? SAPPHIRE : isGetLeads ? LAVENDER : SB_ICON }} />
+      <i className={fa} style={{ width: 15, textAlign: "center", fontSize: 12, flexShrink: 0, color: active ? LAVENDER : isGetLeads ? "#a78bfa" : SB_ICON }} />
       <span style={{ flex: 1 }}>{label}</span>
-      {badge && <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 20, background: "#EEF3FB", color: SAPPHIRE }}>{badge}</span>}
+      {badge && <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 20, background: "rgba(40,96,176,0.30)", color: "#E7EEFB" }}>{badge}</span>}
     </Link>
   );
 }
 
 function SubNavItem({ href, label, fa, active }: { href: string; label: string; fa: string; active: boolean }) {
   return (
-    <Link href={href} style={{
+    <Link href={href} className={active ? "" : "sb-nav-link"} style={{
       display: "flex", alignItems: "center", gap: 8, padding: "6px 10px 6px 24px", borderRadius: 7, marginBottom: 1,
       textDecoration: "none",
       background: active ? SB_ACTIVE_BG : "transparent",
-      color: active ? SAPPHIRE : SB_TEXT,
+      color: active ? "#ffffff" : SB_TEXT,
       fontWeight: active ? 700 : 400, fontSize: 12,
-      border: active ? `1px solid ${SB_ACTIVE_BDR}` : "1px solid transparent",
-      transition: "background 0.15s, color 0.15s",
+      border: "1px solid transparent",
+      boxShadow: active ? "inset 2px 0 0 #8B6FC4" : "none",
+      transition: "background 0.15s, color 0.15s, box-shadow 0.15s",
     }}>
       <i className={fa} style={{ width: 13, textAlign: "center", fontSize: 11, flexShrink: 0, color: active ? SB_ACTIVE_ICO : SB_ICON }} />
       {label}
@@ -146,7 +143,7 @@ function SubNavItem({ href, label, fa, active }: { href: string; label: string; 
 
 function ComingSoonItem({ label, fa }: { label: string; fa: string }) {
   return (
-    <div title="Coming soon" style={{ display: "flex", alignItems: "center", gap: 9, padding: "7px 10px", borderRadius: 7, marginBottom: 1, opacity: 0.45, cursor: "default", userSelect: "none" }}>
+    <div title="Coming soon" style={{ display: "flex", alignItems: "center", gap: 9, padding: "7px 10px", borderRadius: 7, marginBottom: 1, opacity: 0.32, cursor: "default", userSelect: "none" }}>
       <i className={fa} style={{ width: 15, textAlign: "center", fontSize: 12, flexShrink: 0, color: SB_MUTED }} />
       <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: SB_TEXT }}>{label}</div>
       <span style={{ fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 20, letterSpacing: "0.04em", background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.22)" }}>SOON</span>
@@ -154,7 +151,7 @@ function ComingSoonItem({ label, fa }: { label: string; fa: string }) {
   );
 }
 
-function NavDivider() { return <div style={{ margin: "5px 8px", borderTop: `1px solid ${SB_DIVIDER}` }} />; }
+function NavDivider() { return <div style={{ margin: "5px 8px", borderTop: "1px solid rgba(255,255,255,0.07)" }} />; }
 
 // ─── Dropdown shell ───────────────────────────────────────────────────────────
 
@@ -254,7 +251,7 @@ export default function AppShell({
   return (
     <div style={{ background: APP_BG, minHeight: "100vh" }}>
       <style>{`
-        .app-sidebar { display:none; flex-direction:column; position:fixed; top:0; left:0; bottom:0; width:${SIDEBAR_W}px; z-index:40; background:${SIDEBAR_BG}; border-right:1px solid ${CLOUD}; }
+        .app-sidebar { display:none; flex-direction:column; position:fixed; top:0; left:0; bottom:0; width:${SIDEBAR_W}px; z-index:40; background:${SIDEBAR_BG}; border-right:1px solid rgba(255,255,255,0.07); }
         @media(min-width:768px){ .app-sidebar{ display:flex; } }
 
         .app-topbar { position:fixed; top:0; left:0; right:0; z-index:45; height:${TOPBAR_H}px; background:rgba(255,255,255,0.94); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid ${CLOUD}; display:flex; align-items:center; padding:0 20px; gap:8px; }
@@ -268,7 +265,7 @@ export default function AppShell({
 
         .app-nav-scroll { flex:1; min-height:0; overflow-y:auto; }
         .app-nav-scroll::-webkit-scrollbar{ width:3px; }
-        .app-nav-scroll::-webkit-scrollbar-thumb{ background:${CLOUD}; border-radius:3px; }
+        .app-nav-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.12); border-radius:3px; }
 
         .app-bottom-nav{ display:flex; }
         @media(min-width:768px){ .app-bottom-nav{ display:none; } }
@@ -282,25 +279,25 @@ export default function AppShell({
         .tb-btn{ display:flex; align-items:center; background:transparent; border:none; cursor:pointer; outline:none; border-radius:10px; transition:background 0.15s; position:relative; }
         .tb-btn:hover{ background:rgba(13,20,40,0.04); }
 
-        .sb-nav-link:hover { background: ${SB_HOVER_BG} !important; }
+        .sb-nav-link:hover { background: rgba(255,255,255,0.05) !important; color: rgba(231,238,251,0.92) !important; }
       `}</style>
 
       {/* ══ Sidebar ══════════════════════════════════════════════════════════ */}
       <aside className="app-sidebar">
         {/* Logo */}
-        <div style={{ padding: "18px 16px 14px", borderBottom: `1px solid ${SB_DIVIDER}`, flexShrink: 0 }}>
+        <div style={{ padding: "18px 16px 14px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
           <Link href="/" style={{ textDecoration: "none", display: "block" }}>
             <div style={{ position: "relative", width: 136, height: 34 }}>
               <Image
                 src="/logo/ClozeFlow Logo - Transparent.png"
                 alt="ClozeFlow"
                 fill
-                style={{ objectFit: "contain", objectPosition: "left" }}
+                style={{ objectFit: "contain", objectPosition: "left", filter: "brightness(0) invert(1)" }}
               />
             </div>
           </Link>
           {businessName && (
-            <p style={{ fontSize: 10, color: STEEL, marginTop: 4, paddingLeft: 1, marginBottom: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <p style={{ fontSize: 10, color: "rgba(138,157,176,0.65)", marginTop: 4, paddingLeft: 1, marginBottom: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {businessName}
             </p>
           )}
@@ -356,7 +353,7 @@ export default function AppShell({
         </div>
 
         {/* Plan / billing badge */}
-        <div style={{ padding: "10px 10px 14px", borderTop: `1px solid ${CLOUD}`, flexShrink: 0 }}>
+        <div style={{ padding: "10px 10px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
           {plan ? (() => {
             const p         = PLANS[plan];
             const pct       = leadLimit ? Math.min(100, Math.round((leadCount / leadLimit) * 100)) : 0;
@@ -364,9 +361,9 @@ export default function AppShell({
             const nearLimit = !!(leadLimit && leadCount >= leadLimit * 0.8 && !atLimit);
             return (
               <Link href="/profile/billing" style={{ textDecoration: "none", display: "block" }}>
-                <div style={{ padding: "10px 12px", borderRadius: 10, background: "#EEF3FB", border: `1px solid rgba(40,96,176,0.15)` }}>
+                <div style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: SAPPHIRE, display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#E7EEFB", display: "flex", alignItems: "center", gap: 4 }}>
                       <i className={`fa-solid ${p.icon}`} style={{ fontSize: 10 }} /> {p.name} Plan
                     </span>
                     <span style={{ fontSize: 10, color: LAVENDER, fontWeight: 600 }}>Manage →</span>
@@ -374,11 +371,11 @@ export default function AppShell({
                   {leadLimit && (
                     <div style={{ marginTop: 7 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                        <span style={{ fontSize: 10, color: atLimit ? "#dc2626" : nearLimit ? "#d97706" : STEEL, fontWeight: 600 }}>{leadCount} / {leadLimit} leads</span>
-                        {atLimit && <span style={{ fontSize: 9, fontWeight: 800, color: "#dc2626" }}>LIMIT</span>}
+                        <span style={{ fontSize: 10, color: atLimit ? "#fca5a5" : nearLimit ? "#fcd34d" : "rgba(138,157,176,0.80)", fontWeight: 600 }}>{leadCount} / {leadLimit} leads</span>
+                        {atLimit && <span style={{ fontSize: 9, fontWeight: 800, color: "#fca5a5" }}>LIMIT</span>}
                       </div>
-                      <div style={{ height: 3, borderRadius: 2, background: CLOUD, overflow: "hidden" }}>
-                        <div style={{ height: "100%", borderRadius: 2, transition: "width 0.3s", width: `${pct}%`, background: atLimit ? "#dc2626" : nearLimit ? "#d97706" : GRAD_PRIMARY }} />
+                      <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.10)", overflow: "hidden" }}>
+                        <div style={{ height: "100%", borderRadius: 2, transition: "width 0.3s", width: `${pct}%`, background: atLimit ? "#fca5a5" : nearLimit ? "#fcd34d" : GRAD_PRIMARY }} />
                       </div>
                     </div>
                   )}
@@ -387,9 +384,9 @@ export default function AppShell({
             );
           })() : !orgContext && !hasActiveMemberships ? (
             <Link href="/onboarding" style={{ textDecoration: "none", display: "block" }}>
-              <div style={{ padding: "10px 12px", borderRadius: 10, background: "#EEF3FB", border: "1px solid rgba(40,96,176,0.20)", display: "flex", alignItems: "center", gap: 8 }}>
-                <i className="fa-solid fa-rocket" style={{ fontSize: 11, color: SAPPHIRE }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: SAPPHIRE }}>Pick a plan to go live</span>
+              <div style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(40,96,176,0.20)", border: "1px solid rgba(40,96,176,0.35)", display: "flex", alignItems: "center", gap: 8 }}>
+                <i className="fa-solid fa-rocket" style={{ fontSize: 11, color: "#E7EEFB" }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#E7EEFB" }}>Pick a plan to go live</span>
               </div>
             </Link>
           ) : null}
