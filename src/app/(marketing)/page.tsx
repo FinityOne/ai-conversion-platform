@@ -738,78 +738,131 @@ const LAPTOP_LEADS = [
 ];
 
 function LaptopMockup() {
+  const W = 460; // laptop screen width
   return (
-    <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "flex-end" }}>
-      {/* Glow */}
+    <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "flex-end", padding: "24px 80px 24px 40px" }}>
+      {/* Ambient glow */}
       <div style={{
         position: "absolute",
-        width: 480, height: 280,
+        width: 400, height: 220,
         borderRadius: "50%",
-        background: "radial-gradient(ellipse, rgba(40,96,176,0.18) 0%, transparent 70%)",
-        bottom: 20, left: "50%", transform: "translateX(-50%)",
+        background: "radial-gradient(ellipse, rgba(40,96,176,0.2) 0%, transparent 70%)",
+        bottom: 10, left: "50%", transform: "translateX(-50%)",
         pointerEvents: "none",
       }} />
+
+      {/* Floating toast 1 — new inquiry */}
+      <div className="hero-notif hero-notif-1" style={{
+        position: "absolute", top: "12%", right: 0,
+        background: "#fff", borderRadius: 12, padding: "9px 13px",
+        boxShadow: "0 8px 28px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.05)",
+        display: "flex", alignItems: "center", gap: 9, width: 192,
+        pointerEvents: "none",
+      }}>
+        <div className="hero-dot-pulse" style={{ width: 8, height: 8, borderRadius: "50%", background: "#3b82f6", flexShrink: 0 }} />
+        <div>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: TEXT }}>New inquiry</p>
+          <p style={{ margin: 0, fontSize: 10, color: MUTED }}>Sarah C. · Google · just now</p>
+        </div>
+      </div>
+
+      {/* Floating toast 2 — appointment booked */}
+      <div className="hero-notif hero-notif-2" style={{
+        position: "absolute", bottom: "22%", left: 0,
+        background: "#fff", borderRadius: 12, padding: "9px 13px",
+        boxShadow: "0 8px 28px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.05)",
+        display: "flex", alignItems: "center", gap: 9, width: 200,
+        pointerEvents: "none",
+      }}>
+        <div style={{
+          width: 26, height: 26, borderRadius: 7, flexShrink: 0,
+          background: "rgba(39,174,96,0.1)", display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <i className="fa-solid fa-calendar-check" style={{ fontSize: 11, color: "#27AE60" }} />
+        </div>
+        <div>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: "#27AE60" }}>Appointment booked!</p>
+          <p style={{ margin: 0, fontSize: 10, color: MUTED }}>Ashley M. · May 8 · 10:00 AM</p>
+        </div>
+      </div>
+
+      {/* Floating toast 3 — AI responded */}
+      <div className="hero-notif hero-notif-3" style={{
+        position: "absolute", top: "44%", right: -4,
+        background: "#fff", borderRadius: 12, padding: "9px 13px",
+        boxShadow: "0 8px 28px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.05)",
+        display: "flex", alignItems: "center", gap: 9, width: 172,
+        pointerEvents: "none",
+      }}>
+        <div style={{
+          width: 26, height: 26, borderRadius: 7, flexShrink: 0,
+          background: "rgba(40,96,176,0.08)", display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <i className="fa-solid fa-bolt" style={{ fontSize: 11, color: SAPPHIRE }} />
+        </div>
+        <div>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: SAPPHIRE }}>AI responded</p>
+          <p style={{ margin: 0, fontSize: 10, color: MUTED }}>Reply sent · 38 seconds</p>
+        </div>
+      </div>
 
       <div style={{ position: "relative" }}>
         {/* Laptop lid */}
         <div style={{
-          width: 580,
+          width: W,
           background: "#1a1f2e",
-          borderRadius: "16px 16px 4px 4px",
-          padding: "8px 8px 0",
-          boxShadow: "0 32px 64px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)",
+          borderRadius: "14px 14px 3px 3px",
+          padding: "7px 7px 0",
+          boxShadow: "0 28px 56px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)",
         }}>
-          {/* Camera notch */}
-          <div style={{ display: "flex", justifyContent: "center", paddingBottom: 6 }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#374151" }} />
+          {/* Camera dot */}
+          <div style={{ display: "flex", justifyContent: "center", paddingBottom: 5 }}>
+            <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#374151" }} />
           </div>
 
           {/* Screen */}
           <div style={{
             background: "#f1f5f9",
-            borderRadius: "8px 8px 0 0",
+            borderRadius: "7px 7px 0 0",
             overflow: "hidden",
-            height: 340,
+            height: 296,
             display: "flex",
           }}>
             {/* Sidebar */}
             <div style={{
-              width: 130, flexShrink: 0,
+              width: 108, flexShrink: 0,
               background: "#141E38",
               display: "flex", flexDirection: "column",
-              padding: "12px 0",
+              padding: "10px 0",
               gap: 2,
             }}>
-              <div style={{ padding: "0 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.07)", marginBottom: 6 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <div style={{ width: 20, height: 20, borderRadius: 5, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 900, color: "#fff" }}>C</div>
-                  <span style={{ fontSize: 9, fontWeight: 800, color: "rgba(231,238,251,0.9)" }}>ClozeFlow</span>
+              <div style={{ padding: "0 9px 9px", borderBottom: "1px solid rgba(255,255,255,0.07)", marginBottom: 5 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <div style={{ width: 17, height: 17, borderRadius: 4, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 900, color: "#fff", flexShrink: 0 }}>C</div>
+                  <span style={{ fontSize: 8, fontWeight: 800, color: "rgba(231,238,251,0.9)" }}>ClozeFlow</span>
                 </div>
               </div>
               {[
-                { icon: "fa-gauge-high",      label: "Dashboard",   active: false },
-                { icon: "fa-users",           label: "Patients",    active: true  },
-                { icon: "fa-calendar",        label: "Calendar",    active: false },
-                { icon: "fa-paper-plane",     label: "Follow-Up",   active: false },
-                { icon: "fa-chart-bar",       label: "Analytics",   active: false },
+                { icon: "fa-gauge-high",  label: "Dashboard", active: false },
+                { icon: "fa-users",       label: "Patients",  active: true  },
+                { icon: "fa-calendar",    label: "Calendar",  active: false },
+                { icon: "fa-paper-plane", label: "Follow-Up", active: false },
+                { icon: "fa-chart-bar",   label: "Analytics", active: false },
               ].map(item => (
                 <div key={item.label} style={{
-                  display: "flex", alignItems: "center", gap: 7,
-                  padding: "7px 10px", margin: "0 6px", borderRadius: 7,
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "6px 9px", margin: "0 5px", borderRadius: 6,
                   background: item.active ? "rgba(40,96,176,0.22)" : "transparent",
                   boxShadow: item.active ? "inset 3px 0 0 #2860B0" : "none",
                 }}>
-                  <i className={`fa-solid ${item.icon}`} style={{ fontSize: 10, color: item.active ? "#8B6FC4" : "rgba(138,157,176,0.55)", width: 12, textAlign: "center" }} />
-                  <span style={{ fontSize: 9, fontWeight: item.active ? 700 : 500, color: item.active ? "#fff" : "rgba(231,238,251,0.55)" }}>{item.label}</span>
+                  <i className={`fa-solid ${item.icon}`} style={{ fontSize: 9, color: item.active ? "#8B6FC4" : "rgba(138,157,176,0.55)", width: 10, textAlign: "center" }} />
+                  <span style={{ fontSize: 8, fontWeight: item.active ? 700 : 500, color: item.active ? "#fff" : "rgba(231,238,251,0.5)" }}>{item.label}</span>
                 </div>
               ))}
-              <div style={{ marginTop: "auto", padding: "6px 10px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <div style={{ width: 18, height: 18, borderRadius: 5, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff" }}>DR</div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 8, fontWeight: 700, color: "rgba(231,238,251,0.8)" }}>Dr. Rivera</p>
-                    <p style={{ margin: 0, fontSize: 7, color: "rgba(138,157,176,0.6)" }}>Admin</p>
-                  </div>
+              <div style={{ marginTop: "auto", padding: "5px 9px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: 15, height: 15, borderRadius: 4, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 6, fontWeight: 800, color: "#fff", flexShrink: 0 }}>DR</div>
+                  <p style={{ margin: 0, fontSize: 7, fontWeight: 700, color: "rgba(231,238,251,0.8)" }}>Dr. Rivera</p>
                 </div>
               </div>
             </div>
@@ -817,86 +870,83 @@ function LaptopMockup() {
             {/* Main content */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
               {/* Top bar */}
-              <div style={{ background: "#fff", padding: "8px 14px", borderBottom: "1px solid #e8ecf0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ background: "#fff", padding: "7px 11px", borderBottom: "1px solid #e8ecf0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 900, color: TEXT }}>Patient Pipeline</p>
-                  <p style={{ margin: 0, fontSize: 8, color: MUTED }}>Wednesday, May 8 · 9 active today</p>
+                  <p style={{ margin: 0, fontSize: 10, fontWeight: 900, color: TEXT }}>Patient Pipeline</p>
+                  <p style={{ margin: 0, fontSize: 7, color: MUTED }}>May 8 · 9 active today</p>
                 </div>
-                <div style={{ display: "flex", gap: 5 }}>
-                  <div style={{ padding: "4px 8px", background: GRAD_PRIMARY, borderRadius: 6, display: "flex", alignItems: "center", gap: 4 }}>
-                    <i className="fa-solid fa-plus" style={{ fontSize: 8, color: "#fff" }} />
-                    <span style={{ fontSize: 8, fontWeight: 700, color: "#fff" }}>Add Patient</span>
-                  </div>
+                <div style={{ padding: "3px 7px", background: GRAD_PRIMARY, borderRadius: 5, display: "flex", alignItems: "center", gap: 3 }}>
+                  <i className="fa-solid fa-plus" style={{ fontSize: 7, color: "#fff" }} />
+                  <span style={{ fontSize: 7, fontWeight: 700, color: "#fff" }}>Add Patient</span>
                 </div>
               </div>
 
               {/* Stats row */}
-              <div style={{ padding: "8px 12px 6px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6 }}>
+              <div style={{ padding: "6px 10px 5px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 5 }}>
                 {[
-                  { label: "New",      value: "7",  color: "#3b82f6", bg: "rgba(59,130,246,0.08)"  },
-                  { label: "AI Active",value: "4",  color: "#f59e0b", bg: "rgba(245,158,11,0.08)"  },
-                  { label: "Qualified",value: "3",  color: "#6366f1", bg: "rgba(99,102,241,0.08)"  },
-                  { label: "Booked",   value: "9",  color: "#27AE60", bg: "rgba(39,174,96,0.08)"   },
+                  { label: "New",       value: "7",  color: "#3b82f6", bg: "rgba(59,130,246,0.08)"  },
+                  { label: "AI Active", value: "4",  color: "#f59e0b", bg: "rgba(245,158,11,0.08)"  },
+                  { label: "Qualified", value: "3",  color: "#6366f1", bg: "rgba(99,102,241,0.08)"  },
+                  { label: "Booked",    value: "9",  color: "#27AE60", bg: "rgba(39,174,96,0.08)"   },
                 ].map(s => (
-                  <div key={s.label} style={{ background: s.bg, borderRadius: 7, padding: "5px 6px", textAlign: "center" }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</p>
-                    <p style={{ margin: 0, fontSize: 7, fontWeight: 700, color: s.color, opacity: 0.8, marginTop: 2 }}>{s.label}</p>
+                  <div key={s.label} style={{ background: s.bg, borderRadius: 6, padding: "4px 5px", textAlign: "center" }}>
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</p>
+                    <p style={{ margin: 0, fontSize: 6, fontWeight: 700, color: s.color, opacity: 0.8, marginTop: 1 }}>{s.label}</p>
                   </div>
                 ))}
               </div>
 
               {/* AI banner */}
               <div style={{
-                margin: "0 12px 6px",
+                margin: "0 10px 5px",
                 background: "linear-gradient(135deg,rgba(40,96,176,0.07),rgba(139,111,196,0.04))",
                 border: "1px solid rgba(40,96,176,0.18)",
-                borderRadius: 7, padding: "5px 9px",
-                display: "flex", alignItems: "center", gap: 6,
+                borderRadius: 6, padding: "4px 8px",
+                display: "flex", alignItems: "center", gap: 5,
               }}>
-                <span style={{ fontSize: 10, flexShrink: 0 }}>⚡</span>
-                <p style={{ margin: 0, fontSize: 8, fontWeight: 600, color: SAPPHIRE, lineHeight: 1.4 }}>
-                  AI replied to 4 new inquiries today · avg response 38 seconds
+                <span style={{ fontSize: 9, flexShrink: 0 }}>⚡</span>
+                <p style={{ margin: 0, fontSize: 7, fontWeight: 600, color: SAPPHIRE, lineHeight: 1.4 }}>
+                  AI replied to 4 new inquiries today · avg 38 seconds
                 </p>
-                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 3 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: GREEN }} />
-                  <span style={{ fontSize: 7, fontWeight: 700, color: GREEN }}>Live</span>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 2 }}>
+                  <div className="hero-dot-pulse" style={{ width: 5, height: 5, borderRadius: "50%", background: GREEN }} />
+                  <span style={{ fontSize: 6, fontWeight: 700, color: GREEN }}>Live</span>
                 </div>
               </div>
 
               {/* Lead rows */}
-              <div style={{ flex: 1, overflowY: "hidden", padding: "0 12px" }}>
-                {/* Header row */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 90px 60px 70px", gap: 6, padding: "3px 8px", marginBottom: 2 }}>
+              <div style={{ flex: 1, overflowY: "hidden", padding: "0 10px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 74px 50px 58px", gap: 5, padding: "2px 7px", marginBottom: 2 }}>
                   {["Patient", "Service", "Score", "Status"].map(h => (
-                    <span key={h} style={{ fontSize: 7, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</span>
+                    <span key={h} style={{ fontSize: 6, fontWeight: 700, color: "#a8a29e", textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</span>
                   ))}
                 </div>
                 {LAPTOP_LEADS.map(lead => (
                   <div key={lead.initials} style={{
-                    display: "grid", gridTemplateColumns: "1fr 90px 60px 70px", gap: 6,
-                    background: "#fff", borderRadius: 8, padding: "6px 8px", marginBottom: 4,
+                    display: "grid", gridTemplateColumns: "1fr 74px 50px 58px", gap: 5,
+                    background: "#fff", borderRadius: 7, padding: "5px 7px", marginBottom: 3,
                     alignItems: "center",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                   }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                       <div style={{
-                        width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                        width: 18, height: 18, borderRadius: 5, flexShrink: 0,
                         background: lead.statusBg, display: "flex", alignItems: "center",
-                        justifyContent: "center", fontSize: 7, fontWeight: 800, color: lead.statusColor,
+                        justifyContent: "center", fontSize: 6, fontWeight: 800, color: lead.statusColor,
                       }}>{lead.initials}</div>
                       <div>
-                        <p style={{ margin: 0, fontSize: 9, fontWeight: 800, color: TEXT }}>{lead.name}</p>
-                        <p style={{ margin: 0, fontSize: 7, color: "#a8a29e" }}>{lead.detail}</p>
+                        <p style={{ margin: 0, fontSize: 8, fontWeight: 800, color: TEXT }}>{lead.name}</p>
+                        <p style={{ margin: 0, fontSize: 6, color: "#a8a29e" }}>{lead.detail}</p>
                       </div>
                     </div>
-                    <p style={{ margin: 0, fontSize: 8, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lead.job}</p>
-                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <div style={{ flex: 1, height: 3, borderRadius: 2, background: "#e8ecf0", overflow: "hidden" }}>
-                        <div style={{ width: `${lead.score}%`, height: "100%", background: lead.score >= 80 ? "#27AE60" : lead.score >= 60 ? "#f59e0b" : "#3b82f6", borderRadius: 2 }} />
+                    <p style={{ margin: 0, fontSize: 7, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lead.job}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                      <div style={{ flex: 1, height: 2, borderRadius: 1, background: "#e8ecf0", overflow: "hidden" }}>
+                        <div style={{ width: `${lead.score}%`, height: "100%", background: lead.score >= 80 ? "#27AE60" : lead.score >= 60 ? "#f59e0b" : "#3b82f6", borderRadius: 1 }} />
                       </div>
-                      <span style={{ fontSize: 8, fontWeight: 700, color: TEXT }}>{lead.score}</span>
+                      <span style={{ fontSize: 7, fontWeight: 700, color: TEXT }}>{lead.score}</span>
                     </div>
-                    <span style={{ fontSize: 7, fontWeight: 700, padding: "2px 6px", borderRadius: 5, background: lead.statusBg, color: lead.statusColor, whiteSpace: "nowrap" }}>{lead.status}</span>
+                    <span style={{ fontSize: 6, fontWeight: 700, padding: "2px 5px", borderRadius: 4, background: lead.statusBg, color: lead.statusColor, whiteSpace: "nowrap" }}>{lead.status}</span>
                   </div>
                 ))}
               </div>
@@ -904,25 +954,25 @@ function LaptopMockup() {
           </div>
         </div>
 
-        {/* Laptop base */}
+        {/* Laptop hinge + base */}
         <div style={{ display: "flex", justifyContent: "center" }}>
           <div style={{
-            width: 600, height: 12,
+            width: W + 20, height: 10,
             background: "linear-gradient(180deg, #232a3b 0%, #1a1f2e 100%)",
-            borderRadius: "0 0 4px 4px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+            borderRadius: "0 0 3px 3px",
+            boxShadow: "0 3px 10px rgba(0,0,0,0.3)",
           }}>
             <div style={{ display: "flex", justifyContent: "center", paddingTop: 3 }}>
-              <div style={{ width: 60, height: 4, borderRadius: 2, background: "#374151" }} />
+              <div style={{ width: 48, height: 3, borderRadius: 2, background: "#374151" }} />
             </div>
           </div>
         </div>
         <div style={{
-          width: 640, height: 6,
+          width: W + 56, height: 5,
           background: "#111827",
-          borderRadius: "0 0 8px 8px",
+          borderRadius: "0 0 6px 6px",
           margin: "0 auto",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
+          boxShadow: "0 5px 18px rgba(0,0,0,0.4)",
         }} />
       </div>
     </div>
@@ -1078,10 +1128,10 @@ export default function Home() {
       {/* ── Hero ─────────────────────────────────────────── */}
       <section style={{ padding: "72px 24px 80px", background: GRAD_HERO_BG, overflow: "hidden" }}>
         <div style={{
-          maxWidth: 1300, margin: "0 auto",
+          maxWidth: 1120, margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "420px 1fr",
-          gap: 56,
+          gridTemplateColumns: "1fr 1fr",
+          gap: 40,
           alignItems: "center",
         }}
           className="hero-grid"
@@ -1094,7 +1144,7 @@ export default function Home() {
               fontSize: 12, fontWeight: 700, color: SAPPHIRE, letterSpacing: "0.04em",
               marginBottom: 24,
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: SAPPHIRE }} />
+              <span className="hero-badge-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: SAPPHIRE, display: "inline-block" }} />
               ⚡ 100+ medical practices. Zero missed patients.
             </div>
 
@@ -1156,16 +1206,46 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ display: "flex", justifyContent: "center" }}>
+          <div className="hero-laptop" style={{ display: "flex", justifyContent: "center" }}>
             <LaptopMockup />
           </div>
         </div>
 
         <style>{`
-          @media (max-width: 768px) {
-            .hero-grid { grid-template-columns: 1fr !important; gap: 48px !important; text-align: center; }
-            .hero-grid > div:first-child { display: flex; flex-direction: column; align-items: center; }
+          /* ── Notification toast pop-in ── */
+          @keyframes heroNotifPop {
+            0%   { opacity: 0; transform: translateY(10px) scale(0.94); }
+            12%  { opacity: 1; transform: translateY(0)    scale(1);    }
+            78%  { opacity: 1; transform: translateY(0)    scale(1);    }
+            100% { opacity: 0; transform: translateY(-5px) scale(0.97); }
+          }
+          /* ── Live dot pulse ── */
+          @keyframes heroDotPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(39,174,96,0.55); }
+            50%       { box-shadow: 0 0 0 5px rgba(39,174,96,0);  }
+          }
+          /* ── Badge dot breathe ── */
+          @keyframes heroBadgeBreathe {
+            0%, 100% { opacity: 1; transform: scale(1);    }
+            50%       { opacity: 0.6; transform: scale(1.3); }
+          }
+
+          .hero-notif        { opacity: 0; }
+          .hero-notif-1      { animation: heroNotifPop 5s ease-in-out 0.4s infinite; }
+          .hero-notif-2      { animation: heroNotifPop 5s ease-in-out 2.2s infinite; }
+          .hero-notif-3      { animation: heroNotifPop 5s ease-in-out 3.8s infinite; }
+          .hero-dot-pulse    { animation: heroDotPulse 2s ease-in-out infinite; }
+          .hero-badge-dot    { animation: heroBadgeBreathe 2.4s ease-in-out infinite; }
+
+          /* ── Responsive ── */
+          @media (max-width: 960px) {
+            .hero-grid { grid-template-columns: 1fr !important; gap: 0 !important; }
             .hero-laptop { display: none !important; }
+            .hero-grid > div:first-child { text-align: center; display: flex; flex-direction: column; align-items: center; }
+          }
+          @media (max-width: 480px) {
+            .hero-grid > div:first-child h1 { font-size: 32px !important; }
+            .hero-grid > div:first-child p  { font-size: 16px !important; }
           }
         `}</style>
       </section>
