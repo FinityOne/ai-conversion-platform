@@ -1,563 +1,524 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { TEMPLATES, type EmailTemplate, type TemplateCategory } from "./templates";
 
+// ── Design tokens ─────────────────────────────────────────────────────────────
 const TEXT   = "#2C3E50";
 const MUTED  = "#78716c";
 const BORDER = "#e6e2db";
 const BG     = "#F9F7F2";
-const ORANGE = "#D35400";
 const WHITE  = "#ffffff";
 
-// ─── Email definitions ────────────────────────────────────────────────────────
+// ── Timing options ────────────────────────────────────────────────────────────
+const TIMING_OPTIONS = [
+  { label: "Immediate (Day 0)", hours: 0 },
+  { label: "Day 1",  hours: 24 },
+  { label: "Day 2",  hours: 48 },
+  { label: "Day 3",  hours: 72 },
+  { label: "Day 4",  hours: 96 },
+  { label: "Day 5",  hours: 120 },
+  { label: "Day 6",  hours: 144 },
+  { label: "Day 7",  hours: 168 },
+  { label: "Day 10", hours: 240 },
+  { label: "Day 14", hours: 336 },
+  { label: "Day 21", hours: 504 },
+  { label: "Day 30", hours: 720 },
+  { label: "Day 45", hours: 1080 },
+  { label: "Day 60", hours: 1440 },
+];
 
-type EmailStatus = "live-automated" | "live-manual" | "coming-soon";
-
-interface EmailDef {
-  id:       string;
-  category: "personal" | "promo" | "value";
-  title:    string;
-  status:   EmailStatus;
-  timing:   string;
-  timingN:  number;   // hours for timeline positioning
-  icon:     string;
-  color:    string;
-  accentBg: string;
-  subject:  string;
-  purpose:  string;
+function hoursToLabel(h: number): string {
+  const opt = TIMING_OPTIONS.find(o => o.hours === h);
+  if (opt) return opt.label;
+  const days = Math.round(h / 24);
+  return days === 0 ? "Immediate" : `Day ${days}`;
 }
 
-const EMAILS: EmailDef[] = [
-  // ── Personal Touch ──────────────────────────────────────────────────────────
-  {
-    id: "welcome", category: "personal",
-    title: "Welcome Email",
-    status: "live-automated",
-    timing: "Immediate", timingN: 0,
-    icon: "fa-bolt", color: "#ea580c", accentBg: "rgba(234,88,12,0.08)",
-    subject: "We received your inquiry — here's what happens next",
-    purpose: "Confirms receipt, sets expectations, and builds trust before any competitor responds.",
-  },
-  {
-    id: "followup", category: "personal",
-    title: "Follow-Up Email",
-    status: "live-manual",
-    timing: "Day 1", timingN: 24,
-    icon: "fa-envelope-open-text", color: "#7c3aed", accentBg: "rgba(124,58,237,0.08)",
-    subject: "{First Name}, tell us a little more about what you're going through",
-    purpose: "Starts a conversation, captures symptoms, and moves the lead toward booking their first visit.",
-  },
-  {
-    id: "checkin", category: "personal",
-    title: "Personal Check-In",
-    status: "coming-soon",
-    timing: "Day 3", timingN: 72,
-    icon: "fa-user-doctor", color: "#0891b2", accentBg: "rgba(8,145,178,0.08)",
-    subject: "Still thinking about it? We're here — {First Name}",
-    purpose: "A warm, personal nudge from the practice — keeps the lead warm without being pushy.",
-  },
-  // ── Promos ──────────────────────────────────────────────────────────────────
-  {
-    id: "discount", category: "promo",
-    title: "New Patient Offer",
-    status: "coming-soon",
-    timing: "Day 5", timingN: 120,
-    icon: "fa-tag", color: "#15803d", accentBg: "rgba(21,128,61,0.08)",
-    subject: "$29 New Patient Special — expires this Friday",
-    purpose: "Converts hesitant leads with a low-risk, first-appointment offer before they go elsewhere.",
-  },
-  {
-    id: "flash", category: "promo",
-    title: "24-Hour Flash Promo",
-    status: "coming-soon",
-    timing: "Day 7", timingN: 168,
-    icon: "fa-fire", color: "#b45309", accentBg: "rgba(180,83,9,0.08)",
-    subject: "24 hours only: Book today and save $40 on your first visit",
-    purpose: "Creates urgency for leads still sitting on the fence — a short window drives immediate action.",
-  },
-  // ── Value Delivery ──────────────────────────────────────────────────────────
-  {
-    id: "exercises", category: "value",
-    title: "5 At-Home Exercises",
-    status: "coming-soon",
-    timing: "Day 10", timingN: 240,
-    icon: "fa-dumbbell", color: "#0891b2", accentBg: "rgba(8,145,178,0.08)",
-    subject: "5 exercises to relieve back pain at home (do these today)",
-    purpose: "Builds authority and goodwill — positions your practice as the trusted health resource in their inbox.",
-  },
-  {
-    id: "whentovisit", category: "value",
-    title: "When to See a Chiropractor",
-    status: "coming-soon",
-    timing: "Day 14", timingN: 336,
-    icon: "fa-circle-question", color: "#7c3aed", accentBg: "rgba(124,58,237,0.08)",
-    subject: "How do you know when it's time to come in? (read this)",
-    purpose: "Educational guide that helps the lead self-identify as a candidate for care — and book.",
-  },
-];
+// ── Category metadata ─────────────────────────────────────────────────────────
+const CATEGORY_META: Record<TemplateCategory, { label: string; icon: string; color: string; bg: string; border: string; description: string }> = {
+  personal:     { label: "Personal Touch",    icon: "fa-heart",           color: "#ea580c", bg: "rgba(234,88,12,0.06)",   border: "rgba(234,88,12,0.20)",   description: "Relationship emails that make every lead feel heard." },
+  promo:        { label: "Promotions",        icon: "fa-tag",             color: "#15803d", bg: "rgba(21,128,61,0.06)",   border: "rgba(21,128,61,0.20)",   description: "Offers and deals that turn hesitant leads into bookings." },
+  value:        { label: "Value Delivery",    icon: "fa-lightbulb",       color: "#0891b2", bg: "rgba(8,145,178,0.06)",   border: "rgba(8,145,178,0.20)",   description: "Educational content that positions you as the expert." },
+  reengagement: { label: "Re-engagement",    icon: "fa-rotate-left",     color: "#be185d", bg: "rgba(190,24,93,0.06)",   border: "rgba(190,24,93,0.20)",   description: "Bring cold or unresponsive leads back to life." },
+  referral:     { label: "Referral & Reviews",icon: "fa-star",            color: "#b45309", bg: "rgba(180,83,9,0.06)",    border: "rgba(180,83,9,0.20)",    description: "Turn happy patients into your best marketing channel." },
+  urgency:      { label: "Urgency & FOMO",   icon: "fa-fire",            color: "#dc2626", bg: "rgba(220,38,38,0.06)",   border: "rgba(220,38,38,0.20)",   description: "Scarcity and deadline emails that force a decision." },
+  seasonal:     { label: "Seasonal",          icon: "fa-calendar-days",   color: "#7c3aed", bg: "rgba(124,58,237,0.06)",  border: "rgba(124,58,237,0.20)",  description: "Holiday and seasonal campaigns tied to the calendar." },
+  series:       { label: "Email Series",      icon: "fa-list-ol",         color: "#7c3aed", bg: "rgba(124,58,237,0.06)",  border: "rgba(124,58,237,0.20)",  description: "Multi-day drip sequences that build trust over time." },
+};
 
-const CATEGORIES = [
-  {
-    key: "personal" as const,
-    label: "Personal Touch",
-    icon: "fa-heart",
-    color: "#ea580c",
-    bg: "rgba(234,88,12,0.06)",
-    border: "rgba(234,88,12,0.18)",
-    description: "Relationship-building emails that make every lead feel heard and welcomed.",
-  },
-  {
-    key: "promo" as const,
-    label: "Promotions",
-    icon: "fa-tag",
-    color: "#15803d",
-    bg: "rgba(21,128,61,0.06)",
-    border: "rgba(21,128,61,0.18)",
-    description: "Conversion emails with offers that turn hesitant leads into booked appointments.",
-  },
-  {
-    key: "value" as const,
-    label: "Value Delivery",
-    icon: "fa-lightbulb",
-    color: "#0891b2",
-    bg: "rgba(8,145,178,0.06)",
-    border: "rgba(8,145,178,0.18)",
-    description: "Educational content that positions your practice as the expert and keeps leads engaged.",
-  },
-];
+const ALL_CATEGORIES = Object.keys(CATEGORY_META) as TemplateCategory[];
 
-// ─── Status badge ─────────────────────────────────────────────────────────────
+// Seed the flow with the 7 original templates
+const INITIAL_FLOW = new Map<string, number>([
+  ["welcome",         0],
+  ["followup-info",   24],
+  ["checkin-d3",      72],
+  ["new-patient-offer", 120],
+  ["flash-promo",     168],
+  ["exercises",       240],
+  ["whentovisit",     336],
+]);
 
-function StatusBadge({ status }: { status: EmailStatus }) {
-  if (status === "live-automated") {
-    return (
-      <span style={{
-        display: "inline-flex", alignItems: "center", gap: 5,
-        fontSize: 11, fontWeight: 800, padding: "3px 9px", borderRadius: 20,
-        background: "#f0fdf4", color: "#15803d", border: "1px solid #bbf7d0",
-        letterSpacing: "0.04em", textTransform: "uppercase",
-      }}>
-        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }} />
-        Automated
-      </span>
-    );
-  }
-  if (status === "live-manual") {
-    return (
-      <span style={{
-        display: "inline-flex", alignItems: "center", gap: 5,
-        fontSize: 11, fontWeight: 800, padding: "3px 9px", borderRadius: 20,
-        background: "rgba(234,88,12,0.08)", color: ORANGE, border: "1px solid rgba(234,88,12,0.25)",
-        letterSpacing: "0.04em", textTransform: "uppercase",
-      }}>
-        <span style={{ width: 6, height: 6, borderRadius: "50%", background: ORANGE, flexShrink: 0 }} />
-        Manual
-      </span>
-    );
-  }
+// ── Category badge ────────────────────────────────────────────────────────────
+function CatBadge({ category }: { category: TemplateCategory }) {
+  const meta = CATEGORY_META[category];
   return (
     <span style={{
-      display: "inline-flex", alignItems: "center", gap: 5,
-      fontSize: 11, fontWeight: 800, padding: "3px 9px", borderRadius: 20,
-      background: "#f5f5f5", color: "#a8a29e", border: "1px solid #e5e5e5",
-      letterSpacing: "0.04em", textTransform: "uppercase",
+      display: "inline-flex", alignItems: "center", gap: 4,
+      fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 20,
+      background: meta.bg, color: meta.color, border: `1px solid ${meta.border}`,
+      textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap",
     }}>
-      <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#d4d4d4", flexShrink: 0 }} />
-      Coming Soon
+      <i className={`fa-solid ${meta.icon}`} style={{ fontSize: 8 }} />
+      {meta.label}
     </span>
   );
 }
 
-// ─── Timeline strip ───────────────────────────────────────────────────────────
+// ── Preview modal ─────────────────────────────────────────────────────────────
+function PreviewModal({ template, html, onClose }: { template: EmailTemplate; html?: string; onClose: () => void }) {
+  const meta = CATEGORY_META[template.category];
+  return (
+    <div
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+    >
+      <div style={{ background: WHITE, borderRadius: 20, width: "100%", maxWidth: 660, maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(0,0,0,0.25)", overflow: "hidden" }}>
+        {/* Header */}
+        <div style={{ padding: "16px 20px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: `${template.color}15`, border: `1px solid ${template.color}30`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <i className={`fa-solid ${template.icon}`} style={{ fontSize: 15, color: template.color }} />
+            </div>
+            <div>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: TEXT }}>{template.title}</p>
+              <CatBadge category={template.category} />
+            </div>
+          </div>
+          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, border: `1px solid ${BORDER}`, background: BG, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: MUTED, fontSize: 13 }}>
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
 
-function TimelineStrip({ emails, active }: { emails: EmailDef[]; active: Set<string> }) {
-  const CAT_COLOR: Record<string, string> = {
-    personal: "#ea580c",
-    promo:    "#15803d",
-    value:    "#0891b2",
-  };
+        {/* Body */}
+        {html ? (
+          <div style={{ flex: 1, overflow: "hidden", background: "#f0ede8" }}>
+            <iframe srcDoc={html} title={template.title} style={{ width: "100%", height: "100%", border: "none", minHeight: 540 }} sandbox="allow-same-origin" />
+          </div>
+        ) : (
+          <div style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em" }}>Subject Line</p>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: TEXT, lineHeight: 1.5 }}>{template.subject}</p>
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em" }}>Goal</p>
+              <p style={{ margin: 0, fontSize: 14, color: TEXT, lineHeight: 1.7 }}>{template.purpose}</p>
+            </div>
+            <div style={{ padding: "20px 24px", borderRadius: 14, background: meta.bg, border: `1px solid ${meta.border}`, display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <i className="fa-solid fa-paintbrush" style={{ color: meta.color, fontSize: 16, marginTop: 2, flexShrink: 0 }} />
+              <div>
+                <p style={{ margin: "0 0 4px", fontSize: 13, fontWeight: 700, color: TEXT }}>Full template preview coming soon</p>
+                <p style={{ margin: 0, fontSize: 13, color: MUTED, lineHeight: 1.6 }}>This template will be fully designed and personalized with your business name, logo, and contact details before it goes live in your sequence.</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Add to Flow modal ─────────────────────────────────────────────────────────
+function AddToFlowModal({
+  template, onAdd, onClose,
+}: { template: EmailTemplate; onAdd: (hours: number) => void; onClose: () => void }) {
+  const [hours, setHours] = useState(
+    TIMING_OPTIONS.find(o => o.hours >= template.suggestedHours)?.hours ?? template.suggestedHours
+  );
+  const meta = CATEGORY_META[template.category];
 
   return (
+    <div
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+    >
+      <div style={{ background: WHITE, borderRadius: 20, width: "100%", maxWidth: 440, boxShadow: "0 24px 64px rgba(0,0,0,0.25)", overflow: "hidden" }}>
+        {/* Header stripe */}
+        <div style={{ padding: "20px 24px", background: meta.bg, borderBottom: `1px solid ${meta.border}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 12, background: WHITE, border: `1.5px solid ${meta.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <i className={`fa-solid ${template.icon}`} style={{ fontSize: 18, color: template.color }} />
+            </div>
+            <div>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: TEXT }}>{template.title}</p>
+              <CatBadge category={template.category} />
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: "24px" }}>
+          <div style={{ marginBottom: 8, padding: "12px 14px", borderRadius: 10, background: BG, border: `1px solid ${BORDER}` }}>
+            <p style={{ margin: "0 0 2px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.05em" }}>Subject</p>
+            <p style={{ margin: 0, fontSize: 13, color: TEXT, lineHeight: 1.5 }}>{template.subject}</p>
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: TEXT, marginBottom: 6 }}>
+              Send this email on:
+            </label>
+            <select
+              value={hours}
+              onChange={e => setHours(Number(e.target.value))}
+              style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1.5px solid ${BORDER}`, fontSize: 14, color: TEXT, background: WHITE, cursor: "pointer", appearance: "auto" }}
+            >
+              {TIMING_OPTIONS.map(o => (
+                <option key={o.hours} value={o.hours}>{o.label}</option>
+              ))}
+            </select>
+            {template.suggestedHours > 0 && (
+              <p style={{ margin: "6px 0 0", fontSize: 11, color: MUTED }}>
+                Suggested: {hoursToLabel(template.suggestedHours)} based on best-practice sequences
+              </p>
+            )}
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <button
+              onClick={() => onAdd(hours)}
+              style={{ flex: 1, padding: "12px", borderRadius: 11, border: "none", background: template.color, color: WHITE, fontSize: 14, fontWeight: 800, cursor: "pointer" }}
+            >
+              <i className="fa-solid fa-plus" style={{ marginRight: 7, fontSize: 12 }} />
+              Add to Flow
+            </button>
+            <button
+              onClick={onClose}
+              style={{ padding: "12px 18px", borderRadius: 11, border: `1.5px solid ${BORDER}`, background: WHITE, color: MUTED, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Marketplace template card ─────────────────────────────────────────────────
+function TemplateCard({ template, inFlow, onAdd, onPreview }: {
+  template: EmailTemplate;
+  inFlow: boolean;
+  onAdd: () => void;
+  onPreview: () => void;
+}) {
+  const meta = CATEGORY_META[template.category];
+  return (
     <div style={{
-      background: WHITE, border: `1px solid ${BORDER}`,
-      borderRadius: 14, padding: "20px 24px", marginBottom: 28, overflow: "hidden",
+      background: WHITE, borderRadius: 14, border: `1.5px solid ${BORDER}`,
+      borderLeft: `4px solid ${inFlow ? template.color : BORDER}`,
+      overflow: "hidden", display: "flex", flexDirection: "column",
+      transition: "box-shadow 0.15s, border-color 0.15s",
     }}>
-      <p style={{ margin: "0 0 16px", fontSize: 11, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "1px" }}>
-        Sequence Overview — time since lead arrives
-      </p>
-      <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
-        <div style={{ display: "flex", alignItems: "flex-start", minWidth: "max-content", gap: 0 }}>
-          {emails.map((e, i) => {
-            const isActive = active.has(e.id);
-            const dotColor  = isActive ? (e.status === "coming-soon" ? "#d4d4d4" : e.color) : "#d4d4d4";
-            const textColor = isActive ? TEXT : "#c4bfb8";
+      {/* Top */}
+      <div style={{ padding: "14px 14px 10px" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 9, flexShrink: 0, background: `${template.color}12`, border: `1.5px solid ${template.color}25`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <i className={`fa-solid ${template.icon}`} style={{ fontSize: 14, color: template.color }} />
+            </div>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: TEXT, lineHeight: 1.3 }}>{template.title}</p>
+          </div>
+          <CatBadge category={template.category} />
+        </div>
 
+        {/* Subject */}
+        <p style={{ margin: "0 0 6px", fontSize: 12, color: MUTED, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" } as React.CSSProperties}>
+          <i className="fa-solid fa-at" style={{ fontSize: 9, marginRight: 5, color: "#c4bfb8" }} />
+          {template.subject}
+        </p>
+
+        {/* Purpose */}
+        <p style={{ margin: 0, fontSize: 11, color: "#a8a29e", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" } as React.CSSProperties}>
+          {template.purpose}
+        </p>
+      </div>
+
+      {/* Footer */}
+      <div style={{ marginTop: "auto", padding: "10px 14px", borderTop: `1px solid ${BORDER}`, background: BG, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        {template.suggestedHours > 0 ? (
+          <span style={{ fontSize: 10, fontWeight: 700, color: meta.color, background: meta.bg, border: `1px solid ${meta.border}`, padding: "2px 8px", borderRadius: 20 }}>
+            <i className="fa-regular fa-clock" style={{ marginRight: 4, fontSize: 9 }} />
+            Suggested {hoursToLabel(template.suggestedHours)}
+          </span>
+        ) : (
+          <span style={{ fontSize: 10, color: MUTED }}>Manual / seasonal send</span>
+        )}
+
+        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+          <button
+            onClick={onPreview}
+            style={{ padding: "5px 10px", borderRadius: 8, border: `1.5px solid ${BORDER}`, background: WHITE, color: MUTED, fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+          >
+            <i className="fa-solid fa-eye" style={{ fontSize: 10 }} />
+            Preview
+          </button>
+          {inFlow ? (
+            <button
+              disabled
+              style={{ padding: "5px 10px", borderRadius: 8, border: `1.5px solid ${template.color}40`, background: `${template.color}10`, color: template.color, fontSize: 11, fontWeight: 800, cursor: "default", display: "flex", alignItems: "center", gap: 4 }}
+            >
+              <i className="fa-solid fa-circle-check" style={{ fontSize: 10 }} />
+              In Flow
+            </button>
+          ) : (
+            <button
+              onClick={onAdd}
+              style={{ padding: "5px 10px", borderRadius: 8, border: `1.5px solid ${template.color}`, background: template.color, color: WHITE, fontSize: 11, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+            >
+              <i className="fa-solid fa-plus" style={{ fontSize: 10 }} />
+              Add
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Marketplace tab ───────────────────────────────────────────────────────────
+function MarketplaceTab({ flow, onAdd, onPreview }: {
+  flow: Map<string, number>;
+  onAdd: (t: EmailTemplate) => void;
+  onPreview: (t: EmailTemplate) => void;
+}) {
+  const [search, setSearch] = useState("");
+  const [filterCat, setFilterCat] = useState<TemplateCategory | "all">("all");
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: TEMPLATES.length };
+    for (const cat of ALL_CATEGORIES) {
+      c[cat] = TEMPLATES.filter(t => t.category === cat).length;
+    }
+    return c;
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return TEMPLATES.filter(t =>
+      (filterCat === "all" || t.category === filterCat) &&
+      (!q || t.title.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q) || t.purpose.toLowerCase().includes(q))
+    );
+  }, [search, filterCat]);
+
+  return (
+    <>
+      {/* Search + stats */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ position: "relative", marginBottom: 12 }}>
+          <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: MUTED, fontSize: 13, pointerEvents: "none" }} />
+          <input
+            type="text"
+            placeholder="Search templates by title, subject, or goal…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, border: `1.5px solid ${BORDER}`, fontSize: 13, color: TEXT, background: WHITE, outline: "none", boxSizing: "border-box" }}
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: MUTED, fontSize: 13 }}
+            >
+              <i className="fa-solid fa-xmark" />
+            </button>
+          )}
+        </div>
+
+        {/* Category pills */}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          <button
+            onClick={() => setFilterCat("all")}
+            style={{ padding: "5px 12px", borderRadius: 20, border: `1.5px solid ${filterCat === "all" ? TEXT : BORDER}`, background: filterCat === "all" ? TEXT : WHITE, color: filterCat === "all" ? WHITE : MUTED, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+          >
+            All <span style={{ opacity: 0.7 }}>({counts.all})</span>
+          </button>
+          {ALL_CATEGORIES.map(cat => {
+            const meta = CATEGORY_META[cat];
+            const active = filterCat === cat;
             return (
-              <div key={e.id} style={{ display: "flex", alignItems: "flex-start" }}>
-                {/* Node */}
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: 82 }}>
-                  {/* Timing label */}
-                  <span style={{ fontSize: 10, fontWeight: 700, color: isActive ? CAT_COLOR[e.category] : "#c4bfb8", letterSpacing: "0.04em" }}>
-                    {e.timing}
-                  </span>
-                  {/* Dot */}
-                  <div style={{
-                    width: 38, height: 38, borderRadius: "50%",
-                    background: isActive ? (e.status === "coming-soon" ? "#f5f5f5" : `${e.color}15`) : "#f5f5f5",
-                    border: `2px solid ${dotColor}`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    position: "relative",
-                  }}>
-                    <i className={`fa-solid ${e.icon}`} style={{ fontSize: 14, color: dotColor }} />
-                    {/* Live indicator */}
-                    {isActive && e.status !== "coming-soon" && (
-                      <span style={{
-                        position: "absolute", top: -2, right: -2,
-                        width: 10, height: 10, borderRadius: "50%",
-                        background: e.status === "live-automated" ? "#22c55e" : ORANGE,
-                        border: "2px solid #fff",
-                      }} />
-                    )}
-                  </div>
-                  {/* Title */}
-                  <span style={{
-                    fontSize: 10, fontWeight: 600, color: textColor,
-                    textAlign: "center", lineHeight: 1.3, whiteSpace: "nowrap",
-                    maxWidth: 78, overflow: "hidden", textOverflow: "ellipsis",
-                  }}>
-                    {e.title}
-                  </span>
-                </div>
-
-                {/* Connector */}
-                {i < emails.length - 1 && (
-                  <div style={{ display: "flex", alignItems: "center", marginTop: 38, paddingBottom: 32, flexShrink: 0 }}>
-                    <div style={{ width: 10, height: 2, background: isActive && active.has(emails[i + 1].id) ? "#d1d5db" : "#eee" }} />
-                    <div style={{
-                      width: 0, height: 0,
-                      borderTop: "4px solid transparent",
-                      borderBottom: "4px solid transparent",
-                      borderLeft: `5px solid ${isActive && active.has(emails[i + 1].id) ? "#d1d5db" : "#eee"}`,
-                    }} />
-                    <div style={{ width: 10, height: 2, background: active.has(emails[i + 1].id) ? "#d1d5db" : "#eee" }} />
-                  </div>
-                )}
-              </div>
+              <button
+                key={cat}
+                onClick={() => setFilterCat(cat)}
+                style={{ padding: "5px 12px", borderRadius: 20, border: `1.5px solid ${active ? meta.color : BORDER}`, background: active ? meta.color : WHITE, color: active ? WHITE : MUTED, fontSize: 12, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
+              >
+                <i className={`fa-solid ${meta.icon}`} style={{ fontSize: 10 }} />
+                {meta.label} <span style={{ opacity: 0.75 }}>({counts[cat]})</span>
+              </button>
             );
           })}
         </div>
       </div>
 
-      {/* Legend */}
-      <div style={{ display: "flex", gap: 16, marginTop: 14, flexWrap: "wrap" }}>
-        {[
-          { dot: "#22c55e", label: "Automated" },
-          { dot: ORANGE,    label: "Manual" },
-          { dot: "#d4d4d4", label: "Coming Soon" },
-        ].map(({ dot, label }) => (
-          <div key={label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: dot, flexShrink: 0 }} />
-            <span style={{ fontSize: 11, color: MUTED }}>{label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+      {/* Result count */}
+      <p style={{ margin: "0 0 12px", fontSize: 12, color: MUTED }}>
+        {filtered.length === TEMPLATES.length
+          ? `${TEMPLATES.length} templates across ${ALL_CATEGORIES.length} categories`
+          : `${filtered.length} template${filtered.length === 1 ? "" : "s"} found`}
+        {flow.size > 0 && <span style={{ marginLeft: 12, color: "#15803d", fontWeight: 700 }}><i className="fa-solid fa-circle-check" style={{ marginRight: 4, fontSize: 10 }} />{flow.size} in your flow</span>}
+      </p>
 
-// ─── Preview modal ─────────────────────────────────────────────────────────────
-
-function PreviewModal({ email, html, onClose }: { email: EmailDef; html: string; onClose: () => void }) {
-  return (
-    <div
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-      style={{
-        position: "fixed", inset: 0, zIndex: 300,
-        background: "rgba(0,0,0,0.55)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: 16,
-      }}
-    >
-      <div style={{
-        background: WHITE, borderRadius: 20,
-        width: "100%", maxWidth: 660,
-        maxHeight: "90vh",
-        display: "flex", flexDirection: "column",
-        boxShadow: "0 24px 64px rgba(0,0,0,0.25)",
-        overflow: "hidden",
-      }}>
-        <div style={{
-          padding: "16px 20px", borderBottom: `1px solid ${BORDER}`,
-          display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 9, background: `${email.color}15`, border: `1px solid ${email.color}30`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <i className={`fa-solid ${email.icon}`} style={{ fontSize: 13, color: email.color }} />
-            </div>
-            <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: TEXT }}>{email.title}</p>
-              <p style={{ margin: 0, fontSize: 11, color: MUTED }}>Sample preview · {email.timing} after lead arrives</p>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{
-              fontSize: 10, fontWeight: 700, padding: "2px 7px",
-              borderRadius: 8, background: "#fef3c7", color: "#92400e",
-              border: "1px solid #fde68a", textTransform: "uppercase", letterSpacing: "0.04em",
-            }}>
-              Sample Data
-            </span>
-            <button
-              onClick={onClose}
-              style={{ width: 30, height: 30, borderRadius: 8, border: `1px solid ${BORDER}`, background: BG, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: MUTED, fontSize: 13 }}
-            >
-              <i className="fa-solid fa-xmark" />
-            </button>
-          </div>
+      {/* Grid */}
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "52px 24px", background: WHITE, border: `1.5px dashed ${BORDER}`, borderRadius: 14 }}>
+          <i className="fa-solid fa-inbox" style={{ fontSize: 28, color: "#d4d4d4", display: "block", marginBottom: 12 }} />
+          <p style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: TEXT }}>No templates match</p>
+          <p style={{ margin: 0, fontSize: 13, color: MUTED }}>Try a different search or category filter.</p>
         </div>
-        <div style={{ flex: 1, overflow: "hidden", background: "#f0ede8" }}>
-          <iframe
-            srcDoc={html}
-            title={email.title}
-            style={{ width: "100%", height: "100%", border: "none", minHeight: 540 }}
-            sandbox="allow-same-origin"
-          />
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
+          {filtered.map(t => (
+            <TemplateCard
+              key={t.id}
+              template={t}
+              inFlow={flow.has(t.id)}
+              onAdd={() => onAdd(t)}
+              onPreview={() => onPreview(t)}
+            />
+          ))}
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Email card ────────────────────────────────────────────────────────────────
-
-function EmailCard({
-  email, index, isActive, onToggle, html, onPreview,
-}: {
-  email:     EmailDef;
-  index:     number;
-  isActive:  boolean;
-  onToggle:  () => void;
-  html:      string;
-  onPreview: () => void;
-}) {
-  const dim = !isActive;
-
-  return (
-    <div style={{
-      background: WHITE,
-      border: `1.5px solid ${dim ? BORDER : email.color + "40"}`,
-      borderRadius: 14,
-      overflow: "hidden",
-      opacity: dim ? 0.55 : 1,
-      transition: "opacity 0.2s, border-color 0.2s",
-    }}>
-      {/* Card header */}
-      <div style={{
-        padding: "14px 18px",
-        background: dim ? BG : email.accentBg,
-        borderBottom: `1px solid ${dim ? BORDER : email.color + "25"}`,
-        display: "flex", alignItems: "center", gap: 12,
-      }}>
-        {/* Sequence number */}
-        <div style={{
-          width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-          background: dim ? "#e5e5e5" : `${email.color}20`,
-          border: `1.5px solid ${dim ? "#d4d4d4" : email.color + "40"}`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 12, fontWeight: 900, color: dim ? "#a8a29e" : email.color,
-        }}>
-          {index + 1}
-        </div>
-
-        {/* Icon */}
-        <div style={{
-          width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-          background: dim ? "#f5f5f5" : WHITE,
-          border: `1.5px solid ${dim ? "#e5e5e5" : email.color + "35"}`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <i className={`fa-solid ${email.icon}`} style={{ fontSize: 15, color: dim ? "#c4c4c4" : email.color }} />
-        </div>
-
-        {/* Title + badges */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 14, fontWeight: 800, color: dim ? MUTED : TEXT }}>{email.title}</span>
-            <StatusBadge status={email.status} />
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
-            <i className="fa-regular fa-clock" style={{ fontSize: 10, color: dim ? "#c4bfb8" : MUTED }} />
-            <span style={{ fontSize: 11, color: dim ? "#c4bfb8" : MUTED }}>{email.timing} after lead arrives</span>
-          </div>
-        </div>
-
-        {/* Controls */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <button
-            onClick={onPreview}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 5,
-              padding: "7px 13px", borderRadius: 9,
-              border: `1.5px solid ${dim ? BORDER : email.color + "40"}`,
-              background: WHITE, color: dim ? MUTED : email.color,
-              fontSize: 12, fontWeight: 700, cursor: "pointer",
-            }}
-          >
-            <i className="fa-solid fa-eye" style={{ fontSize: 11 }} />
-            Preview
-          </button>
-
-          {/* Toggle */}
-          <button
-            onClick={onToggle}
-            title={isActive ? "Disable" : "Enable"}
-            style={{
-              width: 36, height: 36, borderRadius: 9, flexShrink: 0,
-              border: `1.5px solid ${isActive ? (email.status === "coming-soon" ? "#e5e5e5" : email.color + "50") : BORDER}`,
-              background: isActive ? (email.status === "coming-soon" ? "#f5f5f5" : `${email.color}12`) : WHITE,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer",
-              color: isActive ? (email.status === "coming-soon" ? "#a8a29e" : email.color) : "#c4bfb8",
-              fontSize: 15,
-            }}
-          >
-            <i className={`fa-${isActive ? "solid" : "regular"} fa-circle-check`} />
-          </button>
-        </div>
-      </div>
-
-      {/* Card body */}
-      <div style={{ padding: "13px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
-        {/* Subject */}
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
-          <div style={{ width: 26, height: 26, borderRadius: 7, flexShrink: 0, background: BG, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <i className="fa-solid fa-at" style={{ fontSize: 10, color: MUTED }} />
-          </div>
-          <div>
-            <p style={{ margin: "0 0 1px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.5px" }}>Subject</p>
-            <p style={{ margin: 0, fontSize: 13, color: dim ? MUTED : TEXT, lineHeight: 1.5 }}>{email.subject}</p>
-          </div>
-        </div>
-
-        {/* Purpose */}
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
-          <div style={{ width: 26, height: 26, borderRadius: 7, flexShrink: 0, background: BG, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <i className="fa-solid fa-bullseye" style={{ fontSize: 10, color: MUTED }} />
-          </div>
-          <div>
-            <p style={{ margin: "0 0 1px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.5px" }}>Goal</p>
-            <p style={{ margin: 0, fontSize: 13, color: dim ? MUTED : TEXT, lineHeight: 1.5 }}>{email.purpose}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Coming-soon footer */}
-      {email.status === "coming-soon" && isActive && (
-        <div style={{ padding: "10px 18px", borderTop: `1px solid ${BORDER}`, background: "#fafafa", display: "flex", alignItems: "center", gap: 7 }}>
-          <i className="fa-solid fa-circle-info" style={{ fontSize: 12, color: "#a8a29e", flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: "#a8a29e" }}>
-            This email is planned — automation will go live in a future update.
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Email flow tab ────────────────────────────────────────────────────────────
-
-function EmailFlow({ previews }: { previews: Record<string, string> }) {
-  const defaultActive = new Set(EMAILS.filter(e => e.status !== "coming-soon").map(e => e.id));
-  const [active,  setActive]  = useState<Set<string>>(defaultActive);
-  const [preview, setPreview] = useState<EmailDef | null>(null);
-
-  function toggle(id: string) {
-    setActive(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }
-
-  return (
-    <>
-      <TimelineStrip emails={EMAILS} active={active} />
-
-      {CATEGORIES.map(cat => {
-        const catEmails  = EMAILS.filter(e => e.category === cat.key);
-        const startIndex = EMAILS.indexOf(catEmails[0]);
-
-        return (
-          <div key={cat.key} style={{ marginBottom: 28 }}>
-            {/* Category header */}
-            <div style={{
-              display: "flex", alignItems: "center", gap: 10, marginBottom: 12,
-              padding: "12px 16px", borderRadius: 12,
-              background: cat.bg, border: `1px solid ${cat.border}`,
-            }}>
-              <div style={{ width: 34, height: 34, borderRadius: 9, background: WHITE, border: `1px solid ${cat.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <i className={`fa-solid ${cat.icon}`} style={{ fontSize: 15, color: cat.color }} />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: TEXT }}>{cat.label}</p>
-                <p style={{ margin: 0, fontSize: 12, color: MUTED }}>{cat.description}</p>
-              </div>
-            </div>
-
-            {/* Email cards */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {catEmails.map((email, i) => {
-                // Connector between cards within a category
-                return (
-                  <div key={email.id}>
-                    {i > 0 && (
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "2px 0" }}>
-                        <div style={{ width: 2, height: 14, background: BORDER }} />
-                        <div style={{ width: 0, height: 0, borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: `6px solid ${BORDER}` }} />
-                      </div>
-                    )}
-                    <EmailCard
-                      email={email}
-                      index={startIndex + i}
-                      isActive={active.has(email.id)}
-                      onToggle={() => toggle(email.id)}
-                      html={previews[email.id] ?? ""}
-                      onPreview={() => setPreview(email)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-
-      {/* Bottom note */}
-      <div style={{
-        padding: "14px 18px", borderRadius: 12,
-        background: "rgba(211,84,0,0.05)", border: `1px solid rgba(211,84,0,0.18)`,
-        display: "flex", alignItems: "flex-start", gap: 10,
-      }}>
-        <i className="fa-solid fa-circle-info" style={{ color: ORANGE, fontSize: 14, flexShrink: 0, marginTop: 1 }} />
-        <p style={{ margin: 0, fontSize: 13, color: TEXT, lineHeight: 1.6 }}>
-          <strong>Manual emails</strong> are triggered by you from the lead detail page.&nbsp;
-          <strong>All emails can be fully automated</strong> — the manual step is temporary while we finalize your automation rules. Coming soon emails will go live in a future update.
-        </p>
-      </div>
-
-      {preview && (
-        <PreviewModal
-          email={preview}
-          html={previews[preview.id] ?? ""}
-          onClose={() => setPreview(null)}
-        />
       )}
     </>
   );
 }
 
-// ─── SMS tab ──────────────────────────────────────────────────────────────────
+// ── Flow tab ──────────────────────────────────────────────────────────────────
+function FlowTab({ flow, onUpdateTiming, onRemove, onPreview }: {
+  flow: Map<string, number>;
+  onUpdateTiming: (id: string, hours: number) => void;
+  onRemove: (id: string) => void;
+  onPreview: (t: EmailTemplate) => void;
+}) {
+  const sorted = useMemo(() => {
+    return TEMPLATES
+      .filter(t => flow.has(t.id))
+      .sort((a, b) => (flow.get(a.id) ?? 0) - (flow.get(b.id) ?? 0));
+  }, [flow]);
 
+  const maxHours = sorted.length > 0 ? Math.max(...sorted.map(t => flow.get(t.id) ?? 0)) : 0;
+  const seqDays  = maxHours > 0 ? Math.round(maxHours / 24) : 0;
+
+  if (sorted.length === 0) {
+    return (
+      <div style={{ textAlign: "center", padding: "64px 24px", background: WHITE, border: `1.5px dashed ${BORDER}`, borderRadius: 16 }}>
+        <i className="fa-solid fa-code-branch" style={{ fontSize: 32, color: "#d4d4d4", display: "block", marginBottom: 14 }} />
+        <p style={{ margin: "0 0 6px", fontSize: 17, fontWeight: 800, color: TEXT }}>Your flow is empty</p>
+        <p style={{ margin: 0, fontSize: 14, color: MUTED }}>Head to the Template Library tab and add emails to build your sequence.</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Stats */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        {[
+          { icon: "fa-envelope", val: String(sorted.length), label: "emails in sequence" },
+          { icon: "fa-calendar-days", val: seqDays > 0 ? `${seqDays} days` : "Immediate", label: "sequence length" },
+          { icon: "fa-circle-check", val: String(sorted.filter(t => t.previewKey).length), label: "with full preview" },
+        ].map(({ icon, val, label }) => (
+          <div key={label} style={{ flex: "1 1 140px", padding: "14px 16px", borderRadius: 12, background: WHITE, border: `1px solid ${BORDER}`, textAlign: "center" }}>
+            <i className={`fa-solid ${icon}`} style={{ fontSize: 16, color: MUTED, marginBottom: 6, display: "block" }} />
+            <p style={{ margin: "0 0 2px", fontSize: 20, fontWeight: 900, color: TEXT }}>{val}</p>
+            <p style={{ margin: 0, fontSize: 11, color: MUTED }}>{label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Flow list */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {sorted.map((template, i) => {
+          const hours = flow.get(template.id) ?? 0;
+          return (
+            <div key={template.id}>
+              {/* Connector */}
+              {i > 0 && (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", paddingLeft: 28, margin: "2px 0" }}>
+                  <div style={{ width: 2, height: 14, background: BORDER, marginLeft: 16 }} />
+                  <div style={{ width: 0, height: 0, borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: `5px solid ${BORDER}`, marginLeft: 14 }} />
+                </div>
+              )}
+              {/* Card */}
+              <div style={{ background: WHITE, border: `1.5px solid ${template.color}35`, borderLeft: `4px solid ${template.color}`, borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14 }}>
+                {/* Step number */}
+                <div style={{ width: 28, height: 28, borderRadius: 8, flexShrink: 0, background: `${template.color}12`, border: `1.5px solid ${template.color}35`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: template.color }}>
+                  {i + 1}
+                </div>
+
+                {/* Icon */}
+                <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: `${template.color}10`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <i className={`fa-solid ${template.icon}`} style={{ fontSize: 15, color: template.color }} />
+                </div>
+
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap", marginBottom: 2 }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: TEXT }}>{template.title}</span>
+                    <CatBadge category={template.category} />
+                  </div>
+                  <p style={{ margin: 0, fontSize: 11, color: MUTED, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" } as React.CSSProperties}>
+                    {template.subject}
+                  </p>
+                </div>
+
+                {/* Timing dropdown */}
+                <div style={{ flexShrink: 0 }}>
+                  <select
+                    value={hours}
+                    onChange={e => onUpdateTiming(template.id, Number(e.target.value))}
+                    style={{ padding: "6px 10px", borderRadius: 9, border: `1.5px solid ${template.color}40`, background: `${template.color}08`, color: template.color, fontSize: 12, fontWeight: 700, cursor: "pointer", appearance: "auto" }}
+                  >
+                    {TIMING_OPTIONS.map(o => (
+                      <option key={o.hours} value={o.hours}>{o.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <button
+                    onClick={() => onPreview(template)}
+                    style={{ width: 32, height: 32, borderRadius: 8, border: `1px solid ${BORDER}`, background: BG, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: MUTED, fontSize: 12 }}
+                    title="Preview"
+                  >
+                    <i className="fa-solid fa-eye" />
+                  </button>
+                  <button
+                    onClick={() => onRemove(template.id)}
+                    style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(220,38,38,0.25)", background: "rgba(220,38,38,0.06)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#dc2626", fontSize: 12 }}
+                    title="Remove from flow"
+                  >
+                    <i className="fa-solid fa-trash" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Info note */}
+      <div style={{ marginTop: 20, padding: "14px 18px", borderRadius: 12, background: "rgba(8,145,178,0.05)", border: "1px solid rgba(8,145,178,0.18)", display: "flex", alignItems: "flex-start", gap: 10 }}>
+        <i className="fa-solid fa-circle-info" style={{ color: "#0891b2", fontSize: 14, flexShrink: 0, marginTop: 1 }} />
+        <p style={{ margin: 0, fontSize: 13, color: TEXT, lineHeight: 1.6 }}>
+          Timing is relative to when the lead submits their intake form. Adjust any step using the dropdown above. Full automation is enabled once your sequence is finalized.
+        </p>
+      </div>
+    </>
+  );
+}
+
+// ── SMS tab ───────────────────────────────────────────────────────────────────
 function SmsComingSoon() {
   return (
     <div style={{ background: WHITE, border: `1.5px solid ${BORDER}`, borderRadius: 16, padding: "52px 24px", textAlign: "center" }}>
@@ -566,7 +527,7 @@ function SmsComingSoon() {
       </div>
       <h3 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 900, color: TEXT }}>SMS Follow-Up — Coming Soon</h3>
       <p style={{ margin: "0 0 20px", fontSize: 14, color: MUTED, lineHeight: 1.7, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
-        Text follow-ups get 3× the response rate of email. The same sequence above — Welcome, Follow-Up, Check-In, Promos, and Value emails — will be available over SMS once Twilio verification is complete.
+        Text follow-ups get 3× the response rate of email. The same library of templates will be available over SMS once Twilio verification is complete.
       </p>
       <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 18px", borderRadius: 20, background: "#faf5ff", border: "1px solid #ddd6fe", fontSize: 13, fontWeight: 700, color: "#7c3aed" }}>
         <i className="fa-solid fa-clock" style={{ fontSize: 12 }} />
@@ -576,45 +537,73 @@ function SmsComingSoon() {
   );
 }
 
-// ─── Root component ───────────────────────────────────────────────────────────
-
+// ── Root component ─────────────────────────────────────────────────────────────
 export default function FollowUpClient({ previews }: { previews: Record<string, string> }) {
-  const [tab, setTab] = useState<"email" | "sms">("email");
+  const [tab, setTab]         = useState<"library" | "flow" | "sms">("library");
+  const [flow, setFlow]       = useState<Map<string, number>>(new Map(INITIAL_FLOW));
+  const [addModal, setAddModal] = useState<EmailTemplate | null>(null);
+  const [preview, setPreview] = useState<EmailTemplate | null>(null);
+
+  function handleAdd(template: EmailTemplate) {
+    setAddModal(template);
+  }
+
+  function confirmAdd(hours: number) {
+    if (!addModal) return;
+    setFlow(prev => new Map(prev).set(addModal.id, hours));
+    setAddModal(null);
+  }
+
+  function handleRemove(id: string) {
+    setFlow(prev => { const n = new Map(prev); n.delete(id); return n; });
+  }
+
+  function handleUpdateTiming(id: string, hours: number) {
+    setFlow(prev => new Map(prev).set(id, hours));
+  }
+
+  const TABS = [
+    { key: "library" as const, label: "Template Library", icon: "fa-store", badge: `${TEMPLATES.length}` },
+    { key: "flow"    as const, label: "My Flow",          icon: "fa-code-branch", badge: flow.size > 0 ? String(flow.size) : null },
+    { key: "sms"     as const, label: "SMS",              icon: "fa-message", soon: true },
+  ];
 
   return (
-    <div style={{ maxWidth: 740, margin: "0 auto" }}>
+    <div style={{ maxWidth: 960, margin: "0 auto" }}>
       {/* Page header */}
-      <div style={{ marginBottom: 28 }}>
-        <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: ORANGE }}>
-          Administrator
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "1.5px", color: "#D35400" }}>
+          Follow-Up Engine
         </p>
-        <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900, color: TEXT }}>Follow-Up Engine</h1>
+        <h1 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 900, color: TEXT }}>Email Template Marketplace</h1>
         <p style={{ margin: 0, fontSize: 14, color: MUTED, lineHeight: 1.6 }}>
-          Every new patient lead moves through this automated sequence — from first response to booked appointment.
-          Toggle each email on or off and preview exactly what your leads receive.
+          Browse {TEMPLATES.length} ready-to-deploy templates across {ALL_CATEGORIES.length} categories. Add any to your flow and set the exact timing for each touchpoint.
         </p>
       </div>
 
       {/* Tab bar */}
       <div style={{ display: "flex", gap: 4, marginBottom: 24, background: BG, padding: 4, borderRadius: 12, border: `1px solid ${BORDER}`, width: "fit-content" }}>
-        {(["email", "sms"] as const).map(t => (
+        {TABS.map(t => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={t.key}
+            onClick={() => setTab(t.key)}
             style={{
-              padding: "8px 20px", borderRadius: 9, border: "none",
-              background: tab === t ? WHITE : "transparent",
-              color: tab === t ? TEXT : MUTED,
-              fontSize: 13, fontWeight: tab === t ? 700 : 500,
-              cursor: "pointer",
-              boxShadow: tab === t ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-              display: "flex", alignItems: "center", gap: 7,
-              transition: "all 0.15s",
+              padding: "8px 18px", borderRadius: 9, border: "none",
+              background: tab === t.key ? WHITE : "transparent",
+              color: tab === t.key ? TEXT : MUTED,
+              fontSize: 13, fontWeight: tab === t.key ? 700 : 500,
+              cursor: "pointer", boxShadow: tab === t.key ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+              display: "flex", alignItems: "center", gap: 7, transition: "all 0.15s",
             }}
           >
-            <i className={`fa-solid ${t === "email" ? "fa-envelope" : "fa-message"}`} style={{ fontSize: 12 }} />
-            {t === "email" ? "Email Flow" : "SMS"}
-            {t === "sms" && (
+            <i className={`fa-solid ${t.icon}`} style={{ fontSize: 12 }} />
+            {t.label}
+            {t.badge && (
+              <span style={{ fontSize: 10, fontWeight: 800, padding: "1px 6px", borderRadius: 20, background: tab === t.key ? TEXT : BORDER, color: tab === t.key ? WHITE : MUTED }}>
+                {t.badge}
+              </span>
+            )}
+            {t.soon && (
               <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 8, background: "#7c3aed", color: WHITE, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Soon
               </span>
@@ -623,7 +612,39 @@ export default function FollowUpClient({ previews }: { previews: Record<string, 
         ))}
       </div>
 
-      {tab === "email" ? <EmailFlow previews={previews} /> : <SmsComingSoon />}
+      {/* Tab content */}
+      {tab === "library" && (
+        <MarketplaceTab
+          flow={flow}
+          onAdd={handleAdd}
+          onPreview={t => setPreview(t)}
+        />
+      )}
+      {tab === "flow" && (
+        <FlowTab
+          flow={flow}
+          onUpdateTiming={handleUpdateTiming}
+          onRemove={handleRemove}
+          onPreview={t => setPreview(t)}
+        />
+      )}
+      {tab === "sms" && <SmsComingSoon />}
+
+      {/* Modals */}
+      {addModal && (
+        <AddToFlowModal
+          template={addModal}
+          onAdd={confirmAdd}
+          onClose={() => setAddModal(null)}
+        />
+      )}
+      {preview && (
+        <PreviewModal
+          template={preview}
+          html={preview.previewKey ? previews[preview.previewKey] : undefined}
+          onClose={() => setPreview(null)}
+        />
+      )}
     </div>
   );
 }
