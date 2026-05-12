@@ -33,20 +33,18 @@ const PLANS = [
     features: [
       "Lead capture (up to 50/month)",
       "60-second auto-response",
-      "3–5 follow-ups",
-      "Appointment reminders",
+      "3–5 email follow-up sequences",
       "Basic segmentation",
       "Booking calendar",
-      "Weekly report",
       "Basic landing page",
-      "Team (up to 2 users)",
+      "Advanced lead scoring",
       "HIPAA/GDPR compliant",
     ],
   },
   {
     id: "pro" as const,
     name: "Pro",
-    tagline: "For clinics ready to grow",
+    tagline: "For growing service businesses",
     sixMonthPrice: 499,
     sixMonthSetup: 499,
     annualPrice: 399,
@@ -57,19 +55,18 @@ const PLANS = [
     annualPerDay: "13.12",
     highlight: true,
     cta: "Choose Pro",
-    subBadge: "Most clinics choose this",
+    subBadge: "Most contractors choose this",
     badge: "Most Popular",
     features: [
       "Everything in Base, plus:",
-      "Dedicated Account Manager",
+      "Unlimited lead capture",
+      "12–15 email follow-up sequences",
+      "3–5 SMS follow-up sequences",
       "Custom intake forms",
-      "Advanced follow-ups",
-      "Custom segmentation",
       "Unlimited SMS campaigns",
-      "Real-time analytics",
-      "Monthly strategy calls",
-      "Advanced lead scoring",
-      "Patient LTV tracking",
+      "Unlimited team members",
+      "Dedicated Account Manager",
+      "Weekly report",
     ],
   },
 ];
@@ -79,35 +76,25 @@ type PlanId = "base" | "pro";
 const FLAT_ROWS: { feature: string; base?: boolean; pro?: boolean; values?: [string, string]; divider?: boolean }[] = [
   { feature: "Lead capture / month",               values: ["50", "Unlimited"] },
   { feature: "60-second auto-response",             base: true,  pro: true  },
-  { feature: "Follow-up sequences",                values: ["3–5", "Advanced"] },
-  { feature: "Appointment reminders",               base: true,  pro: true  },
-  { feature: "Basic segmentation",                  base: true,  pro: true  },
-  { feature: "Booking calendar",                    base: true,  pro: true  },
-  { feature: "Weekly report",                       base: true,  pro: true  },
-  { feature: "Basic landing page",                  base: true,  pro: true  },
-  { feature: "Team members",                       values: ["2 users", "Unlimited"] },
-  { feature: "HIPAA/GDPR compliant",                base: true,  pro: true  },
-  { feature: "Dedicated Account Manager",           base: false, pro: true,  divider: true },
-  { feature: "Custom intake forms",                 base: false, pro: true  },
-  { feature: "Custom segmentation",                 base: false, pro: true  },
-  { feature: "Unlimited SMS campaigns",             base: false, pro: true  },
-  { feature: "Real-time analytics",                 base: false, pro: true  },
-  { feature: "Monthly strategy calls",              base: false, pro: true  },
-  { feature: "Advanced lead scoring",               base: false, pro: true  },
-  { feature: "Patient LTV tracking",                base: false, pro: true  },
+  { feature: "Email follow-up sequences",          values: ["3–5", "12–15"] },
+  { feature: "SMS follow-up sequences",            values: ["—", "3–5"] },
+  { feature: "Custom intake forms",                base: false, pro: true  },
+  { feature: "Segmentation",                       base: true,  pro: true  },
+  { feature: "Booking calendar",                   base: true,  pro: true  },
+  { feature: "Basic landing page",                 base: true,  pro: true  },
+  { feature: "Unlimited SMS campaigns",            base: false, pro: true  },
+  { feature: "Advanced lead scoring",              base: true,  pro: true  },
+  { feature: "HIPAA/GDPR compliant",               base: true,  pro: true  },
+  { feature: "Team members",                       values: ["—", "Unlimited"], divider: true },
+  { feature: "Dedicated Account Manager",          base: false, pro: true  },
+  { feature: "Weekly report",                      base: false, pro: true  },
 ];
 
-const ADDON_FEATURES_LEFT = [
-  "AI chatbot + voice",
-  "Landing page + website",
-  "Blog/content creation",
-  "Local targeting contacts",
-];
-const ADDON_FEATURES_RIGHT = [
-  "Google Ads + Meta Ads integration",
+const ADDON_FEATURES = [
+  "Marketing review & recommendations",
   "Social media management",
-  "AI indexing + competitor tracking",
-  "Conversion tracking + analytics",
+  "Google My Business management",
+  "Website audit",
 ];
 
 const FAQS = [
@@ -117,27 +104,31 @@ const FAQS = [
   },
   {
     q: "Why should I choose 6 months instead of annual?",
-    a: "The 6-month commitment is for practices that want to accelerate quickly without a 12-month lock-in. It gives our team time to fully optimize your patient acquisition pipeline and deliver measurable results — typically 2–3× ROI — before you evaluate the annual commitment.",
+    a: "The 6-month commitment is for businesses that want to accelerate quickly without a 12-month lock-in. It gives our team time to fully optimize your lead pipeline and deliver measurable results — typically 2–3× ROI — before you evaluate the annual commitment.",
   },
   {
     q: "What's the difference between 6-month and annual pricing?",
     a: "The 6-month plan is billed every 6 months at the stated monthly rate. Annual plans are billed once per year at approximately 17–20% off the 6-month rate. Both receive the full feature set for their plan tier.",
   },
   {
-    q: "Does ClozeFlow work with my EHR or practice management software?",
-    a: "ClozeFlow is designed to work alongside your existing systems. It captures and converts patient inquiries, then hands off pre-qualified, ready-to-schedule patients to your front desk — no EHR integration required to get started. Deep integrations are available on the Pro plan.",
+    q: "Does ClozeFlow work with my existing job management software?",
+    a: "ClozeFlow is designed to work alongside your existing tools like Jobber, ServiceTitan, or Housecall Pro. It captures and qualifies incoming leads, then hands off ready-to-book customers to your team — no deep integration required to get started.",
   },
   {
     q: "What happens when my 6-month commitment ends?",
-    a: "At the end of your 6-month term, you can renew for another 6 months, upgrade to an annual plan (and save up to 20%), or cancel with no penalties. Your patient data and pipeline history are always yours.",
+    a: "At the end of your 6-month term, you can renew for another 6 months, upgrade to an annual plan (and save up to 20%), or cancel with no penalties. Your lead data and pipeline history are always yours.",
   },
   {
     q: "Is there a money-back guarantee?",
-    a: "Yes. If ClozeFlow doesn't book you at least one qualified patient appointment in your first 30 days, we'll refund every penny — no questions asked. We're that confident in the results.",
+    a: "Yes. If ClozeFlow doesn't book you at least one qualified job in your first 30 days, we'll refund every penny — no questions asked. We're that confident in the results.",
   },
   {
-    q: "Who is the Marketing & Growth Add-On for?",
-    a: "The Add-On replaces your marketing agency with one platform for ads, content, and automation. It includes AI chatbot + voice, a custom landing page and website, blog content creation, Google and Meta Ads, social media management, and conversion analytics. It pairs with any plan — no setup fee.",
+    q: "What does the Multi-Location Add-On include?",
+    a: "The Multi-Location Add-On extends your ClozeFlow plan to cover additional service locations at $199/month per location. Each location gets its own lead pipeline, booking calendar, and follow-up sequences — all managed from one dashboard.",
+  },
+  {
+    q: "What does the Marketing & Growth Add-On include?",
+    a: "The Marketing Add-On gives you focused marketing support to help your business grow online. It includes a review of your current marketing efforts, social media management, Google My Business optimization, and a website audit. It pairs with any plan — no setup fee.",
   },
 ];
 
@@ -233,7 +224,7 @@ export default function PricingPage() {
             color: WHITE, marginBottom: 14, letterSpacing: "-0.025em", lineHeight: 1.1,
             fontFamily: FONT_DISPLAY,
           }}>
-            Simple pricing.<br />Real patient results.
+            Simple pricing.<br />Real results.
           </h1>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.75)", lineHeight: 1.65 }}>
             Commit to growth and we commit back. Every plan starts with our 30-day money-back guarantee — no risk, no long contracts.
@@ -303,7 +294,7 @@ export default function PricingPage() {
                   Why we recommend the 6-month commitment
                 </p>
                 <p style={{ margin: 0, fontSize: 12, color: SLATE, lineHeight: 1.5, marginTop: 2 }}>
-                  Practices that commit to a 6-month runway see 2–3× ROI within the first 90 days — and it only improves from there.
+                  Contractors who commit to a 6-month runway see 2–3× ROI within the first 90 days — and it only improves from there.
                 </p>
               </div>
               <div style={{
@@ -483,65 +474,85 @@ export default function PricingPage() {
           })}
         </div>
 
-        {/* ── Marketing & Growth Add-On ── */}
-        <div style={{
-          marginTop: 28,
-          background: WHITE, border: `1px solid ${CLOUD}`,
-          borderRadius: 16, overflow: "hidden",
-          boxShadow: "0 2px 12px rgba(13,20,40,0.05)",
-        }}>
-          {/* Header */}
+        {/* ── Add-Ons ── */}
+        <div style={{ marginTop: 28 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: SAPPHIRE, textAlign: "center", marginBottom: 16 }}>
+            Optional Add-Ons
+          </p>
+
+          {/* Marketing & Growth Add-On */}
           <div style={{
-            background: `linear-gradient(135deg, rgba(13,20,40,0.96) 0%, rgba(28,72,138,0.96) 100%)`,
-            padding: "20px 28px",
-            display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12,
+            background: WHITE, border: `1px solid ${CLOUD}`,
+            borderRadius: 16, overflow: "hidden",
+            boxShadow: "0 2px 12px rgba(13,20,40,0.05)",
+            marginBottom: 12,
           }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>
+            <div style={{
+              background: `linear-gradient(135deg, rgba(13,20,40,0.96) 0%, rgba(28,72,138,0.96) 100%)`,
+              padding: "20px 28px",
+              display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12,
+            }}>
+              <div>
+                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 4 }}>
                   Optional Add-On
                 </span>
+                <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: WHITE }}>Marketing &amp; Growth Add-On</p>
+                <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>
+                  Focused marketing support to help your business grow online.
+                </p>
               </div>
-              <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: WHITE }}>Marketing &amp; Growth Add-On</p>
-              <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 2 }}>
-                Replace your marketing agency. One platform for ads, content, and automation.
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <p style={{ margin: 0, fontSize: 28, fontWeight: 900, color: WHITE }}>$999<span style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.6)" }}>/mo</span></p>
+                <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.5)" }}>No setup fee · Pairs with any plan</p>
+              </div>
+            </div>
+            <div className="addon-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "20px 28px", gap: 10 }}>
+              {ADDON_FEATURES.map(feat => (
+                <div key={feat} style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 3 }}>
+                    <path d="M3 8l3.5 3.5 6.5-7" stroke={SAPPHIRE} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span style={{ fontSize: 13, color: SLATE }}>{feat}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{
+              padding: "14px 28px 18px",
+              borderTop: `1px solid ${CLOUD}`,
+              background: "rgba(40,96,176,0.03)",
+              display: "flex", alignItems: "center", justifyContent: "flex-end",
+            }}>
+              <Link href="/signup?addon=marketing" style={{
+                display: "inline-block", padding: "10px 20px", borderRadius: 9,
+                fontWeight: 700, fontSize: 13, textDecoration: "none",
+                background: SAPPHIRE_PALE, border: `1.5px solid rgba(40,96,176,0.25)`,
+                color: SAPPHIRE,
+              }}>
+                Add to Your Plan →
+              </Link>
+            </div>
+          </div>
+
+          {/* Multi-Location Add-On */}
+          <div style={{
+            background: WHITE, border: `1px solid ${CLOUD}`,
+            borderRadius: 16, padding: "20px 28px",
+            boxShadow: "0 2px 12px rgba(13,20,40,0.05)",
+            display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16,
+          }}>
+            <div>
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: STEEL, display: "block", marginBottom: 4 }}>
+                Optional Add-On
+              </span>
+              <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: MIDNIGHT_NAVY }}>Multi-Location</p>
+              <p style={{ margin: 0, fontSize: 13, color: SLATE, marginTop: 4, maxWidth: 440, lineHeight: 1.55 }}>
+                Expand ClozeFlow to additional service locations. Each location gets its own lead pipeline, booking calendar, and follow-up sequences — all managed from one dashboard.
               </p>
             </div>
             <div style={{ textAlign: "right", flexShrink: 0 }}>
-              <p style={{ margin: 0, fontSize: 28, fontWeight: 900, color: WHITE }}>$999<span style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.6)" }}>/mo</span></p>
-              <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.5)" }}>No setup fee</p>
+              <p style={{ margin: 0, fontSize: 28, fontWeight: 900, color: MIDNIGHT_NAVY }}>+$199<span style={{ fontSize: 14, fontWeight: 500, color: STEEL }}>/mo</span></p>
+              <p style={{ margin: 0, fontSize: 11, color: STEEL }}>per additional location</p>
             </div>
-          </div>
-
-          {/* Features */}
-          <div className="addon-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "20px 28px", gap: 10 }}>
-            {[...ADDON_FEATURES_LEFT, ...ADDON_FEATURES_RIGHT].map(feat => (
-              <div key={feat} style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 3 }}>
-                  <path d="M3 8l3.5 3.5 6.5-7" stroke={SAPPHIRE} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span style={{ fontSize: 13, color: SLATE }}>{feat}</span>
-              </div>
-            ))}
-          </div>
-
-          <div style={{
-            padding: "14px 28px 18px",
-            borderTop: `1px solid ${CLOUD}`,
-            background: "rgba(40,96,176,0.03)",
-            display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12,
-          }}>
-            <p style={{ margin: 0, fontSize: 13, color: SAPPHIRE, fontWeight: 600 }}>
-              🚀 Pair with Pro to fully automate and scale your pipeline.
-            </p>
-            <Link href="/signup?addon=marketing" style={{
-              display: "inline-block", padding: "10px 20px", borderRadius: 9,
-              fontWeight: 700, fontSize: 13, textDecoration: "none",
-              background: SAPPHIRE_PALE, border: `1.5px solid rgba(40,96,176,0.25)`,
-              color: SAPPHIRE,
-            }}>
-              Add to Your Plan →
-            </Link>
           </div>
         </div>
 
@@ -718,9 +729,9 @@ export default function PricingPage() {
         }}>
           <div>
             <p style={{ fontSize: 10, fontWeight: 700, color: STEEL, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>Enterprise</p>
-            <h3 style={{ fontSize: 18, fontWeight: 900, color: MIDNIGHT_NAVY, marginBottom: 5 }}>Multi-location or custom needs?</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 900, color: MIDNIGHT_NAVY, marginBottom: 5 }}>Custom needs?</h3>
             <p style={{ fontSize: 13, color: SLATE, lineHeight: 1.6, maxWidth: 480 }}>
-              We work with multi-location practices, health systems, and DSOs that need custom integrations, white-label infrastructure, and dedicated support. Custom pricing available.
+              Need custom integrations, white-label infrastructure, or dedicated support for a larger operation? We&apos;ll build the right solution for your business.
             </p>
           </div>
           <a href="mailto:hello@clozeflow.com" style={{
@@ -753,7 +764,7 @@ export default function PricingPage() {
               30-Day Money-Back Guarantee
             </p>
             <p style={{ margin: 0, fontSize: 14, color: SLATE, lineHeight: 1.6, marginTop: 4 }}>
-              If ClozeFlow doesn&apos;t book you at least one qualified patient appointment in your first 30 days, we&apos;ll refund every penny — no questions asked. Zero risk.
+              If ClozeFlow doesn&apos;t book you at least one qualified job in your first 30 days, we&apos;ll refund every penny — no questions asked. Zero risk.
             </p>
           </div>
           <div style={{ textAlign: "center", flexShrink: 0 }}>
@@ -813,7 +824,7 @@ export default function PricingPage() {
             fontSize: "clamp(22px,4vw,34px)", fontWeight: 900, color: WHITE,
             marginBottom: 12, letterSpacing: "-0.02em", fontFamily: FONT_DISPLAY,
           }}>
-            Ready to stop losing patient inquiries?
+            Ready to stop losing job inquiries?
           </h2>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", marginBottom: 32, lineHeight: 1.65 }}>
             Book a free 15-minute demo. No credit card. No commitment.
