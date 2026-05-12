@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pricing — Simple, Honest Plans",
+  title: "Pricing — Simple, Honest Plans | ClozeFlow",
   description:
-    "Create your ClozeFlow account free. Pick a plan when you're ready — Pro at $79/mo, Growth at $149/mo, Max at $799/mo annual. No long-term contracts, no hidden fees.",
+    "Start free. Choose Base at $249/mo (annual) or Pro at $399/mo (annual) when you're ready. Both plans include a one-time $299–$499 setup fee. No hidden fees, cancel anytime.",
 };
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {
