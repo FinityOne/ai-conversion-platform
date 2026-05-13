@@ -2,6 +2,25 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { computeScore, type LeadStatus } from "@/lib/scoring";
 
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+
+  const { data: lead } = await supabase
+    .from("leads").select("id").eq("id", id).eq("user_id", user.id).maybeSingle();
+  if (!lead) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  const { data: logs } = await supabase
+    .from("email_log").select("*").eq("lead_id", id).order("created_at", { ascending: false });
+
+  return NextResponse.json({ emailLog: logs ?? [] });
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
