@@ -90,16 +90,16 @@ function usePageTitle(pathname: string) {
 
 // ─── Sidebar nav components ───────────────────────────────────────────────────
 
-function GroupLabel({ icon, children }: { icon: string; children: React.ReactNode }) {
+function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "10px 10px 3px", fontSize: 9, fontWeight: 800, color: SB_MUTED, letterSpacing: "0.10em", textTransform: "uppercase" }}>
-      <span style={{ opacity: 0.6 }}>{icon}</span>{children}
+    <div style={{ padding: "10px 10px 3px", fontSize: 9, fontWeight: 800, color: SB_MUTED, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+      {children}
     </div>
   );
 }
 
-function NavItem({ href, label, fa, active, isGetLeads, badge }: {
-  href: string; label: string; fa: string; active: boolean; isGetLeads?: boolean; badge?: string;
+function NavItem({ href, label, fa, active, isGetLeads, badge, badgeNew }: {
+  href: string; label: string; fa: string; active: boolean; isGetLeads?: boolean; badge?: string; badgeNew?: boolean;
 }) {
   return (
     <Link href={href} className={active || isGetLeads ? "" : "sb-nav-link"} style={{
@@ -118,6 +118,7 @@ function NavItem({ href, label, fa, active, isGetLeads, badge }: {
     }}>
       <i className={fa} style={{ width: 15, textAlign: "center", fontSize: 12, flexShrink: 0, color: active ? LAVENDER : isGetLeads ? "#a78bfa" : SB_ICON }} />
       <span style={{ flex: 1 }}>{label}</span>
+      {badgeNew && <span style={{ fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 20, background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.28)", letterSpacing: "0.04em" }}>NEW</span>}
       {badge && <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 20, background: "rgba(40,96,176,0.30)", color: "#E7EEFB" }}>{badge}</span>}
     </Link>
   );
@@ -306,13 +307,13 @@ export default function AppShell({
         <div className="app-nav-scroll">
           <div style={{ padding: "8px 6px 12px" }}>
             <div style={{ padding: "6px 0 2px" }}>
-              <NavItem href="/dashboard" label="Dashboard" fa="fa-solid fa-gauge-high" active={is("/dashboard")} />
-              <NavItem href="/pulse"     label="Pulse"     fa="fa-solid fa-heart-pulse" active={is("/pulse")} />
+              <NavItem href="/dashboard" label="Dashboard" fa="fa-solid fa-gauge-high"   active={is("/dashboard")} />
+              <NavItem href="/pulse"     label="Pulse"     fa="fa-solid fa-heart-pulse"  active={is("/pulse")} badgeNew />
             </div>
 
             <NavDivider />
 
-            <GroupLabel icon="📣">Marketing</GroupLabel>
+            <GroupLabel>Marketing</GroupLabel>
             <NavItem href="/share" label="Landing Page" fa="fa-solid fa-file-lines" active={is("/share")} isGetLeads />
             <div style={{ marginTop: 2 }}>
               <ComingSoonItem label="Google & Meta Ads" fa="fa-solid fa-rectangle-ad" />
@@ -321,32 +322,32 @@ export default function AppShell({
 
             <NavDivider />
 
-            <GroupLabel icon="⚡">Leads</GroupLabel>
-            <NavItem href="/leads"    label="Pipeline"   fa="fa-solid fa-bolt-lightning" active={is("/leads") && !is("/leads/")} />
-            <NavItem href="/imports"  label="Imports"    fa="fa-solid fa-file-arrow-up"  active={is("/imports")} />
-            <NavItem href="/segments" label="Segments"   fa="fa-solid fa-layer-group"    active={is("/segments")} />
+            <GroupLabel>Leads</GroupLabel>
+            <NavItem href="/leads"    label="Pipeline"      fa="fa-solid fa-bolt-lightning" active={is("/leads") && !is("/leads/")} badge={leadCount > 0 ? String(leadCount) : undefined} />
+            <NavItem href="/imports"  label="Imports"       fa="fa-solid fa-file-arrow-up"  active={is("/imports")} />
+            <NavItem href="/segments" label="Segments"      fa="fa-solid fa-layer-group"    active={is("/segments")} />
             <div style={{ marginTop: 2 }}>
-              <ComingSoonItem label="AI Voice" fa="fa-solid fa-phone-volume" />
+              <ComingSoonItem label="AI Voice Agent" fa="fa-solid fa-phone-volume" />
             </div>
 
             {!isMember && administratorTabsEnabled && (
               <>
                 <NavDivider />
-                <GroupLabel icon="⚙️">Account</GroupLabel>
-                <SubNavItem href="/profile"        label="Profile"      fa="fa-solid fa-user"          active={is("/profile")} />
-                <SubNavItem href="/business-setup" label="Business"     fa="fa-solid fa-building"      active={is("/business-setup")} />
-                <SubNavItem href="/team"           label="Team"         fa="fa-solid fa-users"         active={is("/team")} />
+                <GroupLabel>Account</GroupLabel>
+                <NavItem href="/profile"        label="Profile"        fa="fa-solid fa-user"          active={is("/profile")} />
+                <NavItem href="/business-setup" label="Business"       fa="fa-solid fa-building"      active={is("/business-setup")} />
+                <NavItem href="/team"           label="Team"           fa="fa-solid fa-users"         active={is("/team")} />
 
                 <NavDivider />
-                <GroupLabel icon="🔧">Pipeline Config</GroupLabel>
-                <SubNavItem href="/lead-fields"    label="Lead Fields"  fa="fa-solid fa-table-columns" active={is("/lead-fields")} />
-                <SubNavItem href="/lead-score"     label="Scoring"      fa="fa-solid fa-chart-line"    active={is("/lead-score")} />
-                <SubNavItem href="/follow-up"      label="Follow-Up"    fa="fa-solid fa-bolt"          active={is("/follow-up")} />
+                <GroupLabel>Pipeline Config</GroupLabel>
+                <NavItem href="/lead-fields"    label="Lead Fields"    fa="fa-solid fa-table-columns" active={is("/lead-fields")} />
+                <NavItem href="/lead-score"     label="Scoring Rules"  fa="fa-solid fa-chart-line"    active={is("/lead-score")} />
+                <NavItem href="/follow-up"      label="Follow-Up"      fa="fa-solid fa-bolt"          active={is("/follow-up")} />
 
                 <NavDivider />
-                <GroupLabel icon="🔌">Tools</GroupLabel>
-                <SubNavItem href="/calendar"       label="Calendar"     fa="fa-solid fa-calendar"      active={is("/calendar")} />
-                <SubNavItem href="/integrations"   label="Integrations" fa="fa-solid fa-plug"          active={is("/integrations")} />
+                <GroupLabel>Tools</GroupLabel>
+                <NavItem href="/calendar"       label="Calendar"       fa="fa-solid fa-calendar"      active={is("/calendar")} />
+                <NavItem href="/integrations"   label="Integrations"   fa="fa-solid fa-plug"          active={is("/integrations")} />
               </>
             )}
           </div>
@@ -428,16 +429,38 @@ export default function AppShell({
           </div>
         ) : (
           pageTitle && (
-            <span className="page-title-desktop" style={{ fontSize: 15, fontWeight: 700, color: MIDNIGHT_NAVY, letterSpacing: "-0.2px" }}>
-              {pageTitle}
-            </span>
+            <div className="page-title-desktop" style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <span style={{ fontSize: 13, color: STEEL, fontWeight: 500 }}>ClozeFlow</span>
+              <span style={{ fontSize: 12, color: CLOUD, userSelect: "none" }}>/</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: MIDNIGHT_NAVY }}>{pageTitle}</span>
+            </div>
           )
         )}
 
-        <div style={{ flex: 1 }} />
+        {/* Search bar */}
+        <div style={{ flex: 1, display: "flex", justifyContent: "center", padding: "0 12px" }}>
+          <div className="page-title-desktop" style={{ position: "relative", width: "100%", maxWidth: 380 }}>
+            <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: STEEL, pointerEvents: "none" }} />
+            <input
+              type="text"
+              placeholder="Search leads, campaigns, locations…"
+              readOnly
+              style={{ width: "100%", padding: "7px 48px 7px 34px", borderRadius: 10, border: `1px solid ${CLOUD}`, background: APP_BG, fontSize: 13, color: STEEL, outline: "none", cursor: "pointer", boxSizing: "border-box" as const }}
+            />
+            <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: "#c4bfb8", border: `1px solid ${CLOUD}`, borderRadius: 5, padding: "2px 5px", pointerEvents: "none" }}>⌘K</span>
+          </div>
+        </div>
 
         {/* ── Right cluster ── */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+
+          {/* Help + Bell icons */}
+          <button className="tb-btn" style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${CLOUD}`, padding: 0 }}>
+            <i className="fa-regular fa-circle-question" style={{ fontSize: 14, color: STEEL }} />
+          </button>
+          <button className="tb-btn" style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${CLOUD}`, padding: 0 }}>
+            <i className="fa-regular fa-bell" style={{ fontSize: 14, color: STEEL }} />
+          </button>
 
           {/* Location picker */}
           {isMultiLocation && (
@@ -509,7 +532,12 @@ export default function AppShell({
                 transition: "border-color 0.15s, background 0.15s",
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: 600, color: MIDNIGHT_NAVY, whiteSpace: "nowrap" }}>{displayName}</span>
+              <div style={{ textAlign: "right" }}>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: MIDNIGHT_NAVY, lineHeight: 1.2, whiteSpace: "nowrap" }}>{displayName}</p>
+                <p style={{ margin: 0, fontSize: 9, fontWeight: 800, color: STEEL, textTransform: "uppercase", letterSpacing: "0.06em", lineHeight: 1.4 }}>
+                  {isAdmin ? "Super Admin" : orgContext?.memberRole === "admin" ? "Admin" : orgContext ? "Member" : "Admin"}
+                </p>
+              </div>
               <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 800, letterSpacing: "-0.5px", boxShadow: "0 2px 8px rgba(40,96,176,0.3)" }}>
                 {initials}
               </div>
