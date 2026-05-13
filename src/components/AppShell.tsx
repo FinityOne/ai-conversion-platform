@@ -103,23 +103,31 @@ function NavItem({ href, label, fa, active, isGetLeads, badge, badgeNew }: {
 }) {
   return (
     <Link href={href} className={active || isGetLeads ? "" : "sb-nav-link"} style={{
-      display: "flex", alignItems: "center", gap: 9, padding: "7px 10px", borderRadius: 8, marginBottom: 1,
+      display: "flex", alignItems: "center", gap: 10, padding: "8px 11px", borderRadius: 9, marginBottom: 2,
       textDecoration: "none",
       background: active
-        ? SB_ACTIVE_BG
+        ? GRAD_PRIMARY
         : isGetLeads
           ? "rgba(139,111,196,0.13)"
           : "transparent",
       color: active ? "#ffffff" : isGetLeads ? "#c4b5f4" : SB_TEXT,
       fontWeight: active ? 700 : isGetLeads ? 600 : 500, fontSize: 13,
-      border: "1px solid transparent",
-      boxShadow: active ? "inset 3px 0 0 #2860B0" : isGetLeads ? "inset 3px 0 0 rgba(139,111,196,0.55)" : "none",
+      boxShadow: active ? "0 2px 12px rgba(40,96,176,0.32)" : isGetLeads ? "inset 3px 0 0 rgba(139,111,196,0.45)" : "none",
       transition: "background 0.15s, color 0.15s, box-shadow 0.15s",
     }}>
-      <i className={fa} style={{ width: 15, textAlign: "center", fontSize: 12, flexShrink: 0, color: active ? LAVENDER : isGetLeads ? "#a78bfa" : SB_ICON }} />
+      <i className={fa} style={{ width: 16, textAlign: "center", fontSize: 13, flexShrink: 0, color: active ? "rgba(255,255,255,0.92)" : isGetLeads ? "#a78bfa" : SB_ICON }} />
       <span style={{ flex: 1 }}>{label}</span>
-      {badgeNew && <span style={{ fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 20, background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.28)", letterSpacing: "0.04em" }}>NEW</span>}
-      {badge && <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 6px", borderRadius: 20, background: "rgba(40,96,176,0.30)", color: "#E7EEFB" }}>{badge}</span>}
+      {badgeNew && (
+        <span style={{ fontSize: 8, fontWeight: 800, padding: "2px 6px", borderRadius: 20, letterSpacing: "0.04em",
+          background: active ? "rgba(255,255,255,0.20)" : "rgba(34,197,94,0.15)",
+          color: active ? "#fff" : "#22c55e",
+          border: `1px solid ${active ? "rgba(255,255,255,0.28)" : "rgba(34,197,94,0.28)"}` }}>NEW</span>
+      )}
+      {badge && (
+        <span style={{ fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 20,
+          background: active ? "rgba(255,255,255,0.22)" : "rgba(40,96,176,0.30)",
+          color: active ? "#fff" : "#E7EEFB" }}>{badge}</span>
+      )}
     </Link>
   );
 }
@@ -306,55 +314,73 @@ export default function AppShell({
 
         <div className="app-nav-scroll">
           <div style={{ padding: "8px 6px 12px" }}>
-            <div style={{ padding: "6px 0 2px" }}>
-              <NavItem href="/dashboard" label="Dashboard" fa="fa-solid fa-gauge-high"   active={is("/dashboard")} />
-              <NavItem href="/pulse"     label="Pulse"     fa="fa-solid fa-heart-pulse"  active={is("/pulse")} badgeNew />
+            <div style={{ padding: "6px 0 4px" }}>
+              <NavItem href="/dashboard" label="Dashboard" fa="fa-solid fa-house"       active={is("/dashboard")} />
+              <NavItem href="/pulse"     label="Pulse"     fa="fa-solid fa-heart-pulse" active={is("/pulse")} badgeNew />
             </div>
 
             <NavDivider />
-
             <GroupLabel>Marketing</GroupLabel>
-            <NavItem href="/share" label="Landing Page" fa="fa-solid fa-file-lines" active={is("/share")} isGetLeads />
-            <div style={{ marginTop: 2 }}>
-              <ComingSoonItem label="Google & Meta Ads" fa="fa-solid fa-rectangle-ad" />
-              <ComingSoonItem label="Website & SEO"     fa="fa-solid fa-globe" />
-            </div>
+            <NavItem href="/share" label="Landing Page" fa="fa-solid fa-globe" active={is("/share")} isGetLeads />
+            <ComingSoonItem label="Google & Meta Ads" fa="fa-solid fa-rectangle-ad" />
+            <ComingSoonItem label="Website & SEO"     fa="fa-solid fa-magnifying-glass" />
 
             <NavDivider />
-
-            <GroupLabel>Leads</GroupLabel>
-            <NavItem href="/leads"    label="Pipeline"      fa="fa-solid fa-bolt-lightning" active={is("/leads") && !is("/leads/")} badge={leadCount > 0 ? String(leadCount) : undefined} />
-            <NavItem href="/imports"  label="Imports"       fa="fa-solid fa-file-arrow-up"  active={is("/imports")} />
-            <NavItem href="/segments" label="Segments"      fa="fa-solid fa-layer-group"    active={is("/segments")} />
-            <div style={{ marginTop: 2 }}>
-              <ComingSoonItem label="AI Voice Agent" fa="fa-solid fa-phone-volume" />
-            </div>
+            <GroupLabel>Pipeline</GroupLabel>
+            <NavItem href="/leads"    label="Pipeline"           fa="fa-solid fa-filter"       active={is("/leads") && !is("/leads/")} badge={leadCount > 0 ? String(leadCount) : undefined} />
+            <NavItem href="/imports"  label="Imports"            fa="fa-solid fa-file-import"  active={is("/imports")} />
+            <NavItem href="/segments" label="Segments"           fa="fa-solid fa-tags"         active={is("/segments")} />
+            <NavItem href="/follow-up" label="Follow-Up Engine"  fa="fa-solid fa-paper-plane"  active={is("/follow-up")} />
+            <ComingSoonItem label="AI Voice Agent" fa="fa-solid fa-phone-volume" />
 
             {!isMember && administratorTabsEnabled && (
               <>
                 <NavDivider />
                 <GroupLabel>Account</GroupLabel>
-                <NavItem href="/profile"        label="Profile"        fa="fa-solid fa-user"          active={is("/profile")} />
-                <NavItem href="/business-setup" label="Business"       fa="fa-solid fa-building"      active={is("/business-setup")} />
-                <NavItem href="/team"           label="Team"           fa="fa-solid fa-users"         active={is("/team")} />
+                <NavItem href="/business-setup" label="Business Setup" fa="fa-solid fa-store"       active={is("/business-setup")} />
+                <NavItem href="/team"           label="Team"           fa="fa-solid fa-user-group"  active={is("/team")} />
+                <NavItem href="/profile"        label="Profile"        fa="fa-solid fa-circle-user" active={is("/profile")} />
 
                 <NavDivider />
-                <GroupLabel>Pipeline Config</GroupLabel>
-                <NavItem href="/lead-fields"    label="Lead Fields"    fa="fa-solid fa-table-columns" active={is("/lead-fields")} />
-                <NavItem href="/lead-score"     label="Scoring Rules"  fa="fa-solid fa-chart-line"    active={is("/lead-score")} />
-                <NavItem href="/follow-up"      label="Follow-Up"      fa="fa-solid fa-bolt"          active={is("/follow-up")} />
+                <GroupLabel>Configure</GroupLabel>
+                <NavItem href="/lead-fields" label="Lead Fields"    fa="fa-solid fa-sliders"    active={is("/lead-fields")} />
+                <NavItem href="/lead-score"  label="Scoring Rules"  fa="fa-solid fa-chart-bar"  active={is("/lead-score")} />
 
                 <NavDivider />
                 <GroupLabel>Tools</GroupLabel>
-                <NavItem href="/calendar"       label="Calendar"       fa="fa-solid fa-calendar"      active={is("/calendar")} />
-                <NavItem href="/integrations"   label="Integrations"   fa="fa-solid fa-plug"          active={is("/integrations")} />
+                <NavItem href="/calendar"     label="Calendar"     fa="fa-solid fa-calendar-days" active={is("/calendar")} />
+                <NavItem href="/integrations" label="Integrations" fa="fa-solid fa-plug"          active={is("/integrations")} />
               </>
             )}
           </div>
         </div>
 
+        {/* User profile mini-card */}
+        <div style={{ padding: "10px 10px 0", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 10px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div style={{ width: 32, height: 32, borderRadius: 9, flexShrink: 0, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 800, boxShadow: "0 2px 8px rgba(40,96,176,0.28)", letterSpacing: "-0.5px" }}>
+              {initials}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#E7EEFB", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</p>
+              <p style={{ margin: 0, fontSize: 10, color: SB_MUTED, lineHeight: 1.4 }}>
+                {isAdmin ? "Super Admin" : orgContext?.memberRole === "admin" ? "Admin" : orgContext ? "Member" : "Admin"}
+              </p>
+            </div>
+            <button
+              onClick={handleSignOut}
+              title="Sign out"
+              style={{ background: "none", border: "none", padding: "5px 6px", cursor: "pointer", borderRadius: 6, color: SB_MUTED, transition: "color 0.15s", display: "flex", alignItems: "center" }}
+              onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = "#E7EEFB")}
+              onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = SB_MUTED)}
+            >
+              <i className="fa-solid fa-arrow-right-from-bracket" style={{ fontSize: 11 }} />
+            </button>
+          </div>
+        </div>
+
         {/* Plan / billing badge */}
-        <div style={{ padding: "10px 10px 14px", borderTop: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+        <div style={{ padding: "8px 10px 14px", flexShrink: 0 }}>
           {plan ? (() => {
             const p         = PLANS[plan];
             const pct       = leadLimit ? Math.min(100, Math.round((leadCount / leadLimit) * 100)) : 0;
