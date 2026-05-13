@@ -357,7 +357,7 @@ export default function AppShell({
 
         {/* User profile mini-card */}
         <div style={{ padding: "10px 10px 0", borderTop: `1px solid ${CLOUD}`, flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 10px", borderRadius: 10, background: FROST, border: `1px solid ${CLOUD}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 10px", borderRadius: 10, background: APP_BG, border: `1px solid ${CLOUD}` }}>
             <div style={{ width: 32, height: 32, borderRadius: 9, flexShrink: 0, background: GRAD_PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 800, boxShadow: "0 2px 8px rgba(40,96,176,0.28)", letterSpacing: "-0.5px" }}>
               {initials}
             </div>
@@ -388,7 +388,7 @@ export default function AppShell({
             const nearLimit = !!(leadLimit && leadCount >= leadLimit * 0.8 && !atLimit);
             return (
               <Link href="/profile/billing" style={{ textDecoration: "none", display: "block" }}>
-                <div style={{ padding: "10px 12px", borderRadius: 10, background: FROST, border: `1px solid ${CLOUD}` }}>
+                <div style={{ padding: "10px 12px", borderRadius: 10, background: APP_BG, border: `1px solid ${CLOUD}` }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
                     <span style={{ fontSize: 11, fontWeight: 800, color: MIDNIGHT_NAVY, display: "flex", alignItems: "center", gap: 4 }}>
                       <i className={`fa-solid ${p.icon}`} style={{ fontSize: 10, color: SAPPHIRE }} /> {p.name} Plan
