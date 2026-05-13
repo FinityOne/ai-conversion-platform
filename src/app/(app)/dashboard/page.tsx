@@ -142,7 +142,7 @@ export default async function DashboardPage(
   const stuckCount = Math.max(0, funnelCounts.engaged);
 
   const dashboardContent = (
-    <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+    <div>
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
       {/* ── Header ── */}
