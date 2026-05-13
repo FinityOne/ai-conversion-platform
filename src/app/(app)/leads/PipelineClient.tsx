@@ -277,7 +277,7 @@ function RightPanel({
           LEAD · #{String(leadIndex + 1).padStart(4, "0")}
         </span>
         <div style={{ display: "flex", gap: 4 }}>
-          <Link href={`/leads/${lead.id}`} title="Open full detail"
+          <Link href={`/leads/${lead.id}`} title="Open full detail" target="_blank" rel="noopener noreferrer"
             style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center",
               borderRadius: 7, border: `1px solid ${CLOUD}`, textDecoration: "none", color: STEEL,
               fontSize: 11, background: "transparent" }}>
@@ -1026,12 +1026,19 @@ export default function PipelineClient({
                         </p>
                       </div>
 
-                      {/* Arrow */}
-                      <div style={{ width: 32, padding: "10px 6px", flexShrink: 0,
-                        display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <i className={`fa-solid fa-chevron-${isSelected ? "down" : "right"}`}
-                          style={{ fontSize: 10, color: isSelected ? SAPPHIRE : STEEL }} />
-                      </div>
+                      {/* Arrow — opens detail page in new tab */}
+                      <a
+                        href={`/leads/${lead.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        title="Open in new tab"
+                        style={{ width: 32, padding: "10px 6px", flexShrink: 0,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          textDecoration: "none", color: isSelected ? SAPPHIRE : STEEL }}
+                      >
+                        <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: 10 }} />
+                      </a>
                     </div>
                   );
                 })}
