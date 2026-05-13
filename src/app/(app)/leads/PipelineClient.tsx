@@ -107,17 +107,26 @@ function ScoreCell({ score }: { score: number }) {
   );
 }
 
+const STAGE_SHORT: Record<string, string> = {
+  new:               "New",
+  contacted:         "Contacted",
+  replied:           "Qualified",
+  follow_up_sent:    "Follow-Up",
+  project_submitted: "Intake",
+  booked:            "Booked",
+};
+
 function StagePill({ status }: { status: string }) {
   const cfg = getStageConfig(status as Parameters<typeof getStageConfig>[0]);
   return (
     <span style={{
-      display: "inline-flex", alignItems: "center", gap: 4,
+      display: "inline-flex", alignItems: "center", gap: 5,
       fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 20,
       background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}`,
-      whiteSpace: "nowrap",
+      whiteSpace: "nowrap", maxWidth: "100%",
     }}>
       <span style={{ width: 6, height: 6, borderRadius: "50%", background: cfg.color, flexShrink: 0 }} />
-      {cfg.label.split("·")[0].trim().split(" ").slice(0, 2).join(" ")}
+      {STAGE_SHORT[status] ?? cfg.label.split(" ")[0]}
     </span>
   );
 }
@@ -871,56 +880,65 @@ export default function PipelineClient({
           ) : (
             <>
               {/* Table header */}
-              <div style={{ display: "flex", background: FROST, borderBottom: `1px solid ${CLOUD}`, minWidth: 600 }}>
-                <div style={{ width: 16, flexShrink: 0 }} />
+              <div style={{ display: "flex", background: FROST, borderBottom: `1px solid ${CLOUD}`, minWidth: 520 }}>
+                <div style={{ width: 12, flexShrink: 0 }} />
                 {/* Score */}
-                <div style={{ width: 80, flexShrink: 0 }}>
+                <div style={{ width: 72, flexShrink: 0 }}>
                   <Link href={sortUrl("score", sort === "score" && dir === "desc" ? "asc" : "desc")}
                     className="pl-sort" style={{ color: sort === "score" ? SAPPHIRE : STEEL }}>
                     SCORE {sort === "score" && <i className={`fa-solid fa-arrow-${dir === "asc" ? "up" : "down"}`} style={{ fontSize: 8 }} />}
                   </Link>
                 </div>
-                {/* Name */}
-                <div style={{ flex: 1, minWidth: 140 }}>
+                {/* Name — flex 1.5 when panel closed, flex 1 when open */}
+                <div style={{ flex: selectedLeadId ? 1 : 1.5, minWidth: 120 }}>
                   <Link href={sortUrl("name", sort === "name" && dir === "asc" ? "desc" : "asc")}
                     className="pl-sort" style={{ color: sort === "name" ? SAPPHIRE : STEEL }}>
                     NAME {sort === "name" && <i className={`fa-solid fa-arrow-${dir === "asc" ? "up" : "down"}`} style={{ fontSize: 8 }} />}
                   </Link>
                 </div>
-                {/* Contact */}
-                <div style={{ width: 150, flexShrink: 0 }}>
-                  <div style={{ padding: "10px 10px", fontSize: 10, fontWeight: 800, textTransform: "uppercase",
-                    letterSpacing: "0.07em", color: STEEL, whiteSpace: "nowrap" }}>CONTACT</div>
+                {/* Email — flex 1, always visible */}
+                <div style={{ flex: 1, minWidth: 120 }}>
+                  <Link href={sortUrl("email", sort === "email" && dir === "asc" ? "desc" : "asc")}
+                    className="pl-sort" style={{ color: sort === "email" ? SAPPHIRE : STEEL }}>
+                    EMAIL {sort === "email" && <i className={`fa-solid fa-arrow-${dir === "asc" ? "up" : "down"}`} style={{ fontSize: 8 }} />}
+                  </Link>
                 </div>
-                {/* Source */}
+                {/* Phone — hidden when panel open */}
                 {!selectedLeadId && (
-                  <div style={{ width: 120, flexShrink: 0 }}>
-                    <div style={{ padding: "10px 10px", fontSize: 10, fontWeight: 800, textTransform: "uppercase",
+                  <div style={{ width: 108, flexShrink: 0 }}>
+                    <div style={{ padding: "10px 8px", fontSize: 10, fontWeight: 800, textTransform: "uppercase",
+                      letterSpacing: "0.07em", color: STEEL, whiteSpace: "nowrap" }}>PHONE</div>
+                  </div>
+                )}
+                {/* Source — hidden when panel open */}
+                {!selectedLeadId && (
+                  <div style={{ width: 100, flexShrink: 0 }}>
+                    <div style={{ padding: "10px 8px", fontSize: 10, fontWeight: 800, textTransform: "uppercase",
                       letterSpacing: "0.07em", color: STEEL, whiteSpace: "nowrap" }}>SOURCE</div>
                   </div>
                 )}
                 {/* Stage */}
-                <div style={{ width: selectedLeadId ? 100 : 130, flexShrink: 0 }}>
+                <div style={{ width: selectedLeadId ? 104 : 112, flexShrink: 0 }}>
                   <Link href={sortUrl("status", sort === "status" && dir === "asc" ? "desc" : "asc")}
                     className="pl-sort" style={{ color: sort === "status" ? SAPPHIRE : STEEL }}>
                     STAGE {sort === "status" && <i className={`fa-solid fa-arrow-${dir === "asc" ? "up" : "down"}`} style={{ fontSize: 8 }} />}
                   </Link>
                 </div>
-                {/* Activity */}
+                {/* Activity dots — hidden when panel open */}
                 {!selectedLeadId && (
-                  <div style={{ width: 80, flexShrink: 0 }}>
-                    <div style={{ padding: "10px 10px", fontSize: 10, fontWeight: 800, textTransform: "uppercase",
+                  <div style={{ width: 72, flexShrink: 0 }}>
+                    <div style={{ padding: "10px 8px", fontSize: 10, fontWeight: 800, textTransform: "uppercase",
                       letterSpacing: "0.07em", color: STEEL, whiteSpace: "nowrap" }}>ACTIVITY</div>
                   </div>
                 )}
                 {/* Added */}
-                <div style={{ width: 70, flexShrink: 0 }}>
+                <div style={{ width: 60, flexShrink: 0 }}>
                   <Link href={sortUrl("created_at", sort === "created_at" && dir === "desc" ? "asc" : "desc")}
                     className="pl-sort" style={{ color: sort === "created_at" ? SAPPHIRE : STEEL }}>
                     ADDED {sort === "created_at" && <i className={`fa-solid fa-arrow-${dir === "asc" ? "up" : "down"}`} style={{ fontSize: 8 }} />}
                   </Link>
                 </div>
-                <div style={{ width: 32, flexShrink: 0 }} />
+                <div style={{ width: 36, flexShrink: 0 }} />
               </div>
 
               {/* Table rows */}
@@ -941,20 +959,20 @@ export default function PipelineClient({
                       style={{
                         display: "flex", alignItems: "center",
                         background: isSelected ? "#EEF3FB" : i % 2 === 0 ? WHITE : "#FAFBFD",
-                        borderBottom: `1px solid ${CLOUD}`, minWidth: 600,
+                        borderBottom: `1px solid ${CLOUD}`, minWidth: 520,
                         borderLeft: isSelected ? `3px solid ${SAPPHIRE}` : "3px solid transparent",
                       }}
                     >
-                      <div style={{ width: 13, flexShrink: 0 }} />
+                      <div style={{ width: 12, flexShrink: 0 }} />
 
                       {/* Score */}
-                      <div style={{ width: 80, padding: "10px 8px", flexShrink: 0 }}>
+                      <div style={{ width: 72, padding: "10px 6px", flexShrink: 0 }}>
                         <ScoreCell score={lead.score} />
                       </div>
 
-                      {/* Name */}
-                      <div style={{ flex: 1, minWidth: 140, padding: "10px 8px", overflow: "hidden" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                      {/* Name — flex 1.5 / 1 */}
+                      <div style={{ flex: selectedLeadId ? 1 : 1.5, minWidth: 120, padding: "10px 8px", overflow: "hidden" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <div style={{ width: 28, height: 28, borderRadius: "50%", background: avBg,
                             border: `1.5px solid ${avColor}33`, display: "flex", alignItems: "center",
                             justifyContent: "center", fontSize: 10, fontWeight: 800, color: avColor, flexShrink: 0 }}>
@@ -972,55 +990,56 @@ export default function PipelineClient({
                         </div>
                       </div>
 
-                      {/* Contact */}
-                      <div style={{ width: 150, padding: "10px 8px", flexShrink: 0, overflow: "hidden" }}>
-                        {lead.email && (
-                          <p style={{ margin: "0 0 2px", fontSize: 11, color: MIDNIGHT_NAVY,
-                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {lead.email}
-                          </p>
-                        )}
-                        {lead.phone && (
-                          <p style={{ margin: 0, fontSize: 11, color: STEEL, whiteSpace: "nowrap" }}>
-                            {formatPhoneDisplay(lead.phone)}
-                          </p>
-                        )}
-                        {!lead.email && !lead.phone && (
-                          <p style={{ margin: 0, fontSize: 11, color: STEEL }}>—</p>
-                        )}
+                      {/* Email — flex 1, always visible */}
+                      <div style={{ flex: 1, minWidth: 120, padding: "10px 8px", overflow: "hidden" }}>
+                        {lead.email
+                          ? <p style={{ margin: 0, fontSize: 12, color: MIDNIGHT_NAVY,
+                              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {lead.email}
+                            </p>
+                          : <p style={{ margin: 0, fontSize: 12, color: STEEL }}>—</p>
+                        }
                       </div>
 
-                      {/* Source */}
+                      {/* Phone — hidden when panel open */}
                       {!selectedLeadId && (
-                        <div style={{ width: 120, padding: "10px 8px", flexShrink: 0, overflow: "hidden" }}>
+                        <div style={{ width: 108, padding: "10px 8px", flexShrink: 0, overflow: "hidden" }}>
+                          {lead.phone
+                            ? <p style={{ margin: 0, fontSize: 12, color: MIDNIGHT_NAVY, whiteSpace: "nowrap" }}>
+                                {formatPhoneDisplay(lead.phone)}
+                              </p>
+                            : <p style={{ margin: 0, fontSize: 12, color: STEEL }}>—</p>
+                          }
+                        </div>
+                      )}
+
+                      {/* Source — hidden when panel open */}
+                      {!selectedLeadId && (
+                        <div style={{ width: 100, padding: "10px 8px", flexShrink: 0, overflow: "hidden" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                             <i className={src.icon} style={{ fontSize: 10, color: src.color, flexShrink: 0 }} />
-                            <div style={{ minWidth: 0 }}>
-                              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: MIDNIGHT_NAVY, whiteSpace: "nowrap" }}>
-                                {src.label}
-                              </p>
-                              <p style={{ margin: 0, fontSize: 10, color: STEEL, whiteSpace: "nowrap" }}>
-                                {src.sub}
-                              </p>
-                            </div>
+                            <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: MIDNIGHT_NAVY, whiteSpace: "nowrap",
+                              overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {src.label}
+                            </p>
                           </div>
                         </div>
                       )}
 
                       {/* Stage */}
-                      <div style={{ width: selectedLeadId ? 100 : 130, padding: "10px 8px", flexShrink: 0 }}>
+                      <div style={{ width: selectedLeadId ? 104 : 112, padding: "10px 8px", flexShrink: 0 }}>
                         <StagePill status={lead.status} />
                       </div>
 
-                      {/* Activity dots */}
+                      {/* Activity dots — hidden when panel open */}
                       {!selectedLeadId && (
-                        <div style={{ width: 80, padding: "10px 8px", flexShrink: 0 }}>
+                        <div style={{ width: 72, padding: "10px 8px", flexShrink: 0 }}>
                           <ActivityDots status={lead.status} score={lead.score} />
                         </div>
                       )}
 
                       {/* Added */}
-                      <div style={{ width: 70, padding: "10px 8px", flexShrink: 0 }}>
+                      <div style={{ width: 60, padding: "10px 6px", flexShrink: 0 }}>
                         <p style={{ margin: 0, fontSize: 11, color: STEEL, whiteSpace: "nowrap" }}>
                           {fmtShort(lead.created_at)}
                         </p>
@@ -1033,7 +1052,7 @@ export default function PipelineClient({
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}
                         title="Open in new tab"
-                        style={{ width: 32, padding: "10px 6px", flexShrink: 0,
+                        style={{ width: 36, padding: "10px 6px", flexShrink: 0,
                           display: "flex", alignItems: "center", justifyContent: "center",
                           textDecoration: "none", color: isSelected ? SAPPHIRE : STEEL }}
                       >
