@@ -22,17 +22,22 @@ function chunk<T>(arr: T[], size: number): T[][] {
 }
 
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
 
+  const body = await req.json() as { patientIds?: string[] };
+  if (!body.patientIds || !Array.isArray(body.patientIds) || body.patientIds.length === 0) {
+    return NextResponse.json({ error: "patientIds is required" }, { status: 400 });
+  }
+
   const { id } = await params;
   const sb = createSupabaseServiceClient();
 
-  // Verify campaign belongs to this user and is in a launchable state
+  // Verify campaign belongs to this user
   const { data: campaign, error: cErr } = await sb
     .from("reactivation_campaigns")
     .select("*")
@@ -41,35 +46,27 @@ export async function POST(
     .single();
 
   if (cErr || !campaign) return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
-  if (!["draft", "paused"].includes(campaign.status)) {
-    return NextResponse.json({ error: "Campaign must be in draft or paused status to launch" }, { status: 400 });
+  if (campaign.status === "completed") {
+    return NextResponse.json({ error: "Cannot add patients to a completed campaign" }, { status: 400 });
   }
 
   // Parallelize: profile + patients + existing enrollments
   const [profileRes, patientsRes, existingEnrollmentsRes] = await Promise.all([
     sb.from("profiles").select("business_name").eq("id", user.id).single(),
-    sb.from("reactivation_patients").select("*").eq("clinic_id", user.id).eq("status", "active"),
-    sb.from("campaign_enrollments").select("patient_id, status").eq("campaign_id", id),
+    sb.from("reactivation_patients").select("*").eq("clinic_id", user.id).eq("status", "active").in("id", body.patientIds),
+    sb.from("campaign_enrollments").select("patient_id").eq("campaign_id", id),
   ]);
+
+  if (patientsRes.error) return NextResponse.json({ error: patientsRes.error.message }, { status: 500 });
 
   const practiceName    = profileRes.data?.business_name ?? campaign.from_name ?? "Your Practice";
   const activePatients  = (patientsRes.data ?? []) as ReactivationPatient[];
+  const alreadyEnrolled = new Set((existingEnrollmentsRes.data ?? []).map(e => e.patient_id));
+  const patientById     = new Map(activePatients.map(p => [p.id, p]));
 
-  if (patientsRes.error) return NextResponse.json({ error: patientsRes.error.message }, { status: 500 });
-  if (activePatients.length === 0) {
-    return NextResponse.json({ error: "No active patients found. Upload patients first." }, { status: 400 });
-  }
-
-  const existing          = existingEnrollmentsRes.data ?? [];
-  const alreadyDone       = new Set(existing.filter(e => ["completed", "booked"].includes(e.status)).map(e => e.patient_id));
-  const alreadyEnrolled   = new Set(existing.map(e => e.patient_id));
-  const patientById       = new Map(activePatients.map(p => [p.id, p]));
-
-  const toEnroll = activePatients.filter(p => !alreadyEnrolled.has(p.id) && !alreadyDone.has(p.id));
+  const toEnroll = activePatients.filter(p => !alreadyEnrolled.has(p.id));
   if (toEnroll.length === 0) {
-    // Nothing new to enroll — just mark active
-    await sb.from("reactivation_campaigns").update({ status: "active", updated_at: new Date().toISOString() }).eq("id", id);
-    return NextResponse.json({ launched: true, enrolled: 0, sent: 0 });
+    return NextResponse.json({ enrolled: 0, sent: 0, skipped: activePatients.length });
   }
 
   const now        = new Date();
@@ -142,16 +139,15 @@ export async function POST(
 
   const sent = logRows.filter(l => l.status === "sent").length;
 
-  // Update campaign status + counts
+  // Update campaign counts
   await sb
     .from("reactivation_campaigns")
     .update({
-      status:         "active",
       total_enrolled: (campaign.total_enrolled ?? 0) + enrolled,
       total_sent:     (campaign.total_sent ?? 0) + sent,
       updated_at:     now.toISOString(),
     })
     .eq("id", id);
 
-  return NextResponse.json({ launched: true, enrolled, sent });
+  return NextResponse.json({ enrolled, sent, skipped: activePatients.length - enrolled });
 }

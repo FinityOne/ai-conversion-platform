@@ -77,53 +77,64 @@ export async function POST(req: Request) {
     return NextResponse.json({ imported: 0, skipped: 0, errors: ["CSV has no data rows"] });
   }
 
-  const sb = createSupabaseServiceClient();
   const errors: string[] = [];
-  let imported = 0;
-  let skipped  = 0;
+  const now = new Date().toISOString();
+
+  // Validate all rows first, collect valid ones for a single bulk upsert
+  const validRows: Array<{
+    clinic_id: string;
+    email: string;
+    first_name: string | null;
+    last_name: string | null;
+    phone: string | null;
+    last_visit_date: string | null;
+    total_visits: number | null;
+    updated_at: string;
+  }> = [];
 
   for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
+    const row   = rows[i];
     const email = pick(row, "email");
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.push(`Row ${i + 2}: invalid or missing email`);
-      skipped++;
       continue;
     }
 
-    const firstName      = pick(row, "first_name", "firstname", "first");
-    const lastName       = pick(row, "last_name", "lastname", "last");
-    const phone          = pick(row, "phone");
-    const rawDate        = pick(row, "last_visit_date", "last_visit", "lastvisit");
-    const rawVisits      = pick(row, "total_visits", "visits");
+    const firstName  = pick(row, "first_name", "firstname", "first") || null;
+    const lastName   = pick(row, "last_name", "lastname", "last") || null;
+    const phone      = pick(row, "phone") || null;
+    const rawDate    = pick(row, "last_visit_date", "last_visit", "lastvisit") || null;
+    const rawVisits  = pick(row, "total_visits", "visits");
+    const totalVisits = rawVisits ? parseInt(rawVisits, 10) || null : null;
 
-    const lastVisitDate  = rawDate ? rawDate : null;
-    const totalVisits    = rawVisits ? parseInt(rawVisits, 10) || null : null;
-
-    const { error: upsertErr } = await sb
-      .from("reactivation_patients")
-      .upsert(
-        {
-          clinic_id:       clinicId,
-          email,
-          first_name:      firstName || null,
-          last_name:       lastName  || null,
-          phone:           phone     || null,
-          last_visit_date: lastVisitDate,
-          total_visits:    totalVisits,
-          updated_at:      new Date().toISOString(),
-        },
-        { onConflict: "clinic_id,email" }
-      );
-
-    if (upsertErr) {
-      errors.push(`Row ${i + 2}: ${upsertErr.message}`);
-      skipped++;
-    } else {
-      imported++;
-    }
+    validRows.push({
+      clinic_id:       clinicId,
+      email,
+      first_name:      firstName,
+      last_name:       lastName,
+      phone,
+      last_visit_date: rawDate,
+      total_visits:    totalVisits,
+      updated_at:      now,
+    });
   }
 
-  return NextResponse.json({ imported, skipped, errors });
+  const skipped = rows.length - validRows.length;
+
+  if (validRows.length === 0) {
+    return NextResponse.json({ imported: 0, skipped, errors });
+  }
+
+  // Single bulk upsert — one DB round-trip regardless of row count
+  const sb = createSupabaseServiceClient();
+  const { error: upsertErr } = await sb
+    .from("reactivation_patients")
+    .upsert(validRows, { onConflict: "clinic_id,email" });
+
+  if (upsertErr) {
+    return NextResponse.json({ error: upsertErr.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ imported: validRows.length, skipped, errors });
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { toast } from "@/lib/toast";
 import {
@@ -14,6 +14,13 @@ interface Props {
 }
 
 const PAGE_SIZE = 20;
+
+const UPLOAD_MESSAGES = [
+  "Reading your patient list…",
+  "Spotting duplicates…",
+  "Saving to the database…",
+  "Almost done — hang tight…",
+];
 
 const STATUS_COLORS: Record<PatientStatus, { bg: string; text: string; border: string }> = {
   active:       { bg: "#F0FDF4", text: "#15803D", border: "#BBF7D0" },
@@ -54,6 +61,13 @@ export default function PatientsClient({ initialPatients }: Props) {
   const [savingEdit, setSavingEdit]   = useState(false);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
   const fileRef = useRef<HTMLInputElement>(null);
+  const [uploadMsgIdx, setUploadMsgIdx] = useState(0);
+
+  useEffect(() => {
+    if (!uploading) { setUploadMsgIdx(0); return; }
+    const t = setInterval(() => setUploadMsgIdx(i => (i + 1) % UPLOAD_MESSAGES.length), 1600);
+    return () => clearInterval(t);
+  }, [uploading]);
 
   const filtered = useMemo(() => {
     let rows = [...patients];
@@ -217,7 +231,7 @@ export default function PatientsClient({ initialPatients }: Props) {
           style={{ ...BTN_PRIMARY, padding: "9px 18px", fontSize: 13, cursor: uploading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 7, opacity: uploading ? 0.7 : 1 }}
         >
           {uploading
-            ? <><i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: 12 }} /> Uploading…</>
+            ? <><i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: 12 }} /> {UPLOAD_MESSAGES[uploadMsgIdx]}</>
             : <><i className="fa-solid fa-file-arrow-up" style={{ fontSize: 12 }} /> Upload CSV</>}
         </button>
       </div>
@@ -260,8 +274,10 @@ export default function PatientsClient({ initialPatients }: Props) {
           <i className="fa-solid fa-users" style={{ fontSize: 40, color: CLOUD, marginBottom: 16 }} />
           <p style={{ margin: "0 0 6px", fontSize: 16, fontWeight: 700, color: MIDNIGHT_NAVY }}>No patients found</p>
           <p style={{ margin: "0 0 20px", fontSize: 14, color: STEEL }}>Upload a CSV to get started</p>
-          <button onClick={() => fileRef.current?.click()} style={{ ...BTN_PRIMARY, padding: "10px 22px", fontSize: 14, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8 }}>
-            <i className="fa-solid fa-file-arrow-up" style={{ fontSize: 13 }} /> Upload CSV
+          <button onClick={() => fileRef.current?.click()} disabled={uploading} style={{ ...BTN_PRIMARY, padding: "10px 22px", fontSize: 14, cursor: uploading ? "not-allowed" : "pointer", display: "inline-flex", alignItems: "center", gap: 8, opacity: uploading ? 0.7 : 1 }}>
+            {uploading
+              ? <><i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: 13 }} /> {UPLOAD_MESSAGES[uploadMsgIdx]}</>
+              : <><i className="fa-solid fa-file-arrow-up" style={{ fontSize: 13 }} /> Upload CSV</>}
           </button>
         </div>
       ) : (

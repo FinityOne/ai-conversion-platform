@@ -1,20 +1,34 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "@/lib/toast";
 import {
   MIDNIGHT_NAVY, SAPPHIRE, SAPPHIRE_PALE, CLOUD, FROST, WHITE, SLATE, STEEL,
-  GRAD_PRIMARY, FONT_SANS, BTN_PRIMARY,
+  GRAD_PRIMARY, FONT_SANS, BTN_PRIMARY, BTN_SECONDARY,
 } from "@/lib/brand";
 import { EMAIL_SEQUENCE } from "@/lib/reactivation";
-import type { ReactivationCampaign, CampaignEnrollment, CampaignStatus, EnrollmentStatus } from "@/lib/reactivation";
+import type { ReactivationCampaign, CampaignEnrollment, CampaignStatus, EnrollmentStatus, ReactivationPatient } from "@/lib/reactivation";
 
 interface Props {
   campaign:    ReactivationCampaign;
   enrollments: CampaignEnrollment[];
 }
+
+const LAUNCH_MESSAGES = [
+  "Rolling out to all active patients…",
+  "Personalizing each welcome-back…",
+  "Firing off the first touchpoints…",
+  "Putting the 'active' in reactivation…",
+];
+
+const ENROLL_MESSAGES = [
+  "Locking in your patients…",
+  "Writing their welcome emails…",
+  "Hitting send…",
+  "Updating campaign stats…",
+];
 
 const CAMPAIGN_STATUS_COLORS: Record<CampaignStatus, { bg: string; text: string; border: string }> = {
   draft:     { bg: "#F3F4F6", text: "#6B7280", border: "#E5E7EB" },
@@ -68,16 +82,107 @@ const EMAIL_DESCRIPTIONS: Record<number, string> = {
 
 export default function CampaignDetailClient({ campaign: initialCampaign, enrollments: initialEnrollments }: Props) {
   const router = useRouter();
-  const [campaign, setCampaign]     = useState<ReactivationCampaign>(initialCampaign);
-  const [enrollments]               = useState<CampaignEnrollment[]>(initialEnrollments);
-  const [launching, setLaunching]   = useState(false);
-  const [pausing, setPausing]       = useState(false);
-  const [deleting, setDeleting]     = useState(false);
+  const [campaign, setCampaign]       = useState<ReactivationCampaign>(initialCampaign);
+  const [enrollments, setEnrollments] = useState<CampaignEnrollment[]>(initialEnrollments);
+  const [launching, setLaunching]     = useState(false);
+  const [pausing, setPausing]         = useState(false);
+  const [deleting, setDeleting]       = useState(false);
   const [editingName, setEditingName] = useState(false);
-  const [nameInput, setNameInput]   = useState(campaign.name);
-  const [savingName, setSavingName] = useState(false);
-  const [search, setSearch]         = useState("");
+  const [nameInput, setNameInput]     = useState(campaign.name);
+  const [savingName, setSavingName]   = useState(false);
+  const [search, setSearch]           = useState("");
   const [previewStep, setPreviewStep] = useState<number | null>(null);
+
+  // Add patients panel
+  const [addOpen, setAddOpen]             = useState(false);
+  const [allPatients, setAllPatients]     = useState<ReactivationPatient[]>([]);
+  const [loadingPatients, setLoadingPatients] = useState(false);
+  const [patientSearch, setPatientSearch] = useState("");
+  const [selectedIds, setSelectedIds]     = useState<Set<string>>(new Set());
+  const [enrolling, setEnrolling]         = useState(false);
+
+  const [launchMsgIdx, setLaunchMsgIdx] = useState(0);
+  const [enrollMsgIdx, setEnrollMsgIdx] = useState(0);
+
+  useEffect(() => {
+    if (!launching) { setLaunchMsgIdx(0); return; }
+    const t = setInterval(() => setLaunchMsgIdx(i => (i + 1) % LAUNCH_MESSAGES.length), 1600);
+    return () => clearInterval(t);
+  }, [launching]);
+
+  useEffect(() => {
+    if (!enrolling) { setEnrollMsgIdx(0); return; }
+    const t = setInterval(() => setEnrollMsgIdx(i => (i + 1) % ENROLL_MESSAGES.length), 1600);
+    return () => clearInterval(t);
+  }, [enrolling]);
+
+  const enrolledPatientIds = useMemo(() => new Set(enrollments.map(e => e.patient_id)), [enrollments]);
+
+  const availablePatients = useMemo(() => {
+    const q = patientSearch.toLowerCase();
+    return allPatients.filter(p => {
+      if (enrolledPatientIds.has(p.id)) return false;
+      if (p.status !== "active") return false;
+      if (!q) return true;
+      return [p.first_name, p.last_name, p.email].some(v => v?.toLowerCase().includes(q));
+    });
+  }, [allPatients, enrolledPatientIds, patientSearch]);
+
+  const openAddPanel = useCallback(async () => {
+    setAddOpen(true);
+    setSelectedIds(new Set());
+    setPatientSearch("");
+    if (allPatients.length > 0) return;
+    setLoadingPatients(true);
+    try {
+      const res  = await fetch("/api/reactivation/patients");
+      const data = await res.json() as { patients: ReactivationPatient[] };
+      setAllPatients(data.patients ?? []);
+    } catch {
+      toast.error("Failed to load patients");
+    } finally {
+      setLoadingPatients(false);
+    }
+  }, [allPatients.length]);
+
+  function togglePatient(id: string) {
+    setSelectedIds(s => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  }
+
+  function toggleAllVisible() {
+    const allSelected = availablePatients.every(p => selectedIds.has(p.id));
+    if (allSelected) {
+      setSelectedIds(s => { const n = new Set(s); availablePatients.forEach(p => n.delete(p.id)); return n; });
+    } else {
+      setSelectedIds(s => { const n = new Set(s); availablePatients.forEach(p => n.add(p.id)); return n; });
+    }
+  }
+
+  async function handleEnroll() {
+    if (selectedIds.size === 0) return;
+    setEnrolling(true);
+    try {
+      const res  = await fetch(`/api/reactivation/campaigns/${campaign.id}/enroll`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patientIds: Array.from(selectedIds) }),
+      });
+      const data = await res.json() as { enrolled?: number; sent?: number; skipped?: number; error?: string };
+      if (!res.ok) { toast.error(data.error ?? "Enroll failed"); return; }
+      toast.success(`Enrolled ${data.enrolled} patient${data.enrolled === 1 ? "" : "s"}, sent ${data.sent} email${data.sent === 1 ? "" : "s"}`);
+      // Refresh enrollments list
+      const listRes  = await fetch(`/api/reactivation/campaigns/${campaign.id}`);
+      const listData = await listRes.json() as { campaign: ReactivationCampaign; enrollments: CampaignEnrollment[] };
+      if (listData.campaign) setCampaign(listData.campaign);
+      if (listData.enrollments) setEnrollments(listData.enrollments);
+      setAddOpen(false);
+      setSelectedIds(new Set());
+    } catch {
+      toast.error("Enroll failed");
+    } finally {
+      setEnrolling(false);
+    }
+  }
 
   const filteredEnrollments = useMemo(() => {
     if (!search) return enrollments;
@@ -201,6 +306,11 @@ export default function CampaignDetailClient({ campaign: initialCampaign, enroll
 
         {/* Action buttons */}
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+          {campaign.status !== "completed" && (
+            <button onClick={openAddPanel} style={{ ...BTN_SECONDARY, padding: "9px 16px", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}>
+              <i className="fa-solid fa-user-plus" style={{ fontSize: 12 }} /> Add Patients
+            </button>
+          )}
           {campaign.status === "active" && (
             <button onClick={handlePause} disabled={pausing} style={{ padding: "9px 16px", borderRadius: 10, border: "1px solid #FDE68A", background: "#FFFBEB", color: "#B45309", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
               {pausing ? <><i className="fa-solid fa-circle-notch fa-spin" style={{ marginRight: 6 }} />Pausing…</> : <><i className="fa-solid fa-pause" style={{ marginRight: 6, fontSize: 11 }} />Pause</>}
@@ -208,7 +318,7 @@ export default function CampaignDetailClient({ campaign: initialCampaign, enroll
           )}
           {(campaign.status === "draft" || campaign.status === "paused") && (
             <button onClick={handleLaunch} disabled={launching} style={{ ...BTN_PRIMARY, padding: "9px 18px", fontSize: 13, cursor: launching ? "not-allowed" : "pointer", opacity: launching ? 0.7 : 1, display: "flex", alignItems: "center", gap: 7 }}>
-              {launching ? <><i className="fa-solid fa-circle-notch fa-spin" />Launching…</> : <><i className="fa-solid fa-rocket" style={{ fontSize: 12 }} />Launch Campaign</>}
+              {launching ? <><i className="fa-solid fa-circle-notch fa-spin" />{LAUNCH_MESSAGES[launchMsgIdx]}</> : <><i className="fa-solid fa-rocket" style={{ fontSize: 12 }} />Launch Campaign</>}
             </button>
           )}
           {(campaign.status === "draft" || campaign.status === "paused") && (
@@ -351,6 +461,139 @@ export default function CampaignDetailClient({ campaign: initialCampaign, enroll
           )}
         </div>
       </div>
+
+      {/* ── Add Patients Slide-over ── */}
+      {addOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={() => setAddOpen(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(13,20,40,0.35)", zIndex: 40 }}
+          />
+          {/* Panel */}
+          <div style={{
+            position: "fixed", top: 0, right: 0, bottom: 0, width: 520,
+            background: WHITE, boxShadow: "-4px 0 32px rgba(13,20,40,0.12)",
+            zIndex: 50, display: "flex", flexDirection: "column", fontFamily: FONT_SANS,
+          }}>
+            {/* Panel header */}
+            <div style={{ padding: "20px 24px 16px", borderBottom: `1px solid ${CLOUD}`, display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ margin: 0, fontSize: 16, fontWeight: 900, color: MIDNIGHT_NAVY }}>Add Patients</h2>
+                <p style={{ margin: "3px 0 0", fontSize: 12, color: STEEL }}>
+                  Select active patients to enroll — email 1 sends immediately.
+                </p>
+              </div>
+              <button onClick={() => setAddOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: STEEL, fontSize: 18, padding: 4 }}>
+                <i className="fa-solid fa-xmark" />
+              </button>
+            </div>
+
+            {/* Search */}
+            <div style={{ padding: "14px 24px 10px", borderBottom: `1px solid ${FROST}` }}>
+              <div style={{ position: "relative" }}>
+                <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: STEEL }} />
+                <input
+                  type="text"
+                  placeholder="Search by name or email…"
+                  value={patientSearch}
+                  onChange={e => setPatientSearch(e.target.value)}
+                  style={{ width: "100%", padding: "8px 12px 8px 32px", borderRadius: 9, border: `1px solid ${CLOUD}`, fontSize: 13, color: MIDNIGHT_NAVY, outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+              {availablePatients.length > 0 && (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, color: SLATE, fontWeight: 500 }}>
+                    <input
+                      type="checkbox"
+                      checked={availablePatients.every(p => selectedIds.has(p.id))}
+                      onChange={toggleAllVisible}
+                    />
+                    Select all ({availablePatients.length})
+                  </label>
+                  {selectedIds.size > 0 && (
+                    <span style={{ fontSize: 12, fontWeight: 700, color: SAPPHIRE }}>
+                      {selectedIds.size} selected
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Patient list */}
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              {loadingPatients ? (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 200 }}>
+                  <i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: 20, color: SAPPHIRE }} />
+                </div>
+              ) : availablePatients.length === 0 ? (
+                <div style={{ padding: "60px 32px", textAlign: "center" }}>
+                  <i className="fa-solid fa-users" style={{ fontSize: 32, color: CLOUD, marginBottom: 12 }} />
+                  <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: MIDNIGHT_NAVY }}>
+                    {allPatients.filter(p => p.status === "active").length === 0
+                      ? "No active patients"
+                      : patientSearch
+                        ? "No matches"
+                        : "All active patients are already enrolled"}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 12, color: STEEL }}>
+                    {allPatients.filter(p => p.status === "active").length === 0
+                      ? "Upload a patient list first."
+                      : patientSearch
+                        ? "Try a different search term."
+                        : ""}
+                  </p>
+                </div>
+              ) : (
+                availablePatients.map(p => (
+                  <label key={p.id} style={{
+                    display: "flex", alignItems: "center", gap: 14, padding: "12px 24px",
+                    borderBottom: `1px solid ${FROST}`, cursor: "pointer",
+                    background: selectedIds.has(p.id) ? SAPPHIRE_PALE : "transparent",
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(p.id)}
+                      onChange={() => togglePatient(p.id)}
+                      style={{ flexShrink: 0 }}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: MIDNIGHT_NAVY, marginBottom: 2 }}>
+                        {[p.first_name, p.last_name].filter(Boolean).join(" ") || "—"}
+                      </div>
+                      <div style={{ fontSize: 12, color: STEEL, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {p.email ?? "No email"}
+                        {p.last_visit_date && <span style={{ marginLeft: 10, color: STEEL }}>Last visit: {new Date(p.last_visit_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>}
+                      </div>
+                    </div>
+                  </label>
+                ))
+              )}
+            </div>
+
+            {/* Footer */}
+            <div style={{ padding: "16px 24px", borderTop: `1px solid ${CLOUD}`, display: "flex", gap: 10, alignItems: "center" }}>
+              <button
+                onClick={handleEnroll}
+                disabled={selectedIds.size === 0 || enrolling}
+                style={{
+                  ...BTN_PRIMARY, flex: 1, padding: "11px 0", fontSize: 14, cursor: selectedIds.size === 0 || enrolling ? "not-allowed" : "pointer",
+                  opacity: selectedIds.size === 0 || enrolling ? 0.6 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                }}
+              >
+                {enrolling
+                  ? <><i className="fa-solid fa-circle-notch fa-spin" /> {ENROLL_MESSAGES[enrollMsgIdx]}</>
+                  : selectedIds.size === 0
+                    ? "Select patients to enroll"
+                    : `Enroll ${selectedIds.size} patient${selectedIds.size === 1 ? "" : "s"}`}
+              </button>
+              <button onClick={() => setAddOpen(false)} style={{ padding: "11px 18px", borderRadius: 10, border: `1px solid ${CLOUD}`, background: WHITE, color: SLATE, fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
