@@ -79,6 +79,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/follow-up":      "Follow-Up Engine",
   "/integrations":   "Integrations",
   "/team":           "Team",
+  "/reactivation":   "Reactivation",
 };
 
 function usePageTitle(pathname: string) {
@@ -409,8 +410,8 @@ export default function AppShell({
             <GroupLabel>Conversion & Retention</GroupLabel>
             <ComingSoonItem label="Missed Call Recovery" fa="fa-solid fa-phone-slash" />
             {tierOk(plan, "growth")
-              ? <ComingSoonItem label="Reactivation Campaigns" fa="fa-solid fa-rotate-right" />
-              : <LockedNavItem  label="Reactivation Campaigns" fa="fa-solid fa-rotate-right" requiredLabel="Growth Accelerator" isSoon />}
+              ? <NavItem href="/reactivation" label="Reactivation" fa="fa-solid fa-rotate-right" active={is("/reactivation")} />
+              : <LockedNavItem label="Reactivation Campaigns" fa="fa-solid fa-rotate-right" requiredLabel="Growth Accelerator" />}
             {tierOk(plan, "growth")
               ? <ComingSoonItem label="Rebooking Engine"       fa="fa-solid fa-calendar-plus" />
               : <LockedNavItem  label="Rebooking Engine"       fa="fa-solid fa-calendar-plus" requiredLabel="Growth Accelerator" isSoon />}
