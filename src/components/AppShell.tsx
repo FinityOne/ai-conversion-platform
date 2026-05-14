@@ -162,6 +162,66 @@ function ComingSoonItem({ label, fa }: { label: string; fa: string }) {
 
 function NavDivider() { return <div style={{ margin: "5px 8px", borderTop: `1px solid ${SB_DIVIDER}` }} />; }
 
+// ─── Tier gating ──────────────────────────────────────────────────────────────
+const TIER_WEIGHT: Record<PlanId, number> = { starter: 1, growth: 2, pro: 3 };
+const tierOk = (plan: PlanId | null | undefined, min: PlanId) =>
+  plan != null && (TIER_WEIGHT[plan] ?? 0) >= TIER_WEIGHT[min];
+
+// ─── Locked nav item (higher tier required) ───────────────────────────────────
+function LockedNavItem({ label, fa, requiredLabel, isSoon = false }: {
+  label: string; fa: string; requiredLabel: string; isSoon?: boolean;
+}) {
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  return (
+    <>
+      <div
+        onMouseEnter={e => {
+          const r = e.currentTarget.getBoundingClientRect();
+          setPos({ x: r.right + 10, y: r.top - 4 });
+        }}
+        onMouseLeave={() => setPos(null)}
+        style={{
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "8px 11px", borderRadius: 9, marginBottom: 2,
+          opacity: 0.40, cursor: "default", userSelect: "none" as const,
+        }}
+      >
+        <i className={fa} style={{ width: 16, textAlign: "center", fontSize: 13, flexShrink: 0, color: SB_MUTED }} />
+        <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: SB_TEXT }}>{label}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {isSoon && (
+            <span style={{ fontSize: 8, fontWeight: 800, padding: "2px 5px", borderRadius: 20, letterSpacing: "0.04em",
+              background: "rgba(251,191,36,0.12)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.22)" }}>SOON</span>
+          )}
+          <i className="fa-solid fa-lock" style={{ fontSize: 9, color: SB_MUTED }} />
+        </div>
+      </div>
+
+      {pos && (
+        <div style={{
+          position: "fixed", left: pos.x, top: pos.y, zIndex: 9999,
+          pointerEvents: "none", width: 216,
+          background: MIDNIGHT_NAVY, borderRadius: 12, padding: "12px 14px",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.30)",
+          border: "1px solid rgba(255,255,255,0.07)",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 7 }}>
+            <i className="fa-solid fa-lock" style={{ fontSize: 10, color: "#f97316" }} />
+            <span style={{ fontSize: 10, fontWeight: 800, color: "#f97316", textTransform: "uppercase", letterSpacing: "0.10em" }}>
+              {requiredLabel}
+            </span>
+          </div>
+          <p style={{ margin: "0 0 10px", fontSize: 12, color: "rgba(255,255,255,0.72)", lineHeight: 1.55 }}>
+            <strong style={{ color: "#fff" }}>{label}</strong> is included in the{" "}
+            <strong style={{ color: "#fff" }}>{requiredLabel}</strong> plan. Upgrade to unlock access.
+          </p>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#f97316" }}>Upgrade to unlock →</span>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ─── Dropdown shell ───────────────────────────────────────────────────────────
 
 function Dropdown({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
@@ -314,44 +374,85 @@ export default function AppShell({
 
         <div className="app-nav-scroll">
           <div style={{ padding: "8px 6px 12px" }}>
-            <div style={{ padding: "6px 0 4px" }}>
+
+            {/* ── Overview ── */}
+            <div style={{ padding: "6px 0 2px" }}>
               <NavItem href="/dashboard" label="Dashboard" fa="fa-solid fa-house"       active={is("/dashboard")} />
               <NavItem href="/pulse"     label="Pulse"     fa="fa-solid fa-heart-pulse" active={is("/pulse")} badgeNew />
             </div>
 
+            {/* ── Patient Pipeline ── */}
             <NavDivider />
-            <GroupLabel>Marketing</GroupLabel>
+            <GroupLabel>Patient Pipeline</GroupLabel>
+            <NavItem href="/leads"     label="Pipeline"         fa="fa-solid fa-filter"      active={is("/leads") && !is("/leads/")} badge={leadCount > 0 ? String(leadCount) : undefined} />
+            <NavItem href="/imports"   label="Imports"          fa="fa-solid fa-file-import" active={is("/imports")} />
+            <NavItem href="/segments"  label="Segments"         fa="fa-solid fa-tags"        active={is("/segments")} />
+            <NavItem href="/follow-up" label="Follow-Up Engine" fa="fa-solid fa-paper-plane" active={is("/follow-up")} />
+            {tierOk(plan, "growth")
+              ? <ComingSoonItem label="AI Voice Agent" fa="fa-solid fa-phone-volume" />
+              : <LockedNavItem  label="AI Voice Agent" fa="fa-solid fa-phone-volume" requiredLabel="Growth Accelerator" isSoon />}
+
+            {/* ── Paid Acquisition ── */}
+            <NavDivider />
+            <GroupLabel>Paid Acquisition</GroupLabel>
             <NavItem href="/share" label="Landing Page" fa="fa-solid fa-globe" active={is("/share")} isGetLeads />
             <ComingSoonItem label="Google & Meta Ads" fa="fa-solid fa-rectangle-ad" />
-            <ComingSoonItem label="Website & SEO"     fa="fa-solid fa-magnifying-glass" />
+            {tierOk(plan, "growth")
+              ? <ComingSoonItem label="Ad A/B Testing"    fa="fa-solid fa-flask" />
+              : <LockedNavItem  label="Ad A/B Testing"    fa="fa-solid fa-flask"      requiredLabel="Growth Accelerator" isSoon />}
+            {tierOk(plan, "pro")
+              ? <ComingSoonItem label="YouTube & Display" fa="fa-brands fa-youtube" />
+              : <LockedNavItem  label="YouTube & Display" fa="fa-brands fa-youtube"  requiredLabel="Market Domination"  isSoon />}
 
+            {/* ── Conversion & Retention ── */}
             <NavDivider />
-            <GroupLabel>Pipeline</GroupLabel>
-            <NavItem href="/leads"    label="Pipeline"           fa="fa-solid fa-filter"       active={is("/leads") && !is("/leads/")} badge={leadCount > 0 ? String(leadCount) : undefined} />
-            <NavItem href="/imports"  label="Imports"            fa="fa-solid fa-file-import"  active={is("/imports")} />
-            <NavItem href="/segments" label="Segments"           fa="fa-solid fa-tags"         active={is("/segments")} />
-            <NavItem href="/follow-up" label="Follow-Up Engine"  fa="fa-solid fa-paper-plane"  active={is("/follow-up")} />
-            <ComingSoonItem label="AI Voice Agent" fa="fa-solid fa-phone-volume" />
+            <GroupLabel>Conversion & Retention</GroupLabel>
+            <ComingSoonItem label="Missed Call Recovery" fa="fa-solid fa-phone-slash" />
+            {tierOk(plan, "growth")
+              ? <ComingSoonItem label="Reactivation Campaigns" fa="fa-solid fa-rotate-right" />
+              : <LockedNavItem  label="Reactivation Campaigns" fa="fa-solid fa-rotate-right" requiredLabel="Growth Accelerator" isSoon />}
+            {tierOk(plan, "growth")
+              ? <ComingSoonItem label="Rebooking Engine"       fa="fa-solid fa-calendar-plus" />
+              : <LockedNavItem  label="Rebooking Engine"       fa="fa-solid fa-calendar-plus" requiredLabel="Growth Accelerator" isSoon />}
+            {tierOk(plan, "pro")
+              ? <ComingSoonItem label="AI Chat Automation"     fa="fa-solid fa-comments" />
+              : <LockedNavItem  label="AI Chat Automation"     fa="fa-solid fa-comments"     requiredLabel="Market Domination"  isSoon />}
 
+            {/* ── Reputation ── */}
+            <NavDivider />
+            <GroupLabel>Reputation</GroupLabel>
+            <ComingSoonItem label="Review Management" fa="fa-solid fa-star" />
+            {tierOk(plan, "growth")
+              ? <ComingSoonItem label="Competitor Tracking" fa="fa-solid fa-binoculars" />
+              : <LockedNavItem  label="Competitor Tracking" fa="fa-solid fa-binoculars" requiredLabel="Growth Accelerator" isSoon />}
+
+            {/* ── Reporting ── */}
+            <NavDivider />
+            <GroupLabel>Reporting</GroupLabel>
+            <NavItem href="/calendar"      label="Calendar"       fa="fa-solid fa-calendar-days" active={is("/calendar")} />
+            <NavItem href="/report/weekly" label="Weekly Report"  fa="fa-solid fa-chart-simple"  active={is("/report/weekly")} />
+            <ComingSoonItem label="Performance Dashboard" fa="fa-solid fa-display" />
+            {tierOk(plan, "growth")
+              ? <ComingSoonItem label="Revenue Analysis"    fa="fa-solid fa-sack-dollar" />
+              : <LockedNavItem  label="Revenue Analysis"    fa="fa-solid fa-sack-dollar"     requiredLabel="Growth Accelerator" isSoon />}
+            {tierOk(plan, "pro")
+              ? <ComingSoonItem label="Advanced Attribution" fa="fa-solid fa-arrow-trend-up" />
+              : <LockedNavItem  label="Advanced Attribution" fa="fa-solid fa-arrow-trend-up" requiredLabel="Market Domination"  isSoon />}
+
+            {/* ── Settings ── */}
             {!isMember && administratorTabsEnabled && (
               <>
                 <NavDivider />
-                <GroupLabel>Account</GroupLabel>
-                <NavItem href="/business-setup" label="Business Setup" fa="fa-solid fa-store"       active={is("/business-setup")} />
-                <NavItem href="/team"           label="Team"           fa="fa-solid fa-user-group"  active={is("/team")} />
-                <NavItem href="/profile"        label="Profile"        fa="fa-solid fa-circle-user" active={is("/profile")} />
-
-                <NavDivider />
-                <GroupLabel>Configure</GroupLabel>
-                <NavItem href="/lead-fields" label="Lead Fields"    fa="fa-solid fa-sliders"    active={is("/lead-fields")} />
-                <NavItem href="/lead-score"  label="Scoring Rules"  fa="fa-solid fa-chart-bar"  active={is("/lead-score")} />
-
-                <NavDivider />
-                <GroupLabel>Tools</GroupLabel>
-                <NavItem href="/calendar"     label="Calendar"     fa="fa-solid fa-calendar-days" active={is("/calendar")} />
-                <NavItem href="/integrations" label="Integrations" fa="fa-solid fa-plug"          active={is("/integrations")} />
+                <GroupLabel>Settings</GroupLabel>
+                <NavItem href="/business-setup" label="Business Setup" fa="fa-solid fa-store"        active={is("/business-setup")} />
+                <NavItem href="/lead-fields"    label="Lead Fields"    fa="fa-solid fa-sliders"      active={is("/lead-fields")} />
+                <NavItem href="/lead-score"     label="Scoring Rules"  fa="fa-solid fa-chart-bar"    active={is("/lead-score")} />
+                <NavItem href="/team"           label="Team"           fa="fa-solid fa-user-group"   active={is("/team")} />
+                <NavItem href="/integrations"   label="Integrations"   fa="fa-solid fa-plug"         active={is("/integrations")} />
+                <NavItem href="/profile"        label="Profile"        fa="fa-solid fa-circle-user"  active={is("/profile")} />
               </>
             )}
+
           </div>
         </div>
 
