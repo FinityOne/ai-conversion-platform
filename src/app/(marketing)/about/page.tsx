@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "About — Our Story | ClozeFlow",
   description:
-    "Meet the team behind ClozeFlow. We built this because we watched great medical practices lose patients to slower competitors who just picked up the phone first.",
+    "Meet the team behind ClozeFlow. We built this because we watched great dental clinics lose new patients to slower competitors who just replied first.",
 };
 
 export default function AboutPage() {
@@ -37,10 +37,10 @@ export default function AboutPage() {
             color: WHITE, lineHeight: 1.1, letterSpacing: "-0.025em",
             marginBottom: 18, fontFamily: FONT_DISPLAY,
           }}>
-            We built this because great practices were losing patients to slower ones.
+            We built this because great dental clinics were losing patients to slower ones.
           </h1>
           <p style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", lineHeight: 1.65 }}>
-            Not because of skill. Not because of outcomes. Because of a slow first reply.
+            Not because of clinical skill. Not because of outcomes. Because of a slow first reply.
           </p>
         </div>
       </section>
@@ -74,7 +74,7 @@ export default function AboutPage() {
               borderLeft: `3px solid ${SAPPHIRE}`, paddingLeft: 20,
               margin: 0,
             }}>
-              &ldquo;My sister runs a med spa in Phoenix. Brilliant clinician, loyal patients — but she was losing 40% of her new inquiry calls to a competitor across town that had a much faster response. She&apos;d come home frustrated every week. The quality of care wasn&apos;t the issue. It was just that she couldn&apos;t reply in time while she was with a patient. That felt like a solvable problem.&rdquo;
+              &ldquo;My sister runs a dental clinic in Phoenix. Brilliant clinician, loyal patients — but she was losing 40% of her new patient inquiries to a competitor across town that simply replied faster. She&apos;d come home frustrated every week. The quality of care wasn&apos;t the issue. She was spending $6K a month on Google Ads and watching half those leads go cold while she was chairside. That felt like a completely solvable problem.&rdquo;
             </blockquote>
           </div>
 
@@ -103,7 +103,7 @@ export default function AboutPage() {
               borderLeft: `3px solid ${LAVENDER}`, paddingLeft: 20,
               margin: 0,
             }}>
-              &ldquo;I&apos;d spent years building AI automation at venture-backed startups. When Marco brought me this problem, the research was already there: if a medical practice doesn&apos;t respond to a patient inquiry within 5 minutes, they lose 80% of those prospects. That&apos;s not a training problem — it&apos;s a systems problem. And it&apos;s completely fixable with the right technology.&rdquo;
+              &ldquo;I&apos;d spent years building AI automation at venture-backed startups. When Marco brought me this problem, the research was already there: if a dental clinic doesn&apos;t respond to a new patient inquiry within 5 minutes, they lose 80% of those prospects. Clinics are spending thousands on ads every month and throwing most of it away with slow follow-up. That&apos;s not a training problem — it&apos;s a systems problem. And it&apos;s completely fixable with the right technology.&rdquo;
             </blockquote>
           </div>
 
@@ -116,7 +116,7 @@ export default function AboutPage() {
               Why We Started ClozeFlow
             </h2>
             <p style={{ fontSize: 16, color: SLATE, lineHeight: 1.8, margin: 0 }}>
-              We started ClozeFlow to level the playing field for independent practices. Large health systems have entire patient acquisition teams working every lead. A solo physician or aesthetics practice doesn&apos;t. We wanted to give every independent practice the same unfair advantage — the ability to respond in under 60 seconds, follow up persistently, and fill their calendar automatically — without adding headcount or increasing ad spend.
+              We started ClozeFlow to level the playing field for independent dental clinics. Large DSO chains have entire patient acquisition teams working every lead. An independent dentist spending $5K–$15K a month on ads doesn&apos;t. We wanted to give every independent dental clinic the same unfair advantage — the ability to respond in under 60 seconds, follow up persistently, and fill their schedule automatically — without adding headcount or increasing what they already spend on marketing.
             </p>
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function AboutPage() {
             Our Vision
           </p>
           <p style={{ fontSize: 20, fontWeight: 500, color: MIDNIGHT_NAVY, lineHeight: 1.75, fontStyle: "italic" }}>
-            &ldquo;We believe every skilled clinician deserves a thriving practice — not just the ability to deliver great care. The patient acquisition side — the first reply, the follow-up, the scheduling — that&apos;s what we automate, so you can focus on what matters most: the patients in your chair.&rdquo;
+            &ldquo;We believe every skilled dentist deserves a thriving clinic — not just the ability to deliver exceptional care. The new patient acquisition side — the first reply, the follow-up, the scheduling — that&apos;s what we automate, so you can focus on what matters most: the patients in your chair.&rdquo;
           </p>
         </div>
       </section>
@@ -153,7 +153,7 @@ export default function AboutPage() {
             {
               icon: "⚡",
               title: "Speed",
-              desc: "Respond before anyone else. The first practice to reply wins 78% of the time. We make sure that&apos;s always you.",
+              desc: "Respond before any other dental clinic. The first practice to reply wins 78% of the time. We make sure that&apos;s always you.",
               color: SAPPHIRE,
               bg: "rgba(40,96,176,0.06)",
               border: "rgba(40,96,176,0.15)",
@@ -169,7 +169,7 @@ export default function AboutPage() {
             {
               icon: "📈",
               title: "Results",
-              desc: "We only win when you win. Our success is measured in new patient appointments booked, not in feature lists.",
+              desc: "We only win when you win. Our success is measured in new dental patient appointments booked, not in feature lists.",
               color: "#27AE60",
               bg: "rgba(39,174,96,0.06)",
               border: "rgba(39,174,96,0.15)",
@@ -218,14 +218,14 @@ export default function AboutPage() {
                 name: "Marco Rivera",
                 role: "Co-Founder & CEO",
                 gradient: GRAD_PRIMARY,
-                bio: "Marco grew up watching his sister's med spa struggle to keep up with patient inquiries. After a decade leading growth and operations at B2B SaaS companies, he left a VP role to build the system he wished she had. He leads product vision and customer success.",
+                bio: "Marco grew up watching his sister's dental clinic hemorrhage new patient leads due to slow follow-up. After a decade leading growth and operations at B2B SaaS companies, he left a VP role to build the system he wished she had. He leads product vision and customer success.",
               },
               {
                 initials: "SC",
                 name: "Sam Chen",
                 role: "Co-Founder & CTO",
                 gradient: `linear-gradient(135deg, ${SAPPHIRE} 0%, ${LAVENDER} 100%)`,
-                bio: "Sam is a software engineer who built AI automation systems at two venture-backed startups. Seeing how many independent practices were losing patients simply due to slow response times, he partnered with Marco to apply enterprise-grade conversion technology to private practices.",
+                bio: "Sam is a software engineer who built AI automation systems at two venture-backed startups. Seeing how many dental clinics were losing new patients to slow response times despite heavy ad spend, he partnered with Marco to apply enterprise-grade conversion technology to independent dental practices.",
               },
             ].map(({ initials, name, role, gradient, bio }) => (
               <div key={name} style={{
@@ -262,8 +262,8 @@ export default function AboutPage() {
         <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 32, textAlign: "center" }}>
           {[
             { n: "2024",  label: "Founded" },
-            { n: "500+",  label: "Practices served" },
-            { n: "$18M+", label: "Patient revenue generated" },
+            { n: "100+",  label: "Dental clinics served" },
+            { n: "$12M+", label: "New patient revenue generated" },
             { n: "47",    label: "States served" },
           ].map(({ n, label }) => (
             <div key={label}>
@@ -285,13 +285,13 @@ export default function AboutPage() {
       <section style={{ background: GRAD_DARK, padding: "72px 24px", textAlign: "center" }}>
         <div style={{ maxWidth: 560, margin: "0 auto" }}>
           <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: 14 }}>
-            Join 500+ Practices
+            Join 100+ Dental Clinics
           </p>
           <h2 style={{
             fontSize: "clamp(22px, 4vw, 34px)", fontWeight: 900, color: WHITE,
             marginBottom: 16, letterSpacing: "-0.02em", fontFamily: FONT_DISPLAY,
           }}>
-            Ready to stop losing patients to a slower reply?
+            Ready to stop losing new patients to a slower reply?
           </h2>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.75)", marginBottom: 32, lineHeight: 1.65 }}>
             It&apos;s free to start. No credit card. Set up in one day.

@@ -36,7 +36,7 @@ export default function MarketingFooter() {
               </div>
             </Link>
             <p style={{ color: STEEL, fontSize: 14, lineHeight: 1.7, maxWidth: 220 }}>
-              Respond to every lead in under 60 seconds. Book more jobs without spending more on ads.
+              Respond to every new patient inquiry in under 60 seconds. Book more dental patients without spending more on ads.
             </p>
             <div style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px rgba(34,197,94,0.7)" }} />
@@ -49,11 +49,26 @@ export default function MarketingFooter() {
             <h4 style={FOOTER_HEAD}>Product</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {[
-                { href: "/features",    label: "Features"        },
-                { href: "/how-it-works",label: "How It Works"    },
-                { href: "/pricing",     label: "Pricing"         },
-                { href: "/calculator",  label: "ROI Calculator"  },
-                { href: "/healthcare",  label: "For Healthcare"  },
+                { href: "/features",     label: "Features"       },
+                { href: "/how-it-works", label: "How It Works"   },
+                { href: "/pricing",      label: "Pricing"        },
+                { href: "/calculator",   label: "ROI Calculator" },
+              ].map(({ href, label }) => (
+                <Link key={href} href={href} style={FOOTER_LINK}>{label}</Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Col 3: For Dental Clinics */}
+          <div>
+            <h4 style={FOOTER_HEAD}>For Dental Clinics</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                { href: "/dental-growth",        label: "Dental Growth System"   },
+                { href: "/free-dental-audit",    label: "Free Growth Audit"      },
+                { href: "/lost-patient-revenue", label: "Revenue Calculator"     },
+                { href: "/demo-reward",          label: "Demo + $50 Gift Card"   },
+                { href: "/dentists",             label: "Patient Conversion"     },
               ].map(({ href, label }) => (
                 <Link key={href} href={href} style={FOOTER_LINK}>{label}</Link>
               ))}

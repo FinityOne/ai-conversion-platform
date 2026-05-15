@@ -104,6 +104,15 @@ export const EMAIL_SEQUENCE: EmailSequenceStep[] = [
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
+function isTableMissing(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  return (
+    error.code === "42P01" ||
+    (error.message?.includes("schema cache") ?? false) ||
+    (error.message?.includes("does not exist") ?? false)
+  );
+}
+
 export async function getPatients(clinicId: string): Promise<ReactivationPatient[]> {
   const sb = createSupabaseServiceClient();
   const { data, error } = await sb
@@ -112,6 +121,7 @@ export async function getPatients(clinicId: string): Promise<ReactivationPatient
     .eq("clinic_id", clinicId)
     .order("created_at", { ascending: false });
 
+  if (isTableMissing(error)) return [];
   if (error) throw new Error(error.message);
   return (data ?? []) as ReactivationPatient[];
 }
@@ -124,6 +134,7 @@ export async function getCampaigns(clinicId: string): Promise<ReactivationCampai
     .eq("clinic_id", clinicId)
     .order("created_at", { ascending: false });
 
+  if (isTableMissing(error)) return [];
   if (error) throw new Error(error.message);
   return (data ?? []) as ReactivationCampaign[];
 }
@@ -141,7 +152,8 @@ export async function getCampaignWithEnrollments(
     .eq("clinic_id", clinicId)
     .single();
 
-  if (cErr || !campaign) return null;
+  if (isTableMissing(cErr) || !campaign) return null;
+  if (cErr) return null;
 
   const { data: enrollments, error: eErr } = await sb
     .from("campaign_enrollments")
@@ -149,6 +161,7 @@ export async function getCampaignWithEnrollments(
     .eq("campaign_id", campaignId)
     .order("enrolled_at", { ascending: false });
 
+  if (isTableMissing(eErr)) return { campaign: campaign as ReactivationCampaign, enrollments: [] };
   if (eErr) throw new Error(eErr.message);
 
   return {
@@ -158,11 +171,11 @@ export async function getCampaignWithEnrollments(
 }
 
 export async function getReactivationStats(clinicId: string): Promise<{
-  totalPatients:  number;
+  totalPatients:   number;
   activeCampaigns: number;
-  totalSent:      number;
-  totalBooked:    number;
-  avgOpenRate:    number;
+  totalSent:       number;
+  totalBooked:     number;
+  avgOpenRate:     number;
 }> {
   const sb = createSupabaseServiceClient();
 
@@ -171,13 +184,17 @@ export async function getReactivationStats(clinicId: string): Promise<{
     sb.from("reactivation_campaigns").select("*").eq("clinic_id", clinicId),
   ]);
 
-  const totalPatients  = patientsRes.count ?? 0;
-  const campaigns      = (campaignsRes.data ?? []) as ReactivationCampaign[];
+  if (isTableMissing(patientsRes.error) || isTableMissing(campaignsRes.error)) {
+    return { totalPatients: 0, activeCampaigns: 0, totalSent: 0, totalBooked: 0, avgOpenRate: 0 };
+  }
+
+  const totalPatients   = patientsRes.count ?? 0;
+  const campaigns       = (campaignsRes.data ?? []) as ReactivationCampaign[];
   const activeCampaigns = campaigns.filter(c => c.status === "active").length;
-  const totalSent      = campaigns.reduce((s, c) => s + (c.total_sent ?? 0), 0);
-  const totalBooked    = campaigns.reduce((s, c) => s + (c.total_booked ?? 0), 0);
-  const totalOpened    = campaigns.reduce((s, c) => s + (c.total_opened ?? 0), 0);
-  const avgOpenRate    = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0;
+  const totalSent       = campaigns.reduce((s, c) => s + (c.total_sent ?? 0), 0);
+  const totalBooked     = campaigns.reduce((s, c) => s + (c.total_booked ?? 0), 0);
+  const totalOpened     = campaigns.reduce((s, c) => s + (c.total_opened ?? 0), 0);
+  const avgOpenRate     = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0;
 
   return { totalPatients, activeCampaigns, totalSent, totalBooked, avgOpenRate };
 }

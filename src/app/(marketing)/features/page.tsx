@@ -6,9 +6,9 @@ import {
 } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Features — Everything You Need to Convert More Leads",
+  title: "Features — Everything You Need to Convert More New Patients",
   description:
-    "Instant AI response, lead qualification, calendar booking, follow-up sequences, and more — all built for home service contractors.",
+    "Instant AI response, patient qualification, calendar booking, follow-up sequences, and more — all built for dental clinics that invest in marketing.",
 };
 
 const TEXT   = MIDNIGHT_NAVY;
@@ -18,9 +18,9 @@ const BG     = FROST;
 
 // ── Plan tiers ────────────────────────────────────────────────────────────────
 const TIERS = {
-  starter: { label: "Pro",    color: SAPPHIRE,      bg: "rgba(40,96,176,0.08)",  border: "rgba(40,96,176,0.2)",   icon: "fa-bolt-lightning" },
-  growth:  { label: "Growth", color: SAPPHIRE,      bg: "rgba(40,96,176,0.08)",  border: "rgba(40,96,176,0.2)",   icon: "fa-chart-line"     },
-  pro:     { label: "Max",    color: MIDNIGHT_NAVY,  bg: "rgba(13,20,40,0.07)",   border: "rgba(13,20,40,0.18)",   icon: "fa-star"           },
+  starter: { label: "Growth Foundation",  color: SAPPHIRE,      bg: "rgba(40,96,176,0.08)",  border: "rgba(40,96,176,0.2)",   icon: "fa-seedling" },
+  growth:  { label: "Growth Accelerator", color: SAPPHIRE,      bg: "rgba(40,96,176,0.08)",  border: "rgba(40,96,176,0.2)",   icon: "fa-rocket"   },
+  pro:     { label: "Market Domination",  color: MIDNIGHT_NAVY,  bg: "rgba(13,20,40,0.07)",   border: "rgba(13,20,40,0.18)",   icon: "fa-crown"    },
 };
 
 function PlanBadge({ plan }: { plan: keyof typeof TIERS }) {
@@ -61,12 +61,12 @@ function MockInstantResponse() {
           <i className="fa-solid fa-user" style={{ fontSize: 11, color: MUTED }} />
         </div>
         <div style={{ background: SAPPHIRE_PALE, borderRadius: "0 10px 10px 10px", padding: "7px 11px", color: MUTED, lineHeight: 1.4 }}>
-          Hi, I need a quote for my AC unit ASAP...
+          Hi, I&apos;m interested in dental implants. How soon can I come in?
         </div>
       </div>
       <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
         <div style={{ background: GRAD_PRIMARY, borderRadius: "10px 10px 0 10px", padding: "7px 11px", color: WHITE, lineHeight: 1.4, maxWidth: "75%" }}>
-          Hi! Thanks for reaching out — we&apos;ll get someone to you today. Can I grab your address?
+          Hi! Thanks for reaching out. We&apos;d love to help — I can check availability for a complimentary implant consult. What day works best for you?
         </div>
       </div>
       <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end" }}>
@@ -80,10 +80,10 @@ function MockInstantResponse() {
 function MockIntakeForm() {
   return (
     <div style={{ padding: "16px", background: WHITE, borderRadius: 12, border: `1px solid ${BORDER}`, fontSize: 12 }}>
-      <p style={{ fontWeight: 800, color: TEXT, marginBottom: 10, fontSize: 13 }}>Get a Free Quote</p>
+      <p style={{ fontWeight: 800, color: TEXT, marginBottom: 10, fontSize: 13 }}>Book a New Patient Consult</p>
       {[
         { label: "Full Name", value: "Sarah M." },
-        { label: "Service Needed", value: "HVAC Repair" },
+        { label: "Treatment Interest", value: "Dental Implants" },
       ].map(f => (
         <div key={f.label} style={{ marginBottom: 8 }}>
           <p style={{ color: MUTED, fontSize: 10, marginBottom: 3 }}>{f.label}</p>
@@ -97,7 +97,7 @@ function MockIntakeForm() {
         </div>
       </div>
       <div style={{ background: GRAD_PRIMARY, borderRadius: 8, padding: "8px", textAlign: "center", color: WHITE, fontWeight: 800, fontSize: 11 }}>
-        Submit Request →
+        Request Consultation →
       </div>
     </div>
   );
@@ -260,22 +260,22 @@ function MockWhiteLabel() {
   return (
     <div style={{ padding: "16px", background: WHITE, borderRadius: 12, border: `1px solid ${BORDER}`, fontSize: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, paddingBottom: 8, borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ width: 30, height: 30, borderRadius: 8, background: GRAD_DARK, display: "flex", alignItems: "center", justifyContent: "center", color: WHITE, fontSize: 13, fontWeight: 900 }}>A</div>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: GRAD_DARK, display: "flex", alignItems: "center", justifyContent: "center", color: WHITE, fontSize: 13, fontWeight: 900 }}>B</div>
         <div>
-          <p style={{ fontWeight: 900, color: TEXT, fontSize: 12 }}>Ace Plumbing Co.</p>
-          <p style={{ color: MUTED, fontSize: 9 }}>ace-plumbing.com/book</p>
+          <p style={{ fontWeight: 900, color: TEXT, fontSize: 12 }}>Bright Smile Dental</p>
+          <p style={{ color: MUTED, fontSize: 9 }}>brightsmile.com/new-patient</p>
         </div>
       </div>
-      <p style={{ color: TEXT, fontWeight: 700, fontSize: 12, marginBottom: 6 }}>Book Your Free Estimate</p>
+      <p style={{ color: TEXT, fontWeight: 700, fontSize: 12, marginBottom: 6 }}>Book a New Patient Appointment</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-        {["Name", "Service", "Preferred Date"].map(f => (
+        {["Name", "Treatment Interest", "Preferred Date"].map(f => (
           <div key={f} style={{ background: BG, border: `1px solid ${BORDER}`, borderRadius: 6, padding: "5px 8px", color: MUTED, fontSize: 10 }}>{f}</div>
         ))}
       </div>
       <div style={{ marginTop: 8, background: GRAD_DARK, borderRadius: 7, padding: "7px", textAlign: "center", color: WHITE, fontWeight: 800, fontSize: 11 }}>
-        Book Now →
+        Book Appointment →
       </div>
-      <p style={{ textAlign: "center", fontSize: 9, color: MUTED, marginTop: 6 }}>Powered by Ace Plumbing</p>
+      <p style={{ textAlign: "center", fontSize: 9, color: MUTED, marginTop: 6 }}>Powered by Bright Smile Dental</p>
     </div>
   );
 }
@@ -286,15 +286,15 @@ const STARTER_FEATURES = [
   {
     icon: "fa-solid fa-bolt-lightning",
     title: "60-Second Automated Response",
-    desc: "Every new lead gets a personalized email reply within 60 seconds — day, night, weekends, holidays. The first contractor to respond wins 78% of the time.",
+    desc: "Every new patient inquiry gets a personalized reply within 60 seconds — day, night, weekends, holidays. The first dental practice to respond wins 78% of the time.",
     stat: "78%",
-    statLabel: "of jobs go to the first responder",
+    statLabel: "of patients book with the first responder",
     mock: <MockInstantResponse />,
   },
   {
     icon: "fa-solid fa-clipboard-list",
-    title: "Custom Intake Form with Photo Upload",
-    desc: "A branded form at your own link captures name, job details, and photos — so you have everything you need before calling.",
+    title: "New Patient Intake Form",
+    desc: "A branded form at your own link captures name, treatment interest, insurance, and photos — everything your front desk needs before the first call.",
     stat: "3×",
     statLabel: "more info vs. a basic contact form",
     mock: <MockIntakeForm />,
@@ -489,10 +489,10 @@ export default function FeaturesPage() {
             The Full Feature Set
           </p>
           <h1 style={{ fontSize: "clamp(28px, 5vw, 52px)", fontWeight: 900, color: TEXT, marginBottom: 18, letterSpacing: "-0.025em", lineHeight: 1.1 }}>
-            Every tool to turn leads<br />into booked jobs — automatically
+            Every tool to turn inquiries<br />into booked patients — automatically
           </h1>
           <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.7, marginBottom: 48 }}>
-            Built specifically for home service contractors. Start with the essentials on Pro, unlock growth tools when you scale, and go full-power on Max.
+            Built specifically for dental clinics that invest in marketing. Start with Growth Foundation, scale to Accelerator, or dominate your local market.
           </p>
 
           {/* Stats strip */}
@@ -525,9 +525,9 @@ export default function FeaturesPage() {
           <div className="plan-nav-scroll">
             <div className="plan-nav-grid" style={{ gap: 12 }}>
               {[
-                { id: "starter", tier: "starter" as const, desc: "Core features for solo operators", price: "$99/mo"  },
-                { id: "growth",  tier: "growth"  as const, desc: "Scale tools for growing crews",    price: "$299/mo" },
-                { id: "pro",     tier: "pro"      as const, desc: "Full power for high-volume ops",   price: "$999/mo" },
+                { id: "starter", tier: "starter" as const, desc: "Paid acquisition, AI follow-up, funnel optimization",    price: "$2,500/mo"  },
+                { id: "growth",  tier: "growth"  as const, desc: "Advanced AI systems and strategic growth advisory",        price: "$4,500/mo"  },
+                { id: "pro",     tier: "pro"      as const, desc: "Multi-location, omnichannel, dedicated growth manager",   price: "$8,500+/mo" },
               ].map(p => (
                 <a key={p.id} href={`#${p.id}`} style={{ textDecoration: "none", flexShrink: 0, minWidth: 180 }}>
                   <div style={{ padding: "14px 16px", borderRadius: 12, background: TIERS[p.tier].bg, border: `1.5px solid ${TIERS[p.tier].border}`, transition: "transform 0.15s" }} className="feat-card">
@@ -553,10 +553,10 @@ export default function FeaturesPage() {
           <div className="section-pill" style={{ background: "rgba(40,96,176,0.06)", border: "1.5px solid rgba(40,96,176,0.2)" }}>
             <i className="fa-solid fa-bolt-lightning" style={{ fontSize: 16, color: SAPPHIRE }} />
             <div>
-              <p style={{ fontSize: 13, fontWeight: 900, color: SAPPHIRE, margin: 0 }}>Pro Plan</p>
+              <p style={{ fontSize: 13, fontWeight: 900, color: SAPPHIRE, margin: 0 }}>Growth Foundation</p>
               <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>Everything you need from day one</p>
             </div>
-            <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: SAPPHIRE, marginLeft: 8 }}>$99/mo</span>
+            <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: SAPPHIRE, marginLeft: 8 }}>$2,500/mo</span>
           </div>
           <div className="section-line" style={{ background: "linear-gradient(to left, transparent, rgba(40,96,176,0.3))" }} />
         </div>
@@ -614,10 +614,10 @@ export default function FeaturesPage() {
             <div className="section-pill" style={{ background: "rgba(40,96,176,0.07)", border: "1.5px solid rgba(40,96,176,0.2)" }}>
               <i className="fa-solid fa-chart-line" style={{ fontSize: 16, color: SAPPHIRE }} />
               <div>
-                <p style={{ fontSize: 13, fontWeight: 900, color: SAPPHIRE, margin: 0 }}>Growth Plan</p>
+                <p style={{ fontSize: 13, fontWeight: 900, color: SAPPHIRE, margin: 0 }}>Growth Accelerator</p>
                 <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>Unlocks when you&apos;re ready to scale</p>
               </div>
-              <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: SAPPHIRE, marginLeft: 8 }}>$299/mo</span>
+              <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: SAPPHIRE, marginLeft: 8 }}>$4,500/mo</span>
             </div>
             <div className="section-line" style={{ background: "linear-gradient(to left, transparent, rgba(40,96,176,0.3))" }} />
           </div>
@@ -658,10 +658,10 @@ export default function FeaturesPage() {
             <div className="section-pill" style={{ background: "rgba(13,20,40,0.06)", border: `1.5px solid rgba(13,20,40,0.2)` }}>
               <i className="fa-solid fa-star" style={{ fontSize: 16, color: TEXT }} />
               <div>
-                <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, margin: 0 }}>Max Plan</p>
+                <p style={{ fontSize: 13, fontWeight: 900, color: TEXT, margin: 0 }}>Market Domination</p>
                 <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>For high-volume operators</p>
               </div>
-              <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: TEXT, marginLeft: 8 }}>$999/mo</span>
+              <span className="pill-price" style={{ fontSize: 14, fontWeight: 900, color: TEXT, marginLeft: 8 }}>$8,500+/mo</span>
             </div>
             <div className="section-line" style={{ background: `linear-gradient(to left, transparent, rgba(13,20,40,0.3))` }} />
           </div>

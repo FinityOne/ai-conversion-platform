@@ -10,65 +10,64 @@ const BORDER = "#e6e2db";
 const ORANGE = "#D35400";
 const GREEN  = "#27AE60";
 
-// ── Grouped service catalogue ─────────────────────────────────────────────────
+// ── Grouped dental treatment catalogue ────────────────────────────────────────
 const SERVICE_GROUPS = [
   {
-    label: "Core Home Trades",
-    icon: "fa-solid fa-house-chimney-crack",
-    color: "#D35400",
-    bg: "rgba(211,84,0,0.07)",
-    border: "rgba(211,84,0,0.18)",
+    label: "General Dentistry",
+    icon: "fa-solid fa-tooth",
+    color: "#0284c7",
+    bg: "rgba(2,132,199,0.07)",
+    border: "rgba(2,132,199,0.18)",
     services: [
-      { label: "HVAC & Cooling",   icon: "fa-solid fa-wind",          avgJob: 800  },
-      { label: "Plumbing",         icon: "fa-solid fa-faucet-drip",   avgJob: 350  },
-      { label: "Electrical",       icon: "fa-solid fa-bolt",          avgJob: 500  },
-      { label: "Roofing",          icon: "fa-solid fa-house-chimney", avgJob: 6500 },
+      { label: "New Patient Exam",      icon: "fa-solid fa-tooth",          avgJob: 450  },
+      { label: "Emergency Dentistry",   icon: "fa-solid fa-triangle-exclamation", avgJob: 650  },
+      { label: "Preventive Care",       icon: "fa-solid fa-shield-halved",  avgJob: 350  },
+      { label: "Restorative Fillings",  icon: "fa-solid fa-circle-nodes",   avgJob: 800  },
     ],
   },
   {
-    label: "Project-Based Trades",
-    icon: "fa-solid fa-helmet-safety",
-    color: "#6366f1",
-    bg: "rgba(99,102,241,0.07)",
-    border: "rgba(99,102,241,0.18)",
+    label: "Cosmetic Dentistry",
+    icon: "fa-solid fa-sparkles",
+    color: "#be185d",
+    bg: "rgba(190,24,93,0.07)",
+    border: "rgba(190,24,93,0.18)",
     services: [
-      { label: "General Contractors", icon: "fa-solid fa-person-digging", avgJob: 12000 },
-      { label: "Flooring",            icon: "fa-solid fa-layer-group",    avgJob: 2800  },
-      { label: "Painting",            icon: "fa-solid fa-paint-roller",   avgJob: 1400  },
-      { label: "Windows & Doors",     icon: "fa-solid fa-border-all",     avgJob: 1800  },
-      { label: "Concrete & Paving",   icon: "fa-solid fa-road",           avgJob: 3500  },
+      { label: "Teeth Whitening",       icon: "fa-solid fa-sparkles",       avgJob: 600  },
+      { label: "Porcelain Veneers",     icon: "fa-solid fa-star",           avgJob: 2800 },
+      { label: "Smile Makeover",        icon: "fa-solid fa-face-smile",     avgJob: 8000 },
+      { label: "Bonding & Contouring",  icon: "fa-solid fa-wand-magic-sparkles", avgJob: 900 },
     ],
   },
   {
-    label: "Outdoor & Recurring",
-    icon: "fa-solid fa-seedling",
-    color: "#16a34a",
-    bg: "rgba(22,163,74,0.07)",
-    border: "rgba(22,163,74,0.18)",
+    label: "Orthodontics & Aligners",
+    icon: "fa-solid fa-teeth",
+    color: "#7c3aed",
+    bg: "rgba(124,58,237,0.07)",
+    border: "rgba(124,58,237,0.18)",
     services: [
-      { label: "Landscaping",       icon: "fa-solid fa-leaf",         avgJob: 200 },
-      { label: "Tree Services",     icon: "fa-solid fa-tree",         avgJob: 800 },
-      { label: "Pest Control",      icon: "fa-solid fa-bug-slash",    avgJob: 250 },
-      { label: "Pool & Spa",        icon: "fa-solid fa-water-ladder", avgJob: 400 },
-      { label: "Pressure Washing",  icon: "fa-solid fa-spray-can",   avgJob: 175 },
-      { label: "Cleaning Services", icon: "fa-solid fa-broom",        avgJob: 180 },
+      { label: "Invisalign / Aligners", icon: "fa-solid fa-teeth",          avgJob: 4800 },
+      { label: "Traditional Braces",   icon: "fa-solid fa-circle-nodes",   avgJob: 5500 },
+      { label: "Teen Orthodontics",     icon: "fa-solid fa-child",          avgJob: 5200 },
+      { label: "Retainers",            icon: "fa-solid fa-rotate",          avgJob: 600  },
     ],
   },
   {
-    label: "Local Service Businesses",
-    icon: "fa-solid fa-store",
-    color: "#0891b2",
-    bg: "rgba(8,145,178,0.07)",
-    border: "rgba(8,145,178,0.18)",
+    label: "Implants & Oral Surgery",
+    icon: "fa-solid fa-teeth-open",
+    color: "#059669",
+    bg: "rgba(5,150,105,0.07)",
+    border: "rgba(5,150,105,0.18)",
     services: [
-      { label: "Local Clinics",      icon: "fa-solid fa-stethoscope",    avgJob: 200 },
-      { label: "Appointment-Based",  icon: "fa-solid fa-calendar-check", avgJob: 150 },
+      { label: "Single Dental Implant", icon: "fa-solid fa-teeth-open",     avgJob: 4500 },
+      { label: "All-on-4 / Full Arch",  icon: "fa-solid fa-layer-group",    avgJob: 28000 },
+      { label: "Wisdom Tooth Removal",  icon: "fa-solid fa-scissors",       avgJob: 800  },
+      { label: "Bone Grafting",         icon: "fa-solid fa-cubes-stacked",  avgJob: 2200 },
     ],
   },
 ];
 
 const OTHER_GROUP = {
-  label: "Other",
+  label: "Other Dental",
   icon: "fa-solid fa-ellipsis",
   color: "#64748b",
   bg: "rgba(100,116,139,0.07)",
@@ -79,25 +78,25 @@ const OTHER_GROUP = {
 // ── Plan definitions ──────────────────────────────────────────────────────────
 const CALC_PLANS = [
   {
-    id: "starter", name: "Pro", icon: "fa-solid fa-bolt",
+    id: "starter", name: "Growth Foundation", icon: "fa-solid fa-seedling",
     color: "#D35400", bg: "rgba(211,84,0,0.06)", border: "rgba(211,84,0,0.25)",
-    monthlyPrice: 99, annualMonthly: 79, annualTotal: 948, threshold: 50,
-    features: ["Up to 50 leads / month", "60-second automated response", "Follow-up email sequences", "Lead inbox with AI scoring", "Calendar bookings", "Email support"],
-    pitch: (l: number) => `~${l} leads/month — Pro's 50-lead cap is a perfect fit.`,
+    monthlyPrice: 2500, annualMonthly: 2500, annualTotal: 30000, threshold: 50,
+    features: ["Done-for-you paid acquisition", "AI-powered lead follow-up", "Automated booking funnel", "Custom intake forms", "Lead inbox with AI scoring", "Dedicated onboarding support"],
+    pitch: (l: number) => `~${l} new patient inquiries/month — Growth Foundation builds your complete dental patient acquisition system.`,
   },
   {
-    id: "growth", name: "Growth", icon: "fa-solid fa-rocket",
+    id: "growth", name: "Growth Accelerator", icon: "fa-solid fa-rocket",
     color: "#7c3aed", bg: "rgba(124,58,237,0.06)", border: "rgba(124,58,237,0.25)",
-    monthlyPrice: 299, annualMonthly: 149, annualTotal: 1788, threshold: 500,
-    features: ["Everything in Pro", "Up to 500 leads / month", "Smart AI reply detection", "Multi-step follow-up sequences", "Analytics & daily digest", "Priority support"],
-    pitch: (l: number) => `~${l} leads/month — Growth gives you capacity to scale up to 500 leads.`,
+    monthlyPrice: 4500, annualMonthly: 4500, annualTotal: 54000, threshold: 500,
+    features: ["Everything in Growth Foundation", "AI patient qualification and prioritization", "Advanced multi-channel follow-up", "Strategic growth advisory calls", "Conversion rate optimization", "Priority support"],
+    pitch: (l: number) => `~${l} inquiries/month — Growth Accelerator adds advanced AI systems and strategic advisory to scale your dental clinic faster.`,
   },
   {
-    id: "pro", name: "Max", icon: "fa-solid fa-gem",
+    id: "pro", name: "Market Domination", icon: "fa-solid fa-crown",
     color: "#0891b2", bg: "rgba(8,145,178,0.06)", border: "rgba(8,145,178,0.25)",
-    monthlyPrice: 999, annualMonthly: 799, annualTotal: 9588, threshold: Infinity,
-    features: ["Everything in Growth", "Unlimited leads", "Hot lead SMS alerts", "White-label booking pages", "Dedicated account manager", "Phone support"],
-    pitch: (l: number) => `At ~${l} leads/month you're scaling — Max gives you unlimited capacity and white-label tools.`,
+    monthlyPrice: 8500, annualMonthly: 8500, annualTotal: 102000, threshold: Infinity,
+    features: ["Everything in Growth Accelerator", "Multi-location management", "Omnichannel acquisition", "Dedicated growth manager", "Weekly executive strategy calls", "Quarterly growth roadmaps"],
+    pitch: (l: number) => `At ~${l} inquiries/month you&apos;re scaling — Market Domination gives you a full-scale growth engine and dedicated manager for your dental group.`,
   },
 ];
 
@@ -215,10 +214,10 @@ export default function CalculatorPage() {
             Revenue Gap Calculator
           </p>
           <h1 style={{ fontSize: "clamp(22px, 5vw, 36px)", fontWeight: 900, color: TEXT, marginBottom: 10, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
-            How much revenue are you leaving on the table?
+            How many new patients is your dental clinic losing?
           </h1>
           <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.6 }}>
-            Takes 30 seconds. See your gap and the right plan for your volume.
+            Takes 30 seconds. See your revenue gap and the right plan for your clinic&apos;s volume.
           </p>
         </div>
       </section>
@@ -236,7 +235,7 @@ export default function CalculatorPage() {
 
             {/* Q1 label */}
             <p style={{ fontSize: 13, fontWeight: 700, color: TEXT, marginBottom: 10 }}>
-              1. What type of business are you?
+              1. What dental treatments do you primarily offer?
             </p>
 
             {/* Category grid: 2 cols on mobile, auto-expand */}
@@ -342,8 +341,8 @@ export default function CalculatorPage() {
                 <i className="fa-solid fa-circle-check" style={{ color: GREEN, fontSize: 11, flexShrink: 0 }} />
                 <span style={{ fontSize: 12, color: TEXT }}>
                   {activeService
-                    ? <><strong>{activeService.label}</strong> · avg job pre-filled at {fmt$(activeService.avgJob)}</>
-                    : <>Other selected · set your avg job value below</>
+                    ? <><strong>{activeService.label}</strong> · avg treatment pre-filled at {fmt$(activeService.avgJob)}</>
+                    : <>Other selected · set your avg treatment value below</>
                   }
                 </span>
               </div>
@@ -353,27 +352,27 @@ export default function CalculatorPage() {
 
             {/* Q2 */}
             <SliderRow
-              label="2. Jobs completed last month"
+              label="2. New patients booked last month"
               value={completedJobs} min={1} max={200}
-              suffix=" jobs"
+              suffix=" patients"
               onChange={setCompletedJobs}
             />
 
             {/* Q3 */}
             <SliderRow
-              label="3. Average job value"
-              value={avgJobCost} min={50} max={25000} step={50}
+              label="3. Average treatment plan value"
+              value={avgJobCost} min={50} max={30000} step={50}
               prefix="$"
-              hint="Pre-filled from your service — adjust to match your numbers"
+              hint="Pre-filled from your treatment type — adjust to match your numbers"
               onChange={setAvgJobCost}
             />
 
             {/* Q4 */}
             <SliderRow
-              label="4. Current close rate"
+              label="4. Current inquiry-to-booking rate"
               value={closeRate} min={1} max={80}
               suffix="%"
-              hint={`Implies ~${results.impliedLeads} leads/month`}
+              hint={`Implies ~${results.impliedLeads} new patient inquiries/month`}
               onChange={setCloseRate}
             />
           </div>
@@ -415,7 +414,7 @@ export default function CalculatorPage() {
                 {showGap ? (
                   <>
                     <p style={{ fontSize: 20, fontWeight: 900, color: GREEN, marginBottom: 2 }}>{fmt$(results.monthlyGap)}</p>
-                    <p style={{ fontSize: 11, color: MUTED }}>{results.extraJobs} extra jobs</p>
+                    <p style={{ fontSize: 11, color: MUTED }}>{results.extraJobs} extra patients</p>
                   </>
                 ) : (
                   <p style={{ fontSize: 11, color: MUTED, lineHeight: 1.4 }}>Close rate already strong</p>

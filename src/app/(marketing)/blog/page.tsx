@@ -7,9 +7,9 @@ import {
 } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "Journal — Patient Acquisition & Practice Growth | ClozeFlow",
+  title: "Journal — New Patient Acquisition & Dental Practice Growth | ClozeFlow",
   description:
-    "Evidence-based strategies for independent medical practices: how to convert more patient inquiries, reduce no-shows, and grow your panel without adding staff.",
+    "Evidence-based strategies for independent dental clinics: how to convert more new patient inquiries, reduce no-shows, and grow your practice without adding staff.",
 };
 
 const CATEGORY_COLORS: Record<string, { text: string; bg: string; border: string }> = {
@@ -72,10 +72,10 @@ export default function BlogPage() {
             color: WHITE, lineHeight: 1.1, letterSpacing: "-0.025em",
             marginBottom: 18, fontFamily: FONT_DISPLAY,
           }}>
-            Practice Growth &amp; Patient Acquisition
+            Dental Practice Growth &amp; New Patient Acquisition
           </h1>
           <p style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", lineHeight: 1.65, maxWidth: 640, marginBottom: 32 }}>
-            Evidence-based strategies for independent medical practices. Written by clinicians, practice administrators, and growth advisors who have built the systems these articles describe.
+            Evidence-based strategies for dental clinics that invest in marketing. Written by dental practice advisors and growth experts who have built the systems these articles describe.
           </p>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>

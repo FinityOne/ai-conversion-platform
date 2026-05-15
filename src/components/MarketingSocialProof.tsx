@@ -17,11 +17,10 @@ function pick<T>(rng: () => number, arr: T[]): T {
 }
 
 const PRACTICES = [
-  "A med spa","A dental practice","An orthodontics office","A chiropractic clinic",
-  "A physical therapy clinic","A mental health practice","A primary care clinic",
-  "An optometry office","A weight loss clinic","A sports medicine practice",
-  "A wellness center","A multi-location medspa","A functional medicine clinic",
-  "A pediatric dental practice","A pain management clinic",
+  "A dental clinic","An orthodontics office","A cosmetic dental practice","A general dentistry clinic",
+  "A pediatric dental practice","An implant dentistry center","A family dental clinic",
+  "A multi-location dental group","An Invisalign provider","A dental spa",
+  "A restorative dentistry clinic","A sedation dentistry practice","A dental DSO","An endodontics office","A periodontics clinic",
 ];
 
 const CITIES = [

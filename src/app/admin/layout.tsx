@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { createSupabaseServiceClient } from "@/lib/supabase-service";
+import { ALL_DENTAL_LP_SOURCES } from "@/lib/internal-leads";
 import AdminShell from "@/components/AdminShell";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -21,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { count: demoLeadCount } = await service
     .from("internal_leads")
     .select("id", { count: "exact", head: true })
-    .in("source", ["healthcare_landing", "homepage_demo"])
+    .in("source", ALL_DENTAL_LP_SOURCES)
     .eq("status", "new");
 
   return (

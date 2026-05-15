@@ -6,9 +6,9 @@ import {
 } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: "How It Works — The Science Behind Patient Conversion | ClozeFlow",
+  title: "How It Works — The Science Behind New Patient Conversion | ClozeFlow",
   description:
-    "Learn why responding to patient inquiries within 60 seconds dramatically increases conversion. See exactly how ClozeFlow qualifies, responds, and books appointments automatically.",
+    "Learn why responding to new patient inquiries within 60 seconds dramatically increases conversion for dental clinics. See exactly how ClozeFlow qualifies, responds, and books appointments automatically.",
 };
 
 const BG     = FROST;
@@ -34,10 +34,10 @@ export default function HowItWorksPage() {
             The Science Behind ClozeFlow
           </p>
           <h1 style={{ fontSize: "clamp(30px, 5vw, 44px)", fontWeight: 900, color: WHITE, marginBottom: 18, letterSpacing: "-0.025em", lineHeight: 1.1, fontFamily: FONT_DISPLAY }}>
-            Why speed and persistence win every new patient
+            Why speed and persistence win every new dental patient
           </h1>
           <p style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", lineHeight: 1.65 }}>
-            The data is clear. The playbook is proven. Here&apos;s exactly how ClozeFlow turns the science of patient conversion into booked appointments for your practice.
+            The data is clear. The playbook is proven. Here&apos;s exactly how ClozeFlow turns the science of new patient conversion into booked appointments for your dental clinic.
           </p>
         </div>
       </section>
@@ -51,7 +51,7 @@ export default function HowItWorksPage() {
           </div>
 
           <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.75, marginBottom: 28 }}>
-            An MIT and InsideSales.com study — one of the most cited in B2B sales research — found that contacting a lead within 5 minutes makes you <strong style={{ color: TEXT }}>100 times more likely to connect</strong> compared to waiting 30 minutes. After 5 minutes, your odds of connecting drop 21×. After 1 hour, most leads have already moved on.
+            An MIT and InsideSales.com study — one of the most cited in sales research — found that contacting a lead within 5 minutes makes you <strong style={{ color: TEXT }}>100 times more likely to connect</strong> compared to waiting 30 minutes. For dental clinics, this is everything: a patient who doesn&apos;t hear back within minutes simply books at the practice down the street.
           </p>
 
           {/* Visual timeline */}
@@ -81,7 +81,7 @@ export default function HowItWorksPage() {
 
           <div style={{ background: `rgba(40,96,176,0.06)`, border: `1px solid rgba(40,96,176,0.15)`, borderRadius: 10, padding: "16px 20px" }}>
             <p style={{ fontSize: 15, color: TEXT, fontWeight: 600 }}>
-              ⚡ ClozeFlow responds to every new lead in under <strong>60 seconds</strong> — automatically, 24/7/365 — so you&apos;re always the first contractor to respond.
+              ⚡ ClozeFlow responds to every new patient inquiry in under <strong>60 seconds</strong> — automatically, 24/7/365 — so your dental clinic always replies first.
             </p>
           </div>
         </div>
@@ -95,7 +95,7 @@ export default function HowItWorksPage() {
         </div>
 
         <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.75, marginBottom: 28 }}>
-          Most practices give up after 1–2 contact attempts. Research from the National Sales Executive Association shows that <strong style={{ color: TEXT }}>80% of sales require 5 or more follow-up attempts</strong> — yet 90% of teams quit after 3 tries or fewer. The optimal follow-up sequence looks like this:
+          Most dental practices give up after 1–2 contact attempts. Research from the National Sales Executive Association shows that <strong style={{ color: TEXT }}>80% of bookings require 5 or more follow-up attempts</strong> — yet 90% of front desks quit after 3 tries or fewer. The optimal follow-up sequence looks like this:
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -133,7 +133,7 @@ export default function HowItWorksPage() {
             {[
               { icon: "🗣️", title: "Conversational tone",  desc: "Messages sound like a real person wrote them — because they did. We help you craft your scripts." },
               { icon: "⏱️", title: "Perfect timing",        desc: "Sent at the right moment, every time. Never too late to connect, never so fast it feels spammy." },
-              { icon: "🎯", title: "Personalization",        desc: "Uses the lead&apos;s name, service type, and specific details from their inquiry." },
+              { icon: "🎯", title: "Personalization",        desc: "Uses the patient&apos;s name, treatment interest, and specific details from their inquiry." },
             ].map(({ icon, title, desc }) => (
               <div key={title} style={{ background: FROST, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "20px 18px", textAlign: "center" }}>
                 <span style={{ fontSize: 28, display: "block", marginBottom: 10 }}>{icon}</span>
@@ -153,7 +153,7 @@ export default function HowItWorksPage() {
         </div>
 
         <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.75, marginBottom: 28 }}>
-          The average new patient inquiry costs $50–$200 to generate — through Google Ads, social media, SEO, and referral programs. If you&apos;re converting 25% of those inquiries when you could be converting 55%, you&apos;re effectively <strong style={{ color: TEXT }}>throwing away 60% of every dollar you spend on patient acquisition</strong>.
+          Dental clinics spend $80–$300 per new patient inquiry — through Google Ads, Meta Ads, Zocdoc, and SEO. If you&apos;re converting 25% of those inquiries when you could be converting 55%, you&apos;re effectively <strong style={{ color: TEXT }}>throwing away 60% of every marketing dollar you spend</strong>.
         </p>
 
         <div style={{ background: WHITE, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "28px 24px", marginBottom: 28 }}>
@@ -180,7 +180,7 @@ export default function HowItWorksPage() {
             padding: "12px 24px", borderRadius: 8, textDecoration: "none",
             boxShadow: "0 4px 20px rgba(40,96,176,0.25)",
           }}>
-            Calculate your practice's revenue gap →
+            Calculate your dental clinic&apos;s revenue gap →
           </Link>
         </div>
       </section>
@@ -195,12 +195,12 @@ export default function HowItWorksPage() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {[
-              { n: 1, title: "Patient submits inquiry / calls / texts",         desc: "Anywhere a patient reaches out — your website, Google Business, social media, a direct text to your number — ClozeFlow captures it." },
-              { n: 2, title: "ClozeFlow detects the inquiry in < 30 seconds",  desc: "Our real-time monitoring picks up the new inquiry immediately and triggers your response sequence." },
-              { n: 3, title: "Instant text + email sent within 60 seconds",    desc: "A professional, personalized message goes out using your practice name and branding before a minute has passed." },
-              { n: 4, title: "AI qualification questions sent",                 desc: "Follow-up messages ask about the patient&apos;s needs, insurance, and timeline — gathering everything your front desk needs." },
-              { n: 5, title: "Qualified patient offered calendar slots",        desc: "Ready-to-book patients see your available times and self-schedule. No phone tag, no back-and-forth." },
-              { n: 6, title: "Booking confirmed, added to your pipeline",       desc: "The appointment appears on your calendar. The patient is logged in your pipeline. Your team shows up ready to deliver great care." },
+              { n: 1, title: "New patient submits inquiry / calls / texts",     desc: "Anywhere a patient finds your dental clinic — your website, Google Ads, Meta Ads, Zocdoc, a direct text to your number — ClozeFlow captures it." },
+              { n: 2, title: "ClozeFlow detects the inquiry in < 30 seconds",  desc: "Our real-time monitoring picks up the new inquiry immediately and triggers your personalized response sequence." },
+              { n: 3, title: "Instant text + email sent within 60 seconds",    desc: "A professional, personalized message goes out using your clinic name and branding before a minute has passed — day or night." },
+              { n: 4, title: "AI qualification questions sent",                 desc: "Follow-up messages ask about the patient&apos;s treatment interest, insurance, and timeline — gathering everything your front desk needs." },
+              { n: 5, title: "Qualified patient offered appointment slots",     desc: "Ready-to-book patients see your available times and self-schedule. No phone tag, no back-and-forth, no missed opportunities." },
+              { n: 6, title: "Booking confirmed, added to your pipeline",       desc: "The appointment appears on your calendar. The patient is logged in your pipeline. Your team shows up ready to deliver great dental care." },
             ].map(({ n, title, desc }, i, arr) => (
               <div key={n} style={{ display: "flex", gap: 20 }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>

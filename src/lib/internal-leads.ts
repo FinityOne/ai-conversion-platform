@@ -7,10 +7,25 @@ export type LeadPriority = "low" | "medium" | "high" | "urgent";
 export type LeadSource   =
   | "referral" | "google_ad" | "organic" | "linkedin"
   | "cold_outreach" | "trade_event" | "partner" | "csv_import"
-  | "healthcare_landing" | "homepage_demo" | "other";
+  | "healthcare_landing" | "homepage_demo"
+  | "lp_dentists" | "lp_demo_reward" | "lp_lost_patient_revenue"
+  | "lp_free_dental_audit" | "lp_dental_growth" | "dental_growth_lp"
+  | "other";
 export type ActivityType =
   | "note" | "call" | "email" | "meeting" | "in_person" | "demo"
   | "follow_up" | "status_change" | "import";
+
+export interface LPQualification {
+  practice_name?:  string;
+  specialty?:      string;
+  locations?:      string;
+  monthly_leads?:  string;
+  ad_spend?:       string;
+  avg_value?:      string;
+  bottleneck?:     string;
+  timeline?:       string;
+  lp_source?:      string;
+}
 
 export interface InternalLead {
   id:                string;
@@ -39,6 +54,7 @@ export interface InternalLead {
   created_by:        string | null;
   created_at:        string;
   updated_at:        string;
+  metadata:          LPQualification | null;
 }
 
 export interface LeadActivity {
@@ -92,17 +108,89 @@ export const PRIORITY_CONFIG: Record<LeadPriority, { label: string; color: strin
 };
 
 export const SOURCE_LABELS: Record<LeadSource, string> = {
-  referral:            "Referral",
-  google_ad:           "Google Ad",
-  organic:             "Organic Search",
-  linkedin:            "LinkedIn",
-  cold_outreach:       "Cold Outreach",
-  trade_event:         "Trade Event",
-  partner:             "Partner",
-  csv_import:          "CSV Import",
-  healthcare_landing:  "Demo Request (Healthcare LP)",
-  homepage_demo:       "Demo Request (Homepage)",
-  other:               "Other",
+  referral:               "Referral",
+  google_ad:              "Google Ad",
+  organic:                "Organic Search",
+  linkedin:               "LinkedIn",
+  cold_outreach:          "Cold Outreach",
+  trade_event:            "Trade Event",
+  partner:                "Partner",
+  csv_import:             "CSV Import",
+  healthcare_landing:     "Demo Request (Healthcare LP)",
+  homepage_demo:          "Demo Request (Homepage)",
+  lp_dentists:            "LP — Patient Conversion",
+  lp_demo_reward:         "LP — Demo + Gift Card",
+  lp_lost_patient_revenue:"LP — Revenue Calculator",
+  lp_free_dental_audit:   "LP — Free Audit",
+  lp_dental_growth:       "LP — Dental Growth",
+  dental_growth_lp:       "LP — Dental Growth",
+  other:                  "Other",
+};
+
+export const ALL_DENTAL_LP_SOURCES: LeadSource[] = [
+  "healthcare_landing", "homepage_demo",
+  "lp_dentists", "lp_demo_reward", "lp_lost_patient_revenue",
+  "lp_free_dental_audit", "lp_dental_growth", "dental_growth_lp",
+];
+
+// Human-readable labels for LP qualification fields
+export const LP_FIELD_LABELS: Record<keyof LPQualification, string> = {
+  practice_name:  "Practice Name",
+  specialty:      "Primary Specialty",
+  locations:      "Locations",
+  monthly_leads:  "Monthly Inquiries",
+  ad_spend:       "Monthly Marketing Spend",
+  avg_value:      "Avg Treatment Value",
+  bottleneck:     "Biggest Bottleneck",
+  timeline:       "Timeline to Improve",
+  lp_source:      "Landing Page",
+};
+
+export const LP_FIELD_VALUE_LABELS: Record<string, Record<string, string>> = {
+  specialty: {
+    general:   "General Dentistry",
+    cosmetic:  "Cosmetic Dentistry",
+    ortho:     "Orthodontics / Invisalign",
+    implants:  "Implants / Oral Surgery",
+    multi:     "Multi-specialty",
+    pediatric: "Pediatric Dentistry",
+  },
+  locations: {
+    "1":   "1 location",
+    "2-3": "2–3 locations",
+    "4+":  "4+ locations (group practice)",
+  },
+  monthly_leads: {
+    "<20":    "Fewer than 20 / mo",
+    "20-50":  "20–50 / mo",
+    "50-100": "50–100 / mo",
+    "100+":   "100+ / mo",
+  },
+  ad_spend: {
+    "<1k":   "Under $1,000 / mo",
+    "1k-3k": "$1,000 – $3,000 / mo",
+    "3k-7k": "$3,000 – $7,000 / mo",
+    "7k+":   "$7,000+ / mo",
+  },
+  avg_value: {
+    "<500":      "Under $500",
+    "500-1200":  "$500 – $1,200",
+    "1200-3000": "$1,200 – $3,000",
+    "3000+":     "$3,000+",
+  },
+  bottleneck: {
+    "slow-response":     "Slow response to new inquiries",
+    "missed-calls":      "Missed calls not followed up",
+    "treatment-dropoff": "Patients ghost after consultations",
+    "reactivation":      "No reactivation system",
+    "all":               "All of the above",
+  },
+  timeline: {
+    "asap":      "As soon as possible",
+    "1-2mo":     "Within 1–2 months",
+    "3-6mo":     "3–6 months",
+    "exploring": "Just exploring",
+  },
 };
 
 export const TRADE_OPTIONS = [

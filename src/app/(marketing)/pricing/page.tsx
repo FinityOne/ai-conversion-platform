@@ -203,8 +203,8 @@ const FAQS = [
     a: "Market Domination is custom scoped starting at $8,500+/month, with a recommended ad budget of $10,000+/month. Because every multi-location or high-growth clinic has unique needs, we scope the engagement based on your specific goals and markets. Book a call and we'll put together a custom growth plan.",
   },
   {
-    q: "What type of clinics is ClozeFlow best for?",
-    a: "ClozeFlow works best for clinics that are committed to growth, have a strong desire to improve their systems, are responsive and coachable, and are ready to invest in marketing. If you want predictable patient acquisition without managing it yourself, this is for you.",
+    q: "What type of dental clinics is ClozeFlow best for?",
+    a: "ClozeFlow works best for dental clinic owners already spending $1,500+/month on marketing (Google Ads, Meta, Zocdoc) who want to convert more of that spend into booked patients. If you&apos;re doing $500K+ in annual revenue and want predictable new patient acquisition without managing it yourself, this is built for you.",
   },
   {
     q: "What results can I expect?",
@@ -296,7 +296,7 @@ export default function PricingPage() {
             We Don&apos;t Just Get You Leads. We Build the System That Gets You More Patients.
           </p>
           <p style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto" }}>
-            We help clinics generate more high-quality leads, convert more inquiries into booked appointments, and grow predictable revenue.
+            We help dental clinics generate more high-quality new patient leads, convert more inquiries into booked appointments, and grow predictable revenue.
           </p>
           {/* Value props row */}
           <div style={{

@@ -123,7 +123,7 @@ export default function PlanGate({ hasPlan, children }: Props) {
                   Your pipeline is ready
                 </h2>
                 <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>
-                  Pick a plan to unlock ClozeFlow and start<br />turning leads into booked jobs automatically.
+                  Pick a plan to unlock ClozeFlow and start<br />filling your calendar with new patients automatically.
                 </p>
               </div>
 

@@ -42,14 +42,14 @@ export default function TopBanner() {
     }}>
       {/* Desktop copy */}
       <span className="hidden sm:inline" style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.85)", whiteSpace: "nowrap" }}>
-        <span style={{ color: LAVENDER, fontWeight: 700 }}>Limited offer</span>
-        {" — Save up to 20% on annual plans · 30-day money-back guarantee"}
+        <span style={{ color: LAVENDER, fontWeight: 700 }}>Built for dental clinics</span>
+        {" — Stop losing new patients to a slow reply · 30-day money-back guarantee"}
       </span>
 
       {/* Mobile copy */}
       <span className="sm:hidden" style={{ fontSize: 11, fontWeight: 500, color: "rgba(255,255,255,0.85)", whiteSpace: "nowrap" }}>
-        <span style={{ color: LAVENDER, fontWeight: 700 }}>20% off</span>
-        {" annual · 30-day guarantee"}
+        <span style={{ color: LAVENDER, fontWeight: 700 }}>For dental clinics</span>
+        {" · 30-day guarantee"}
       </span>
 
       <Link

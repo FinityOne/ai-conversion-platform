@@ -19,23 +19,23 @@ const GREEN  = "#27AE60";
 
 const TESTIMONIALS = [
   {
-    quote: "In our first 30 days with ClozeFlow, we converted 14 more consultations from inquiries we used to miss. That alone covered 6 months of the subscription.",
+    quote: "In our first 30 days with ClozeFlow, we booked 18 more new patient consults from inquiries we used to miss after hours. That alone paid for the entire year.",
     name: "Dr. Lauren M.",
-    title: "Medical Director, Luminary Aesthetics",
+    title: "Owner, Milestone Dental Group",
     location: "Scottsdale, AZ",
     initials: "LM",
     photo: "https://images.pexels.com/photos/5214413/pexels-photo-5214413.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
   },
   {
-    quote: "We were losing patients who called after hours or on weekends. ClozeFlow responds instantly and books them for a consult. Our no-show rate also dropped because of the reminders.",
+    quote: "We were spending $8K/month on Google Ads and losing half those leads because nobody replied fast enough. ClozeFlow fixed that overnight — our new patient bookings doubled.",
     name: "Dr. James T.",
-    title: "Owner, Align Chiropractic & Wellness",
+    title: "Owner, Apex Family Dental",
     location: "Austin, TX",
     initials: "JT",
     photo: "https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=120&h=120&fit=crop",
   },
   {
-    quote: "Our front desk was overwhelmed with follow-up calls. ClozeFlow handles all of it — qualification, scheduling, reminders. My staff now focus on the patients in the office.",
+    quote: "Our front desk was drowning in follow-up calls. ClozeFlow handles all of it — qualification, scheduling, reminders. My team now focuses entirely on the patients in the chair.",
     name: "Dr. Priya S.",
     title: "Practice Owner, Bright Smile Dental",
     location: "Chicago, IL",
@@ -45,87 +45,87 @@ const TESTIMONIALS = [
 ];
 
 const FEATURES = [
-  { title: "60-Second Response",   desc: "Every patient inquiry gets a personal reply the moment they reach out — evenings, weekends, holidays. First response wins the appointment." },
-  { title: "Smart Qualification",  desc: "AI asks the right intake questions upfront — service interest, insurance, timeline — so your front desk only handles ready-to-book patients." },
-  { title: "Automated Follow-Up",  desc: "A structured follow-up sequence nurtures every inquiry over 5 days. No patient goes cold while you're with someone in the exam room." },
+  { title: "60-Second Response",   desc: "Every new patient inquiry gets a personal reply the moment they reach out — evenings, weekends, holidays. First response wins the appointment." },
+  { title: "Smart Qualification",  desc: "AI asks the right intake questions upfront — treatment interest, insurance, timeline — so your front desk only handles ready-to-book patients." },
+  { title: "Automated Follow-Up",  desc: "A structured follow-up sequence nurtures every inquiry over 5 days. No lead goes cold while you're chairside with another patient." },
   { title: "Online Scheduling",    desc: "Qualified patients pick an appointment slot directly from your availability. No phone tag, no missed connections, no double bookings." },
   { title: "Patient Pipeline",     desc: "Every inquiry, every status, one clean view. Know exactly where each potential patient stands — new, in-follow-up, or booked." },
-  { title: "Source Tracking",      desc: "See which Google ads, Healthgrades profiles, and referral sources are actually converting — tracked all the way to the booked appointment." },
+  { title: "Ad Spend Tracking",    desc: "See which Google Ads, Meta campaigns, and referral sources are actually converting — tracked all the way to the booked new patient appointment." },
 ];
 
 const HIW_STEPS = [
   {
     n: "01",
-    title: "Connect your patient inquiry sources",
-    desc: "Website, Google, Healthgrades, Zocdoc — anywhere patients find your practice. Our team handles the full setup in one day. No tech skills needed.",
+    title: "Connect your new patient inquiry sources",
+    desc: "Your website, Google Ads, Meta Ads, Zocdoc — anywhere patients find your dental practice. Our team handles the full setup in one day. No tech skills needed.",
   },
   {
     n: "02",
     title: "AI responds in under 60 seconds",
-    desc: "Every inquiry gets a warm, intelligent reply the moment it arrives — day or night. The AI qualifies the service of interest, insurance, and preferred time while you're with patients.",
+    desc: "Every inquiry gets a warm, intelligent reply the moment it arrives — day or night. The AI qualifies the treatment of interest, insurance, and preferred time while you're chairside.",
   },
   {
     n: "03",
     title: "Qualified patients land on your schedule",
-    desc: "Ready-to-book patients schedule themselves. You get a notification, the chart is prepped, and you focus entirely on delivering great care.",
+    desc: "Ready-to-book patients self-schedule directly. You get a notification, the chart is prepped, and you focus entirely on delivering exceptional dental care.",
   },
 ];
 
 const MEDICAL_SPECIALTIES: { label: string; icon: string; color: string; bg: string; border: string; services: { icon: string; label: string }[] }[] = [
   {
-    label: "Aesthetics & Med Spa",
-    icon: "fa-solid fa-spa",
-    color: "#be185d",
-    bg: "rgba(190,24,93,0.06)",
-    border: "rgba(190,24,93,0.15)",
-    services: [
-      { icon: "fa-solid fa-sparkles",            label: "Botox & Fillers"          },
-      { icon: "fa-solid fa-sun",                 label: "Laser & Skin Resurfacing"  },
-      { icon: "fa-solid fa-droplet",             label: "IV Therapy & Hydration"    },
-      { icon: "fa-solid fa-star",                label: "Body Contouring"           },
-      { icon: "fa-solid fa-face-smile",          label: "Facials & Chemical Peels"  },
-    ],
-  },
-  {
-    label: "Dental & Orthodontics",
+    label: "General Dentistry",
     icon: "fa-solid fa-tooth",
     color: "#0284c7",
     bg: "rgba(2,132,199,0.06)",
     border: "rgba(2,132,199,0.15)",
     services: [
-      { icon: "fa-solid fa-tooth",               label: "General Dentistry"         },
-      { icon: "fa-solid fa-teeth",               label: "Orthodontics & Invisalign" },
-      { icon: "fa-solid fa-teeth-open",          label: "Dental Implants"           },
-      { icon: "fa-solid fa-star",                label: "Cosmetic Dentistry"        },
-      { icon: "fa-solid fa-child",               label: "Pediatric Dentistry"       },
+      { icon: "fa-solid fa-tooth",               label: "Preventive Care & Cleanings" },
+      { icon: "fa-solid fa-heart-pulse",         label: "Emergency Dentistry"          },
+      { icon: "fa-solid fa-star",                label: "Family Dentistry"             },
+      { icon: "fa-solid fa-face-smile",          label: "Restorative Fillings"         },
+      { icon: "fa-solid fa-shield-halved",       label: "Night Guards & Orthotics"     },
     ],
   },
   {
-    label: "PT, Chiro & Rehab",
-    icon: "fa-solid fa-person-walking",
+    label: "Cosmetic Dentistry",
+    icon: "fa-solid fa-sparkles",
+    color: "#be185d",
+    bg: "rgba(190,24,93,0.06)",
+    border: "rgba(190,24,93,0.15)",
+    services: [
+      { icon: "fa-solid fa-sparkles",            label: "Teeth Whitening"              },
+      { icon: "fa-solid fa-star",                label: "Porcelain Veneers"            },
+      { icon: "fa-solid fa-face-smile",          label: "Smile Makeovers"              },
+      { icon: "fa-solid fa-wand-magic-sparkles", label: "Bonding & Contouring"         },
+      { icon: "fa-solid fa-gem",                 label: "Gum Contouring"               },
+    ],
+  },
+  {
+    label: "Orthodontics & Aligners",
+    icon: "fa-solid fa-teeth",
+    color: "#7c3aed",
+    bg: "rgba(124,58,237,0.06)",
+    border: "rgba(124,58,237,0.15)",
+    services: [
+      { icon: "fa-solid fa-teeth",               label: "Invisalign & Clear Aligners"  },
+      { icon: "fa-solid fa-circle-nodes",        label: "Traditional Braces"           },
+      { icon: "fa-solid fa-child",               label: "Teen Orthodontics"            },
+      { icon: "fa-solid fa-person",              label: "Adult Orthodontics"           },
+      { icon: "fa-solid fa-rotate",              label: "Retainers & Refinements"      },
+    ],
+  },
+  {
+    label: "Implants & Oral Surgery",
+    icon: "fa-solid fa-teeth-open",
     color: "#059669",
     bg: "rgba(5,150,105,0.06)",
     border: "rgba(5,150,105,0.15)",
     services: [
-      { icon: "fa-solid fa-person-walking",      label: "Physical Therapy"          },
-      { icon: "fa-solid fa-hand-holding-medical", label: "Chiropractic Care"        },
-      { icon: "fa-solid fa-dumbbell",            label: "Sports Medicine"           },
-      { icon: "fa-solid fa-heart-pulse",         label: "Occupational Therapy"      },
-      { icon: "fa-solid fa-brain",               label: "Neurology Rehab"           },
-    ],
-  },
-  {
-    label: "Primary Care & Clinics",
-    icon: "fa-solid fa-stethoscope",
-    color: "#6366f1",
-    bg: "rgba(99,102,241,0.06)",
-    border: "rgba(99,102,241,0.15)",
-    services: [
-      { icon: "fa-solid fa-stethoscope",         label: "Primary Care Clinics"      },
-      { icon: "fa-solid fa-brain",               label: "Mental Health & Therapy"   },
-      { icon: "fa-solid fa-eye",                 label: "Optometry & Vision Care"   },
-      { icon: "fa-solid fa-syringe",             label: "Weight Loss & Wellness"    },
-      { icon: "fa-solid fa-paw",                 label: "Veterinary Practices"      },
+      { icon: "fa-solid fa-teeth-open",          label: "Dental Implants"              },
+      { icon: "fa-solid fa-layer-group",         label: "All-on-4 / Full Arch"         },
+      { icon: "fa-solid fa-scissors",            label: "Extractions & Wisdom Teeth"   },
+      { icon: "fa-solid fa-cubes-stacked",       label: "Bone Grafting"                },
+      { icon: "fa-solid fa-shield",              label: "Sinus Lifts"                  },
     ],
   },
 ];
@@ -137,14 +137,14 @@ function fmt$(n: number) {
 const CF_BOOKING_RATE = 55;
 
 const SPECIALTY_PRESETS = [
-  { label: "Med Spa",        icon: "fa-solid fa-spa",                  avg: 900  },
-  { label: "Dental",         icon: "fa-solid fa-tooth",                avg: 1200 },
-  { label: "Ortho",          icon: "fa-solid fa-teeth",                avg: 5500 },
-  { label: "Physical Therapy", icon: "fa-solid fa-person-walking",     avg: 1600 },
-  { label: "Chiropractic",   icon: "fa-solid fa-hand-holding-medical", avg: 1200 },
-  { label: "Mental Health",  icon: "fa-solid fa-brain",                avg: 1600 },
-  { label: "Primary Care",   icon: "fa-solid fa-stethoscope",          avg: 600  },
-  { label: "Optometry",      icon: "fa-solid fa-eye",                  avg: 500  },
+  { label: "General",        icon: "fa-solid fa-tooth",                avg: 1200 },
+  { label: "Cosmetic",       icon: "fa-solid fa-sparkles",             avg: 2800 },
+  { label: "Orthodontics",   icon: "fa-solid fa-teeth",                avg: 5500 },
+  { label: "Implants",       icon: "fa-solid fa-teeth-open",           avg: 4500 },
+  { label: "Clear Aligners", icon: "fa-solid fa-circle-nodes",         avg: 4800 },
+  { label: "Pediatric",      icon: "fa-solid fa-child",                avg: 900  },
+  { label: "Periodontics",   icon: "fa-solid fa-shield-halved",        avg: 2200 },
+  { label: "Endodontics",    icon: "fa-solid fa-syringe",              avg: 1800 },
 ];
 
 function CalcSlider({
@@ -225,10 +225,10 @@ function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
             letterSpacing: "-0.02em", lineHeight: 1.1,
             fontFamily: FONT_DISPLAY, fontStyle: "italic", marginBottom: 12,
           }}>
-            How many patients are slipping through?
+            How many new patients are slipping through?
           </h2>
           <p style={{ fontSize: 16, color: "rgba(249,247,242,0.55)", maxWidth: 520, margin: "0 auto" }}>
-            Every unanswered inquiry is a patient who found someone else. See exactly how much that costs you every year.
+            Every unanswered inquiry is a patient who found another dentist. See exactly how much your slow follow-up costs you every year.
           </p>
         </div>
 
@@ -246,7 +246,7 @@ function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
 
             {/* Specialty presets */}
             <p style={{ fontSize: 12, fontWeight: 700, color: TEXT, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              Your specialty
+              Your dental specialty
             </p>
             <div style={{
               display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, marginBottom: 24,
@@ -279,7 +279,7 @@ function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
             <div style={{ height: 1, background: BORDER, marginBottom: 24 }} />
 
             <CalcSlider
-              label="Monthly patient inquiries"
+              label="Monthly new patient inquiries"
               value={inquiries} min={10} max={500}
               suffix=" / mo"
               onChange={setInquiries}
@@ -298,7 +298,7 @@ function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
             />
 
             <p style={{ fontSize: 11, color: MUTED, lineHeight: 1.5, marginTop: 4 }}>
-              Treatment plan value pre-filled from specialty averages. ClozeFlow scenario uses 55% booking rate — our medical practice average with automated follow-up.
+              Treatment plan value pre-filled from dental specialty averages. ClozeFlow scenario uses 55% booking rate — our dental practice average with automated follow-up.
             </p>
           </div>
 
@@ -423,18 +423,18 @@ function InlineCalculator({ onOpenModal }: { onOpenModal: () => void }) {
 }
 
 const PIPELINE_LEADS = [
-  { initials: "AM", name: "Ashley M.", job: "Botox Consult",        status: "Booked",    statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  detail: "May 8 · 10:00 AM"  },
-  { initials: "RK", name: "Ryan K.",   job: "Invisalign Inquiry",   status: "AI Active", statusColor: "#f59e0b", statusBg: "rgba(245,158,11,0.12)", detail: "Following up…"     },
-  { initials: "NP", name: "Nina P.",   job: "PT Evaluation",        status: "Qualified", statusColor: "#6366f1", statusBg: "rgba(99,102,241,0.12)", detail: "Score: 88 / 100"   },
-  { initials: "DL", name: "David L.",  job: "Chiro Initial Visit",  status: "New",       statusColor: "#3b82f6", statusBg: "rgba(59,130,246,0.12)", detail: "Just arrived"      },
+  { initials: "AM", name: "Ashley M.", job: "Invisalign Consult",    status: "Booked",    statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  detail: "May 8 · 10:00 AM"  },
+  { initials: "RK", name: "Ryan K.",   job: "Dental Implant Inquiry", status: "AI Active", statusColor: "#f59e0b", statusBg: "rgba(245,158,11,0.12)", detail: "Following up…"     },
+  { initials: "NP", name: "Nina P.",   job: "Teeth Whitening",        status: "Qualified", statusColor: "#6366f1", statusBg: "rgba(99,102,241,0.12)", detail: "Score: 88 / 100"   },
+  { initials: "DL", name: "David L.",  job: "New Patient Exam",       status: "New",       statusColor: "#3b82f6", statusBg: "rgba(59,130,246,0.12)", detail: "Just arrived"      },
 ];
 
 function ConnectScreenContent() {
   const sources = [
-    { name: "Google Business",  color: "#ea580c" },
-    { name: "Healthgrades",     color: "#be185d" },
-    { name: "Your Website",     color: "#7c3aed" },
+    { name: "Google Ads",       color: "#ea580c" },
     { name: "Zocdoc",           color: "#0891b2" },
+    { name: "Your Website",     color: "#7c3aed" },
+    { name: "Meta / Facebook",  color: "#be185d" },
   ];
   return (
     <div>
@@ -477,7 +477,7 @@ function ChatScreenContent() {
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, margin: 0 }}>Ashley M.</p>
-          <p style={{ fontSize: 8, color: MUTED, margin: 0 }}>Healthgrades · just now</p>
+          <p style={{ fontSize: 8, color: MUTED, margin: 0 }}>Google Ads · just now</p>
         </div>
         <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 100, padding: "2px 7px" }}>
           <span style={{ fontSize: 8, fontWeight: 700, color: "#f59e0b" }}>AI Active</span>
@@ -486,27 +486,27 @@ function ChatScreenContent() {
       <div style={{ padding: "10px 10px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
           <div style={{ background: DEEP_NAVY, borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
-            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;Hi, I&apos;m interested in Botox. What are your prices?&rdquo;</p>
+            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;Hi, I&apos;m interested in Invisalign. How much does it cost?&rdquo;</p>
           </div>
           <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>10:32 AM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
           <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow · 38s</span>
           <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "7px 10px", maxWidth: "85%", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
-            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Hi Ashley! We&apos;d love to help. Are you looking for a full-face consult or a specific area?&rdquo;</p>
+            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Hi Ashley! We&apos;d love to help. Have you had an orthodontic consultation before, or is this your first time?&rdquo;</p>
           </div>
           <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>10:32 AM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
           <div style={{ background: DEEP_NAVY, borderRadius: "12px 4px 12px 12px", padding: "7px 10px", maxWidth: "80%" }}>
-            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;Forehead and crow&apos;s feet. ASAP if possible!&rdquo;</p>
+            <p style={{ fontSize: 9, color: "#fff", lineHeight: 1.45, margin: 0 }}>&ldquo;First time! My teeth are pretty crowded. Would love to get started ASAP.&rdquo;</p>
           </div>
           <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>10:34 AM</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
           <span style={{ fontSize: 7, fontWeight: 700, color: SAPPHIRE, marginBottom: 2 }}>ClozeFlow · 15s</span>
           <div style={{ background: "#fff", borderRadius: "4px 12px 12px 12px", padding: "7px 10px", maxWidth: "85%", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
-            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Perfect — we have a consult slot Thursday at 10 AM. Want me to book it for you?&rdquo;</p>
+            <p style={{ fontSize: 9, color: TEXT, lineHeight: 1.45, margin: 0 }}>&ldquo;Perfect — we have a complimentary Invisalign consult Thursday at 10 AM. Want me to hold that slot for you?&rdquo;</p>
           </div>
           <span style={{ fontSize: 7, color: "#a8a29e", marginTop: 2 }}>10:34 AM</span>
         </div>
@@ -554,8 +554,8 @@ function CalendarScreenContent() {
             <p style={{ fontSize: 10, fontWeight: 800, color: SAPPHIRE, margin: 0 }}>10:00 AM</p>
           </div>
           <p style={{ fontSize: 11, fontWeight: 800, color: TEXT, marginBottom: 1 }}>Ashley M.</p>
-          <p style={{ fontSize: 9, color: MUTED, marginBottom: 1 }}>Botox Consultation</p>
-          <p style={{ fontSize: 9, color: "#a8a29e" }}>Forehead & crow&apos;s feet</p>
+          <p style={{ fontSize: 9, color: MUTED, marginBottom: 1 }}>Invisalign Consultation</p>
+          <p style={{ fontSize: 9, color: "#a8a29e" }}>Crowding · First-time patient</p>
         </div>
         <div style={{ marginTop: 8, background: "rgba(39,174,96,0.08)", border: "1px solid rgba(39,174,96,0.18)", borderRadius: 8, padding: "7px 10px", textAlign: "center" }}>
           <p style={{ fontSize: 9, fontWeight: 700, color: GREEN, margin: 0 }}>Booked automatically · ClozeFlow</p>
@@ -729,12 +729,12 @@ function HowItWorks() {
 }
 
 const LAPTOP_LEADS = [
-  { initials: "AM", name: "Ashley M.",   job: "Botox Consult",       status: "Booked",    statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 94, detail: "May 8 · 10:00 AM"  },
-  { initials: "RK", name: "Ryan K.",     job: "Invisalign Inquiry",  status: "AI Active", statusColor: "#f59e0b", statusBg: "rgba(245,158,11,0.12)", score: 71, detail: "Following up…"     },
-  { initials: "NP", name: "Nina P.",     job: "PT Evaluation",       status: "Qualified", statusColor: "#6366f1", statusBg: "rgba(99,102,241,0.12)", score: 88, detail: "May 9 · 2:30 PM"   },
-  { initials: "DL", name: "David L.",    job: "Chiro Initial Visit",  status: "Booked",   statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 82, detail: "May 8 · 3:00 PM"   },
-  { initials: "SC", name: "Sarah C.",    job: "Med Spa Facial",      status: "New",       statusColor: "#3b82f6", statusBg: "rgba(59,130,246,0.12)", score: 55, detail: "Just arrived"      },
-  { initials: "TH", name: "Tom H.",      job: "Mental Health Intake", status: "Booked",   statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 90, detail: "May 10 · 11:00 AM" },
+  { initials: "AM", name: "Ashley M.",   job: "Invisalign Consult",    status: "Booked",    statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 94, detail: "May 8 · 10:00 AM"  },
+  { initials: "RK", name: "Ryan K.",     job: "Dental Implant Inquiry", status: "AI Active", statusColor: "#f59e0b", statusBg: "rgba(245,158,11,0.12)", score: 71, detail: "Following up…"     },
+  { initials: "NP", name: "Nina P.",     job: "Teeth Whitening",        status: "Qualified", statusColor: "#6366f1", statusBg: "rgba(99,102,241,0.12)", score: 88, detail: "May 9 · 2:30 PM"   },
+  { initials: "DL", name: "David L.",    job: "New Patient Exam",       status: "Booked",    statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 82, detail: "May 8 · 3:00 PM"   },
+  { initials: "SC", name: "Sarah C.",    job: "Veneer Consultation",    status: "New",       statusColor: "#3b82f6", statusBg: "rgba(59,130,246,0.12)", score: 55, detail: "Just arrived"      },
+  { initials: "TH", name: "Tom H.",      job: "Wisdom Tooth Removal",   status: "Booked",    statusColor: "#27AE60", statusBg: "rgba(39,174,96,0.12)",  score: 90, detail: "May 10 · 11:00 AM" },
 ];
 
 function LaptopMockup() {
@@ -762,7 +762,7 @@ function LaptopMockup() {
         <div className="hero-dot-pulse" style={{ width: 8, height: 8, borderRadius: "50%", background: "#3b82f6", flexShrink: 0 }} />
         <div>
           <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: TEXT }}>New inquiry</p>
-          <p style={{ margin: 0, fontSize: 10, color: MUTED }}>Sarah C. · Google · just now</p>
+          <p style={{ margin: 0, fontSize: 10, color: MUTED }}>Sarah C. · Google Ads · just now</p>
         </div>
       </div>
 
@@ -906,7 +906,7 @@ function LaptopMockup() {
               }}>
                 <span style={{ fontSize: 9, flexShrink: 0 }}>⚡</span>
                 <p style={{ margin: 0, fontSize: 7, fontWeight: 600, color: SAPPHIRE, lineHeight: 1.4 }}>
-                  AI replied to 4 new inquiries today · avg 38 seconds
+                  AI replied to 4 new patient inquiries today · avg 38 seconds
                 </p>
                 <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 2 }}>
                   <div className="hero-dot-pulse" style={{ width: 5, height: 5, borderRadius: "50%", background: GREEN }} />
@@ -1074,7 +1074,7 @@ function PhoneMockup() {
           }}>
             <span style={{ fontSize: 10, flexShrink: 0 }}>⚡</span>
             <p style={{ margin: 0, fontSize: 8, fontWeight: 600, color: SAPPHIRE, lineHeight: 1.4 }}>
-              AI replied to 4 new inquiries while you were with patients
+              AI replied to 4 new inquiries while you were chairside
             </p>
           </div>
 
@@ -1145,7 +1145,7 @@ export default function Home() {
               marginBottom: 24,
             }}>
               <span className="hero-badge-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: SAPPHIRE, display: "inline-block" }} />
-              ⚡ 100+ medical practices. Zero missed patients.
+              ⚡ 100+ dental clinics. Zero missed new patients.
             </div>
 
             <h1 style={{
@@ -1162,7 +1162,7 @@ export default function Home() {
               fontSize: 18, color: MUTED, lineHeight: 1.65,
               marginBottom: 36, maxWidth: 460,
             }}>
-              ClozeFlow responds to every inquiry in under 60 seconds, qualifies the patient, and books them straight to your schedule — while you&apos;re with someone in the room.
+              ClozeFlow responds to every new patient inquiry in under 60 seconds, qualifies them, and books them straight onto your schedule — while you&apos;re chairside with another patient.
             </p>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
@@ -1259,10 +1259,10 @@ export default function Home() {
         textAlign: "center",
       }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: MUTED, marginBottom: 16 }}>
-          Trusted by practices found on
+          Trusted by dental clinics getting patients from
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px 32px" }}>
-          {["Google", "Healthgrades", "Zocdoc", "Yelp", "Your Website"].map(name => (
+          {["Google Ads", "Meta Ads", "Zocdoc", "Yelp", "Your Website"].map(name => (
             <span key={name} style={{ fontSize: 14, fontWeight: 700, color: "#a8a29e" }}>{name}</span>
           ))}
         </div>
@@ -1278,10 +1278,10 @@ export default function Home() {
             fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 900, color: TEXT,
             marginBottom: 12, lineHeight: 1.15,
           }}>
-            Built for medical practices that run on appointments
+            Built for dental clinics that invest in marketing
           </h2>
           <p style={{ fontSize: 16, color: MUTED, maxWidth: 480, margin: "0 auto" }}>
-            If patient inquiries are how you grow, ClozeFlow was built for you.
+            If you&apos;re spending on ads to grow your dental practice, ClozeFlow makes sure every dollar converts.
           </p>
         </div>
 
