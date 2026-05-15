@@ -162,8 +162,8 @@ export async function POST(req: NextRequest) {
                 <table style="width:100%;border-collapse:collapse">
                   ${row("Practice",   practice_name?.trim())}
                   ${row("Specialty",  specialty  ? (SPECIALTY_LABELS[specialty]  ?? specialty)  : null)}
-                  ${row("Locations",  locations  ? ({ "1": "1 location", "2-3": "2–3 locations", "4+": "4+ locations" }[locations] ?? locations) : null)}
-                  ${row("Monthly inquiries", monthly_leads ? ({ "<20": "<20/mo", "20-50": "20–50/mo", "50-100": "50–100/mo", "100+": "100+/mo" }[monthly_leads] ?? monthly_leads) : null)}
+                  ${row("Locations",  locations  ? (({ "1": "1 location", "2-3": "2–3 locations", "4+": "4+ locations" } as Record<string, string>)[locations] ?? locations) : null)}
+                  ${row("Monthly inquiries", monthly_leads ? (({ "<20": "<20/mo", "20-50": "20–50/mo", "50-100": "50–100/mo", "100+": "100+/mo" } as Record<string, string>)[monthly_leads] ?? monthly_leads) : null)}
                   ${row("Marketing spend",   ad_spend  ? (AD_SPEND_LABELS[ad_spend]  ?? ad_spend)  : null)}
                   ${row("Avg treatment value", avg_value ? (AVG_VALUE_LABELS[avg_value] ?? avg_value) : null)}
                   ${row("Bottleneck",  bottleneck ? (BOTTLENECK_LABELS[bottleneck] ?? bottleneck) : null)}

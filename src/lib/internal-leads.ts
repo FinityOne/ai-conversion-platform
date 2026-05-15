@@ -240,8 +240,8 @@ export async function getInternalLead(id: string): Promise<InternalLead | null> 
 }
 
 export async function createInternalLead(
-  fields: Omit<InternalLead, "id" | "created_at" | "updated_at" | "tags" | "website" | "linkedin_url">
-    & { tags?: string[]; website?: string | null; linkedin_url?: string | null }
+  fields: Omit<InternalLead, "id" | "created_at" | "updated_at" | "tags" | "website" | "linkedin_url" | "metadata">
+    & { tags?: string[]; website?: string | null; linkedin_url?: string | null; metadata?: InternalLead["metadata"] }
 ): Promise<InternalLead> {
   const sb = createSupabaseServiceClient();
   const { data, error } = await sb
